@@ -1,0 +1,41 @@
+version: ">= 0.14.0"
+
+formatter: markdown table
+
+content: |-
+  # Terraform Network-as-Code Cisco NX-OS Module
+
+  A Terraform module to configure Cisco NX-OS devices.
+
+  ## Usage
+
+  This module supports an inventory driven approach, where a complete NX-OS configuration or parts of it are either modeled in one or more YAML files or natively using Terraform variables.
+
+  ## Examples
+
+  Configuring an NX-OS system configuration using YAML:
+
+  #### `system.nac.yaml`
+
+  ```yaml
+  {{ include "./examples/system/system.nac.yaml" }}
+  ```
+
+  #### `main.tf`
+
+  ```hcl
+  {{ include "./examples/system/main.tf" }}
+  ```
+
+  {{ .Requirements }}
+  {{ .Inputs }}
+  {{ .Outputs }}
+  {{ .Resources }}
+  {{ .Modules }}
+output:
+  file: README.md
+  mode: replace
+
+sort:
+  enabled: true
+  by: required
