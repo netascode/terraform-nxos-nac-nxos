@@ -57,8 +57,8 @@ locals {
           vrf_key     = format("%s/%s", device.name, vrf.vrf)
           address     = rp.address
           group_range = try(rp.group_range, local.defaults.nxos.devices.configuration.routing.pim.vrfs.rps.group_range, "224.0.0.0/4")
-          bidir       = try(rp.group_range, local.defaults.nxos.devices.configuration.routing.pim.vrfs.rps.bidir, false)
-          override    = try(rp.group_range, local.defaults.nxos.devices.configuration.routing.pim.vrfs.rps.override, false)
+          bidir       = try(rp.bidir, local.defaults.nxos.devices.configuration.routing.pim.vrfs.rps.bidir, false)
+          override    = try(rp.override, local.defaults.nxos.devices.configuration.routing.pim.vrfs.rps.override, false)
         }
       ]
     ]
