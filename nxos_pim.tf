@@ -95,7 +95,7 @@ locals {
     for device in local.devices : [
       for vrf in try(local.device_config[device.name].routing.pim.vrfs, []) : [
         for rp in try(vrf.anycast_rps, []) : {
-          key         = format("%s/%s/%s", device.name, vrf.vrf, rp.address)
+          key         = format("%s/%s/%s/%s", device.name, vrf.vrf, rp.address, rp.set_address)
           device      = device.name
           vrf_key     = format("%s/%s", device.name, vrf.vrf)
           address     = rp.address
