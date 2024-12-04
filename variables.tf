@@ -16,6 +16,12 @@ variable "model" {
   default     = {}
 }
 
+variable "save_config" {
+  description = "Write changes to startup-config on all devices."
+  type        = bool
+  default     = false
+}
+
 variable "write_default_values_file" {
   description = "Write all default values to a YAML file. Value is a path pointing to the file to be created."
   type        = string

@@ -53,7 +53,7 @@ provider "nxos" {
 }
 
 resource "nxos_save_config" "save_config" {
-  for_each = { for device in local.devices : device.name => device }
+  for_each = { for device in local.devices : device.name => device if var.save_config }
   device   = each.key
   depends_on = [
     nxos_bgp_route_control.bgp_route_control,
