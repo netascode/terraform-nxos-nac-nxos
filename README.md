@@ -77,7 +77,7 @@ module "nxos" {
 | [nxos_evpn_vni.evpn_vni](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/evpn_vni) | resource |
 | [nxos_evpn_vni_route_target.evpn_vni_route_target](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/evpn_vni_route_target) | resource |
 | [nxos_evpn_vni_route_target_direction.evpn_vni_route_target_direction](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/evpn_vni_route_target_direction) | resource |
-| [nxos_feature_bfd.feature_bfd](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/feature_bfd) | resource |
+| [nxos_feature_bfd.bfd](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/feature_bfd) | resource |
 | [nxos_feature_bgp.bgp](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/feature_bgp) | resource |
 | [nxos_feature_dhcp.dhcp](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/feature_dhcp) | resource |
 | [nxos_feature_evpn.evpn](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/feature_evpn) | resource |
@@ -137,6 +137,7 @@ module "nxos" {
 | [nxos_pim_static_rp_group_list.pim_static_rp_group_list](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/pim_static_rp_group_list) | resource |
 | [nxos_pim_static_rp_policy.pim_static_rp_policy](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/pim_static_rp_policy) | resource |
 | [nxos_pim_vrf.pim_vrf](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/pim_vrf) | resource |
+| [nxos_save_config.save_config](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/save_config) | resource |
 | [nxos_svi_interface.svi_interface](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/svi_interface) | resource |
 | [nxos_svi_interface_vrf.svi_interface_vrf](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/svi_interface_vrf) | resource |
 | [nxos_system.system](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/system) | resource |

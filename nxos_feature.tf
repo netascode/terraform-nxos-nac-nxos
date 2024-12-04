@@ -1,4 +1,4 @@
-resource "nxos_feature_bfd" "feature_bfd" {
+resource "nxos_feature_bfd" "bfd" {
   for_each = { for device in local.devices : device.name => device }
   device   = each.key
   admin_state = try(
