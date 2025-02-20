@@ -187,3 +187,34 @@ resource "nxos_bgp_peer_address_family" "bgpPeerAf" {
   send_community_extended = each.value.send_community_extended
   send_community_standard = each.value.send_community_standard
 }
+
+locals {
+  routing_bgp_vrfs_neighbors_address_families_route_control = flatten([
+    for device in local.devices : [
+      for vrf in try(local.device_config[device.name].routing.bgp.vrfs, []) : [
+        for nei in try(vrf.neighbors, []) : [
+          for af in try(nei.address_families, []) : {
+            key            = format("%s/%s/%s/%s", device.name, vrf.vrf, nei.ip, local.address_family_names_map[af.address_family])
+            device         = device.name
+            vrf            = vrf.vrf
+            neighbor_key   = format("%s/%s/%s", device.name, vrf.vrf, nei.ip)
+            address_family = local.address_family_names_map[af.address_family]
+            route_map_name = try(af.route_map_name, local.defaults.nxos.configuration.routing.bgp.vrfs.neighbors.address_families.route_map_name)
+            direction      = try(af.direction, local.defaults.nxos.configuration.routing.bgp.vrfs.neighbors.address_families.direction, "in")
+          }
+        ]
+      ]
+    ]
+  ])
+}
+
+resource "nxos_bgp_peer_address_family_route_control" "bgp_peer_af_route_control" {
+  for_each       = { for v in local.routing_bgp_vrfs_neighbors_address_families_route_control : v.key => v }
+  device         = each.value.device
+  asn            = nxos_bgp_instance.bgp_instance[each.value.device].asn
+  vrf            = each.value.vrf
+  address        = nxos_bgp_peer.bgp_peer[each.value.neighbor_key].address
+  address_family = each.value.address_family
+  route_map_name = each.value.route_map_name
+  direction      = each.value.direction
+}
