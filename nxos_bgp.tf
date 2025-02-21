@@ -161,11 +161,11 @@ locals {
       for vrf in try(local.device_config[device.name].routing.bgp.vrfs, []) : [
         for nei in try(vrf.neighbors, []) : [
           for af in try(nei.address_families, []) : {
-            key                     = format("%s/%s/%s/%s", device.name, vrf.vrf, nei.ip, af.address_family)
+            key                     = format("%s/%s/%s/%s", device.name, vrf.vrf, nei.ip, local.address_family_names_map[af.address_family])
             device                  = device.name
             vrf                     = vrf.vrf
             neighbor_key            = format("%s/%s/%s", device.name, vrf.vrf, nei.ip)
-            address_family          = af.address_family
+            address_family          = local.address_family_names_map[af.address_family]
             send_community_standard = try(af.send_community_standard, local.defaults.nxos.configuration.routing.bgp.vrfs.neighbors.address_families.send_community_standard, false) ? "enabled" : "disabled"
             send_community_extended = try(af.send_community_extended, local.defaults.nxos.configuration.routing.bgp.vrfs.neighbors.address_families.send_community_extended, false) ? "enabled" : "disabled"
             route_reflector_client  = try(af.route_reflector_client, local.defaults.nxos.configuration.routing.bgp.vrfs.neighbors.address_families.route_reflector_client, false) ? "rr-client" : ""
