@@ -68,6 +68,7 @@ module "nxos" {
 | [nxos_bgp_instance.bgp_instance](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/bgp_instance) | resource |
 | [nxos_bgp_peer.bgp_peer](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/bgp_peer) | resource |
 | [nxos_bgp_peer_address_family.bgpPeerAf](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/bgp_peer_address_family) | resource |
+| [nxos_bgp_peer_address_family_route_control.bgp_peer_address_family_route_control](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/bgp_peer_address_family_route_control) | resource |
 | [nxos_bgp_peer_template.bgp_peer_template](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/bgp_peer_template) | resource |
 | [nxos_bgp_peer_template_address_family.bgp_peer_template_address_family](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/bgp_peer_template_address_family) | resource |
 | [nxos_bgp_route_control.bgp_route_control](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/bgp_route_control) | resource |
