@@ -114,6 +114,8 @@ module "nxos" {
 | [nxos_ipv4_interface_address.loopback_ipv4_secondary_interface_address](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/ipv4_interface_address) | resource |
 | [nxos_ipv4_interface_address.svi_ipv4_interface_address](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/ipv4_interface_address) | resource |
 | [nxos_ipv4_interface_address.svi_ipv4_secondary_interface_address](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/ipv4_interface_address) | resource |
+| [nxos_ipv4_prefix_list_rule.ipv4_prefix_list_rule](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/ipv4_prefix_list_rule) | resource |
+| [nxos_ipv4_prefix_list_rule_entry.ipv4_prefix_list_rule_entry](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/ipv4_prefix_list_rule_entry) | resource |
 | [nxos_ipv4_vrf.ipv4_vrf](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/ipv4_vrf) | resource |
 | [nxos_ipv4_vrf.ipv4_vrf_default](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/ipv4_vrf) | resource |
 | [nxos_loopback_interface.loopback_interface](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/loopback_interface) | resource |
