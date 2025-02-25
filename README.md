@@ -141,6 +141,10 @@ module "nxos" {
 | [nxos_pim_static_rp_group_list.pim_static_rp_group_list](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/pim_static_rp_group_list) | resource |
 | [nxos_pim_static_rp_policy.pim_static_rp_policy](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/pim_static_rp_policy) | resource |
 | [nxos_pim_vrf.pim_vrf](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/pim_vrf) | resource |
+| [nxos_route_map_rule.route_map_rule](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/route_map_rule) | resource |
+| [nxos_route_map_rule_entry.route_map_rule_entry](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/route_map_rule_entry) | resource |
+| [nxos_route_map_rule_entry_match_route.route_map_rule_entry_match_route](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/route_map_rule_entry_match_route) | resource |
+| [nxos_route_map_rule_entry_match_route_prefix_list.route_map_rule_entry_match_route_prefix_list](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/route_map_rule_entry_match_route_prefix_list) | resource |
 | [nxos_save_config.save_config](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/save_config) | resource |
 | [nxos_svi_interface.svi_interface](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/svi_interface) | resource |
 | [nxos_svi_interface_vrf.svi_interface_vrf](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/svi_interface_vrf) | resource |
