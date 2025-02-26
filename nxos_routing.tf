@@ -148,3 +148,67 @@ resource "nxos_route_map_rule_entry_match_route_prefix_list" "route_map_rule_ent
   prefix_list_dn = each.value.prefix_list_dn
   depends_on     = [nxos_route_map_rule_entry_match_route.route_map_rule_entry_match_route]
 }
+
+locals {
+  routing_route_map_rule_entry_set_regular_community = flatten([
+    for device in local.devices : [
+      for route_map in try(local.device_config[device.name].routing.route_maps, []) : [
+        for entry in try(route_map.entries, []) : [
+          for option in ["additive", "no_community", "set_criteria"] : (
+            try(entry[option], null) != null ? [
+              {
+                key          = format("%s/%s/%s/%s", device.name, route_map.name, entry.order, option),
+                device       = device.name,
+                rule_name    = route_map.name,
+                order        = entry.order,
+                additive     = try(entry.additive, "disabled"),
+                no_community = try(entry.no_community, "disabled"),
+                set_criteria = try(entry.set_criteria, "none")
+              }
+            ] : []
+          )
+        ]
+      ]
+    ]
+  ])
+}
+
+resource "nxos_route_map_rule_entry_set_regular_community" "route_map_rule_entry_set_regular_community" {
+  for_each     = { for v in local.routing_route_map_rule_entry_set_regular_community : v.key => v }
+  device       = each.value.device
+  rule_name    = each.value.rule_name
+  order        = each.value.order
+  additive     = each.value.additive
+  no_community = each.value.no_community
+  set_criteria = each.value.set_criteria
+  depends_on   = [nxos_route_map_rule_entry.route_map_rule_entry]
+}
+
+locals {
+  routing_route_map_rule_entry_set_regular_community_item = flatten([
+    for device in local.devices : [
+      for route_map in try(local.device_config[device.name].routing.route_maps, []) : [
+        for entry in try(route_map.entries, []) : (
+          try(entry.community, null) != null ? [
+            {
+              key       = format("%s/%s/%s", device.name, route_map.name, entry.order),
+              device    = device.name,
+              rule_name = route_map.name,
+              order     = entry.order,
+              community = entry.community
+            }
+          ] : []
+        )
+      ]
+    ]
+  ])
+}
+
+resource "nxos_route_map_rule_entry_set_regular_community_item" "route_map_rule_entry_set_regular_community_item" {
+  for_each   = { for v in local.routing_route_map_rule_entry_set_regular_community_item : v.key => v }
+  device     = each.value.device
+  rule_name  = each.value.rule_name
+  order      = each.value.order
+  community  = each.value.community
+  depends_on = [nxos_route_map_rule_entry_set_regular_community.route_map_rule_entry_set_regular_community]
+}
