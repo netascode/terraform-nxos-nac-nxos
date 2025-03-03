@@ -26,10 +26,10 @@ locals {
           rule_name  = ipv4_prefix_list.name,
           order      = entry.order,
           action     = try(entry.action, local.defaults.nxos.configuration.routing.ipv4_prefix_lists.entries.action, "permit"),
-          prefix     = try(entry.prefix, null),
-          criteria   = try(entry.criteria, "exact"),
-          from_range = try(entry.from_range, 0),
-          to_range   = try(entry.to_range, 0)
+          prefix     = try(entry.prefix, local.defaults.nxos.configuration.routing.ipv4_prefix_lists.entries.prefix, null),
+          criteria   = try(entry.criteria, local.defaults.nxos.configuration.routing.ipv4_prefix_lists.entries.criteria, "exact"),
+          from_range = try(entry.from_range, local.defaults.nxos.configuration.routing.ipv4_prefix_lists.entries.from_range, 0),
+          to_range   = try(entry.to_range, local.defaults.nxos.configuration.routing.ipv4_prefix_lists.entries.to_range, 0)
         }
       ]
     ]
@@ -161,9 +161,9 @@ locals {
                 device       = device.name,
                 rule_name    = route_map.name,
                 order        = entry.order,
-                additive     = try(entry.additive, "disabled"),
-                no_community = try(entry.no_community, "disabled"),
-                set_criteria = try(entry.set_criteria, "none")
+                additive     = try(entry.additive, local.defaults.nxos.configuration.routing.route_maps.entries.additive, false) ? "enabled" : "disabled",
+                no_community = try(entry.no_community, local.defaults.nxos.configuration.routing.route_maps.entries.no_community, false) ? "enabled" : "disabled",
+                set_criteria = try(entry.set_criteria, local.defaults.nxos.configuration.routing.route_maps.entries.set_criteria, "none")
               }
             ] : []
           )
@@ -195,7 +195,7 @@ locals {
               device    = device.name,
               rule_name = route_map.name,
               order     = entry.order,
-              community = entry.community
+              community = try(entry.community, local.defaults.nxos.configuration.routing.route_maps.entries.community)
             }
           ] : []
         )
