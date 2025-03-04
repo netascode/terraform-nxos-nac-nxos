@@ -257,7 +257,7 @@ locals {
           key           = format("%s/%s/%s", device.name, int.id, ip)
           device        = device.name
           interface_key = format("%s/%s", device.name, int.id)
-	  vrf           = "default"
+	  vrf           = try(int.vrf, local.interfaces_loopbacks_group_config[format("%s/%s", device.name, int.id)].vrf, local.defaults.nxos.devices.configuration.interfaces.loopbacks.vrf, "default")
           ip            = ip
         }
       ]
