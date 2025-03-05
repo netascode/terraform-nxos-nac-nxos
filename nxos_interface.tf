@@ -17,7 +17,7 @@ locals {
         device                                  = device.name
         id                                      = int.id
         type                                    = "eth"
-        access_vlan                             = try(int.access_vlan, local.interfaces_ethernets_group_config[format("%s/%s", device.name, int.id)].access_vlan, local.defaults.nxos.devices.configuration.interfaces.ethernets.access_vlan, null)
+        access_vlan                             = try(int.access_vlan, local.interfaces_ethernets_group_config[format("%s/%s", device.name, int.id)].access_vlan, local.defaults.nxos.devices.configuration.interfaces.ethernets.access_vlan, 1)
         admin_state                             = try(int.admin_state, local.interfaces_ethernets_group_config[format("%s/%s", device.name, int.id)].admin_state, local.defaults.nxos.devices.configuration.interfaces.ethernets.admin_state, false)
         auto_negotiation                        = try(int.auto_negotiation, local.interfaces_ethernets_group_config[format("%s/%s", device.name, int.id)].auto_negotiation, local.defaults.nxos.devices.configuration.interfaces.ethernets.auto_negotiation, null)
         bandwidth                               = try(int.bandwidth, local.interfaces_ethernets_group_config[format("%s/%s", device.name, int.id)].bandwidth, local.defaults.nxos.devices.configuration.interfaces.ethernets.bandwidth, null)
@@ -32,7 +32,7 @@ locals {
         medium                                  = try(int.medium, local.interfaces_ethernets_group_config[format("%s/%s", device.name, int.id)].medium, local.defaults.nxos.devices.configuration.interfaces.ethernets.medium, null)
         mode                                    = try(int.mode, local.interfaces_ethernets_group_config[format("%s/%s", device.name, int.id)].mode, local.defaults.nxos.devices.configuration.interfaces.ethernets.mode, null)
         mtu                                     = try(int.mtu, local.interfaces_ethernets_group_config[format("%s/%s", device.name, int.id)].mtu, local.defaults.nxos.devices.configuration.interfaces.ethernets.mtu, null)
-        native_vlan                             = try(int.native_vlan, local.interfaces_ethernets_group_config[format("%s/%s", device.name, int.id)].native_vlan, local.defaults.nxos.devices.configuration.interfaces.ethernets.native_vlan, null)
+        native_vlan                             = try(int.native_vlan, local.interfaces_ethernets_group_config[format("%s/%s", device.name, int.id)].native_vlan, local.defaults.nxos.devices.configuration.interfaces.ethernets.native_vlan, 1)
         speed                                   = try(int.speed, local.interfaces_ethernets_group_config[format("%s/%s", device.name, int.id)].speed, local.defaults.nxos.devices.configuration.interfaces.ethernets.speed, null)
         speed_group                             = try(int.speed_group, local.interfaces_ethernets_group_config[format("%s/%s", device.name, int.id)].speed_group, local.defaults.nxos.devices.configuration.interfaces.ethernets.speed_group, null)
         trunk_vlans                             = try(int.trunk_vlans, local.interfaces_ethernets_group_config[format("%s/%s", device.name, int.id)].trunk_vlans, local.defaults.nxos.devices.configuration.interfaces.ethernets.trunk_vlans, null)
@@ -63,6 +63,7 @@ locals {
         pim_dr_priority                         = try(int.pim.dr_priority, local.interfaces_ethernets_group_config[format("%s/%s", device.name, int.id)].pim.dr_priority, local.defaults.nxos.devices.configuration.interfaces.ethernets.pim.dr_priority, null)
         pim_passive                             = try(int.pim.passive, local.interfaces_ethernets_group_config[format("%s/%s", device.name, int.id)].pim.passive, local.defaults.nxos.devices.configuration.interfaces.ethernets.pim.passive, null)
         pim_sparse_mode                         = try(int.pim.sparse_mode, local.interfaces_ethernets_group_config[format("%s/%s", device.name, int.id)].pim.sparse_mode, local.defaults.nxos.devices.configuration.interfaces.ethernets.pim.sparse_mode, null)
+        channel_group                           = try(int.channel_group, local.interfaces_ethernets_group_config[format("%s/%s", device.name, int.id)].channel_group, local.defaults.nxos.devices.configuration.interfaces.ethernets.channel_group, null)
       }
     ]
   ])
@@ -122,6 +123,86 @@ resource "nxos_ipv4_interface_address" "ethernet_ipv4_interface_address" {
 }
 
 locals {
+  interfaces_port_channels_group = flatten([
+    for device in local.devices : [
+      for int in try(local.device_config[device.name].interfaces.port_channels, []) : {
+        key           = format("%s/%s", device.name, int.id)
+        configuration = yamldecode(provider::utils::yaml_merge([for g in try(int.interface_groups, []) : try([for ig in local.interface_groups : yamlencode(ig.configuration) if ig.name == g][0], "")]))
+      }
+    ]
+  ])
+  interfaces_port_channels_group_config = {
+    for int in local.interfaces_port_channels_group : int.key => int.configuration
+  }
+  interfaces_port_channels= flatten([
+    for device in local.devices : [
+      for int in try(local.device_config[device.name].interfaces.port_channels, []) : {
+        key                                     = format("%s/%s", device.name, int.id)
+        device                                  = device.name
+        id                                      = int.id
+        type                                    = "po"
+        port_channel_mode                       = try(int.port_channel_mode, local.interfaces_port_channels_group_config[format("%s/%s", device.name, int.id)].port_channel_mode, local.defaults.nxos.devices.configuration.interfaces.port_channels.port_channel_mode, "on")
+        minimum_links                           = try(int.minimum_links, local.interfaces_port_channels_group_config[format("%s/%s", device.name, int.id)].minimum_links, local.defaults.nxos.devices.configuration.interfaces.port_channels.minimum_links, 1)
+        maximum_links                           = try(int.maximum_links, local.interfaces_port_channels_group_config[format("%s/%s", device.name, int.id)].maximum_links, local.defaults.nxos.devices.configuration.interfaces.port_channels.maximum_links, 32)
+        suspend_individual                      = try(int.suspend_individual, local.interfaces_port_channels_group_config[format("%s/%s", device.name, int.id)].suspend_individual, local.defaults.nxos.devices.configuration.interfaces.port_channels.suspend_individual, "enable")
+        access_vlan                             = try(int.access_vlan, local.interfaces_port_channels_group_config[format("%s/%s", device.name, int.id)].access_vlan, local.defaults.nxos.devices.configuration.interfaces.port_channels.access_vlan, 1)
+        admin_state                             = try(int.admin_state, local.interfaces_port_channels_group_config[format("%s/%s", device.name, int.id)].admin_state, local.defaults.nxos.devices.configuration.interfaces.port_channels.admin_state, false)
+        auto_negotiation                        = try(int.auto_negotiation, local.interfaces_port_channels_group_config[format("%s/%s", device.name, int.id)].auto_negotiation, local.defaults.nxos.devices.configuration.interfaces.port_channels.auto_negotiation, null)
+        bandwidth                               = try(int.bandwidth, local.interfaces_port_channels_group_config[format("%s/%s", device.name, int.id)].bandwidth, local.defaults.nxos.devices.configuration.interfaces.port_channels.bandwidth, null)
+        delay                                   = try(int.delay, local.interfaces_port_channels_group_config[format("%s/%s", device.name, int.id)].delay, local.defaults.nxos.devices.configuration.interfaces.port_channels.delay, null)
+        description                             = try(int.description, local.interfaces_port_channels_group_config[format("%s/%s", device.name, int.id)].description, local.defaults.nxos.devices.configuration.interfaces.port_channels.description, null)
+        duplex                                  = try(int.duplex, local.interfaces_port_channels_group_config[format("%s/%s", device.name, int.id)].duplex, local.defaults.nxos.devices.configuration.interfaces.port_channels.duplex, null)
+        layer3                                  = try(int.layer3, local.interfaces_port_channels_group_config[format("%s/%s", device.name, int.id)].layer3, local.defaults.nxos.devices.configuration.interfaces.port_channels.layer3, false)
+        link_logging                            = try(int.link_logging, local.interfaces_port_channels_group_config[format("%s/%s", device.name, int.id)].link_logging, local.defaults.nxos.devices.configuration.interfaces.port_channels.link_logging, null)
+        medium                                  = try(int.medium, local.interfaces_port_channels_group_config[format("%s/%s", device.name, int.id)].medium, local.defaults.nxos.devices.configuration.interfaces.port_channels.medium, null)
+        mode                                    = try(int.mode, local.interfaces_port_channels_group_config[format("%s/%s", device.name, int.id)].mode, local.defaults.nxos.devices.configuration.interfaces.port_channels.mode, null)
+        mtu                                     = try(int.mtu, local.interfaces_port_channels_group_config[format("%s/%s", device.name, int.id)].mtu, local.defaults.nxos.devices.configuration.interfaces.port_channels.mtu, null)
+        native_vlan                             = try(int.native_vlan, local.interfaces_port_channels_group_config[format("%s/%s", device.name, int.id)].native_vlan, local.defaults.nxos.devices.configuration.interfaces.port_channels.native_vlan, 1)
+        speed                                   = try(int.speed, local.interfaces_port_channels_group_config[format("%s/%s", device.name, int.id)].speed, local.defaults.nxos.devices.configuration.interfaces.port_channels.speed, null)
+        speed_group                             = try(int.speed_group, local.interfaces_port_channels_group_config[format("%s/%s", device.name, int.id)].speed_group, local.defaults.nxos.devices.configuration.interfaces.port_channels.speed_group, null)
+        trunk_vlans                             = try(int.trunk_vlans, local.interfaces_port_channels_group_config[format("%s/%s", device.name, int.id)].trunk_vlans, local.defaults.nxos.devices.configuration.interfaces.port_channels.trunk_vlans, null)
+        vrf                                     = try(int.vrf, local.interfaces_port_channels_group_config[format("%s/%s", device.name, int.id)].vrf, local.defaults.nxos.devices.configuration.interfaces.port_channels.vrf, "default")
+      }
+    ]
+  ])
+}
+
+resource "nxos_port_channel_interface" "port_channel_interface" {
+  for_each                 = { for v in local.interfaces_port_channels : v.key => v }
+  device                   = each.value.device
+  interface_id             = "po${each.value.id}"
+  port_channel_mode        = each.value.port_channel_mode
+  minimum_links            = each.value.minimum_links
+  maximum_links            = each.value.maximum_links
+  suspend_individual       = each.value.suspend_individual
+  access_vlan              = each.value.layer3 ? "unknown" : "vlan-${each.value.access_vlan}"
+  admin_state              = each.value.admin_state ? "up" : "down"
+  auto_negotiation         = each.value.auto_negotiation
+  bandwidth                = each.value.bandwidth
+  delay                    = each.value.delay
+  description              = each.value.description
+  duplex                   = each.value.duplex
+  layer                    = each.value.layer3 ? "Layer3" : "Layer2"
+  link_logging             = each.value.link_logging
+  medium                   = each.value.medium
+  mode                     = each.value.mode
+  mtu                      = each.value.mtu
+  native_vlan              = each.value.layer3 ? "unknown" : "vlan-${each.value.native_vlan}"
+  speed                    = each.value.speed
+  trunk_vlans              = each.value.layer3 ? "1-4094" : each.value.trunk_vlans
+  user_configured_flags    = "admin_layer,admin_mtu,admin_state"
+}
+
+resource "nxos_port_channel_interface_member" "port_channel_interface_member" {
+  for_each     = { for v in local.interfaces_ethernets : v.key => v if v.channel_group != null }
+  device       = each.value.device
+  interface_id = "po${each.value.channel_group}"
+  interface_dn = "sys/intf/phys-[${nxos_physical_interface.physical_interface[each.key].interface_id}]"
+  force        = false
+  depends_on = [nxos_port_channel_interface.port_channel_interface]
+}
+
+locals {
   interfaces_loopbacks_group = flatten([
     for device in local.devices : [
       for int in try(local.device_config[device.name].interfaces.loopbacks, []) : {
@@ -176,6 +257,7 @@ locals {
           key           = format("%s/%s/%s", device.name, int.id, ip)
           device        = device.name
           interface_key = format("%s/%s", device.name, int.id)
+	  vrf           = try(int.vrf, local.interfaces_loopbacks_group_config[format("%s/%s", device.name, int.id)].vrf, local.defaults.nxos.devices.configuration.interfaces.loopbacks.vrf, "default")
           ip            = ip
         }
       ]
