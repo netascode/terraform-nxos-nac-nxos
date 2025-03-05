@@ -1,6 +1,7 @@
 defaults:
   nxos:
     devices:
+      managed: true
       configuration:
         interfaces:
           loopbacks:
@@ -15,6 +16,10 @@ defaults:
             admin_state: true
             ospf:
               advertise_secondaries: true
+          port_channels:
+            admin_state: true
+            ospf:
+              advertise_secondaries: true
         routing:
           pim:
             vrfs:
@@ -22,3 +27,14 @@ defaults:
           ospf_processes:
             vrfs:
               admin_state: true
+          ipv4_prefix_lists:
+            entries:
+              action: permit
+              criteria: exact
+              from_range: 0
+              to_range: 0
+          route_maps:
+            entries:
+              additive: false
+              no_community: false
+              set_criteria: none
