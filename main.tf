@@ -46,10 +46,16 @@ locals {
   device_config = { for device, config in local.raw_device_config :
     device => yamldecode(templatestring(config, local.device_variables[device]))
   }
+
+  provider_devices = [for device in local.devices : {
+    name    = device.name
+    url     = device.url
+    managed = try(device.managed, local.defaults.nxos.devices.managed, true)
+  }]
 }
 
 provider "nxos" {
-  devices = local.devices
+  devices = local.provider_devices
 }
 
 resource "nxos_save_config" "save_config" {
