@@ -1,5 +1,5 @@
 resource "nxos_bgp" "bgp" {
-  for_each    = { for device in local.devices : device.name => device if try(contains(local.device_config[device.name].system.features, "bgp"), contains(local.defaults.nxos.configuration.system.features, "bgp"), false) }
+  for_each    = { for device in local.devices : device.name => device if try(local.device_config[device.name].system.feature.bgp, local.defaults.nxos.devices.configuration.system.feature.bgp, false) }
   device      = each.key
   admin_state = "enabled"
 
