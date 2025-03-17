@@ -1,135 +1,79 @@
 resource "nxos_feature_bfd" "bfd" {
-  for_each = { for device in local.devices : device.name => device }
-  device   = each.key
-  admin_state = try(
-    contains(local.device_config[each.key].system.features, "bfd"),
-    contains(local.defaults.nxos.devices.configuration.system.features, "bfd"),
-    false
-  ) ? "enabled" : "disabled"
+  for_each    = { for device in local.devices : device.name => device if try(local.device_config[each.key].system.feature.bfd, local.defaults.nxos.devices.configuration.system.feature.bfd, null) != null }
+  device      = each.key
+  admin_state = try(local.device_config[each.key].system.feature.bfd, local.defaults.nxos.devices.configuration.system.feature.bfd) ? "enabled" : "disabled"
 }
 
 resource "nxos_feature_bgp" "bgp" {
-  for_each = { for device in local.devices : device.name => device }
-  device   = each.key
-  admin_state = try(
-    contains(local.device_config[each.key].system.features, "bgp"),
-    contains(local.defaults.nxos.devices.configuration.system.features, "bgp"),
-    false
-  ) ? "enabled" : "disabled"
+  for_each    = { for device in local.devices : device.name => device if try(local.device_config[each.key].system.feature.bgp, local.defaults.nxos.devices.configuration.system.feature.bgp, null) != null }
+  device      = each.key
+  admin_state = try(local.device_config[each.key].system.feature.bgp, local.defaults.nxos.devices.configuration.system.feature.bgp) ? "enabled" : "disabled"
 }
 
 resource "nxos_feature_dhcp" "dhcp" {
-  for_each = { for device in local.devices : device.name => device }
-  device   = each.key
-  admin_state = try(
-    contains(local.device_config[each.key].system.features, "dhcp"),
-    contains(local.defaults.nxos.devices.configuration.system.features, "dhcp"),
-    false
-  ) ? "enabled" : "disabled"
+  for_each    = { for device in local.devices : device.name => device if try(local.device_config[each.key].system.feature.dhcp, local.defaults.nxos.devices.configuration.system.feature.dhcp, null) != null }
+  device      = each.key
+  admin_state = try(local.device_config[each.key].system.feature.dhcp, local.defaults.nxos.devices.configuration.system.feature.dhcp) ? "enabled" : "disabled"
 }
 
 resource "nxos_feature_evpn" "evpn" {
-  for_each = { for device in local.devices : device.name => device }
-  device   = each.key
-  admin_state = try(
-    contains(local.device_config[each.key].system.features, "evpn"),
-    contains(local.defaults.nxos.devices.configuration.system.features, "evpn"),
-    false
-  ) ? "enabled" : "disabled"
+  for_each    = { for device in local.devices : device.name => device if try(local.device_config[each.key].system.feature.evpn, local.defaults.nxos.devices.configuration.system.feature.evpn, null) != null }
+  device      = each.key
+  admin_state = try(local.device_config[each.key].system.feature.evpn, local.defaults.nxos.devices.configuration.system.feature.evpn) ? "enabled" : "disabled"
 }
 
 resource "nxos_feature_hmm" "fabric_forwarding" {
-  for_each = { for device in local.devices : device.name => device }
-  device   = each.key
-  admin_state = try(
-    contains(local.device_config[each.key].system.features, "fabric_forwarding"),
-    contains(local.defaults.nxos.devices.configuration.system.features, "fabric_forwarding"),
-    false
-  ) ? "enabled" : "disabled"
+  for_each    = { for device in local.devices : device.name => device if try(local.device_config[each.key].system.feature.fabric_forwarding, local.defaults.nxos.devices.configuration.system.feature.fabric_forwarding, null) != null }
+  device      = each.key
+  admin_state = try(local.device_config[each.key].system.feature.fabric_forwarding, local.defaults.nxos.devices.configuration.system.feature.fabric_forwarding) ? "enabled" : "disabled"
 }
 
 resource "nxos_feature_hsrp" "hsrp" {
-  for_each = { for device in local.devices : device.name => device }
-  device   = each.key
-  admin_state = try(
-    contains(local.device_config[each.key].system.features, "hsrp"),
-    contains(local.defaults.nxos.devices.configuration.system.features, "hsrp"),
-    false
-  ) ? "enabled" : "disabled"
+  for_each    = { for device in local.devices : device.name => device if try(local.device_config[each.key].system.feature.hsrp, local.defaults.nxos.devices.configuration.system.feature.hsrp, null) != null }
+  device      = each.key
+  admin_state = try(local.device_config[each.key].system.feature.hsrp, local.defaults.nxos.devices.configuration.system.feature.hsrp) ? "enabled" : "disabled"
 }
 
 resource "nxos_feature_interface_vlan" "interface_vlan" {
-  for_each = { for device in local.devices : device.name => device }
-  device   = each.key
-  admin_state = try(
-    contains(local.device_config[each.key].system.features, "interface_vlan"),
-    contains(local.defaults.nxos.devices.configuration.system.features, "interface_vlan"),
-    false
-  ) ? "enabled" : "disabled"
+  for_each    = { for device in local.devices : device.name => device if try(local.device_config[each.key].system.feature.interface_vlan, local.defaults.nxos.devices.configuration.system.feature.interface_vlan, null) != null }
+  device      = each.key
+  admin_state = try(local.device_config[each.key].system.feature.interface_vlan, local.defaults.nxos.devices.configuration.system.feature.interface_vlan) ? "enabled" : "disabled"
 }
 
 resource "nxos_feature_isis" "isis" {
-  for_each = { for device in local.devices : device.name => device }
-  device   = each.key
-  admin_state = try(
-    contains(local.device_config[each.key].system.features, "isis"),
-    contains(local.defaults.nxos.devices.configuration.system.features, "isis"),
-    false
-  ) ? "enabled" : "disabled"
+  for_each    = { for device in local.devices : device.name => device if try(local.device_config[each.key].system.feature.isis, local.defaults.nxos.devices.configuration.system.feature.isis, null) != null }
+  device      = each.key
+  admin_state = try(local.device_config[each.key].system.feature.isis, local.defaults.nxos.devices.configuration.system.feature.isis) ? "enabled" : "disabled"
 }
 
 resource "nxos_feature_lacp" "lacp" {
-  for_each = { for device in local.devices : device.name => device }
-  device   = each.key
-  admin_state = try(
-    contains(local.device_config[each.key].system.features, "lacp"),
-    contains(local.defaults.nxos.devices.configuration.system.features, "lacp"),
-    false
-  ) ? "enabled" : "disabled"
+  for_each    = { for device in local.devices : device.name => device if try(local.device_config[each.key].system.feature.lacp, local.defaults.nxos.devices.configuration.system.feature.lacp, null) != null }
+  device      = each.key
+  admin_state = try(local.device_config[each.key].system.feature.lacp, local.defaults.nxos.devices.configuration.system.feature.lacp) ? "enabled" : "disabled"
 }
 
 resource "nxos_feature_lldp" "lldp" {
-  for_each = { for device in local.devices : device.name => device }
-  device   = each.key
-  admin_state = try(
-    contains(local.device_config[each.key].system.features, "lldp"),
-    contains(local.defaults.nxos.devices.configuration.system.features, "lldp"),
-    false
-  ) ? "enabled" : "disabled"
+  for_each    = { for device in local.devices : device.name => device if try(local.device_config[each.key].system.feature.lldp, local.defaults.nxos.devices.configuration.system.feature.lldp, null) != null }
+  device      = each.key
+  admin_state = try(local.device_config[each.key].system.feature.lldp, local.defaults.nxos.devices.configuration.system.feature.lldp) ? "enabled" : "disabled"
 }
 
 resource "nxos_feature_macsec" "macsec" {
-  for_each = { for device in local.devices : device.name => device }
-  device   = each.key
-  admin_state = try(
-    contains(local.device_config[each.key].system.features, "macsec"),
-    contains(local.defaults.nxos.devices.configuration.system.features, "macsec"),
-    false
-  ) ? "enabled" : "disabled"
+  for_each    = { for device in local.devices : device.name => device if try(local.device_config[each.key].system.feature.macsec, local.defaults.nxos.devices.configuration.system.feature.macsec, null) != null }
+  device      = each.key
+  admin_state = try(local.device_config[each.key].system.feature.macsec, local.defaults.nxos.devices.configuration.system.feature.macsec) ? "enabled" : "disabled"
 }
 
 resource "nxos_feature_netflow" "netflow" {
-  for_each = { for device in local.devices : device.name => device if try(
-    contains(local.device_config[device.name].system.features, "netflow"),
-    contains(local.defaults.nxos.devices.configuration.system.features, "netflow"),
-    false
-  ) }
-  device = each.key
-  admin_state = try(
-    contains(local.device_config[each.key].system.features, "netflow"),
-    contains(local.defaults.nxos.devices.configuration.system.features, "netflow"),
-    false
-  ) ? "enabled" : "disabled"
+  for_each    = { for device in local.devices : device.name => device if try(local.device_config[each.key].system.feature.netflow, local.defaults.nxos.devices.configuration.system.feature.netflow, null) != null }
+  device      = each.key
+  admin_state = try(local.device_config[each.key].system.feature.netflow, local.defaults.nxos.devices.configuration.system.feature.netflow) ? "enabled" : "disabled"
 }
 
 resource "nxos_feature_nv_overlay" "nv_overlay" {
-  for_each = { for device in local.devices : device.name => device }
-  device   = each.key
-  admin_state = try(
-    contains(local.device_config[each.key].system.features, "nv_overlay"),
-    contains(local.defaults.nxos.devices.configuration.system.features, "nv_overlay"),
-    false
-  ) ? "enabled" : "disabled"
+  for_each    = { for device in local.devices : device.name => device if try(local.device_config[each.key].system.feature.nv_overlay, local.defaults.nxos.devices.configuration.system.feature.nv_overlay, null) != null }
+  device      = each.key
+  admin_state = try(local.device_config[each.key].system.feature.nv_overlay, local.defaults.nxos.devices.configuration.system.feature.nv_overlay) ? "enabled" : "disabled"
 
   depends_on = [
     nxos_feature_vn_segment.vn_segment
@@ -137,111 +81,67 @@ resource "nxos_feature_nv_overlay" "nv_overlay" {
 }
 
 resource "nxos_feature_ospf" "ospf" {
-  for_each = { for device in local.devices : device.name => device }
-  device   = each.key
-  admin_state = try(
-    contains(local.device_config[each.key].system.features, "ospf"),
-    contains(local.defaults.nxos.devices.configuration.system.features, "ospf"),
-    false
-  ) ? "enabled" : "disabled"
+  for_each    = { for device in local.devices : device.name => device if try(local.device_config[each.key].system.feature.ospf, local.defaults.nxos.devices.configuration.system.feature.ospf, null) != null }
+  device      = each.key
+  admin_state = try(local.device_config[each.key].system.feature.ospf, local.defaults.nxos.devices.configuration.system.feature.ospf) ? "enabled" : "disabled"
 }
 
 resource "nxos_feature_ospfv3" "ospfv3" {
-  for_each = { for device in local.devices : device.name => device }
-  device   = each.key
-  admin_state = try(
-    contains(local.device_config[each.key].system.features, "ospfv3"),
-    contains(local.defaults.nxos.devices.configuration.system.features, "ospfv3"),
-    false
-  ) ? "enabled" : "disabled"
+  for_each    = { for device in local.devices : device.name => device if try(local.device_config[each.key].system.feature.ospfv3, local.defaults.nxos.devices.configuration.system.feature.ospfv3, null) != null }
+  device      = each.key
+  admin_state = try(local.device_config[each.key].system.feature.ospfv3, local.defaults.nxos.devices.configuration.system.feature.ospfv3) ? "enabled" : "disabled"
 }
 
 resource "nxos_feature_pim" "pim" {
-  for_each = { for device in local.devices : device.name => device }
-  device   = each.key
-  admin_state = try(
-    contains(local.device_config[each.key].system.features, "pim"),
-    contains(local.defaults.nxos.devices.configuration.system.features, "pim"),
-    false
-  ) ? "enabled" : "disabled"
+  for_each    = { for device in local.devices : device.name => device if try(local.device_config[each.key].system.feature.pim, local.defaults.nxos.devices.configuration.system.feature.pim, null) != null }
+  device      = each.key
+  admin_state = try(local.device_config[each.key].system.feature.pim, local.defaults.nxos.devices.configuration.system.feature.pim) ? "enabled" : "disabled"
 }
 
 resource "nxos_feature_ptp" "ptp" {
-  for_each = { for device in local.devices : device.name => device }
-  device   = each.key
-  admin_state = try(
-    contains(local.device_config[each.key].system.features, "ptp"),
-    contains(local.defaults.nxos.devices.configuration.system.features, "ptp"),
-    false
-  ) ? "enabled" : "disabled"
+  for_each    = { for device in local.devices : device.name => device if try(local.device_config[each.key].system.feature.ptp, local.defaults.nxos.devices.configuration.system.feature.ptp, null) != null }
+  device      = each.key
+  admin_state = try(local.device_config[each.key].system.feature.ptp, local.defaults.nxos.devices.configuration.system.feature.ptp) ? "enabled" : "disabled"
 }
 
 resource "nxos_feature_pvlan" "pvlan" {
-  for_each = { for device in local.devices : device.name => device }
-  device   = each.key
-  admin_state = try(
-    contains(local.device_config[each.key].system.features, "pvlan"),
-    contains(local.defaults.nxos.devices.configuration.system.features, "pvlan"),
-    false
-  ) ? "enabled" : "disabled"
+  for_each    = { for device in local.devices : device.name => device if try(local.device_config[each.key].system.feature.pvlan, local.defaults.nxos.devices.configuration.system.feature.pvlan, null) != null }
+  device      = each.key
+  admin_state = try(local.device_config[each.key].system.feature.pvlan, local.defaults.nxos.devices.configuration.system.feature.pvlan) ? "enabled" : "disabled"
 }
 
 resource "nxos_feature_ssh" "ssh" {
-  for_each = { for device in local.devices : device.name => device }
-  device   = each.key
-  admin_state = try(
-    contains(local.device_config[each.key].system.features, "ssh"),
-    contains(local.defaults.nxos.devices.configuration.system.features, "ssh"),
-    false
-  ) ? "enabled" : "disabled"
+  for_each    = { for device in local.devices : device.name => device if try(local.device_config[each.key].system.feature.ssh, local.defaults.nxos.devices.configuration.system.feature.ssh, null) != null }
+  device      = each.key
+  admin_state = try(local.device_config[each.key].system.feature.ssh, local.defaults.nxos.devices.configuration.system.feature.ssh) ? "enabled" : "disabled"
 }
 
 resource "nxos_feature_tacacs" "tacacs" {
-  for_each = { for device in local.devices : device.name => device }
-  device   = each.key
-  admin_state = try(
-    contains(local.device_config[each.key].system.features, "tacacs"),
-    contains(local.defaults.nxos.devices.configuration.system.features, "tacacs"),
-    false
-  ) ? "enabled" : "disabled"
+  for_each    = { for device in local.devices : device.name => device if try(local.device_config[each.key].system.feature.tacacs, local.defaults.nxos.devices.configuration.system.feature.tacacs, null) != null }
+  device      = each.key
+  admin_state = try(local.device_config[each.key].system.feature.tacacs, local.defaults.nxos.devices.configuration.system.feature.tacacs) ? "enabled" : "disabled"
 }
 
 resource "nxos_feature_telnet" "telnet" {
-  for_each = { for device in local.devices : device.name => device }
-  device   = each.key
-  admin_state = try(
-    contains(local.device_config[each.key].system.features, "telnet"),
-    contains(local.defaults.nxos.devices.configuration.system.features, "telnet"),
-    false
-  ) ? "enabled" : "disabled"
+  for_each    = { for device in local.devices : device.name => device if try(local.device_config[each.key].system.feature.telnet, local.defaults.nxos.devices.configuration.system.feature.telnet, null) != null }
+  device      = each.key
+  admin_state = try(local.device_config[each.key].system.feature.telnet, local.defaults.nxos.devices.configuration.system.feature.telnet) ? "enabled" : "disabled"
 }
 
 resource "nxos_feature_udld" "udld" {
-  for_each = { for device in local.devices : device.name => device }
-  device   = each.key
-  admin_state = try(
-    contains(local.device_config[each.key].system.features, "udld"),
-    contains(local.defaults.nxos.devices.configuration.system.features, "udld"),
-    false
-  ) ? "enabled" : "disabled"
+  for_each    = { for device in local.devices : device.name => device if try(local.device_config[each.key].system.feature.udld, local.defaults.nxos.devices.configuration.system.feature.udld, null) != null }
+  device      = each.key
+  admin_state = try(local.device_config[each.key].system.feature.udld, local.defaults.nxos.devices.configuration.system.feature.udld) ? "enabled" : "disabled"
 }
 
 resource "nxos_feature_vn_segment" "vn_segment" {
-  for_each = { for device in local.devices : device.name => device }
-  device   = each.key
-  admin_state = try(
-    contains(local.device_config[each.key].system.features, "vn_segment"),
-    contains(local.defaults.nxos.devices.configuration.system.features, "vn_segment"),
-    false
-  ) ? "enabled" : "disabled"
+  for_each    = { for device in local.devices : device.name => device if try(local.device_config[each.key].system.feature.vn_segment, local.defaults.nxos.devices.configuration.system.feature.vn_segment, null) != null }
+  device      = each.key
+  admin_state = try(local.device_config[each.key].system.feature.vn_segment, local.defaults.nxos.devices.configuration.system.feature.vn_segment) ? "enabled" : "disabled"
 }
 
 resource "nxos_feature_vpc" "vpc" {
-  for_each = { for device in local.devices : device.name => device }
-  device   = each.key
-  admin_state = try(
-    contains(local.device_config[each.key].system.features, "vpc"),
-    contains(local.defaults.nxos.devices.configuration.system.features, "vpc"),
-    false
-  ) ? "enabled" : "disabled"
+  for_each    = { for device in local.devices : device.name => device if try(local.device_config[each.key].system.feature.vpc, local.defaults.nxos.devices.configuration.system.feature.vpc, null) != null }
+  device      = each.key
+  admin_state = try(local.device_config[each.key].system.feature.vpc, local.defaults.nxos.devices.configuration.system.feature.vpc) ? "enabled" : "disabled"
 }
