@@ -64,6 +64,8 @@ module "nxos" {
 |------|------|
 | [local_sensitive_file.defaults](https://registry.terraform.io/providers/hashicorp/local/latest/docs/resources/sensitive_file) | resource |
 | [nxos_bgp.bgp](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/bgp) | resource |
+| [nxos_bgp_address_family.bgp_address_family](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/bgp_address_family) | resource |
+| [nxos_bgp_advertised_prefix.bgp_advertised_prefix](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/bgp_advertised_prefix) | resource |
 | [nxos_bgp_graceful_restart.bgp_graceful_restart](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/bgp_graceful_restart) | resource |
 | [nxos_bgp_instance.bgp_instance](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/bgp_instance) | resource |
 | [nxos_bgp_peer.bgp_peer](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/bgp_peer) | resource |
@@ -72,6 +74,7 @@ module "nxos" {
 | [nxos_bgp_peer_template.bgp_peer_template](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/bgp_peer_template) | resource |
 | [nxos_bgp_peer_template_address_family.bgp_peer_template_address_family](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/bgp_peer_template_address_family) | resource |
 | [nxos_bgp_route_control.bgp_route_control](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/bgp_route_control) | resource |
+| [nxos_bgp_route_redistribution.bgp_route_redistribution](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/bgp_route_redistribution) | resource |
 | [nxos_bgp_vrf.bgp_vrf](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/bgp_vrf) | resource |
 | [nxos_bridge_domain.bridge_domain](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/bridge_domain) | resource |
 | [nxos_ethernet.ethernet](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/ethernet) | resource |

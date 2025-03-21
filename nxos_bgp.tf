@@ -61,6 +61,137 @@ resource "nxos_bgp_graceful_restart" "bgp_graceful_restart" {
   stale_interval   = each.value.graceful_restart_stalepath_time
 }
 
+
+locals {
+  routing_bgp_address_family = flatten([
+    for device in local.devices : [
+      for vrf in try(local.device_config[device.name].routing.bgp.vrfs, []) : [
+        for af in try(vrf.address_families, []) : {
+          key                                    = format("%s/%s/%s", device.name, vrf.vrf, af.address_family)
+          device                                 = device.name
+          vrf                                    = vrf.vrf
+          address_family                         = local.address_family_names_map[af.address_family]
+          advertise_l2vpn_evpn                   = try(af.advertise_l2vpn_evpn, local.defaults.nxos.configuration.routing.bgp.vrfs.address_families.advertise_l2vpn_evpn, false) ? "enabled" : "disabled",
+          advertise_only_active_routes           = try(af.advertise_only_active_routes, local.defaults.nxos.configuration.routing.bgp.vrfs.address_families.advertise_only_active_routes, false) ? "enabled" : "disabled",
+          advertise_physical_ip_for_type5_routes = try(af.advertise_physical_ip_for_type5_routes, local.defaults.nxos.configuration.routing.bgp.vrfs.address_families.advertise_physical_ip_for_type5_routes, false) ? "enabled" : "disabled",
+          critical_nexthop_timeout               = try(af.critical_nexthop_timeout, local.defaults.nxos.configuration.routing.bgp.vrfs.address_families.critical_nexthop_timeout, "crit")
+          default_information_originate          = try(af.default_information_originate, local.defaults.nxos.configuration.routing.bgp.vrfs.address_families.default_information_originate, false) ? "enabled" : "disabled",
+          max_ecmp_paths                         = try(af.max_ecmp_paths, local.defaults.nxos.configuration.routing.bgp.vrfs.address_families.max_ecmp_paths, 1)
+          max_external_ecmp_paths                = try(af.max_external_ecmp_paths, local.defaults.nxos.configuration.routing.bgp.vrfs.address_families.max_external_ecmp_paths, 1)
+          max_external_internal_ecmp_paths       = try(af.max_external_internal_ecmp_paths, local.defaults.nxos.configuration.routing.bgp.vrfs.address_families.max_external_internal_ecmp_paths, 1)
+          max_local_ecmp_paths                   = try(af.max_local_ecmp_paths, local.defaults.nxos.configuration.routing.bgp.vrfs.address_families.max_local_ecmp_paths, 1)
+          max_mixed_ecmp_paths                   = try(af.max_mixed_ecmp_paths, local.defaults.nxos.configuration.routing.bgp.vrfs.address_families.max_mixed_ecmp_paths, 1)
+          next_hop_route_map_name                = try(af.next_hop_route_map_name, local.defaults.nxos.configuration.routing.bgp.vrfs.address_families.next_hop_route_map_name, "")
+          non_critical_nexthop_timeout           = try(af.non_critical_nexthop_timeout, local.defaults.nxos.configuration.routing.bgp.vrfs.address_families.non_critical_nexthop_timeout, "noncrit")
+          prefix_priority                        = try(af.prefix_priority, local.defaults.nxos.configuration.routing.bgp.vrfs.address_families.prefix_priority, "none")
+          retain_rt_all                          = try(af.retain_rt_all, local.defaults.nxos.configuration.routing.bgp.vrfs.address_families.retain_rt_all, false) ? "enabled" : "disabled",
+          table_map_route_map_name               = try(af.table_map_route_map_name, local.defaults.nxos.configuration.routing.bgp.vrfs.address_families.table_map_route_map_name, "")
+          vni_ethernet_tag                       = try(af.vni_ethernet_tag, local.defaults.nxos.configuration.routing.bgp.vrfs.address_families.vni_ethernet_tag, false) ? "enabled" : "disabled",
+          wait_igp_converged                     = try(af.wait_igp_converged, local.defaults.nxos.configuration.routing.bgp.vrfs.address_families.wait_igp_converged, false) ? "enabled" : "disabled",
+        }
+      ]
+    ]
+  ])
+}
+
+resource "nxos_bgp_address_family" "bgp_address_family" {
+  for_each                               = { for v in local.routing_bgp_address_family : v.key => v }
+  device                                 = each.value.device
+  asn                                    = nxos_bgp_instance.bgp_instance[each.value.device].asn
+  vrf                                    = each.value.vrf
+  address_family                         = each.value.address_family
+  advertise_l2vpn_evpn                   = each.value.advertise_l2vpn_evpn
+  advertise_only_active_routes           = each.value.advertise_only_active_routes
+  advertise_physical_ip_for_type5_routes = each.value.advertise_physical_ip_for_type5_routes
+  critical_nexthop_timeout               = each.value.critical_nexthop_timeout
+  default_information_originate          = each.value.default_information_originate
+  max_ecmp_paths                         = each.value.max_ecmp_paths
+  max_external_ecmp_paths                = each.value.max_external_ecmp_paths
+  max_external_internal_ecmp_paths       = each.value.max_external_internal_ecmp_paths
+  max_local_ecmp_paths                   = each.value.max_local_ecmp_paths
+  max_mixed_ecmp_paths                   = each.value.max_mixed_ecmp_paths
+  next_hop_route_map_name                = each.value.next_hop_route_map_name
+  non_critical_nexthop_timeout           = each.value.non_critical_nexthop_timeout
+  prefix_priority                        = each.value.prefix_priority
+  retain_rt_all                          = each.value.retain_rt_all
+  table_map_route_map_name               = each.value.table_map_route_map_name
+  vni_ethernet_tag                       = each.value.vni_ethernet_tag
+  wait_igp_converged                     = each.value.wait_igp_converged
+  depends_on                             = [nxos_bgp_vrf.bgp_vrf]
+}
+
+locals {
+  routing_bgp_advertised_prefix = flatten([
+    for device in local.devices : [
+      for vrf in try(local.device_config[device.name].routing.bgp.vrfs, []) : [
+        for af in try(vrf.address_families, []) : [
+          for prefix in try(af.networks, []) : [
+            {
+              key            = format("%s/%s/%s/%s", device.name, vrf.vrf, af.address_family, prefix.prefix)
+              device         = device.name
+              vrf            = vrf.vrf
+              address_family = local.address_family_names_map[af.address_family]
+              prefix         = prefix.prefix
+              route_map      = try(prefix.route_map, null)
+              evpn           = try(prefix.evpn, false) ? "enabled" : "disabled",
+            }
+          ]
+        ]
+      ]
+    ]
+  ])
+}
+
+resource "nxos_bgp_advertised_prefix" "bgp_advertised_prefix" {
+  for_each       = { for v in local.routing_bgp_advertised_prefix : v.key => v }
+  device         = each.value.device
+  asn            = nxos_bgp_instance.bgp_instance[each.value.device].asn
+  vrf            = each.value.vrf
+  address_family = each.value.address_family
+  prefix         = each.value.prefix
+  route_map      = each.value.route_map
+  evpn           = each.value.evpn
+  depends_on     = [nxos_bgp_address_family.bgp_address_family]
+}
+
+locals {
+  routing_bgp_route_redistribution = flatten([
+    for device in local.devices : [
+      for vrf in try(local.device_config[device.name].routing.bgp.vrfs, []) : [
+        for af in try(vrf.address_families, []) : [
+          for redistribution in try(af.redistributions, []) : [
+            {
+              key               = format("%s/%s/%s/%s", device.name, vrf.vrf, af.address_family, redistribution.protocol)
+              device            = device.name
+              vrf               = vrf.vrf
+              address_family    = local.address_family_names_map[af.address_family]
+              protocol          = redistribution.protocol
+              protocol_instance = try(redistribution.protocol_instance, "none")
+              route_map         = try(redistribution.route_map, null)
+              scope             = try(redistribution.scope, "inter")
+              srv6_prefix_type  = try(redistribution.srv6_prefix_type, "unspecified")
+            }
+          ]
+        ]
+      ]
+    ]
+  ])
+}
+
+resource "nxos_bgp_route_redistribution" "bgp_route_redistribution" {
+  for_each          = { for v in local.routing_bgp_route_redistribution : v.key => v }
+  device            = each.value.device
+  asn               = nxos_bgp_instance.bgp_instance[each.value.device].asn
+  vrf               = each.value.vrf
+  address_family    = each.value.address_family
+  protocol          = each.value.protocol
+  protocol_instance = each.value.protocol_instance
+  route_map         = each.value.route_map
+  scope             = each.value.scope
+  srv6_prefix_type  = each.value.srv6_prefix_type
+  depends_on        = [nxos_bgp_address_family.bgp_address_family]
+}
+
 locals {
   routing_bgp_peer_templates = flatten([
     for device in local.devices : [
