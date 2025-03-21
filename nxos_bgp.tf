@@ -85,7 +85,7 @@ locals {
           non_critical_nexthop_timeout           = try(af.non_critical_nexthop_timeout, local.defaults.nxos.configuration.routing.bgp.vrfs.address_families.non_critical_nexthop_timeout, "noncrit")
           prefix_priority                        = try(af.prefix_priority, local.defaults.nxos.configuration.routing.bgp.vrfs.address_families.prefix_priority, "none")
           retain_rt_all                          = try(af.retain_rt_all, local.defaults.nxos.configuration.routing.bgp.vrfs.address_families.retain_rt_all, false) ? "enabled" : "disabled",
-          table_map_route_map_name               = try(af.table_map_route_map_name, local.defaults.nxos.configuration.routing.bgp.vrfs.address_families.able_map_route_map_name, "")
+          table_map_route_map_name               = try(af.table_map_route_map_name, local.defaults.nxos.configuration.routing.bgp.vrfs.address_families.table_map_route_map_name, "")
           vni_ethernet_tag                       = try(af.vni_ethernet_tag, local.defaults.nxos.configuration.routing.bgp.vrfs.address_families.vni_ethernet_tag, false) ? "enabled" : "disabled",
           wait_igp_converged                     = try(af.wait_igp_converged, local.defaults.nxos.configuration.routing.bgp.vrfs.address_families.wait_igp_converged, false) ? "enabled" : "disabled",
         }
