@@ -39,7 +39,7 @@ module "nxos" {
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.8.0 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.9.0 |
 | <a name="requirement_local"></a> [local](#requirement\_local) | >= 2.3.0 |
 | <a name="requirement_nxos"></a> [nxos](#requirement\_nxos) | >= 0.5.9 |
 | <a name="requirement_utils"></a> [utils](#requirement\_utils) | >= 0.2.6 |
@@ -141,6 +141,7 @@ module "nxos" {
 | [nxos_pim_anycast_rp_peer.pim_anycast_rp_peer](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/pim_anycast_rp_peer) | resource |
 | [nxos_pim_instance.pim_instance](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/pim_instance) | resource |
 | [nxos_pim_interface.pim_interface](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/pim_interface) | resource |
+| [nxos_pim_ssm_range.pim_ssm_range](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/pim_ssm_range) | resource |
 | [nxos_pim_static_rp.pim_static_rp](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/pim_static_rp) | resource |
 | [nxos_pim_static_rp_group_list.pim_static_rp_group_list](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/pim_static_rp_group_list) | resource |
 | [nxos_pim_static_rp_policy.pim_static_rp_policy](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/pim_static_rp_policy) | resource |
