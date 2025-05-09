@@ -42,7 +42,7 @@ locals {
         urpf                                    = try(int.urpf, local.interfaces_ethernets_group_config[format("%s/%s", device.name, int.id)].urpf, local.defaults.nxos.devices.configuration.interfaces.ethernets.urpf, null)
         ipv4_address                            = try(int.ipv4_address, local.interfaces_ethernets_group_config[format("%s/%s", device.name, int.id)].ipv4_address, local.defaults.nxos.devices.configuration.interfaces.ethernets.ipv4_address, null)
         ospf_process_name                       = try(int.ospf.process_name, local.interfaces_ethernets_group_config[format("%s/%s", device.name, int.id)].ospf.process_name, local.defaults.nxos.devices.configuration.interfaces.ethernets.ospf.process_name, null)
-        ospf_advertise_secondaries              = try(int.ospf.advertise_secondaries, local.interfaces_ethernets_group_config[format("%s/%s", device.name, int.id)].ospf.advertise_secondaries, local.defaults.nxos.devices.configuration.interfaces.ethernets.ospf.advertise_secondaries, false)
+        ospf_advertise_secondaries              = try(int.ospf.advertise_secondaries, local.interfaces_ethernets_group_config[format("%s/%s", device.name, int.id)].ospf.advertise_secondaries, local.defaults.nxos.devices.configuration.interfaces.ethernets.ospf.advertise_secondaries, true)
         ospf_area                               = try(int.ospf.area, local.interfaces_ethernets_group_config[format("%s/%s", device.name, int.id)].ospf.area, local.defaults.nxos.devices.configuration.interfaces.ethernets.ospf.area, null)
         ospf_bfd                                = try(int.ospf.bfd, local.interfaces_ethernets_group_config[format("%s/%s", device.name, int.id)].ospf.bfd, local.defaults.nxos.devices.configuration.interfaces.ethernets.ospf.bfd, null)
         ospf_cost                               = try(int.ospf.cost, local.interfaces_ethernets_group_config[format("%s/%s", device.name, int.id)].ospf.cost, local.defaults.nxos.devices.configuration.interfaces.ethernets.ospf.cost, null)
@@ -146,6 +146,144 @@ resource "nxos_ipv4_interface_address" "ethernet_ipv4_secondary_interface_addres
   depends_on = [
     nxos_ipv4_interface_address.ethernet_ipv4_interface_address
   ]
+}
+
+locals {
+  interfaces_subinterfaces_group = flatten([
+    for device in local.devices : [
+      for int in try(local.device_config[device.name].interfaces.subinterfaces, []) : {
+        key           = format("%s/%s", device.name, int.id)
+        configuration = yamldecode(provider::utils::yaml_merge([for g in try(int.interface_groups, []) : try([for ig in local.interface_groups : yamlencode(ig.configuration) if ig.name == g][0], "")]))
+      }
+    ]
+  ])
+  interfaces_subinterfaces_group_config = {
+    for int in local.interfaces_subinterfaces_group : int.key => int.configuration
+  }
+  interfaces_subinterfaces = flatten([
+    for device in local.devices : [
+      for int in try(local.device_config[device.name].interfaces.subinterfaces, []) : {
+        key                                     = format("%s/%s", device.name, int.id)
+        device                                  = device.name
+        id                                      = int.id
+        type                                    = "eth"
+        admin_state                             = try(int.admin_state, local.interfaces_subinterfaces_group_config[format("%s/%s", device.name, int.id)].admin_state, local.defaults.nxos.devices.configuration.interfaces.subinterfaces.admin_state, false)
+        bandwidth                               = try(int.bandwidth, local.interfaces_subinterfaces_group_config[format("%s/%s", device.name, int.id)].bandwidth, local.defaults.nxos.devices.configuration.interfaces.subinterfaces.bandwidth, null)
+        delay                                   = try(int.delay, local.interfaces_subinterfaces_group_config[format("%s/%s", device.name, int.id)].delay, local.defaults.nxos.devices.configuration.interfaces.subinterfaces.delay, null)
+        description                             = try(int.description, local.interfaces_subinterfaces_group_config[format("%s/%s", device.name, int.id)].description, local.defaults.nxos.devices.configuration.interfaces.subinterfaces.description, null)
+        encap                                   = try(int.vlan, null) != null ? "vlan-${int.vlan}" : try(local.interfaces_subinterfaces_group_config[format("%s/%s", device.name, int.id)].vlan, null) != null ? "vlan-${local.interfaces_subinterfaces_group_config[format("%s/%s", device.name, int.id)].vlan}" : null
+        layer3                                  = try(int.layer3, local.interfaces_subinterfaces_group_config[format("%s/%s", device.name, int.id)].layer3, local.defaults.nxos.devices.configuration.interfaces.subinterfaces.layer3, false)
+        link_logging                            = try(int.link_logging, local.interfaces_subinterfaces_group_config[format("%s/%s", device.name, int.id)].link_logging, local.defaults.nxos.devices.configuration.interfaces.subinterfaces.link_logging, null)
+        medium                                  = try(int.medium, local.interfaces_subinterfaces_group_config[format("%s/%s", device.name, int.id)].medium, local.defaults.nxos.devices.configuration.interfaces.subinterfaces.medium, null)
+        mtu                                     = try(int.mtu, local.interfaces_subinterfaces_group_config[format("%s/%s", device.name, int.id)].mtu, local.defaults.nxos.devices.configuration.interfaces.subinterfaces.mtu, null)
+        vrf                                     = try(int.vrf, local.interfaces_subinterfaces_group_config[format("%s/%s", device.name, int.id)].vrf, local.defaults.nxos.devices.configuration.interfaces.subinterfaces.vrf, "default")
+        ip_unnumbered                           = try(int.ip_unnumbered, local.interfaces_subinterfaces_group_config[format("%s/%s", device.name, int.id)].ip_unnumbered, local.defaults.nxos.devices.configuration.interfaces.subinterfaces.ip_unnumbered, null)
+        urpf                                    = try(int.urpf, local.interfaces_subinterfaces_group_config[format("%s/%s", device.name, int.id)].urpf, local.defaults.nxos.devices.configuration.interfaces.subinterfaces.urpf, null)
+        ipv4_address                            = try(int.ipv4_address, local.interfaces_subinterfaces_group_config[format("%s/%s", device.name, int.id)].ipv4_address, local.defaults.nxos.devices.configuration.interfaces.subinterfaces.ipv4_address, null)
+        ospf_process_name                       = try(int.ospf.process_name, local.interfaces_subinterfaces_group_config[format("%s/%s", device.name, int.id)].ospf.process_name, local.defaults.nxos.devices.configuration.interfaces.subinterfaces.ospf.process_name, null)
+        ospf_advertise_secondaries              = try(int.ospf.advertise_secondaries, local.interfaces_subinterfaces_group_config[format("%s/%s", device.name, int.id)].ospf.advertise_secondaries, local.defaults.nxos.devices.configuration.interfaces.subinterfaces.ospf.advertise_secondaries, true)
+        ospf_area                               = try(int.ospf.area, local.interfaces_subinterfaces_group_config[format("%s/%s", device.name, int.id)].ospf.area, local.defaults.nxos.devices.configuration.interfaces.subinterfaces.ospf.area, null)
+        ospf_bfd                                = try(int.ospf.bfd, local.interfaces_subinterfaces_group_config[format("%s/%s", device.name, int.id)].ospf.bfd, local.defaults.nxos.devices.configuration.interfaces.subinterfaces.ospf.bfd, null)
+        ospf_cost                               = try(int.ospf.cost, local.interfaces_subinterfaces_group_config[format("%s/%s", device.name, int.id)].ospf.cost, local.defaults.nxos.devices.configuration.interfaces.subinterfaces.ospf.cost, null)
+        ospf_dead_interval                      = try(int.ospf.dead_interval, local.interfaces_subinterfaces_group_config[format("%s/%s", device.name, int.id)].ospf.dead_interval, local.defaults.nxos.devices.configuration.interfaces.subinterfaces.ospf.dead_interval, null)
+        ospf_hello_interval                     = try(int.ospf.hello_interval, local.interfaces_subinterfaces_group_config[format("%s/%s", device.name, int.id)].ospf.hello_interval, local.defaults.nxos.devices.configuration.interfaces.subinterfaces.ospf.hello_interval, null)
+        ospf_network_type                       = try(int.ospf.network_type, local.interfaces_subinterfaces_group_config[format("%s/%s", device.name, int.id)].ospf.network_type, local.defaults.nxos.devices.configuration.interfaces.subinterfaces.ospf.network_type, null)
+        ospf_passive                            = try(int.ospf.passive, local.interfaces_subinterfaces_group_config[format("%s/%s", device.name, int.id)].ospf.passive, local.defaults.nxos.devices.configuration.interfaces.subinterfaces.ospf.passive, null)
+        ospf_priority                           = try(int.ospf.priority, local.interfaces_subinterfaces_group_config[format("%s/%s", device.name, int.id)].ospf.priority, local.defaults.nxos.devices.configuration.interfaces.subinterfaces.ospf.priority, null)
+        ospf_authentication_key                 = try(int.ospf.authentication_key, local.interfaces_subinterfaces_group_config[format("%s/%s", device.name, int.id)].ospf.authentication_key, local.defaults.nxos.devices.configuration.interfaces.subinterfaces.ospf.authentication_key, null)
+        ospf_authentication_key_id              = try(int.ospf.authentication_key_id, local.interfaces_subinterfaces_group_config[format("%s/%s", device.name, int.id)].ospf.authentication_key_id, local.defaults.nxos.devices.configuration.interfaces.subinterfaces.ospf.authentication_key_id, null)
+        ospf_authentication_key_secure_mode     = try(int.ospf.authentication_key_secure_mode, local.interfaces_subinterfaces_group_config[format("%s/%s", device.name, int.id)].ospf.authentication_key_secure_mode, local.defaults.nxos.devices.configuration.interfaces.subinterfaces.ospf.authentication_key_secure_mode, false)
+        ospf_authentication_keychain            = try(int.ospf.authentication_keychain, local.interfaces_subinterfaces_group_config[format("%s/%s", device.name, int.id)].ospf.authentication_keychain, local.defaults.nxos.devices.configuration.interfaces.subinterfaces.ospf.authentication_keychain, null)
+        ospf_authentication_md5_key             = try(int.ospf.authentication_md5_key, local.interfaces_subinterfaces_group_config[format("%s/%s", device.name, int.id)].ospf.authentication_md5_key, local.defaults.nxos.devices.configuration.interfaces.subinterfaces.ospf.authentication_md5_key, null)
+        ospf_authentication_md5_key_secure_mode = try(int.ospf.authentication_md5_key_secure_mode, local.interfaces_subinterfaces_group_config[format("%s/%s", device.name, int.id)].ospf.authentication_md5_key_secure_mode, local.defaults.nxos.devices.configuration.interfaces.subinterfaces.ospf.authentication_md5_key_secure_mode, false)
+        ospf_authentication_type                = try(int.ospf.authentication_type, local.interfaces_subinterfaces_group_config[format("%s/%s", device.name, int.id)].ospf.authentication_type, local.defaults.nxos.devices.configuration.interfaces.subinterfaces.ospf.authentication_type, null)
+        pim_admin_state                         = try(int.pim.admin_state, local.interfaces_subinterfaces_group_config[format("%s/%s", device.name, int.id)].pim.admin_state, local.defaults.nxos.devices.configuration.interfaces.subinterfaces.pim.admin_state, null)
+        pim_bfd                                 = try(int.pim.bfd, local.interfaces_subinterfaces_group_config[format("%s/%s", device.name, int.id)].pim.bfd, local.defaults.nxos.devices.configuration.interfaces.subinterfaces.pim.bfd, null)
+        pim_dr_priority                         = try(int.pim.dr_priority, local.interfaces_subinterfaces_group_config[format("%s/%s", device.name, int.id)].pim.dr_priority, local.defaults.nxos.devices.configuration.interfaces.subinterfaces.pim.dr_priority, null)
+        pim_passive                             = try(int.pim.passive, local.interfaces_subinterfaces_group_config[format("%s/%s", device.name, int.id)].pim.passive, local.defaults.nxos.devices.configuration.interfaces.subinterfaces.pim.passive, null)
+        pim_sparse_mode                         = try(int.pim.sparse_mode, local.interfaces_subinterfaces_group_config[format("%s/%s", device.name, int.id)].pim.sparse_mode, local.defaults.nxos.devices.configuration.interfaces.subinterfaces.pim.sparse_mode, null)
+        port_channel                            = try(int.port_channel, local.interfaces_subinterfaces_group_config[format("%s/%s", device.name, int.id)].port_channel, local.defaults.nxos.devices.configuration.interfaces.subinterfaces.port_channel, null)
+        icmp_control                            = join(",", concat(try(int.icmp_redirect, local.interfaces_subinterfaces_group_config[format("%s/%s", device.name, int.id)].icmp_redirect, local.defaults.nxos.devices.configuration.interfaces.subinterfaces.icmp_redirect, null) == true ? ["redirect"] : [], try(int.icmp_unreachable, local.interfaces_subinterfaces_group_config[format("%s/%s", device.name, int.id)].icmp_unreachable, local.defaults.nxos.devices.configuration.interfaces.subinterfaces.icmp_unreachable, null) == true ? ["unreachable"] : []))
+      }
+    ]
+  ])
+  interfaces_subinterfaces_ipv4_secondary_addresses = flatten([
+    for device in local.devices : [
+      for int in try(local.device_config[device.name].interfaces.subinterfaces, []) : [
+        for ip in try(int.ipv4_secondary_addresses, []) : {
+          key           = format("%s/%s/%s", device.name, int.id, ip)
+          device        = device.name
+          interface_key = format("%s/%s", device.name, int.id)
+          vrf           = try(int.vrf, local.interfaces_subinterfaces_group_config[format("%s/%s", device.name, int.id)].vrf, local.defaults.nxos.devices.configuration.interfaces.subinterfaces.vrf, "default")
+          ip            = ip
+        }
+      ]
+    ]
+  ])
+}
+resource "nxos_subinterface" "subinterface" {
+  for_each     = { for v in local.interfaces_subinterfaces : v.key => v }
+  device       = each.value.device
+  interface_id = "eth${each.value.id}"
+  admin_state  = each.value.admin_state ? "up" : "down"
+  bandwidth    = each.value.bandwidth
+  delay        = each.value.delay
+  description  = each.value.description
+  encap        = each.value.encap
+  link_logging = each.value.link_logging
+  medium       = each.value.medium
+  mtu          = each.value.mtu
+}
+
+resource "nxos_subinterface_vrf" "subinterface_vrf" {
+  for_each     = { for v in local.interfaces_subinterfaces : v.key => v if v.layer3 }
+  device       = each.value.device
+  interface_id = nxos_subinterface.subinterface[each.key].interface_id
+  vrf_dn       = "sys/inst-${each.value.vrf}"
+}
+
+resource "nxos_ipv4_interface" "subinterface_ipv4_interface" {
+  for_each     = { for v in local.interfaces_subinterfaces : v.key => v if v.layer3 }
+  device       = each.value.device
+  vrf          = each.value.vrf
+  interface_id = nxos_subinterface_vrf.subinterface_vrf[each.key].interface_id
+  unnumbered   = each.value.ip_unnumbered
+  urpf         = each.value.urpf
+
+  depends_on = [nxos_ipv4_vrf.ipv4_vrf_default]
+}
+
+resource "nxos_ipv4_interface_address" "subinterface_ipv4_interface_address" {
+  for_each     = { for v in local.interfaces_subinterfaces : v.key => v if v.layer3 && v.ipv4_address != null }
+  device       = each.value.device
+  vrf          = each.value.vrf
+  interface_id = nxos_ipv4_interface.subinterface_ipv4_interface[each.key].interface_id
+  address      = each.value.ipv4_address
+}
+
+resource "nxos_ipv4_interface_address" "subinterface_ipv4_secondary_interface_address" {
+  for_each     = { for v in local.interfaces_subinterfaces_ipv4_secondary_addresses : v.key => v }
+  device       = each.value.device
+  vrf          = each.value.vrf
+  interface_id = nxos_ipv4_interface.subinterface_ipv4_interface[each.value.interface_key].interface_id
+  address      = each.value.ip
+  type         = "secondary"
+
+  depends_on = [
+    nxos_ipv4_interface_address.subinterface_ipv4_interface_address
+  ]
+}
+
+resource "nxos_icmpv4_vrf" "subinterface_icmpv4_vrf" {
+  for_each = { for v in local.interfaces_subinterfaces : v.key => v if v.icmp_control != [] }
+  vrf_name = each.value.vrf
+}
+
+resource "nxos_icmpv4_interface" "subinterface_icmpv4_interface" {
+  for_each     = { for v in local.interfaces_subinterfaces : v.key => v if v.icmp_control != [] }
+  vrf_name     = each.value.vrf
+  interface_id = nxos_ipv4_interface.subinterface_ipv4_interface[each.value.key].interface_id
+  control      = each.value.icmp_control
 }
 
 locals {
@@ -307,7 +445,7 @@ locals {
         vrf                                     = try(int.vrf, local.interfaces_loopbacks_group_config[format("%s/%s", device.name, int.id)].vrf, local.defaults.nxos.devices.configuration.interfaces.loopbacks.vrf, "default")
         ipv4_address                            = try(int.ipv4_address, local.interfaces_loopbacks_group_config[format("%s/%s", device.name, int.id)].ipv4_address, local.defaults.nxos.devices.configuration.interfaces.loopbacks.ipv4_address, null)
         ospf_process_name                       = try(int.ospf.process_name, local.interfaces_loopbacks_group_config[format("%s/%s", device.name, int.id)].ospf.process_name, local.defaults.nxos.devices.configuration.interfaces.loopbacks.ospf.process_name, null)
-        ospf_advertise_secondaries              = try(int.ospf.advertise_secondaries, local.interfaces_loopbacks_group_config[format("%s/%s", device.name, int.id)].ospf.advertise_secondaries, local.defaults.nxos.devices.configuration.interfaces.loopbacks.ospf.advertise_secondaries, false)
+        ospf_advertise_secondaries              = try(int.ospf.advertise_secondaries, local.interfaces_loopbacks_group_config[format("%s/%s", device.name, int.id)].ospf.advertise_secondaries, local.defaults.nxos.devices.configuration.interfaces.loopbacks.ospf.advertise_secondaries, true)
         ospf_area                               = try(int.ospf.area, local.interfaces_loopbacks_group_config[format("%s/%s", device.name, int.id)].ospf.area, local.defaults.nxos.devices.configuration.interfaces.loopbacks.ospf.area, null)
         ospf_bfd                                = try(int.ospf.bfd, local.interfaces_loopbacks_group_config[format("%s/%s", device.name, int.id)].ospf.bfd, local.defaults.nxos.devices.configuration.interfaces.loopbacks.ospf.bfd, null)
         ospf_cost                               = try(int.ospf.cost, local.interfaces_loopbacks_group_config[format("%s/%s", device.name, int.id)].ospf.cost, local.defaults.nxos.devices.configuration.interfaces.loopbacks.ospf.cost, null)
@@ -423,7 +561,7 @@ locals {
         mtu                                     = try(int.mtu, local.interfaces_vlans_group_config[format("%s/%s", device.name, int.id)].mtu, local.defaults.nxos.devices.configuration.interfaces.vlans.mtu, null)
         fabric_forwarding_mode                  = try(int.fabric_forwarding_mode, local.interfaces_vlans_group_config[format("%s/%s", device.name, int.id)].fabric_forwarding_mode, local.defaults.nxos.devices.configuration.interfaces.vlans.fabric_forwarding_mode, null)
         ospf_process_name                       = try(int.ospf.process_name, local.interfaces_vlans_group_config[format("%s/%s", device.name, int.id)].ospf.process_name, local.defaults.nxos.devices.configuration.interfaces.vlans.ospf.process_name, null)
-        ospf_advertise_secondaries              = try(int.ospf.advertise_secondaries, local.interfaces_vlans_group_config[format("%s/%s", device.name, int.id)].ospf.advertise_secondaries, local.defaults.nxos.devices.configuration.interfaces.vlans.ospf.advertise_secondaries, false)
+        ospf_advertise_secondaries              = try(int.ospf.advertise_secondaries, local.interfaces_vlans_group_config[format("%s/%s", device.name, int.id)].ospf.advertise_secondaries, local.defaults.nxos.devices.configuration.interfaces.vlans.ospf.advertise_secondaries, true)
         ospf_area                               = try(int.ospf.area, local.interfaces_vlans_group_config[format("%s/%s", device.name, int.id)].ospf.area, local.defaults.nxos.devices.configuration.interfaces.vlans.ospf.area, null)
         ospf_bfd                                = try(int.ospf.bfd, local.interfaces_vlans_group_config[format("%s/%s", device.name, int.id)].ospf.bfd, local.defaults.nxos.devices.configuration.interfaces.vlans.ospf.bfd, null)
         ospf_cost                               = try(int.ospf.cost, local.interfaces_vlans_group_config[format("%s/%s", device.name, int.id)].ospf.cost, local.defaults.nxos.devices.configuration.interfaces.vlans.ospf.cost, null)
