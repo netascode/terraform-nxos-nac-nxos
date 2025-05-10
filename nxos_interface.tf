@@ -220,6 +220,28 @@ locals {
       ]
     ]
   ])
+  interfaces_subinterfaces_dhcp_relay = flatten([
+    for device in local.devices : [
+      for int in try(local.device_config[device.name].interfaces.subinterfaces, []) : [{
+        key           = format("%s/%s", device.name, int.id)
+        device        = device.name
+        interface_key = format("%s/%s", device.name, int.id)
+      }] if length(try(int.dhcp_relay.addresses, local.interfaces_subinterfaces_group_config[format("%s/%s", device.name, int.id)].dhcp_relay.addresses, [])) > 0
+    ]
+  ])
+  interfaces_subinterfaces_dhcp_relay_addresses = flatten([
+    for device in local.devices : [
+      for int in try(local.device_config[device.name].interfaces.subinterfaces, []) : [
+        for address in try(int.dhcp_relay.addresses, local.interfaces_subinterfaces_group_config[format("%s/%s", device.name, int.id)].dhcp_relay.addresses, []) : {
+          key           = format("%s/%s/%s", device.name, int.id, address.ip)
+          device        = device.name
+          address         = address.ip
+          vrf           = try(address.vrf, local.interfaces_subinterfaces_group_config[format("%s/%s", device.name, int.id)].address.vrf, local.defaults.nxos.devices.configuration.interfaces.subinterfaces.vrf, "unspecified") == try(int.vrf, local.interfaces_subinterfaces_group_config[format("%s/%s", device.name, int.id)].vrf) ? "unspecified" : try(address.vrf, local.interfaces_subinterfaces_group_config[format("%s/%s", device.name, int.id)].address.vrf, "unspecified")
+          interface_key = format("%s/%s", device.name, int.id)
+        }
+      ]
+    ]
+  ])
 }
 resource "nxos_subinterface" "subinterface" {
   for_each     = { for v in local.interfaces_subinterfaces : v.key => v }
@@ -284,7 +306,30 @@ resource "nxos_icmpv4_interface" "subinterface_icmpv4_interface" {
   vrf_name     = each.value.vrf
   interface_id = nxos_ipv4_interface.subinterface_ipv4_interface[each.value.key].interface_id
   control      = each.value.icmp_control
+
+  depends_on = [
+    nxos_icmpv4_vrf.subinterface_icmpv4_vrf
+  ]
 }
+
+resource "nxos_dhcp_relay_interface" "subinterface_dhcp_relay_interface" {
+  for_each     = { for v in local.interfaces_subinterfaces_dhcp_relay : v.key => v }
+  device       = each.value.device
+  interface_id = nxos_ipv4_interface.subinterface_ipv4_interface[each.value.interface_key].interface_id
+}
+
+resource "nxos_dhcp_relay_address" "subinterface_dhcp_relay_address" {
+  for_each     = { for v in local.interfaces_subinterfaces_dhcp_relay_addresses : v.key => v }
+  device       = each.value.device
+  interface_id = nxos_ipv4_interface.subinterface_ipv4_interface[each.value.interface_key].interface_id
+  vrf          = each.value.vrf
+  address      = each.value.address
+
+  depends_on = [
+    nxos_dhcp_relay_interface.subinterface_dhcp_relay_interface
+  ]
+}
+
 
 locals {
   interfaces_port_channels_group = flatten([
