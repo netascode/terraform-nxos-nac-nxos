@@ -125,6 +125,9 @@ module "nxos" {
 | [nxos_ipv4_prefix_list_rule_entry.ipv4_prefix_list_rule_entry](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/ipv4_prefix_list_rule_entry) | resource |
 | [nxos_ipv4_vrf.ipv4_vrf](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/ipv4_vrf) | resource |
 | [nxos_ipv4_vrf.ipv4_vrf_default](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/ipv4_vrf) | resource |
+| [nxos_keychain.keychain](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/keychain) | resource |
+| [nxos_keychain_classic.keychain_classic](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/keychain_classic) | resource |
+| [nxos_keychain_key.keychain_key](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/keychain_key) | resource |
 | [nxos_loopback_interface.loopback_interface](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/loopback_interface) | resource |
 | [nxos_loopback_interface_vrf.loopback_interface_vrf](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/loopback_interface_vrf) | resource |
 | [nxos_nve_interface.nve_interface](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/nve_interface) | resource |
