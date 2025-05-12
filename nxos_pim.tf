@@ -23,6 +23,10 @@ locals {
         anycast_rp_local_interface  = try(vrf.anycast_rp_local_interface, local.defaults.nxos.devices.configuration.routing.pim.vrfs.anycast_rp_local_interface, "unspecified")
         anycast_rp_source_interface = try(vrf.anycast_rp_source_interface, local.defaults.nxos.devices.configuration.routing.pim.vrfs.anycast_rp_source_interface, "unspecified")
         rp                          = try(length(vrf.rps), 0) > 0
+        ssm_ranges                  = try(vrf.ssm_ranges, [])
+        ssm_prefix_list             = try(vrf.ssm_prefix_list, "")
+        ssm_route_map               = try(vrf.ssm_route_map, "")
+        ssm_none                    = try(vrf.ssm_range_none, local.defaults.nxos.devices.configuration.routing.pim.vrfs.ssm_range_none)
       }
     ]
   ])
@@ -40,6 +44,18 @@ resource "nxos_pim_vrf" "pim_vrf" {
   ]
 }
 
+resource "nxos_pim_ssm_range" "pim_ssm_range" {
+  for_each     = { for v in local.routing_pim_vrfs : v.key => v }
+  vrf_name     = nxos_pim_vrf.pim_vrf[each.key].name
+  group_list_1 = try(each.value.ssm_ranges[0], null)
+  group_list_2 = try(each.value.ssm_ranges[1], null)
+  group_list_3 = try(each.value.ssm_ranges[2], null)
+  group_list_4 = try(each.value.ssm_ranges[3], null)
+  prefix_list  = each.value.ssm_prefix_list
+  route_map    = each.value.ssm_route_map
+  ssm_none     = each.value.ssm_none
+}
+
 resource "nxos_pim_static_rp_policy" "pim_static_rp_policy" {
   for_each = { for v in local.routing_pim_vrfs : v.key => v if v.rp }
   device   = each.value.device
@@ -52,7 +68,7 @@ locals {
     for device in local.devices : [
       for vrf in try(local.device_config[device.name].routing.pim.vrfs, []) : [
         for rp in try(vrf.rps, []) : {
-          key         = format("%s/%s/%s", device.name, vrf.vrf, rp.address)
+          key         = format("%s/%s/%s/%s", device.name, vrf.vrf, rp.address, try(rp.group_range, local.defaults.nxos.devices.configuration.routing.pim.vrfs.rps.group_range, "224.0.0.0/4"))
           device      = device.name
           vrf_key     = format("%s/%s", device.name, vrf.vrf)
           address     = rp.address
