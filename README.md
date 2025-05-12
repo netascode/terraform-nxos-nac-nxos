@@ -77,6 +77,8 @@ module "nxos" {
 | [nxos_bgp_route_redistribution.bgp_route_redistribution](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/bgp_route_redistribution) | resource |
 | [nxos_bgp_vrf.bgp_vrf](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/bgp_vrf) | resource |
 | [nxos_bridge_domain.bridge_domain](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/bridge_domain) | resource |
+| [nxos_dhcp_relay_address.subinterface_dhcp_relay_address](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/dhcp_relay_address) | resource |
+| [nxos_dhcp_relay_interface.subinterface_dhcp_relay_interface](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/dhcp_relay_interface) | resource |
 | [nxos_ethernet.ethernet](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/ethernet) | resource |
 | [nxos_evpn.evpn](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/evpn) | resource |
 | [nxos_evpn_vni.evpn_vni](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/evpn_vni) | resource |

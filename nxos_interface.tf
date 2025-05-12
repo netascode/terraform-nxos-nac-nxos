@@ -235,7 +235,7 @@ locals {
         for address in try(int.dhcp_relay.addresses, local.interfaces_subinterfaces_group_config[format("%s/%s", device.name, int.id)].dhcp_relay.addresses, []) : {
           key           = format("%s/%s/%s", device.name, int.id, address.ip)
           device        = device.name
-          address         = address.ip
+          address       = address.ip
           vrf           = try(address.vrf, local.interfaces_subinterfaces_group_config[format("%s/%s", device.name, int.id)].address.vrf, local.defaults.nxos.devices.configuration.interfaces.subinterfaces.vrf, "unspecified") == try(int.vrf, local.interfaces_subinterfaces_group_config[format("%s/%s", device.name, int.id)].vrf) ? "unspecified" : try(address.vrf, local.interfaces_subinterfaces_group_config[format("%s/%s", device.name, int.id)].address.vrf, "unspecified")
           interface_key = format("%s/%s", device.name, int.id)
         }
