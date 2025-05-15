@@ -123,11 +123,12 @@ module "nxos" {
 | [nxos_ipv4_interface_address.svi_ipv4_secondary_interface_address](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/ipv4_interface_address) | resource |
 | [nxos_ipv4_prefix_list_rule.ipv4_prefix_list_rule](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/ipv4_prefix_list_rule) | resource |
 | [nxos_ipv4_prefix_list_rule_entry.ipv4_prefix_list_rule_entry](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/ipv4_prefix_list_rule_entry) | resource |
+| [nxos_ipv4_static_route.example](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/ipv4_static_route) | resource |
 | [nxos_ipv4_vrf.ipv4_vrf](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/ipv4_vrf) | resource |
 | [nxos_ipv4_vrf.ipv4_vrf_default](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/ipv4_vrf) | resource |
 | [nxos_keychain.keychain](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/keychain) | resource |
-| [nxos_keychain_classic.keychain_classic](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/keychain_classic) | resource |
 | [nxos_keychain_key.keychain_key](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/keychain_key) | resource |
+| [nxos_keychain_manager.keychain_manager](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/keychain_manager) | resource |
 | [nxos_loopback_interface.loopback_interface](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/loopback_interface) | resource |
 | [nxos_loopback_interface_vrf.loopback_interface_vrf](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/loopback_interface_vrf) | resource |
 | [nxos_nve_interface.nve_interface](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/nve_interface) | resource |
@@ -139,6 +140,7 @@ module "nxos" {
 | [nxos_ospf_authentication.ospf_authentication](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/ospf_authentication) | resource |
 | [nxos_ospf_instance.ospf_instance](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/ospf_instance) | resource |
 | [nxos_ospf_interface.ospf_interface](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/ospf_interface) | resource |
+| [nxos_ospf_max_metric.ospf_max_metric](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/ospf_max_metric) | resource |
 | [nxos_ospf_vrf.ospf_vrf](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/ospf_vrf) | resource |
 | [nxos_physical_interface.physical_interface](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/physical_interface) | resource |
 | [nxos_physical_interface_vrf.physical_interface_vrf](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/physical_interface_vrf) | resource |

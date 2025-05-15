@@ -57,20 +57,32 @@ locals {
 }
 
 resource "nxos_ospf_vrf" "ospf_vrf" {
-  for_each                    = { for v in local.routing_ospf_processes_vrfs : v.key => v }
+  for_each                 = { for v in local.routing_ospf_processes_vrfs : v.key => v }
+  device                   = each.value.device
+  instance_name            = nxos_ospf_instance.ospf_instance[each.value.proc_key].name
+  name                     = each.value.vrf
+  admin_state              = each.value.admin_state
+  bandwidth_reference      = each.value.bandwidth_reference
+  bandwidth_reference_unit = each.value.banwidth_reference_unit
+  distance                 = each.value.distance
+  log_adjacency_changes    = each.value.log_adjacency_changes
+  router_id                = each.value.router_id
+}
+
+
+resource "nxos_ospf_max_metric" "ospf_max_metric" {
+  for_each                    = { for v in local.routing_ospf_processes_vrfs : v.key => v if v.max_metric_control != "" }
   device                      = each.value.device
   instance_name               = nxos_ospf_instance.ospf_instance[each.value.proc_key].name
-  name                        = each.value.vrf
-  admin_state                 = each.value.admin_state
-  bandwidth_reference         = each.value.bandwidth_reference
-  bandwidth_reference_unit    = each.value.banwidth_reference_unit
-  distance                    = each.value.distance
-  log_adjacency_changes       = each.value.log_adjacency_changes
-  router_id                   = each.value.router_id
+  vrf_name                    = each.value.vrf
   max_metric_control          = each.value.max_metric_control
   max_metric_external_lsa     = each.value.max_metric_external_lsa
   max_metric_summary_lsa      = each.value.max_metric_summary_lsa
   max_metric_startup_interval = each.value.max_metric_startup_interval
+
+  depends_on = [
+    nxos_ospf_vrf.ospf_vrf
+  ]
 }
 
 locals {
