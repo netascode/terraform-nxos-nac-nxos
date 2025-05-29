@@ -75,10 +75,10 @@ resource "nxos_ospf_max_metric" "ospf_max_metric" {
   device                      = each.value.device
   instance_name               = nxos_ospf_instance.ospf_instance[each.value.proc_key].name
   vrf_name                    = each.value.vrf
-  max_metric_control          = each.value.max_metric_control
-  max_metric_external_lsa     = each.value.max_metric_external_lsa
-  max_metric_summary_lsa      = each.value.max_metric_summary_lsa
-  max_metric_startup_interval = each.value.max_metric_startup_interval
+  control          = each.value.max_metric_control
+  external_lsa     = each.value.max_metric_external_lsa
+  summary_lsa      = each.value.max_metric_summary_lsa
+  startup_interval = each.value.max_metric_startup_interval
 
   depends_on = [
     nxos_ospf_vrf.ospf_vrf
