@@ -151,6 +151,13 @@ module "nxos" {
 | [nxos_port_channel_interface.port_channel_interface](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/port_channel_interface) | resource |
 | [nxos_port_channel_interface_member.port_channel_interface_member](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/port_channel_interface_member) | resource |
 | [nxos_port_channel_interface_vrf.port_channel_interface_vrf](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/port_channel_interface_vrf) | resource |
+| [nxos_rest.service_acceleration](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/rest) | resource |
+| [nxos_rest.service_system_hypershield_sas_sas](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/rest) | resource |
+| [nxos_rest.service_system_hypershield_sas_svc](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/rest) | resource |
+| [nxos_rest.service_system_hypershield_sas_svc_fw_policy](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/rest) | resource |
+| [nxos_rest.service_system_hypershield_sas_svc_fw_policy_ip_vrf](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/rest) | resource |
+| [nxos_rest.service_system_hypershield_sas_svc_instance](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/rest) | resource |
+| [nxos_rest.service_system_hypershield_sas_svc_scontroller](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/rest) | resource |
 | [nxos_route_map_rule.route_map_rule](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/route_map_rule) | resource |
 | [nxos_route_map_rule_entry.route_map_rule_entry](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/route_map_rule_entry) | resource |
 | [nxos_route_map_rule_entry_match_route.route_map_rule_entry_match_route](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/route_map_rule_entry_match_route) | resource |
