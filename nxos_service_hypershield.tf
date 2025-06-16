@@ -7,7 +7,7 @@ locals {
         source_interface   = try(local.device_config[device.name].hypershield.source_interface, null)
         https_proxy_port   = try(local.device_config[device.name].hypershield.https_proxy_port, null)
         https_proxy_server = try(local.device_config[device.name].hypershield.https_proxy_server, null)
-        admin_state        = try(local.device_config[device.name].hypershield.admin_state == "in-service" || local.device_config[device.name].hypershield.admin_state == null ? "in-service" : local.device_config[device.name].hypershield.admin_state, null)
+        admin_state        = try(local.device_config[device.name].hypershield.admin_state, null)
         vrfs               = try(local.device_config[device.name].hypershield.vrfs, [])
     }]
   ])
@@ -40,7 +40,7 @@ resource "nxos_rest" "service_system_hypershield_sas_svc_instance" {
   class_name = "sasSvcInstance"
 
   content = {
-    cpSrcInterface = each.value.source_interface
+    cpSrcInterface = (each.value.source_interface == null || each.value.source_interface == "" ? "DME_UNSET_PROPERTY_MARKER" : each.value.source_interface)
     name           = "hypershield" # This is the sevice name and must be set to hypershield - This line refers to the "service system hypershield" command
   }
 
@@ -53,8 +53,8 @@ resource "nxos_rest" "service_system_hypershield_sas_svc_scontroller" {
   dn         = "sys/sas/svc/svcinst-hypershield/scontroller"
   class_name = "sasSController"
   content = {
-    httpsProxyPort = each.value.https_proxy_port
-    httpsProxySvr  = each.value.https_proxy_server
+    httpsProxyPort = (each.value.https_proxy_port == null || each.value.https_proxy_port == "" ? "DME_UNSET_PROPERTY_MARKER" : each.value.https_proxy_port)
+    httpsProxySvr  = (each.value.https_proxy_server == null || each.value.https_proxy_server == "" ? "DME_UNSET_PROPERTY_MARKER" : each.value.https_proxy_server)
   }
 
   depends_on = [nxos_rest.service_system_hypershield_sas_svc_instance]
@@ -72,11 +72,10 @@ resource "nxos_rest" "service_system_hypershield_sas_svc_fw_policy" {
 
   lifecycle {
     precondition {
-      condition     = each.value.admin_state == "in-service" || each.value.admin_state == null
-      error_message = "Allowed values: `in-service` or null"
+      condition     = each.value.admin_state == "in-service" || each.value.admin_state == "out-of-service" || each.value.admin_state == null
+      error_message = "Allowed values: `in-service`, `out-of-service`"
     }
   }
-
 
   depends_on = [nxos_rest.service_system_hypershield_sas_svc_instance]
 
