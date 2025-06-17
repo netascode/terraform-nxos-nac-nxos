@@ -157,6 +157,7 @@ module "nxos" {
 | [nxos_rest.service_system_hypershield_sas_svc_fw_policy](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/rest) | resource |
 | [nxos_rest.service_system_hypershield_sas_svc_fw_policy_ip_vrf](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/rest) | resource |
 | [nxos_rest.service_system_hypershield_sas_svc_instance](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/rest) | resource |
+| [nxos_rest.service_system_hypershield_sas_svc_instance_delete](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/rest) | resource |
 | [nxos_rest.service_system_hypershield_sas_svc_scontroller](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/rest) | resource |
 | [nxos_route_map_rule.route_map_rule](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/route_map_rule) | resource |
 | [nxos_route_map_rule_entry.route_map_rule_entry](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/route_map_rule_entry) | resource |
