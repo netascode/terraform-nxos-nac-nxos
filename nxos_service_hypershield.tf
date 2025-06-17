@@ -107,8 +107,8 @@ locals {
         device      = device.name
         vrf_name    = vrf.name
         affinity = (
-          contains([0, 1, 2, 3, 4], vrf.affinity) ? vrf.affinity :
-          (vrf.affinity == "dynamic" || vrf.affinity == null ? "0" : vrf.affinity)
+          try(contains([0, 1, 2, 3, 4], vrf.affinity) ? vrf.affinity :
+          (vrf.affinity == "dynamic" ? "0" : vrf.affinity), null)
         )
       }
     ]
@@ -127,7 +127,11 @@ resource "nxos_rest" "service_system_hypershield_sas_svc_fw_policy_ip_vrf" {
 
   lifecycle {
     precondition {
-      condition     = contains(["0", "1", "2", "3", "4", null, "dynamic"], each.value.affinity)
+      condition = (
+        each.value.affinity == null ? true : (
+          contains(["0", "1", "2", "3", "4", "dynamic"], each.value.affinity)
+        )
+      )
       error_message = "Allowed values: 1, 2, 3, 4. For dynamic affinity use `dynamic`, 0"
     }
   }
