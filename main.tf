@@ -51,8 +51,7 @@ locals {
       [yamlencode(try(local.global.configuration, {}))],
       [for dg in local.device_groups : yamlencode(try(dg.configuration, {})) if contains(try(device.device_groups, []), dg.name)],
       [for dg in local.device_groups : yamlencode(try(dg.configuration, {})) if contains(try(dg.devices, []), device.name)],
-      [for dg in local.device_groups : local.device_group_config_template_config[dg.name] if contains(try(device.device_groups, []), dg.name)],
-      [for dg in local.device_groups : local.device_group_config_template_config[dg.name] if contains(try(dg.devices, []), device.name)],
+      [local.device_config_template_config[device.name]],
       [yamlencode(try(device.configuration, {}))]
     )), "")
   }
