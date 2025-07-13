@@ -34,6 +34,21 @@ locals {
     )), "")
   }
 
+  interface_groups_raw_config = {
+    for device in local.devices : device.name => {
+      for ig in local.interface_groups : ig.name => yamlencode(try(ig.configuration, {}))
+    }
+  }
+
+  interface_group_config = {
+    for device in local.devices : device.name => [
+      for ig in local.interface_groups : {
+        name = ig.name
+        configuration = yamldecode(templatestring(local.interface_groups_raw_config[device.name][ig.name], local.device_variables[device.name]))
+      }
+    ]
+  }
+
   device_variables = { for device in local.devices :
     device.name => merge(concat(
       [try(local.global.variables, {})],
