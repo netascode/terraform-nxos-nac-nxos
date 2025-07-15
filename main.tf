@@ -34,7 +34,7 @@ locals {
       [for dg in local.device_groups :
         merge([
           for t in try(dg.configuration_templates, []) :
-            try([for ct in local.configuration_templates : try(ct.configuration.variables, {}) if ct.name == t][0], {})
+            try([for ct in local.configuration_templates : try(ct.variables, {}) if ct.name == t][0], {})
         ]...)
         if contains(try(device.device_groups, []), dg.name) || contains(try(dg.devices, []), device.name)
       ],
