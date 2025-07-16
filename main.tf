@@ -26,15 +26,6 @@ locals {
     ])
   }
 
-  # device_variables = { for device in local.devices :
-  #   device.name => merge(concat(
-  #     [try(local.global.variables, {})],
-  #     [for dg in local.device_groups : try(dg.variables, {}) if contains(try(device.device_groups, []), dg.name)],
-  #     [for dg in local.device_groups : try(dg.variables, {}) if contains(try(dg.devices, []), device.name)],
-  #     [try(device.variables, {})]
-  #   )...)
-  # }
-
   device_config_template_config = { for device, config in local.device_config_template_raw_config :
     device => templatestring(config, local.device_variables[device])
   }
@@ -55,22 +46,11 @@ locals {
     }
   }
 
-  # interface_group_variables = {
-  #   for device in local.devices : device.name => {
-  #     for ig in local.interface_groups : ig.name => merge(concat(
-  #       [try(local.global.variables, {})],
-  #       [for dg in local.device_groups : try(dg.variables, {}) if contains(try(device.device_groups, []), dg.name)],
-  #       [for dg in local.device_groups : try(dg.variables, {}) if contains(try(dg.devices, []), device.name)],
-  #       [try(device.variables, {})]
-  #     )...)
-  #   }
-  # }
-
-  interface_group_config = {
+  interface_groups_config = {
     for device in local.devices : device.name => [
       for ig in local.interface_groups : {
         name          = ig.name
-        configuration = yamldecode(templatestring(local.interface_groups_raw_config[device.name][ig.name], local.device_variables[device.name][ig.name]))
+        configuration = yamldecode(templatestring(local.interface_groups_raw_config[device.name][ig.name], local.device_variables[device.name]))
       }
     ]
   }

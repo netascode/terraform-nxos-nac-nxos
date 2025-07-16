@@ -3,7 +3,7 @@ locals {
     for device in local.devices : [
       for int in try(local.device_config[device.name].interfaces.ethernets, []) : {
         key           = format("%s/%s", device.name, int.id)
-        configuration = yamldecode(provider::utils::yaml_merge([for g in try(int.interface_groups, []) : try([for ig in local.interface_group_config[device.name] : yamlencode(ig.configuration) if ig.name == g][0], "")]))
+        configuration = yamldecode(provider::utils::yaml_merge([for g in try(int.interface_groups, []) : try([for ig in local.interface_groups_config[device.name] : yamlencode(ig.configuration) if ig.name == g][0], "")]))
       }
     ]
   ])
@@ -153,7 +153,7 @@ locals {
     for device in local.devices : [
       for int in try(local.device_config[device.name].interfaces.port_channels, []) : {
         key           = format("%s/%s", device.name, int.id)
-        configuration = yamldecode(provider::utils::yaml_merge([for g in try(int.interface_groups, []) : try([for ig in local.interface_group_config[device.name] : yamlencode(ig.configuration) if ig.name == g][0], "")]))
+        configuration = yamldecode(provider::utils::yaml_merge([for g in try(int.interface_groups, []) : try([for ig in local.interface_groups_config[device.name] : yamlencode(ig.configuration) if ig.name == g][0], "")]))
       }
     ]
   ])
@@ -288,7 +288,7 @@ locals {
     for device in local.devices : [
       for int in try(local.device_config[device.name].interfaces.loopbacks, []) : {
         key           = format("%s/%s", device.name, int.id)
-        configuration = yamldecode(provider::utils::yaml_merge([for g in try(int.interface_groups, []) : try([for ig in local.interface_group_config[device.name] : yamlencode(ig.configuration) if ig.name == g][0], "")]))
+        configuration = yamldecode(provider::utils::yaml_merge([for g in try(int.interface_groups, []) : try([for ig in local.interface_groups_config[device.name] : yamlencode(ig.configuration) if ig.name == g][0], "")]))
       }
     ]
   ])
@@ -397,7 +397,7 @@ locals {
     for device in local.devices : [
       for int in try(local.device_config[device.name].interfaces.vlans, []) : {
         key           = format("%s/%s", device.name, int.id)
-        configuration = yamldecode(provider::utils::yaml_merge([for g in try(int.interface_groups, []) : try([for ig in local.interface_group_config[device.name] : yamlencode(ig.configuration) if ig.name == g][0], "")]))
+        configuration = yamldecode(provider::utils::yaml_merge([for g in try(int.interface_groups, []) : try([for ig in local.interface_groups_config[device.name] : yamlencode(ig.configuration) if ig.name == g][0], "")]))
       }
     ]
   ])
