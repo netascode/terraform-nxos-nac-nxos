@@ -15,7 +15,7 @@ locals {
     )...)
   }
 
-  device_config_template_raw_config = { for device in local.devices :
+  device_config_templates_raw_config = { for device in local.devices :
     device.name => provider::utils::yaml_merge([
       for dg in local.device_groups :
       provider::utils::yaml_merge([
@@ -26,16 +26,16 @@ locals {
     ])
   }
 
-  device_config_template_config = { for device, config in local.device_config_template_raw_config :
+  device_config_templates_config = { for device, config in local.device_config_templates_raw_config :
     device => templatestring(config, local.device_variables[device])
   }
 
-  raw_device_config = { for device in local.devices :
+  devices_raw_config = { for device in local.devices :
     device.name => try(provider::utils::yaml_merge(concat(
       [yamlencode(try(local.global.configuration, {}))],
       [for dg in local.device_groups : yamlencode(try(dg.configuration, {})) if contains(try(device.device_groups, []), dg.name)],
       [for dg in local.device_groups : yamlencode(try(dg.configuration, {})) if contains(try(dg.devices, []), device.name)],
-      [local.device_config_template_config[device.name]],
+      [local.device_config_templates_config[device.name]],
       [yamlencode(try(device.configuration, {}))]
     )), "")
   }
@@ -55,7 +55,7 @@ locals {
     ]
   }
 
-  device_config = { for device, config in local.raw_device_config :
+  device_config = { for device, config in local.devices_raw_config :
     device => yamldecode(templatestring(config, local.device_variables[device]))
   }
 
