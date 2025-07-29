@@ -218,7 +218,7 @@ resource "nxos_vrf_routing" "vrf_routing" {
 }
 
 resource "nxos_vrf_address_family" "vrf_address_family" {
-  for_each       = { for v in local.vrfs_address_families : v.key => v }
+  for_each       = { for v in local.vrfs_address_families : v.key => v if v.vrf != "default" }
   device         = each.value.device
   vrf            = nxos_vrf_routing.vrf_routing[each.value.vrf_key].vrf
   address_family = each.value.address_family

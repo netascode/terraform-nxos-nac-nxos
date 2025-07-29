@@ -120,6 +120,10 @@ resource "nxos_save_config" "save_config" {
     nxos_bridge_domain.bridge_domain,
     nxos_vrf_route_target.vrf_route_target,
     nxos_ipv4_vrf.ipv4_vrf,
-    nxos_ipv4_vrf.ipv4_vrf_default
+    nxos_ipv4_vrf.ipv4_vrf_default,
+    nxos_vpc_domain.vpc_domain,
+    nxos_vpc_keepalive.vpc_keepalive,
+    nxos_vpc_peerlink.vpc_peerlink,
+    nxos_vpc_interface.vpc_interface
   ]
 }

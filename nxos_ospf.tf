@@ -95,7 +95,7 @@ resource "nxos_ospf_area" "ospf_area" {
 }
 
 locals {
-  ospf_interfaces = concat(local.interfaces_ethernets, local.interfaces_loopbacks, local.interfaces_vlans, local.interfaces_port_channels)
+  ospf_interfaces = concat(local.interfaces_ethernets, local.interfaces_loopbacks, local.interfaces_vlans)
 }
 
 resource "nxos_ospf_interface" "ospf_interface" {
