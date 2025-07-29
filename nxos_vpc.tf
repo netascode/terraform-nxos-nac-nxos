@@ -27,7 +27,7 @@ locals {
         virtual_peerlink_source_ip      = try(local.device_config[device.name].vpc_domain.virtual_peerlink_source_ip, local.defaults.nxos.devices.configuration.vpc_domains.virtual_peerlink_source_ip, null)
         peer_keepalive                  = try(local.device_config[device.name].vpc_domain.peer_keepalive, {})
       } : null
-    ] if try(local.device_config[device.name].vpc_domain, null) != null
+    ]
   ])
 }
 
@@ -71,22 +71,46 @@ resource "nxos_vpc_domain" "vpc_domain" {
   ]
 }
 
+locals {
+  vpc_keepalives = flatten([
+    for device in local.devices : [
+      try(local.device_config[device.name].vpc_domain, null) != null && try(local.device_config[device.name].vpc_domain.peer_keepalive, null) != null ? {
+        key                                = format("%s/%s", device.name, local.device_config[device.name].vpc_domain.domain_id)
+        device                             = device.name
+        destination_ip                     = try(local.device_config[device.name].vpc_domain.peer_keepalive.destination_ip, local.defaults.nxos.devices.configuration.vpc_domains.peer_keepalive.destination_ip, null)
+        source_ip                          = try(local.device_config[device.name].vpc_domain.peer_keepalive.source_ip, local.defaults.nxos.devices.configuration.vpc_domains.peer_keepalive.source_ip, null)
+        flush_timeout                      = try(local.device_config[device.name].vpc_domain.peer_keepalive.flush_timeout, local.defaults.nxos.devices.configuration.vpc_domains.peer_keepalive.flush_timeout, null)
+        interval                           = try(local.device_config[device.name].vpc_domain.peer_keepalive.interval, local.defaults.nxos.devices.configuration.vpc_domains.peer_keepalive.interval, null)
+        precedence_type                    = try(local.device_config[device.name].vpc_domain.peer_keepalive.precedence_type, local.defaults.nxos.devices.configuration.vpc_domains.peer_keepalive.precedence_type, null)
+        precedence_value                   = try(local.device_config[device.name].vpc_domain.peer_keepalive.precedence_value, local.defaults.nxos.devices.configuration.vpc_domains.peer_keepalive.precedence_value, null)
+        timeout                            = try(local.device_config[device.name].vpc_domain.peer_keepalive.timeout, local.defaults.nxos.devices.configuration.vpc_domains.peer_keepalive.timeout, null)
+        type_of_service_byte               = try(local.device_config[device.name].vpc_domain.peer_keepalive.type_of_service_byte, local.defaults.nxos.devices.configuration.vpc_domains.peer_keepalive.type_of_service_byte, null)
+        type_of_service_configuration_type = try(local.device_config[device.name].vpc_domain.peer_keepalive.type_of_service_configuration_type, local.defaults.nxos.devices.configuration.vpc_domains.peer_keepalive.type_of_service_configuration_type, null)
+        type_of_service_type               = try(local.device_config[device.name].vpc_domain.peer_keepalive.type_of_service_type, local.defaults.nxos.devices.configuration.vpc_domains.peer_keepalive.type_of_service_type, null)
+        type_of_service_value              = try(local.device_config[device.name].vpc_domain.peer_keepalive.type_of_service_value, local.defaults.nxos.devices.configuration.vpc_domains.peer_keepalive.type_of_service_value, null)
+        udp_port                           = try(local.device_config[device.name].vpc_domain.peer_keepalive.udp_port, local.defaults.nxos.devices.configuration.vpc_domains.peer_keepalive.udp_port, null)
+        vrf                                = try(local.device_config[device.name].vpc_domain.peer_keepalive.vrf, local.defaults.nxos.devices.configuration.vpc_domains.peer_keepalive.vrf, null)
+      } : null
+    ]
+  ])
+}
+
 resource "nxos_vpc_keepalive" "vpc_keepalive" {
-  for_each                           = { for vpc_domain in local.vpc_domains : vpc_domain.key => vpc_domain }
+  for_each                           = { for vpc_keepalive in local.vpc_keepalives : vpc_keepalive.key => vpc_keepalive }
   device                             = each.value.device
-  destination_ip                     = each.value.peer_keepalive.destination_ip
-  source_ip                          = each.value.peer_keepalive.source_ip
-  flush_timeout                      = each.value.peer_keepalive.flush_timeout
-  interval                           = each.value.peer_keepalive.interval
-  precedence_type                    = each.value.peer_keepalive.precedence_type
-  precedence_value                   = each.value.peer_keepalive.precedence_value
-  timeout                            = each.value.peer_keepalive.timeout
-  type_of_service_byte               = each.value.peer_keepalive.type_of_service_byte
-  type_of_service_configuration_type = each.value.peer_keepalive.type_of_service_configuration_type
-  type_of_service_type               = each.value.peer_keepalive.type_of_service_type
-  type_of_service_value              = each.value.peer_keepalive.type_of_service_value
-  udp_port                           = each.value.peer_keepalive.udp_port
-  vrf                                = each.value.peer_keepalive.vrf
+  destination_ip                     = each.value.destination_ip
+  source_ip                          = each.value.source_ip
+  flush_timeout                      = each.value.flush_timeout
+  interval                           = each.value.interval
+  precedence_type                    = each.value.precedence_type
+  precedence_value                   = each.value.precedence_value
+  timeout                            = each.value.timeout
+  type_of_service_byte               = each.value.type_of_service_byte
+  type_of_service_configuration_type = each.value.type_of_service_configuration_type
+  type_of_service_type               = each.value.type_of_service_type
+  type_of_service_value              = each.value.type_of_service_value
+  udp_port                           = each.value.udp_port
+  vrf                                = each.value.vrf
 
   depends_on = [
     nxos_vpc_domain.vpc_domain
