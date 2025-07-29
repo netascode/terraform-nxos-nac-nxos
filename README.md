@@ -106,10 +106,6 @@ module "nxos" {
 | [nxos_feature_udld.udld](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/feature_udld) | resource |
 | [nxos_feature_vn_segment.vn_segment](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/feature_vn_segment) | resource |
 | [nxos_feature_vpc.vpc](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/feature_vpc) | resource |
-| [nxos_vpc_domain.vpc_domain](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/vpc_domain) | resource |
-| [nxos_vpc_keepalive.vpc_keepalive](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/vpc_keepalive) | resource |
-| [nxos_vpc_peerlink.vpc_peerlink](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/vpc_peerlink) | resource |
-| [nxos_vpc_interface.vpc_interface](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/vpc_interface) | resource |
 | [nxos_hmm.hmm](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/hmm) | resource |
 | [nxos_hmm_instance.hmm_instance](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/hmm_instance) | resource |
 | [nxos_hmm_interface.hmm_interface](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/hmm_interface) | resource |

@@ -95,11 +95,11 @@ resource "nxos_ospf_area" "ospf_area" {
 }
 
 locals {
-  ospf_interfaces = concat(local.interfaces_ethernets, local.interfaces_loopbacks, local.interfaces_vlans)
+  ospf_interfaces = concat(local.interfaces_ethernets, local.interfaces_loopbacks, local.interfaces_vlans, local.interfaces_port_channels)
 }
 
 resource "nxos_ospf_interface" "ospf_interface" {
-  for_each              = { for v in local.ospf_interfaces : v.key => v if v.ospf_process_name != null }
+  for_each              = { for v in local.ospf_interfaces : v.key => v if try(v.ospf_process_name, null) != null }
   device                = each.value.device
   instance_name         = each.value.ospf_process_name
   vrf_name              = nxos_ospf_vrf.ospf_vrf["${each.value.device}/${each.value.ospf_process_name}/${each.value.vrf}"].name
