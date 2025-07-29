@@ -1,7 +1,7 @@
 locals {
   vpc_domains = flatten([
     for device in local.devices : [
-      try(local.device_config[device.name].vpc_domain, null) != null ? {
+      {
         key                             = format("%s/%s", device.name, local.device_config[device.name].vpc_domain.domain_id)
         device                          = device.name
         domain_id                       = try(local.device_config[device.name].vpc_domain.domain_id, local.defaults.nxos.devices.configuration.vpc_domains.domain_id, null)
@@ -26,8 +26,8 @@ locals {
         track                           = try(local.device_config[device.name].vpc_domain.track, local.defaults.nxos.devices.configuration.vpc_domains.track, null)
         virtual_peerlink_source_ip      = try(local.device_config[device.name].vpc_domain.virtual_peerlink_source_ip, local.defaults.nxos.devices.configuration.vpc_domains.virtual_peerlink_source_ip, null)
         peer_keepalive                  = try(local.device_config[device.name].vpc_domain.peer_keepalive, {})
-      } : null
-    ]
+      }
+    ] if try(local.device_config[device.name].vpc_domain, null) != null
   ])
 }
 
@@ -74,7 +74,7 @@ resource "nxos_vpc_domain" "vpc_domain" {
 locals {
   vpc_keepalives = flatten([
     for device in local.devices : [
-      try(local.device_config[device.name].vpc_domain, null) != null && try(local.device_config[device.name].vpc_domain.peer_keepalive, null) != null ? {
+      {
         key                                = format("%s/%s", device.name, local.device_config[device.name].vpc_domain.domain_id)
         device                             = device.name
         destination_ip                     = try(local.device_config[device.name].vpc_domain.peer_keepalive.destination_ip, local.defaults.nxos.devices.configuration.vpc_domains.peer_keepalive.destination_ip, null)
@@ -90,8 +90,8 @@ locals {
         type_of_service_value              = try(local.device_config[device.name].vpc_domain.peer_keepalive.type_of_service_value, local.defaults.nxos.devices.configuration.vpc_domains.peer_keepalive.type_of_service_value, null)
         udp_port                           = try(local.device_config[device.name].vpc_domain.peer_keepalive.udp_port, local.defaults.nxos.devices.configuration.vpc_domains.peer_keepalive.udp_port, null)
         vrf                                = try(local.device_config[device.name].vpc_domain.peer_keepalive.vrf, local.defaults.nxos.devices.configuration.vpc_domains.peer_keepalive.vrf, null)
-      } : null
-    ]
+      }
+    ] if try(local.device_config[device.name].vpc_domain, null) != null && try(local.device_config[device.name].vpc_domain.peer_keepalive, null) != null
   ])
 }
 
