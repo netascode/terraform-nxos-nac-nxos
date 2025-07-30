@@ -38,5 +38,5 @@ defaults:
               additive: false
               no_community: false
               set_criteria: none
-        vpc_domains:
+        vpc_domain:
           admin_state: true
