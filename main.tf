@@ -40,6 +40,10 @@ locals {
     )), "")
   }
 
+  device_config = { for device, config in local.devices_raw_config :
+    device => yamldecode(templatestring(config, local.device_variables[device]))
+  }
+
   interface_groups_raw_config = {
     for device in local.devices : device.name => {
       for ig in local.interface_groups : ig.name => yamlencode(try(ig.configuration, {}))
@@ -53,10 +57,6 @@ locals {
         configuration = yamldecode(templatestring(local.interface_groups_raw_config[device.name][ig.name], local.device_variables[device.name]))
       }
     ]
-  }
-
-  device_config = { for device, config in local.devices_raw_config :
-    device => yamldecode(templatestring(config, local.device_variables[device]))
   }
 
   provider_devices = [for device in local.devices : {
