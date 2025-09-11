@@ -25,6 +25,6 @@ resource "nxos_hmm_interface" "hmm_interface" {
 
   depends_on = [
     nxos_hmm_instance.hmm_instance,
-    nxos_svi_interface.svi_interface
+    nxos_svi_interface_vrf.svi_interface_vrf
   ]
 }
