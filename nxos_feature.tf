@@ -110,6 +110,15 @@ resource "nxos_feature_pvlan" "pvlan" {
   admin_state = try(local.device_config[each.key].system.feature.pvlan, local.defaults.nxos.devices.configuration.system.feature.pvlan) ? "enabled" : "disabled"
 }
 
+resource "nxos_rest" "service_acceleration" {
+  for_each   = { for device in local.devices : device.name => device if try(local.device_config[device.name].system.feature.service_acceleration, local.defaults.nxos.devices.configuration.system.feature.service_acceleration, null) != null }
+  dn         = "sys/fm/serviceacceleration"
+  class_name = "fmServiceAcceleration"
+  content = {
+    adminSt : try(local.device_config[each.key].system.feature.service_acceleration, local.defaults.nxos.devices.configuration.system.feature.service_acceleration) ? "enabled" : "disabled"
+  }
+}
+
 resource "nxos_feature_ssh" "ssh" {
   for_each    = { for device in local.devices : device.name => device if try(local.device_config[device.name].system.feature.ssh, local.defaults.nxos.devices.configuration.system.feature.ssh, null) != null }
   device      = each.key
