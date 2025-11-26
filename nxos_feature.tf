@@ -1,3 +1,9 @@
+resource "nxos_feature_bash_shell" "bash_shell" {
+  for_each    = { for device in local.devices : device.name => device if try(local.device_config[device.name].system.feature.bash_shell, local.defaults.nxos.devices.configuration.system.feature.bash_shell, null) != null }
+  device      = each.key
+  admin_state = try(local.device_config[each.key].system.feature.bash_shell, local.defaults.nxos.devices.configuration.system.feature.bash_shell) ? "enabled" : "disabled"
+}
+
 resource "nxos_feature_bfd" "bfd" {
   for_each    = { for device in local.devices : device.name => device if try(local.device_config[device.name].system.feature.bfd, local.defaults.nxos.devices.configuration.system.feature.bfd, null) != null }
   device      = each.key
@@ -70,6 +76,12 @@ resource "nxos_feature_netflow" "netflow" {
   admin_state = try(local.device_config[each.key].system.feature.netflow, local.defaults.nxos.devices.configuration.system.feature.netflow) ? "enabled" : "disabled"
 }
 
+resource "nxos_feature_ngoam" "ngoam" {
+  for_each    = { for device in local.devices : device.name => device if try(local.device_config[device.name].system.feature.ngoam, local.defaults.nxos.devices.configuration.system.feature.ngoam, null) != null }
+  device      = each.key
+  admin_state = try(local.device_config[each.key].system.feature.ngoam, local.defaults.nxos.devices.configuration.system.feature.ngoam) ? "enabled" : "disabled"
+}
+
 resource "nxos_feature_nv_overlay" "nv_overlay" {
   for_each    = { for device in local.devices : device.name => device if try(local.device_config[device.name].system.feature.nv_overlay, local.defaults.nxos.devices.configuration.system.feature.nv_overlay, null) != null }
   device      = each.key
@@ -108,6 +120,12 @@ resource "nxos_feature_pvlan" "pvlan" {
   for_each    = { for device in local.devices : device.name => device if try(local.device_config[device.name].system.feature.pvlan, local.defaults.nxos.devices.configuration.system.feature.pvlan, null) != null }
   device      = each.key
   admin_state = try(local.device_config[each.key].system.feature.pvlan, local.defaults.nxos.devices.configuration.system.feature.pvlan) ? "enabled" : "disabled"
+}
+
+resource "nxos_feature_sflow" "sflow" {
+  for_each    = { for device in local.devices : device.name => device if try(local.device_config[device.name].system.feature.sflow, local.defaults.nxos.devices.configuration.system.feature.sflow, null) != null }
+  device      = each.key
+  admin_state = try(local.device_config[each.key].system.feature.sflow, local.defaults.nxos.devices.configuration.system.feature.sflow) ? "enabled" : "disabled"
 }
 
 resource "nxos_feature_ssh" "ssh" {
