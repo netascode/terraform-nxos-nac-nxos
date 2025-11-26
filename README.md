@@ -82,7 +82,6 @@ module "nxos" {
 | [nxos_evpn_vni.evpn_vni](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/evpn_vni) | resource |
 | [nxos_evpn_vni_route_target.evpn_vni_route_target](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/evpn_vni_route_target) | resource |
 | [nxos_evpn_vni_route_target_direction.evpn_vni_route_target_direction](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/evpn_vni_route_target_direction) | resource |
-| [nxos_feature_bash_shell.bash_shell](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/feature_bash_shell) | resource |
 | [nxos_feature_bfd.bfd](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/feature_bfd) | resource |
 | [nxos_feature_bgp.bgp](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/feature_bgp) | resource |
 | [nxos_feature_dhcp.dhcp](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/feature_dhcp) | resource |
@@ -95,14 +94,12 @@ module "nxos" {
 | [nxos_feature_lldp.lldp](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/feature_lldp) | resource |
 | [nxos_feature_macsec.macsec](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/feature_macsec) | resource |
 | [nxos_feature_netflow.netflow](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/feature_netflow) | resource |
-| [nxos_feature_ngoam.ngoam](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/feature_ngoam) | resource |
 | [nxos_feature_nv_overlay.nv_overlay](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/feature_nv_overlay) | resource |
 | [nxos_feature_ospf.ospf](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/feature_ospf) | resource |
 | [nxos_feature_ospfv3.ospfv3](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/feature_ospfv3) | resource |
 | [nxos_feature_pim.pim](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/feature_pim) | resource |
 | [nxos_feature_ptp.ptp](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/feature_ptp) | resource |
 | [nxos_feature_pvlan.pvlan](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/feature_pvlan) | resource |
-| [nxos_feature_sflow.sflow](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/feature_sflow) | resource |
 | [nxos_feature_ssh.ssh](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/feature_ssh) | resource |
 | [nxos_feature_tacacs.tacacs](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/feature_tacacs) | resource |
 | [nxos_feature_telnet.telnet](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/feature_telnet) | resource |
