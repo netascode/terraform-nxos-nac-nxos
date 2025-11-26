@@ -161,6 +161,11 @@ module "nxos" {
 | [nxos_svi_interface.svi_interface](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/svi_interface) | resource |
 | [nxos_svi_interface_vrf.svi_interface_vrf](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/svi_interface_vrf) | resource |
 | [nxos_system.system](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/system) | resource |
+| [nxos_vpc_domain.vpc_domain](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/vpc_domain) | resource |
+| [nxos_vpc_instance.vpc_instance](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/vpc_instance) | resource |
+| [nxos_vpc_interface.vpc_interface](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/vpc_interface) | resource |
+| [nxos_vpc_keepalive.vpc_keepalive](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/vpc_keepalive) | resource |
+| [nxos_vpc_peerlink.vpc_peerlink](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/vpc_peerlink) | resource |
 | [nxos_vrf.vrf](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/vrf) | resource |
 | [nxos_vrf_address_family.vrf_address_family](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/vrf_address_family) | resource |
 | [nxos_vrf_route_target.vrf_route_target](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/vrf_route_target) | resource |
