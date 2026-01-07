@@ -262,7 +262,7 @@ resource "nxos_ipv4_interface_address" "port_channel_ipv4_interface_address" {
   vrf          = each.value.vrf
   interface_id = nxos_ipv4_interface.port_channel_ipv4_interface[each.key].interface_id
   address      = each.value.ipv4_address
-  tag         = each.value.tag
+  tag          = each.value.tag
 }
 
 resource "nxos_ipv4_interface_address" "port_channel_ipv4_secondary_interface_address" {
