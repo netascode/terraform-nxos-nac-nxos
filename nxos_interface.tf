@@ -41,6 +41,7 @@ locals {
         ip_unnumbered                           = try(int.ip_unnumbered, local.interfaces_ethernets_group_config[format("%s/%s", device.name, int.id)].ip_unnumbered, local.defaults.nxos.devices.configuration.interfaces.ethernets.ip_unnumbered, null)
         urpf                                    = try(int.urpf, local.interfaces_ethernets_group_config[format("%s/%s", device.name, int.id)].urpf, local.defaults.nxos.devices.configuration.interfaces.ethernets.urpf, null)
         ipv4_address                            = try(int.ipv4_address, local.interfaces_ethernets_group_config[format("%s/%s", device.name, int.id)].ipv4_address, local.defaults.nxos.devices.configuration.interfaces.ethernets.ipv4_address, null)
+        tag                                     = try(int.tag, local.interfaces_ethernets_group_config[format("%s/%s", device.name, int.id)].tag, local.defaults.nxos.devices.configuration.interfaces.ethernets.tag, null)
         ospf_process_name                       = try(int.ospf.process_name, local.interfaces_ethernets_group_config[format("%s/%s", device.name, int.id)].ospf.process_name, local.defaults.nxos.devices.configuration.interfaces.ethernets.ospf.process_name, null)
         ospf_advertise_secondaries              = try(int.ospf.advertise_secondaries, local.interfaces_ethernets_group_config[format("%s/%s", device.name, int.id)].ospf.advertise_secondaries, local.defaults.nxos.devices.configuration.interfaces.ethernets.ospf.advertise_secondaries, false)
         ospf_area                               = try(int.ospf.area, local.interfaces_ethernets_group_config[format("%s/%s", device.name, int.id)].ospf.area, local.defaults.nxos.devices.configuration.interfaces.ethernets.ospf.area, null)
@@ -133,6 +134,7 @@ resource "nxos_ipv4_interface_address" "ethernet_ipv4_interface_address" {
   vrf          = each.value.vrf
   interface_id = nxos_ipv4_interface.ethernet_ipv4_interface[each.key].interface_id
   address      = each.value.ipv4_address
+  tag          = each.value.tag
 }
 
 resource "nxos_ipv4_interface_address" "ethernet_ipv4_secondary_interface_address" {
@@ -190,6 +192,7 @@ locals {
         ip_unnumbered            = try(int.ip_unnumbered, local.interfaces_port_channels_group_config[format("%s/%s", device.name, int.id)].ip_unnumbered, local.defaults.nxos.devices.configuration.interfaces.port_channels.ip_unnumbered, null)
         urpf                     = try(int.urpf, local.interfaces_port_channels_group_config[format("%s/%s", device.name, int.id)].urpf, local.defaults.nxos.devices.configuration.interfaces.port_channels.urpf, null)
         ipv4_address             = try(int.ipv4_address, local.interfaces_port_channels_group_config[format("%s/%s", device.name, int.id)].ipv4_address, local.defaults.nxos.devices.configuration.interfaces.port_channels.ipv4_address, null)
+        tag                      = try(int.tag, local.interfaces_port_channels_group_config[format("%s/%s", device.name, int.id)].tag, local.defaults.nxos.devices.configuration.interfaces.port_channels.tag, null)
         ipv4_secondary_addresses = try(int.ipv4_secondary_addresses, local.interfaces_port_channels_group_config[format("%s/%s", device.name, int.id)].ipv4_secondary_addresses, local.defaults.nxos.devices.configuration.interfaces.port_channels.ipv4_secondary_addresses, [])
       }
     ]
@@ -259,6 +262,7 @@ resource "nxos_ipv4_interface_address" "port_channel_ipv4_interface_address" {
   vrf          = each.value.vrf
   interface_id = nxos_ipv4_interface.port_channel_ipv4_interface[each.key].interface_id
   address      = each.value.ipv4_address
+  tag         = each.value.tag
 }
 
 resource "nxos_ipv4_interface_address" "port_channel_ipv4_secondary_interface_address" {
@@ -306,6 +310,7 @@ locals {
         description                             = try(int.description, local.interfaces_loopbacks_group_config[format("%s/%s", device.name, int.id)].description, local.defaults.nxos.devices.configuration.interfaces.loopbacks.description, null)
         vrf                                     = try(int.vrf, local.interfaces_loopbacks_group_config[format("%s/%s", device.name, int.id)].vrf, local.defaults.nxos.devices.configuration.interfaces.loopbacks.vrf, "default")
         ipv4_address                            = try(int.ipv4_address, local.interfaces_loopbacks_group_config[format("%s/%s", device.name, int.id)].ipv4_address, local.defaults.nxos.devices.configuration.interfaces.loopbacks.ipv4_address, null)
+        tag                                     = try(int.tag, local.interfaces_loopbacks_group_config[format("%s/%s", device.name, int.id)].tag, local.defaults.nxos.devices.configuration.interfaces.loopbacks.tag, null)
         ospf_process_name                       = try(int.ospf.process_name, local.interfaces_loopbacks_group_config[format("%s/%s", device.name, int.id)].ospf.process_name, local.defaults.nxos.devices.configuration.interfaces.loopbacks.ospf.process_name, null)
         ospf_advertise_secondaries              = try(int.ospf.advertise_secondaries, local.interfaces_loopbacks_group_config[format("%s/%s", device.name, int.id)].ospf.advertise_secondaries, local.defaults.nxos.devices.configuration.interfaces.loopbacks.ospf.advertise_secondaries, false)
         ospf_area                               = try(int.ospf.area, local.interfaces_loopbacks_group_config[format("%s/%s", device.name, int.id)].ospf.area, local.defaults.nxos.devices.configuration.interfaces.loopbacks.ospf.area, null)
@@ -377,6 +382,7 @@ resource "nxos_ipv4_interface_address" "loopback_ipv4_interface_address" {
   interface_id = nxos_ipv4_interface.loopback_ipv4_interface[each.key].interface_id
   address      = each.value.ipv4_address
   type         = "primary"
+  tag          = each.value.tag
 }
 
 resource "nxos_ipv4_interface_address" "loopback_ipv4_secondary_interface_address" {
@@ -415,6 +421,7 @@ locals {
         description                             = try(int.description, local.interfaces_vlans_group_config[format("%s/%s", device.name, int.id)].description, local.defaults.nxos.devices.configuration.interfaces.vlans.description, null)
         vrf                                     = try(int.vrf, local.interfaces_vlans_group_config[format("%s/%s", device.name, int.id)].vrf, local.defaults.nxos.devices.configuration.interfaces.vlans.vrf, "default")
         ipv4_address                            = try(int.ipv4_address, local.interfaces_vlans_group_config[format("%s/%s", device.name, int.id)].ipv4_address, local.defaults.nxos.devices.configuration.interfaces.vlans.ipv4_address, null)
+        tag                                     = try(int.tag, local.interfaces_vlans_group_config[format("%s/%s", device.name, int.id)].tag, local.defaults.nxos.devices.configuration.interfaces.vlans.tag, null)
         delay                                   = try(int.delay, local.interfaces_vlans_group_config[format("%s/%s", device.name, int.id)].delay, local.defaults.nxos.devices.configuration.interfaces.vlans.delay, null)
         bandwidth                               = try(int.bandwidth, local.interfaces_vlans_group_config[format("%s/%s", device.name, int.id)].bandwidth, local.defaults.nxos.devices.configuration.interfaces.vlans.bandwidth, null)
         ip_forward                              = try(int.ip_forward, local.interfaces_vlans_group_config[format("%s/%s", device.name, int.id)].ip_forward, local.defaults.nxos.devices.configuration.interfaces.vlans.ip_forward, false)
@@ -498,6 +505,7 @@ resource "nxos_ipv4_interface_address" "svi_ipv4_interface_address" {
   interface_id = nxos_ipv4_interface.svi_ipv4_interface[each.key].interface_id
   address      = each.value.ipv4_address
   type         = "primary"
+  tag          = each.value.tag
 }
 
 resource "nxos_ipv4_interface_address" "svi_ipv4_secondary_interface_address" {
