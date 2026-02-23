@@ -115,7 +115,7 @@ resource "nxos_pim_anycast_rp_peer" "pim_anycast_rp_peer" {
 }
 
 locals {
-  pim_interfaces = concat(local.interfaces_ethernets, local.interfaces_loopbacks, local.interfaces_vlans, local.interfaces_port_channels)
+  pim_interfaces = concat(local.interfaces_ethernets, local.interfaces_subinterfaces, local.interfaces_loopbacks, local.interfaces_vlans, local.interfaces_port_channels)
 }
 
 resource "nxos_pim_interface" "pim_interface" {
