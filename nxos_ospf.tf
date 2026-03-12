@@ -99,7 +99,7 @@ locals {
 }
 
 resource "nxos_ospf_interface" "ospf_interface" {
-  for_each              = { for v in local.ospf_interfaces : v.key => v if v.ospf_process_name != null }
+  for_each              = { for v in local.ospf_interfaces : v.key => v if try(v.ospf_process_name, null) != null }
   device                = each.value.device
   instance_name         = each.value.ospf_process_name
   vrf_name              = nxos_ospf_vrf.ospf_vrf["${each.value.device}/${each.value.ospf_process_name}/${each.value.vrf}"].name
@@ -116,7 +116,7 @@ resource "nxos_ospf_interface" "ospf_interface" {
 }
 
 resource "nxos_ospf_authentication" "ospf_authentication" {
-  for_each            = { for v in local.ospf_interfaces : v.key => v if v.ospf_authentication_type == "simple" || v.ospf_authentication_type == "md5" }
+  for_each            = { for v in local.ospf_interfaces : v.key => v if try(v.ospf_authentication_type, null) == "simple" || try(v.ospf_authentication_type, null) == "md5" }
   device              = each.value.device
   instance_name       = each.value.ospf_process_name
   vrf_name            = each.value.vrf
