@@ -1,76 +1,24 @@
+module "model" {
+  source = "./modules/model"
+
+  yaml_directories          = var.yaml_directories
+  yaml_files                = var.yaml_files
+  model                     = var.model
+  managed_device_groups     = var.managed_device_groups
+  managed_devices           = var.managed_devices
+  write_default_values_file = var.write_default_values_file
+  write_model_file          = var.write_model_file
+}
+
 locals {
-  nxos                    = try(local.model.nxos, {})
-  global                  = try(local.nxos.global, [])
-  devices                 = try(local.nxos.devices, [])
-  device_groups           = try(local.nxos.device_groups, [])
-  interface_groups        = try(local.nxos.interface_groups, [])
-  configuration_templates = try(local.nxos.configuration_templates, [])
-
-  device_variables = { for device in local.devices :
-    device.name => merge(concat(
-      [try(local.global.variables, {})],
-      [for dg in local.device_groups : try(dg.variables, {}) if contains(try(device.device_groups, []), dg.name)],
-      [for dg in local.device_groups : try(dg.variables, {}) if contains(try(dg.devices, []), device.name)],
-      [try(device.variables, {})]
-    )...)
+  model    = module.model.model
+  defaults = module.model.default_values
+  nxos     = try(local.model.nxos, {})
+  devices  = try(local.nxos.devices, [])
+  device_config = { for device in try(local.nxos.devices, []) :
+    device.name => try(device.configuration, {})
   }
-
-  device_group_variables = { for dg in local.device_groups :
-    dg.name => try(dg.variables, {})
-  }
-
-  device_config_templates_raw_config = { for device in local.devices :
-    device.name => {
-      for dg in local.device_groups : dg.name => [
-        for t in try(dg.configuration_templates, []) :
-        yamlencode(try([for ct in local.configuration_templates : try(ct.configuration, {}) if ct.name == t][0], {}))
-      ]
-      if contains(try(device.device_groups, []), dg.name) || contains(try(dg.devices, []), device.name)
-    }
-  }
-
-  device_config_templates_config = { for device, groups in local.device_config_templates_raw_config :
-    device => provider::utils::yaml_merge([
-      for group_name, group_configs in groups : provider::utils::yaml_merge(
-        [for config in group_configs : templatestring(config, merge(local.device_variables[device], local.device_group_variables[group_name]))]
-      )
-    ])
-  }
-
-  devices_raw_config = { for device in local.devices :
-    device.name => try(provider::utils::yaml_merge(concat(
-      [yamlencode(try(local.global.configuration, {}))],
-      [for dg in local.device_groups : yamlencode(try(dg.configuration, {})) if contains(try(device.device_groups, []), dg.name)],
-      [for dg in local.device_groups : yamlencode(try(dg.configuration, {})) if contains(try(dg.devices, []), device.name)],
-      [local.device_config_templates_config[device.name]],
-      [yamlencode(try(device.configuration, {}))]
-    )), "")
-  }
-
-  device_config = { for device, config in local.devices_raw_config :
-    device => yamldecode(templatestring(config, local.device_variables[device]))
-  }
-
-  interface_groups_raw_config = {
-    for device in local.devices : device.name => {
-      for ig in local.interface_groups : ig.name => yamlencode(try(ig.configuration, {}))
-    }
-  }
-
-  interface_groups_config = {
-    for device in local.devices : device.name => [
-      for ig in local.interface_groups : {
-        name          = ig.name
-        configuration = yamldecode(templatestring(local.interface_groups_raw_config[device.name][ig.name], local.device_variables[device.name]))
-      }
-    ]
-  }
-
-  provider_devices = [for device in local.devices : {
-    name    = device.name
-    url     = device.url
-    managed = try(device.managed, local.defaults.nxos.devices.managed, true)
-  }]
+  provider_devices = module.model.devices
 }
 
 provider "nxos" {

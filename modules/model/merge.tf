@@ -11,17 +11,14 @@ locals {
   model_string    = provider::utils::yaml_merge(concat(local.yaml_strings_directories, local.yaml_strings_files, local.model_strings))
   model           = yamldecode(local.model_string)
   user_defaults   = { "defaults" : try(local.model["defaults"], {}) }
-  defaults_string = provider::utils::yaml_merge([file("${path.module}/defaults/defaults.yaml"), yamlencode(local.user_defaults)])
+  defaults_string = provider::utils::yaml_merge([file("${path.module}/../../defaults/defaults.yaml"), yamlencode(local.user_defaults)])
   defaults        = yamldecode(local.defaults_string)["defaults"]
 }
 
-resource "terraform_data" "validation" {
-  lifecycle {
-    precondition {
-      condition     = length(var.yaml_directories) != 0 || length(var.yaml_files) != 0 || length(keys(var.model)) != 0
-      error_message = "Either `yaml_directories`,`yaml_files` or a non-empty `model` value must be provided."
-    }
-  }
+resource "local_sensitive_file" "model" {
+  count    = var.write_model_file != "" ? 1 : 0
+  content  = yamlencode(local.nxos_devices)
+  filename = var.write_model_file
 }
 
 resource "local_sensitive_file" "defaults" {

@@ -14,6 +14,10 @@ variable "model" {
   description = "As an alternative to YAML files, a native Terraform data structure can be provided as well."
   type        = map(any)
   default     = {}
+  validation {
+    condition     = length(var.yaml_directories) != 0 || length(var.yaml_files) != 0 || length(keys(var.model)) != 0
+    error_message = "Either `yaml_directories`,`yaml_files` or a non-empty `model` value must be provided."
+  }
 }
 
 variable "managed_device_groups" {
@@ -26,12 +30,6 @@ variable "managed_devices" {
   description = "List of device names to be managed. By default all devices will be managed."
   type        = list(string)
   default     = []
-}
-
-variable "save_config" {
-  description = "Write changes to startup-config on all devices."
-  type        = bool
-  default     = false
 }
 
 variable "write_default_values_file" {
