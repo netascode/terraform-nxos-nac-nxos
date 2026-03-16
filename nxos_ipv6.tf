@@ -1,0 +1,172 @@
+locals {
+  # Group IPv6 static routes by device/vrf for the nxos_ipv6 vrfs nested map
+  ipv6_static_routes_by_device_vrf = {
+    for entry in flatten([
+      for device in local.devices : [
+        for route in try(local.device_config[device.name].routing.ipv6_static_routes, []) : {
+          device = device.name
+          vrf    = route.vrf
+          route  = route
+        }
+      ]
+    ]) : "${entry.device}/${entry.vrf}" => entry...
+  }
+
+  # Collect all IPv6 interfaces across all interface types as a flat list
+  ipv6_interfaces = flatten([
+    for device in local.devices : concat(
+      # Ethernets (layer3 only)
+      [for int in try(local.device_config[device.name].interfaces.ethernets, []) : {
+        device                          = device.name
+        vrf                             = try(int.vrf, local.defaults.nxos.devices.configuration.interfaces.ethernets.vrf, "default")
+        id                              = "eth${int.id}"
+        ipv6_auto_configuration         = try(int.ipv6_auto_configuration, local.defaults.nxos.devices.configuration.interfaces.ethernets.ipv6_auto_configuration, null)
+        ipv6_default_route              = try(int.ipv6_default_route, local.defaults.nxos.devices.configuration.interfaces.ethernets.ipv6_default_route, null)
+        ipv6_forward                    = try(int.ipv6_forward, local.defaults.nxos.devices.configuration.interfaces.ethernets.ipv6_forward, null)
+        ipv6_link_local_address_use_bia = try(int.ipv6_link_local_address_use_bia, local.defaults.nxos.devices.configuration.interfaces.ethernets.ipv6_link_local_address_use_bia, null)
+        ipv6_use_link_local_address     = try(int.ipv6_use_link_local_address, local.defaults.nxos.devices.configuration.interfaces.ethernets.ipv6_use_link_local_address, null)
+        ipv6_urpf                       = try(int.ipv6_urpf, local.defaults.nxos.devices.configuration.interfaces.ethernets.ipv6_urpf, null)
+        ipv6_link_local_address         = try(int.ipv6_link_local_address, local.defaults.nxos.devices.configuration.interfaces.ethernets.ipv6_link_local_address, null)
+        ipv6_addresses                  = try(int.ipv6_addresses, [])
+        } if try(int.layer3, local.defaults.nxos.devices.configuration.interfaces.ethernets.layer3, false)
+      ],
+      # Loopbacks
+      [for int in try(local.device_config[device.name].interfaces.loopbacks, []) : {
+        device                          = device.name
+        vrf                             = try(int.vrf, local.defaults.nxos.devices.configuration.interfaces.loopbacks.vrf, "default")
+        id                              = "lo${int.id}"
+        ipv6_auto_configuration         = try(int.ipv6_auto_configuration, local.defaults.nxos.devices.configuration.interfaces.loopbacks.ipv6_auto_configuration, null)
+        ipv6_default_route              = try(int.ipv6_default_route, local.defaults.nxos.devices.configuration.interfaces.loopbacks.ipv6_default_route, null)
+        ipv6_forward                    = try(int.ipv6_forward, local.defaults.nxos.devices.configuration.interfaces.loopbacks.ipv6_forward, null)
+        ipv6_link_local_address_use_bia = try(int.ipv6_link_local_address_use_bia, local.defaults.nxos.devices.configuration.interfaces.loopbacks.ipv6_link_local_address_use_bia, null)
+        ipv6_use_link_local_address     = try(int.ipv6_use_link_local_address, local.defaults.nxos.devices.configuration.interfaces.loopbacks.ipv6_use_link_local_address, null)
+        ipv6_urpf                       = try(int.ipv6_urpf, local.defaults.nxos.devices.configuration.interfaces.loopbacks.ipv6_urpf, null)
+        ipv6_link_local_address         = try(int.ipv6_link_local_address, local.defaults.nxos.devices.configuration.interfaces.loopbacks.ipv6_link_local_address, null)
+        ipv6_addresses                  = try(int.ipv6_addresses, [])
+      }],
+      # SVIs
+      [for int in try(local.device_config[device.name].interfaces.vlans, []) : {
+        device                          = device.name
+        vrf                             = try(int.vrf, local.defaults.nxos.devices.configuration.interfaces.vlans.vrf, "default")
+        id                              = "vlan${int.id}"
+        ipv6_auto_configuration         = try(int.ipv6_auto_configuration, local.defaults.nxos.devices.configuration.interfaces.vlans.ipv6_auto_configuration, null)
+        ipv6_default_route              = try(int.ipv6_default_route, local.defaults.nxos.devices.configuration.interfaces.vlans.ipv6_default_route, null)
+        ipv6_forward                    = try(int.ipv6_forward, local.defaults.nxos.devices.configuration.interfaces.vlans.ipv6_forward, null)
+        ipv6_link_local_address_use_bia = try(int.ipv6_link_local_address_use_bia, local.defaults.nxos.devices.configuration.interfaces.vlans.ipv6_link_local_address_use_bia, null)
+        ipv6_use_link_local_address     = try(int.ipv6_use_link_local_address, local.defaults.nxos.devices.configuration.interfaces.vlans.ipv6_use_link_local_address, null)
+        ipv6_urpf                       = try(int.ipv6_urpf, local.defaults.nxos.devices.configuration.interfaces.vlans.ipv6_urpf, null)
+        ipv6_link_local_address         = try(int.ipv6_link_local_address, local.defaults.nxos.devices.configuration.interfaces.vlans.ipv6_link_local_address, null)
+        ipv6_addresses                  = try(int.ipv6_addresses, [])
+      }],
+      # Port channels (layer3 only)
+      [for int in try(local.device_config[device.name].interfaces.port_channels, []) : {
+        device                          = device.name
+        vrf                             = try(int.vrf, local.defaults.nxos.devices.configuration.interfaces.port_channels.vrf, "default")
+        id                              = "po${int.id}"
+        ipv6_auto_configuration         = try(int.ipv6_auto_configuration, local.defaults.nxos.devices.configuration.interfaces.port_channels.ipv6_auto_configuration, null)
+        ipv6_default_route              = try(int.ipv6_default_route, local.defaults.nxos.devices.configuration.interfaces.port_channels.ipv6_default_route, null)
+        ipv6_forward                    = try(int.ipv6_forward, local.defaults.nxos.devices.configuration.interfaces.port_channels.ipv6_forward, null)
+        ipv6_link_local_address_use_bia = try(int.ipv6_link_local_address_use_bia, local.defaults.nxos.devices.configuration.interfaces.port_channels.ipv6_link_local_address_use_bia, null)
+        ipv6_use_link_local_address     = try(int.ipv6_use_link_local_address, local.defaults.nxos.devices.configuration.interfaces.port_channels.ipv6_use_link_local_address, null)
+        ipv6_urpf                       = try(int.ipv6_urpf, local.defaults.nxos.devices.configuration.interfaces.port_channels.ipv6_urpf, null)
+        ipv6_link_local_address         = try(int.ipv6_link_local_address, local.defaults.nxos.devices.configuration.interfaces.port_channels.ipv6_link_local_address, null)
+        ipv6_addresses                  = try(int.ipv6_addresses, [])
+        } if try(int.layer3, local.defaults.nxos.devices.configuration.interfaces.port_channels.layer3, false)
+      ],
+    )
+  ])
+}
+
+resource "nxos_ipv6" "ipv6" {
+  for_each = { for device in local.devices : device.name => device
+    if try(local.device_config[device.name].ipv6.routing, local.defaults.nxos.devices.configuration.ipv6.routing, null) != null ||
+    try(local.device_config[device.name].ipv6.access_list_match_local, local.defaults.nxos.devices.configuration.ipv6.access_list_match_local, null) != null ||
+    try(local.device_config[device.name].ipv6.drop_nd_fragments, local.defaults.nxos.devices.configuration.ipv6.drop_nd_fragments, null) != null ||
+    try(local.device_config[device.name].ipv6.queue_packets, local.defaults.nxos.devices.configuration.ipv6.queue_packets, null) != null ||
+    try(local.device_config[device.name].ipv6.static_neighbor_outside_subnet, local.defaults.nxos.devices.configuration.ipv6.static_neighbor_outside_subnet, null) != null ||
+    try(local.device_config[device.name].ipv6.switch_packets, local.defaults.nxos.devices.configuration.ipv6.switch_packets, null) != null ||
+    length(try(local.device_config[device.name].vrfs, [])) > 0 ||
+    length(try(local.device_config[device.name].routing.ipv6_static_routes, [])) > 0 ||
+  length([for int in local.ipv6_interfaces : int if int.device == device.name]) > 0 }
+  device = each.key
+
+  access_list_match_local        = try(local.device_config[each.key].ipv6.access_list_match_local, local.defaults.nxos.devices.configuration.ipv6.access_list_match_local, null) != null ? (try(local.device_config[each.key].ipv6.access_list_match_local, local.defaults.nxos.devices.configuration.ipv6.access_list_match_local) ? "enabled" : "disabled") : null
+  admin_state                    = try(local.device_config[each.key].ipv6.routing, local.defaults.nxos.devices.configuration.ipv6.routing, null) != null ? (try(local.device_config[each.key].ipv6.routing, local.defaults.nxos.devices.configuration.ipv6.routing) ? "enabled" : "disabled") : null
+  drop_nd_fragments              = try(local.device_config[each.key].ipv6.drop_nd_fragments, local.defaults.nxos.devices.configuration.ipv6.drop_nd_fragments, null) != null ? (try(local.device_config[each.key].ipv6.drop_nd_fragments, local.defaults.nxos.devices.configuration.ipv6.drop_nd_fragments) ? "enabled" : "disabled") : null
+  queue_packets                  = try(local.device_config[each.key].ipv6.queue_packets, local.defaults.nxos.devices.configuration.ipv6.queue_packets, null) != null ? (try(local.device_config[each.key].ipv6.queue_packets, local.defaults.nxos.devices.configuration.ipv6.queue_packets) ? "enabled" : "disabled") : null
+  static_neighbor_outside_subnet = try(local.device_config[each.key].ipv6.static_neighbor_outside_subnet, local.defaults.nxos.devices.configuration.ipv6.static_neighbor_outside_subnet, null) != null ? (try(local.device_config[each.key].ipv6.static_neighbor_outside_subnet, local.defaults.nxos.devices.configuration.ipv6.static_neighbor_outside_subnet) ? "enabled" : "disabled") : null
+  switch_packets                 = try(local.device_config[each.key].ipv6.switch_packets, local.defaults.nxos.devices.configuration.ipv6.switch_packets, null)
+
+  vrfs = merge(
+    # "default" VRF
+    {
+      "default" = {
+        static_routes = { for route in try(local.ipv6_static_routes_by_device_vrf["${each.key}/default"], []) : route.route.prefix => {
+          description = try(route.route.description, local.defaults.nxos.devices.configuration.routing.ipv6_static_routes.description, null)
+          preference  = try(route.route.preference, local.defaults.nxos.devices.configuration.routing.ipv6_static_routes.preference, null)
+          tag         = try(route.route.tag, local.defaults.nxos.devices.configuration.routing.ipv6_static_routes.tag, null)
+
+          next_hops = { for nh in try(route.route.next_hops, []) : "${try(nh.interface, local.defaults.nxos.devices.configuration.routing.ipv6_static_routes.next_hops.interface, "unspecified")};${try(nh.address, local.defaults.nxos.devices.configuration.routing.ipv6_static_routes.next_hops.address, "::")};${try(nh.vrf, local.defaults.nxos.devices.configuration.routing.ipv6_static_routes.next_hops.vrf, "default")}" => {
+            description           = try(nh.description, local.defaults.nxos.devices.configuration.routing.ipv6_static_routes.next_hops.description, null)
+            object                = try(nh.track, local.defaults.nxos.devices.configuration.routing.ipv6_static_routes.next_hops.track, null)
+            preference            = try(nh.preference, local.defaults.nxos.devices.configuration.routing.ipv6_static_routes.next_hops.preference, null)
+            tag                   = try(nh.tag, local.defaults.nxos.devices.configuration.routing.ipv6_static_routes.next_hops.tag, null)
+            name                  = try(nh.name, local.defaults.nxos.devices.configuration.routing.ipv6_static_routes.next_hops.name, null)
+            rewrite_encapsulation = try(nh.rewrite_encapsulation, local.defaults.nxos.devices.configuration.routing.ipv6_static_routes.next_hops.rewrite_encapsulation, null)
+          } }
+        } }
+
+        interfaces = { for int in local.ipv6_interfaces : int.id => {
+          auto_configuration         = int.ipv6_auto_configuration != null ? (int.ipv6_auto_configuration ? "enabled" : "disabled") : null
+          default_route              = int.ipv6_default_route != null ? (int.ipv6_default_route ? "enabled" : "disabled") : null
+          forward                    = int.ipv6_forward != null ? (int.ipv6_forward ? "enabled" : "disabled") : null
+          link_local_address_use_bia = int.ipv6_link_local_address_use_bia != null ? (int.ipv6_link_local_address_use_bia ? "enabled" : "disabled") : null
+          use_link_local_address     = int.ipv6_use_link_local_address != null ? (int.ipv6_use_link_local_address ? "enabled" : "disabled") : null
+          urpf                       = int.ipv6_urpf
+          link_local_address         = int.ipv6_link_local_address
+
+          addresses = { for addr in int.ipv6_addresses : addr.address => {
+            type       = try(addr.type, null)
+            tag        = try(addr.tag, null)
+            control    = try(addr.eui64, false) ? "eui64" : null
+            preference = try(addr.route_preference, null)
+          } }
+        } if int.device == each.key && int.vrf == "default" }
+      }
+    },
+    # VRFs from configuration.vrfs[]
+    { for vrf in try(local.device_config[each.key].vrfs, []) : vrf.name => {
+      static_routes = { for route in try(local.ipv6_static_routes_by_device_vrf["${each.key}/${vrf.name}"], []) : route.route.prefix => {
+        description = try(route.route.description, local.defaults.nxos.devices.configuration.routing.ipv6_static_routes.description, null)
+        preference  = try(route.route.preference, local.defaults.nxos.devices.configuration.routing.ipv6_static_routes.preference, null)
+        tag         = try(route.route.tag, local.defaults.nxos.devices.configuration.routing.ipv6_static_routes.tag, null)
+
+        next_hops = { for nh in try(route.route.next_hops, []) : "${try(nh.interface, local.defaults.nxos.devices.configuration.routing.ipv6_static_routes.next_hops.interface, "unspecified")};${try(nh.address, local.defaults.nxos.devices.configuration.routing.ipv6_static_routes.next_hops.address, "::")};${try(nh.vrf, local.defaults.nxos.devices.configuration.routing.ipv6_static_routes.next_hops.vrf, "default")}" => {
+          description           = try(nh.description, local.defaults.nxos.devices.configuration.routing.ipv6_static_routes.next_hops.description, null)
+          object                = try(nh.track, local.defaults.nxos.devices.configuration.routing.ipv6_static_routes.next_hops.track, null)
+          preference            = try(nh.preference, local.defaults.nxos.devices.configuration.routing.ipv6_static_routes.next_hops.preference, null)
+          tag                   = try(nh.tag, local.defaults.nxos.devices.configuration.routing.ipv6_static_routes.next_hops.tag, null)
+          name                  = try(nh.name, local.defaults.nxos.devices.configuration.routing.ipv6_static_routes.next_hops.name, null)
+          rewrite_encapsulation = try(nh.rewrite_encapsulation, local.defaults.nxos.devices.configuration.routing.ipv6_static_routes.next_hops.rewrite_encapsulation, null)
+        } }
+      } }
+
+      interfaces = { for int in local.ipv6_interfaces : int.id => {
+        auto_configuration         = int.ipv6_auto_configuration != null ? (int.ipv6_auto_configuration ? "enabled" : "disabled") : null
+        default_route              = int.ipv6_default_route != null ? (int.ipv6_default_route ? "enabled" : "disabled") : null
+        forward                    = int.ipv6_forward != null ? (int.ipv6_forward ? "enabled" : "disabled") : null
+        link_local_address_use_bia = int.ipv6_link_local_address_use_bia != null ? (int.ipv6_link_local_address_use_bia ? "enabled" : "disabled") : null
+        use_link_local_address     = int.ipv6_use_link_local_address != null ? (int.ipv6_use_link_local_address ? "enabled" : "disabled") : null
+        urpf                       = int.ipv6_urpf
+        link_local_address         = int.ipv6_link_local_address
+
+        addresses = { for addr in int.ipv6_addresses : addr.address => {
+          type       = try(addr.type, null)
+          tag        = try(addr.tag, null)
+          control    = try(addr.eui64, false) ? "eui64" : null
+          preference = try(addr.route_preference, null)
+        } }
+      } if int.device == each.key && int.vrf == vrf.name }
+    } }
+  )
+}
