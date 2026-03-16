@@ -91,6 +91,7 @@ module "nxos" {
 | [nxos_svi_interface.svi_interface](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/svi_interface) | resource |
 | [nxos_system.system](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/system) | resource |
 | [nxos_user_management.user_management](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/user_management) | resource |
+| [nxos_vpc.vpc](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/vpc) | resource |
 | [nxos_vrf.vrf](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/vrf) | resource |
 ## Modules
 
