@@ -4,7 +4,7 @@ resource "nxos_bgp" "bgp" {
   admin_state = "enabled"
 
   depends_on = [
-    nxos_feature_bgp.bgp
+    nxos_feature.feature
   ]
 }
 

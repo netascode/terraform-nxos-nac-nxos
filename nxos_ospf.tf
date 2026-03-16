@@ -4,7 +4,7 @@ resource "nxos_ospf" "ospf" {
   admin_state = "enabled"
 
   depends_on = [
-    nxos_feature_ospf.ospf
+    nxos_feature.feature
   ]
 }
 

@@ -148,7 +148,7 @@ resource "nxos_evpn" "evpn" {
   admin_state = "enabled"
 
   depends_on = [
-    nxos_feature_evpn.evpn
+    nxos_feature.feature
   ]
 }
 

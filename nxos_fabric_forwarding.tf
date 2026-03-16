@@ -3,7 +3,7 @@ resource "nxos_hmm" "hmm" {
   device   = each.value.name
 
   depends_on = [
-    nxos_feature_hmm.fabric_forwarding
+    nxos_feature.feature
   ]
 }
 

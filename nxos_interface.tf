@@ -488,7 +488,7 @@ resource "nxos_nve_interface" "nve_interface" {
   suppress_mac_route               = try(local.device_config[each.key].interfaces.nve.suppress_mac_route, local.defaults.nxos.devices.configuration.interfaces.nve.suppress_mac_route, false)
 
   depends_on = [
-    nxos_feature_nv_overlay.nv_overlay
+    nxos_feature.feature
   ]
 }
 
