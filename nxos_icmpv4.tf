@@ -54,12 +54,11 @@ locals {
 
 resource "nxos_icmpv4" "icmpv4" {
   for_each = { for device in local.devices : device.name => device
-    if try(local.device_config[device.name].icmpv4.stateful_ha, local.defaults.nxos.devices.configuration.icmpv4.stateful_ha, null) != null ||
-  length([for int in local.icmpv4_interfaces : int if int.device == device.name]) > 0 }
+  if length([for int in local.icmpv4_interfaces : int if int.device == device.name]) > 0 }
   device               = each.key
   admin_state          = "enabled"
   instance_admin_state = "enabled"
-  control              = try(local.device_config[each.key].icmpv4.stateful_ha, local.defaults.nxos.devices.configuration.icmpv4.stateful_ha, false) ? "stateful-ha" : ""
+  control              = ""
   vrfs = { for key, entry in local.icmpv4_vrfs : entry.vrf => {
     interfaces = { for int in local.icmpv4_interfaces : int.id => {
       control = join(",", sort(compact([

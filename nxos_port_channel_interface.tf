@@ -7,7 +7,7 @@ locals {
         id                                      = int.id
         type                                    = "po"
         vrf                                     = try(int.vrf, local.defaults.nxos.devices.configuration.interfaces.port_channels.vrf, "default")
-        ospf_process_name                       = try(int.ospf.process_name, local.defaults.nxos.devices.configuration.interfaces.port_channels.ospf.process_name, null)
+        ospf_process_name                       = try(int.ospf.process, local.defaults.nxos.devices.configuration.interfaces.port_channels.ospf.process, null)
         ospf_advertise_secondaries              = try(int.ospf.advertise_secondaries, local.defaults.nxos.devices.configuration.interfaces.port_channels.ospf.advertise_secondaries, false)
         ospf_area                               = try(int.ospf.area, local.defaults.nxos.devices.configuration.interfaces.port_channels.ospf.area, null)
         ospf_bfd                                = try(int.ospf.bfd, local.defaults.nxos.devices.configuration.interfaces.port_channels.ospf.bfd, null)
@@ -100,7 +100,7 @@ resource "nxos_port_channel_interface" "port_channel_interface" {
   if length(try(local.device_config[device.name].interfaces.port_channels, [])) > 0 }
   device = each.key
   port_channel_interfaces = { for int in try(local.device_config[each.key].interfaces.port_channels, []) : "po${int.id}" => {
-    port_channel_mode      = try(int.port_channel_mode, local.defaults.nxos.devices.configuration.interfaces.port_channels.port_channel_mode, null)
+    port_channel_mode      = try([for eth in try(local.device_config[each.key].interfaces.ethernets, []) : try(eth.port_channel_mode, local.defaults.nxos.devices.configuration.interfaces.ethernets.port_channel_mode, null) if try(eth.port_channel, null) == int.id][0], null)
     minimum_links          = try(int.minimum_links, local.defaults.nxos.devices.configuration.interfaces.port_channels.minimum_links, null)
     maximum_links          = try(int.maximum_links, local.defaults.nxos.devices.configuration.interfaces.port_channels.maximum_links, null)
     suspend_individual     = try(int.suspend_individual, local.defaults.nxos.devices.configuration.interfaces.port_channels.suspend_individual, null) != null ? (try(int.suspend_individual, local.defaults.nxos.devices.configuration.interfaces.port_channels.suspend_individual) ? "enable" : "disable") : null
@@ -139,7 +139,6 @@ resource "nxos_port_channel_interface" "port_channel_interface" {
     squelch                = try(int.squelch, local.defaults.nxos.devices.configuration.interfaces.port_channels.squelch, null) != null ? (try(int.squelch, local.defaults.nxos.devices.configuration.interfaces.port_channels.squelch) ? "enable" : "disable") : null
     transmission_mode      = try(int.transparent_mode, local.defaults.nxos.devices.configuration.interfaces.port_channels.transparent_mode, null)
     trunk_logging          = try(int.trunk_logging, local.defaults.nxos.devices.configuration.interfaces.port_channels.trunk_logging, null) != null ? (try(int.trunk_logging, local.defaults.nxos.devices.configuration.interfaces.port_channels.trunk_logging) ? "enable" : "disable") : null
-    usage                  = try(int.usage, local.defaults.nxos.devices.configuration.interfaces.port_channels.usage, null)
     user_configured_flags  = "admin_layer,admin_mtu,admin_state"
     vrf_dn                 = try(int.layer3, local.defaults.nxos.devices.configuration.interfaces.port_channels.layer3, false) ? "sys/inst-${try(int.vrf, local.defaults.nxos.devices.configuration.interfaces.port_channels.vrf, "default")}" : null
     members = { for eth in try(local.device_config[each.key].interfaces.ethernets, []) : "sys/intf/phys-[eth${eth.id}]" => {

@@ -10,7 +10,7 @@ locals {
         description                             = try(int.description, local.defaults.nxos.devices.configuration.interfaces.loopbacks.description, null)
         vrf                                     = try(int.vrf, local.defaults.nxos.devices.configuration.interfaces.loopbacks.vrf, "default")
         ipv4_address                            = try(int.ipv4_address, local.defaults.nxos.devices.configuration.interfaces.loopbacks.ipv4_address, null)
-        ospf_process_name                       = try(int.ospf.process_name, local.defaults.nxos.devices.configuration.interfaces.loopbacks.ospf.process_name, null)
+        ospf_process_name                       = try(int.ospf.process, local.defaults.nxos.devices.configuration.interfaces.loopbacks.ospf.process, null)
         ospf_advertise_secondaries              = try(int.ospf.advertise_secondaries, local.defaults.nxos.devices.configuration.interfaces.loopbacks.ospf.advertise_secondaries, false)
         ospf_area                               = try(int.ospf.area, local.defaults.nxos.devices.configuration.interfaces.loopbacks.ospf.area, null)
         ospf_bfd                                = try(int.ospf.bfd, local.defaults.nxos.devices.configuration.interfaces.loopbacks.ospf.bfd, null)

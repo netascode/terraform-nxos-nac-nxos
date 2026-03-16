@@ -67,26 +67,18 @@ resource "nxos_system" "system" {
   name = try(local.device_config[each.key].system.hostname, local.defaults.nxos.devices.configuration.system.hostname, null)
 
   # ethpmInst attributes (ethernet)
-  ethernet_mtu                                       = try(local.device_config[each.key].system.mtu, local.defaults.nxos.devices.configuration.system.mtu, null)
-  ethernet_default_admin_state                       = try(local.device_config[each.key].system.ethernet.default_switchport_shutdown, local.defaults.nxos.devices.configuration.system.ethernet.default_switchport_shutdown, null) != null ? (try(local.device_config[each.key].system.ethernet.default_switchport_shutdown, local.defaults.nxos.devices.configuration.system.ethernet.default_switchport_shutdown) ? "down" : "up") : null
-  ethernet_admin_link_down_syslog_level              = try(local.device_config[each.key].system.ethernet.admin_link_down_syslog_level, local.defaults.nxos.devices.configuration.system.ethernet.admin_link_down_syslog_level, null)
-  ethernet_admin_link_up_syslog_level                = try(local.device_config[each.key].system.ethernet.admin_link_up_syslog_level, local.defaults.nxos.devices.configuration.system.ethernet.admin_link_up_syslog_level, null)
-  ethernet_admin_state                               = try(local.device_config[each.key].system.ethernet.admin_state, local.defaults.nxos.devices.configuration.system.ethernet.admin_state, null)
-  ethernet_allow_unsupported_sfp                     = try(local.device_config[each.key].system.ethernet.unsupported_transceiver, local.defaults.nxos.devices.configuration.system.ethernet.unsupported_transceiver, null)
-  ethernet_chassis_infrastructure_adaptor_vlan       = try(local.device_config[each.key].system.ethernet.chassis_infrastructure_adaptor_vlan, local.defaults.nxos.devices.configuration.system.ethernet.chassis_infrastructure_adaptor_vlan, null)
-  ethernet_chassis_infrastructure_epds_port_number   = try(local.device_config[each.key].system.ethernet.chassis_infrastructure_epds_port_number, local.defaults.nxos.devices.configuration.system.ethernet.chassis_infrastructure_epds_port_number, null)
-  ethernet_chassis_infrastructure_ipv6_address       = try(local.device_config[each.key].system.ethernet.chassis_infrastructure_ipv6_address, local.defaults.nxos.devices.configuration.system.ethernet.chassis_infrastructure_ipv6_address, null)
-  ethernet_chassis_infrastructure_vlan               = try(local.device_config[each.key].system.ethernet.chassis_infrastructure_vlan, local.defaults.nxos.devices.configuration.system.ethernet.chassis_infrastructure_vlan, null)
-  ethernet_chassis_management_instance               = try(local.device_config[each.key].system.ethernet.chassis_management_instance, local.defaults.nxos.devices.configuration.system.ethernet.chassis_management_instance, null)
-  ethernet_chassis_management_instance_fabric_number = try(local.device_config[each.key].system.ethernet.chassis_management_instance_fabric_number, local.defaults.nxos.devices.configuration.system.ethernet.chassis_management_instance_fabric_number, null)
-  ethernet_control                                   = try(local.device_config[each.key].system.ethernet.control, local.defaults.nxos.devices.configuration.system.ethernet.control, null)
-  ethernet_interface_syslog_info                     = try(local.device_config[each.key].system.ethernet.interface_syslog_info, local.defaults.nxos.devices.configuration.system.ethernet.interface_syslog_info, null)
-  ethernet_log_event                                 = try(local.device_config[each.key].system.ethernet.log_event, local.defaults.nxos.devices.configuration.system.ethernet.log_event, null) != null ? try(local.log_event_map[try(local.device_config[each.key].system.ethernet.log_event, local.defaults.nxos.devices.configuration.system.ethernet.log_event)], null) : null
-  ethernet_default_layer                             = try(local.device_config[each.key].system.ethernet.default_switchport, local.defaults.nxos.devices.configuration.system.ethernet.default_switchport, null)
-  ethernet_system_interface_admin_state              = try(local.device_config[each.key].system.ethernet.interface_shutdown, local.defaults.nxos.devices.configuration.system.ethernet.interface_shutdown, null)
-  ethernet_system_link_failure_laser_on              = try(local.device_config[each.key].system.ethernet.link_failure_laser_on, local.defaults.nxos.devices.configuration.system.ethernet.link_failure_laser_on, null)
-  ethernet_system_storm_control_multi_threshold      = try(local.device_config[each.key].system.ethernet.storm_control_multicast, local.defaults.nxos.devices.configuration.system.ethernet.storm_control_multicast, null)
-  ethernet_vlan_tag_native                           = try(local.device_config[each.key].system.ethernet.dot1q_tag_native, local.defaults.nxos.devices.configuration.system.ethernet.dot1q_tag_native, null)
+  ethernet_mtu                                  = try(local.device_config[each.key].system.mtu, local.defaults.nxos.devices.configuration.system.mtu, null)
+  ethernet_default_admin_state                  = try(local.device_config[each.key].system.ethernet.default_switchport_shutdown, local.defaults.nxos.devices.configuration.system.ethernet.default_switchport_shutdown, null) != null ? (try(local.device_config[each.key].system.ethernet.default_switchport_shutdown, local.defaults.nxos.devices.configuration.system.ethernet.default_switchport_shutdown) ? "down" : "up") : null
+  ethernet_admin_link_down_syslog_level         = try(local.device_config[each.key].system.ethernet.admin_link_down_syslog_level, local.defaults.nxos.devices.configuration.system.ethernet.admin_link_down_syslog_level, null)
+  ethernet_admin_link_up_syslog_level           = try(local.device_config[each.key].system.ethernet.admin_link_up_syslog_level, local.defaults.nxos.devices.configuration.system.ethernet.admin_link_up_syslog_level, null)
+  ethernet_allow_unsupported_sfp                = try(local.device_config[each.key].system.ethernet.unsupported_transceiver, local.defaults.nxos.devices.configuration.system.ethernet.unsupported_transceiver, null)
+  ethernet_interface_syslog_info                = try(local.device_config[each.key].system.ethernet.interface_syslog_info, local.defaults.nxos.devices.configuration.system.ethernet.interface_syslog_info, null)
+  ethernet_log_event                            = try(local.device_config[each.key].system.ethernet.log_event, local.defaults.nxos.devices.configuration.system.ethernet.log_event, null) != null ? try(local.log_event_map[try(local.device_config[each.key].system.ethernet.log_event, local.defaults.nxos.devices.configuration.system.ethernet.log_event)], null) : null
+  ethernet_default_layer                        = try(local.device_config[each.key].system.ethernet.default_switchport, local.defaults.nxos.devices.configuration.system.ethernet.default_switchport, null)
+  ethernet_system_interface_admin_state         = try(local.device_config[each.key].system.ethernet.interface_shutdown, local.defaults.nxos.devices.configuration.system.ethernet.interface_shutdown, null)
+  ethernet_system_link_failure_laser_on         = try(local.device_config[each.key].system.ethernet.link_failure_laser_on, local.defaults.nxos.devices.configuration.system.ethernet.link_failure_laser_on, null)
+  ethernet_system_storm_control_multi_threshold = try(local.device_config[each.key].system.ethernet.storm_control_multicast, local.defaults.nxos.devices.configuration.system.ethernet.storm_control_multicast, null)
+  ethernet_vlan_tag_native                      = try(local.device_config[each.key].system.ethernet.dot1q_tag_native, local.defaults.nxos.devices.configuration.system.ethernet.dot1q_tag_native, null)
 
   # arpEntity / arpInst attributes
   arp_admin_state                         = "enabled"
@@ -95,7 +87,6 @@ resource "nxos_system" "system" {
   arp_unnumbered_svi_software_replication = try(local.device_config[each.key].arp.unnumbered_svi_software_replication, local.defaults.nxos.devices.configuration.arp.unnumbered_svi_software_replication, null) != null ? (try(local.device_config[each.key].arp.unnumbered_svi_software_replication, local.defaults.nxos.devices.configuration.arp.unnumbered_svi_software_replication) ? "enabled" : "disabled") : null
   arp_cache_limit                         = try(local.device_config[each.key].arp.cache_limit, local.defaults.nxos.devices.configuration.arp.cache_limit, null)
   arp_cache_syslog_rate                   = try(local.device_config[each.key].arp.cache_syslog_rate, local.defaults.nxos.devices.configuration.arp.cache_syslog_rate, null)
-  arp_control                             = try(local.device_config[each.key].arp.control, local.defaults.nxos.devices.configuration.arp.control, null)
   arp_evpn_timeout                        = try(local.device_config[each.key].arp.evpn_timeout, local.defaults.nxos.devices.configuration.arp.evpn_timeout, null)
   arp_interface_cache_limit               = try(local.device_config[each.key].arp.cache_interface_limit, local.defaults.nxos.devices.configuration.arp.cache_interface_limit, null)
   arp_ip_adjacency_route_distance         = try(local.device_config[each.key].arp.adjacency_route_distance, local.defaults.nxos.devices.configuration.arp.adjacency_route_distance, null)
@@ -119,7 +110,6 @@ resource "nxos_system" "system" {
   nd_aging_interval                      = try(local.device_config[each.key].ipv6.nd.aging_interval, local.defaults.nxos.devices.configuration.ipv6.nd.aging_interval, null)
   nd_cache_limit                         = try(local.device_config[each.key].ipv6.nd.cache_limit, local.defaults.nxos.devices.configuration.ipv6.nd.cache_limit, null)
   nd_cache_syslog_rate                   = try(local.device_config[each.key].ipv6.nd.cache_syslog_rate, local.defaults.nxos.devices.configuration.ipv6.nd.cache_syslog_rate, null)
-  nd_control                             = try(local.device_config[each.key].ipv6.nd.control, local.defaults.nxos.devices.configuration.ipv6.nd.control, null)
   nd_ipv6_adjacency_route_distance       = try(local.device_config[each.key].ipv6.nd.adjacency_route_distance, local.defaults.nxos.devices.configuration.ipv6.nd.adjacency_route_distance, null)
   nd_off_list_timeout                    = try(local.device_config[each.key].ipv6.nd.off_list_timeout, local.defaults.nxos.devices.configuration.ipv6.nd.off_list_timeout, null)
   nd_probe_interval_for_solicit_neighbor = try(local.device_config[each.key].ipv6.nd.probe_interval_for_solicit_neighbor, local.defaults.nxos.devices.configuration.ipv6.nd.probe_interval_for_solicit_neighbor, null)

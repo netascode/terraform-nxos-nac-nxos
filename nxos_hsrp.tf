@@ -22,13 +22,24 @@ locals {
         hsrp          = try(int.hsrp, null)
         defaults_path = local.defaults.nxos.devices.configuration.interfaces.port_channels
       } if try(int.hsrp, null) != null],
-      [for int in try(local.device_config[device.name].interfaces.subinterfaces, []) : {
-        key           = format("%s/%s", device.name, int.id)
-        device        = device.name
-        id            = int.id
-        hsrp          = try(int.hsrp, null)
-        defaults_path = local.defaults.nxos.devices.configuration.interfaces.subinterfaces
-      } if try(int.hsrp, null) != null],
+      flatten([for eth in try(local.device_config[device.name].interfaces.ethernets, []) :
+        [for sub in try(eth.subinterfaces, []) : {
+          key           = format("%s/%s", device.name, sub.id)
+          device        = device.name
+          id            = sub.id
+          hsrp          = try(sub.hsrp, null)
+          defaults_path = local.defaults.nxos.devices.configuration.interfaces.ethernets.subinterfaces
+        } if try(sub.hsrp, null) != null]
+      ]),
+      flatten([for pc in try(local.device_config[device.name].interfaces.port_channels, []) :
+        [for sub in try(pc.subinterfaces, []) : {
+          key           = format("%s/%s", device.name, sub.id)
+          device        = device.name
+          id            = sub.id
+          hsrp          = try(sub.hsrp, null)
+          defaults_path = local.defaults.nxos.devices.configuration.interfaces.port_channels.subinterfaces
+        } if try(sub.hsrp, null) != null]
+      ]),
     )
   ])
 }
