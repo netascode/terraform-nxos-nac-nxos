@@ -61,19 +61,6 @@ locals {
       }
     ]
   ])
-  interfaces_ethernets_ipv4_secondary_addresses = flatten([
-    for device in local.devices : [
-      for int in try(local.device_config[device.name].interfaces.ethernets, []) : [
-        for ip in try(int.ipv4_secondary_addresses, []) : {
-          key           = format("%s/%s/%s", device.name, int.id, ip)
-          device        = device.name
-          interface_key = format("%s/%s", device.name, int.id)
-          vrf           = try(int.vrf, local.defaults.nxos.devices.configuration.interfaces.ethernets.vrf, "default")
-          ip            = ip
-        }
-      ]
-    ]
-  ])
 }
 
 resource "nxos_physical_interface" "physical_interface" {
@@ -137,37 +124,6 @@ resource "nxos_physical_interface" "physical_interface" {
   } }
 }
 
-resource "nxos_ipv4_interface" "ethernet_ipv4_interface" {
-  for_each     = { for v in local.interfaces_ethernets : v.key => v if v.layer3 }
-  device       = each.value.device
-  vrf          = each.value.vrf
-  interface_id = "eth${each.value.id}"
-  unnumbered   = each.value.ip_unnumbered
-  urpf         = each.value.urpf
-
-  depends_on = [nxos_physical_interface.physical_interface, nxos_ipv4_vrf.ipv4_vrf_default]
-}
-
-resource "nxos_ipv4_interface_address" "ethernet_ipv4_interface_address" {
-  for_each     = { for v in local.interfaces_ethernets : v.key => v if v.layer3 && v.ipv4_address != null }
-  device       = each.value.device
-  vrf          = each.value.vrf
-  interface_id = nxos_ipv4_interface.ethernet_ipv4_interface[each.key].interface_id
-  address      = each.value.ipv4_address
-}
-
-resource "nxos_ipv4_interface_address" "ethernet_ipv4_secondary_interface_address" {
-  for_each     = { for v in local.interfaces_ethernets_ipv4_secondary_addresses : v.key => v }
-  device       = each.value.device
-  vrf          = each.value.vrf
-  interface_id = nxos_ipv4_interface.ethernet_ipv4_interface[each.value.interface_key].interface_id
-  address      = each.value.ip
-  type         = "secondary"
-
-  depends_on = [
-    nxos_ipv4_interface_address.ethernet_ipv4_interface_address
-  ]
-}
 
 locals {
   interfaces_port_channels = flatten([
@@ -306,19 +262,6 @@ locals {
       }
     ]
   ])
-  interfaces_loopbacks_ipv4_secondary_addresses = flatten([
-    for device in local.devices : [
-      for int in try(local.device_config[device.name].interfaces.loopbacks, []) : [
-        for ip in try(int.ipv4_secondary_addresses, []) : {
-          key           = format("%s/%s/%s", device.name, int.id, ip)
-          device        = device.name
-          interface_key = format("%s/%s", device.name, int.id)
-          vrf           = try(int.vrf, local.defaults.nxos.devices.configuration.interfaces.loopbacks.vrf, "default")
-          ip            = ip
-        }
-      ]
-    ]
-  ])
 }
 
 resource "nxos_loopback_interface" "loopback_interface" {
@@ -333,36 +276,6 @@ resource "nxos_loopback_interface" "loopback_interface" {
   } }
 }
 
-resource "nxos_ipv4_interface" "loopback_ipv4_interface" {
-  for_each     = { for v in local.interfaces_loopbacks : v.key => v }
-  device       = each.value.device
-  vrf          = each.value.vrf
-  interface_id = "lo${each.value.id}"
-
-  depends_on = [nxos_loopback_interface.loopback_interface, nxos_ipv4_vrf.ipv4_vrf_default]
-}
-
-resource "nxos_ipv4_interface_address" "loopback_ipv4_interface_address" {
-  for_each     = { for v in local.interfaces_loopbacks : v.key => v if v.ipv4_address != null }
-  device       = each.value.device
-  vrf          = each.value.vrf
-  interface_id = nxos_ipv4_interface.loopback_ipv4_interface[each.key].interface_id
-  address      = each.value.ipv4_address
-  type         = "primary"
-}
-
-resource "nxos_ipv4_interface_address" "loopback_ipv4_secondary_interface_address" {
-  for_each     = { for v in local.interfaces_loopbacks_ipv4_secondary_addresses : v.key => v }
-  device       = each.value.device
-  vrf          = each.value.vrf
-  interface_id = nxos_ipv4_interface.loopback_ipv4_interface[each.value.interface_key].interface_id
-  address      = each.value.ip
-  type         = "secondary"
-
-  depends_on = [
-    nxos_ipv4_interface_address.loopback_ipv4_interface_address
-  ]
-}
 
 locals {
   interfaces_vlans = flatten([
@@ -413,18 +326,6 @@ locals {
       }
     ]
   ])
-  interfaces_vlans_ipv4_secondary_addresses = flatten([
-    for device in local.devices : [
-      for int in try(local.device_config[device.name].interfaces.vlans, []) : [
-        for ip in try(int.ipv4_secondary_addresses, []) : {
-          key           = format("%s/%s/%s", device.name, int.id, ip)
-          device        = device.name
-          interface_key = format("%s/%s", device.name, int.id)
-          ip            = ip
-        }
-      ]
-    ]
-  ])
 }
 
 resource "nxos_svi_interface" "svi_interface" {
@@ -442,38 +343,6 @@ resource "nxos_svi_interface" "svi_interface" {
   } }
 }
 
-resource "nxos_ipv4_interface" "svi_ipv4_interface" {
-  for_each     = { for v in local.interfaces_vlans : v.key => v }
-  device       = each.value.device
-  vrf          = each.value.vrf
-  interface_id = "vlan${each.value.id}"
-  forward      = each.value.ip_forward ? "enabled" : "disabled"
-  drop_glean   = each.value.ip_drop_glean ? "enabled" : "disabled"
-
-  depends_on = [nxos_svi_interface.svi_interface, nxos_ipv4_vrf.ipv4_vrf_default]
-}
-
-resource "nxos_ipv4_interface_address" "svi_ipv4_interface_address" {
-  for_each     = { for v in local.interfaces_vlans : v.key => v if v.ipv4_address != null }
-  device       = each.value.device
-  vrf          = each.value.vrf
-  interface_id = nxos_ipv4_interface.svi_ipv4_interface[each.key].interface_id
-  address      = each.value.ipv4_address
-  type         = "primary"
-}
-
-resource "nxos_ipv4_interface_address" "svi_ipv4_secondary_interface_address" {
-  for_each     = { for v in local.interfaces_vlans_ipv4_secondary_addresses : v.key => v }
-  device       = each.value.device
-  vrf          = each.value.vrf
-  interface_id = nxos_ipv4_interface.svi_ipv4_interface[each.value.interface_key].interface_id
-  address      = each.value.ip
-  type         = "secondary"
-
-  depends_on = [
-    nxos_ipv4_interface_address.svi_ipv4_interface_address
-  ]
-}
 
 locals {
   interfaces_nve_vnis = flatten([

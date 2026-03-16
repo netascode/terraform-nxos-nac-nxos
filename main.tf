@@ -34,11 +34,6 @@ resource "nxos_save_config" "save_config" {
     nxos_hmm.hmm,
     nxos_feature.feature,
     nxos_physical_interface.physical_interface,
-    nxos_ipv4_interface_address.ethernet_ipv4_interface_address,
-    nxos_ipv4_interface_address.loopback_ipv4_interface_address,
-    nxos_ipv4_interface_address.loopback_ipv4_secondary_interface_address,
-    nxos_ipv4_interface_address.svi_ipv4_interface_address,
-    nxos_ipv4_interface_address.svi_ipv4_secondary_interface_address,
     nxos_nve_vni_ingress_replication.nve_vni_ingress_replication,
     nxos_ospf.ospf,
     nxos_pim.pim,
@@ -46,10 +41,9 @@ resource "nxos_save_config" "save_config" {
     nxos_system.system,
     nxos_bridge_domain.bridge_domain,
     nxos_vrf.vrf,
-    nxos_ipv4_vrf.ipv4_vrf,
-    nxos_ipv4_vrf.ipv4_vrf_default,
     nxos_port_channel_interface.port_channel_interface,
     nxos_icmpv4.icmpv4,
-    nxos_subinterface.subinterface
+    nxos_subinterface.subinterface,
+    nxos_ipv4.ipv4
   ]
 }

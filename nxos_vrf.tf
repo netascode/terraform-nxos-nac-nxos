@@ -152,15 +152,3 @@ resource "nxos_vrf" "vrf" {
     } }
   } }
 }
-
-resource "nxos_ipv4_vrf" "ipv4_vrf" {
-  for_each = { for v in local.vrfs : v.key => v }
-  device   = each.value.device
-  name     = each.value.name
-}
-
-resource "nxos_ipv4_vrf" "ipv4_vrf_default" {
-  for_each = { for device in local.devices : device.name => device }
-  device   = each.value.name
-  name     = "default"
-}
