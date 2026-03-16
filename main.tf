@@ -30,7 +30,7 @@ resource "nxos_save_config" "save_config" {
   device   = each.key
   depends_on = [
     nxos_bgp.bgp,
-    nxos_evpn_vni_route_target.evpn_vni_route_target,
+    nxos_evpn.evpn,
     nxos_hmm.hmm,
     nxos_feature.feature,
     nxos_physical_interface.physical_interface,

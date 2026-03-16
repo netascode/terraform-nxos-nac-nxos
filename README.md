@@ -68,9 +68,6 @@ module "nxos" {
 | [nxos_bgp.bgp](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/bgp) | resource |
 | [nxos_bridge_domain.bridge_domain](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/bridge_domain) | resource |
 | [nxos_evpn.evpn](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/evpn) | resource |
-| [nxos_evpn_vni.evpn_vni](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/evpn_vni) | resource |
-| [nxos_evpn_vni_route_target.evpn_vni_route_target](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/evpn_vni_route_target) | resource |
-| [nxos_evpn_vni_route_target_direction.evpn_vni_route_target_direction](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/evpn_vni_route_target_direction) | resource |
 | [nxos_feature.feature](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/feature) | resource |
 | [nxos_hmm.hmm](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/hmm) | resource |
 | [nxos_icmpv4.icmpv4](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/icmpv4) | resource |
