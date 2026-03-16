@@ -46,6 +46,7 @@ resource "nxos_save_config" "save_config" {
     nxos_subinterface.subinterface,
     nxos_ipv4.ipv4,
     nxos_ipv6.ipv6,
-    nxos_hsrp.hsrp
+    nxos_hsrp.hsrp,
+    nxos_isis.isis
   ]
 }
