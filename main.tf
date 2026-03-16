@@ -55,6 +55,7 @@ resource "nxos_save_config" "save_config" {
     nxos_spanning_tree.spanning_tree,
     nxos_vpc.vpc,
     nxos_default_qos.default_qos,
-    nxos_dhcp.dhcp
+    nxos_dhcp.dhcp,
+    nxos_logging.logging
   ]
 }
