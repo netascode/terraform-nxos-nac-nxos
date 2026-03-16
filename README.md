@@ -69,6 +69,7 @@ module "nxos" {
 | [nxos_bgp.bgp](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/bgp) | resource |
 | [nxos_bridge_domain.bridge_domain](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/bridge_domain) | resource |
 | [nxos_default_qos.default_qos](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/default_qos) | resource |
+| [nxos_dhcp.dhcp](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/dhcp) | resource |
 | [nxos_evpn.evpn](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/evpn) | resource |
 | [nxos_feature.feature](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/feature) | resource |
 | [nxos_hmm.hmm](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/hmm) | resource |
