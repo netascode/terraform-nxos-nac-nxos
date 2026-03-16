@@ -24,6 +24,7 @@ defaults:
           pim:
             vrfs:
               admin_state: true
+              ssm_range_none: false
           ospf_processes:
             vrfs:
               admin_state: true
