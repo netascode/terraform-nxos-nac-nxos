@@ -29,10 +29,7 @@ resource "nxos_save_config" "save_config" {
   for_each = { for device in local.devices : device.name => device if var.save_config }
   device   = each.key
   depends_on = [
-    nxos_bgp_route_control.bgp_route_control,
-    nxos_bgp_graceful_restart.bgp_graceful_restart,
-    nxos_bgp_peer_template_address_family.bgp_peer_template_address_family,
-    nxos_bgp_peer_address_family.bgpPeerAf,
+    nxos_bgp.bgp,
     nxos_evpn_vni_route_target.evpn_vni_route_target,
     nxos_hmm.hmm,
     nxos_feature.feature,
