@@ -100,6 +100,7 @@ module "nxos" {
 | [nxos_route_map_rule_entry_set_regular_community.route_map_rule_entry_set_regular_community](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/route_map_rule_entry_set_regular_community) | resource |
 | [nxos_route_map_rule_entry_set_regular_community_item.route_map_rule_entry_set_regular_community_item](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/route_map_rule_entry_set_regular_community_item) | resource |
 | [nxos_save_config.save_config](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/save_config) | resource |
+| [nxos_subinterface.subinterface](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/subinterface) | resource |
 | [nxos_svi_interface.svi_interface](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/svi_interface) | resource |
 | [nxos_system.system](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/system) | resource |
 | [nxos_vrf.vrf](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/vrf) | resource |

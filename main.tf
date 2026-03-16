@@ -48,6 +48,7 @@ resource "nxos_save_config" "save_config" {
     nxos_ipv4_vrf.ipv4_vrf,
     nxos_ipv4_vrf.ipv4_vrf_default,
     nxos_port_channel_interface.port_channel_interface,
-    nxos_icmpv4.icmpv4
+    nxos_icmpv4.icmpv4,
+    nxos_subinterface.subinterface
   ]
 }
