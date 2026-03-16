@@ -27,4 +27,8 @@ resource "nxos_bridge_domain" "bridge_domain" {
     vrf_name            = try(vlan.vrf, local.defaults.nxos.devices.configuration.vlans.vrf, null)
     cross_connect       = try(vlan.cross_connect, local.defaults.nxos.devices.configuration.vlans.cross_connect, null)
   } }
+
+  depends_on = [
+    nxos_feature.feature
+  ]
 }
