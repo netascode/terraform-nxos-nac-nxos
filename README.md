@@ -70,6 +70,7 @@ module "nxos" {
 | [nxos_evpn.evpn](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/evpn) | resource |
 | [nxos_feature.feature](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/feature) | resource |
 | [nxos_hmm.hmm](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/hmm) | resource |
+| [nxos_hsrp.hsrp](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/hsrp) | resource |
 | [nxos_icmpv4.icmpv4](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/icmpv4) | resource |
 | [nxos_ipv4.ipv4](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/ipv4) | resource |
 | [nxos_ipv6.ipv6](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/ipv6) | resource |
