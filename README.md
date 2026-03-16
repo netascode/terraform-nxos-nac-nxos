@@ -78,6 +78,7 @@ module "nxos" {
 | [nxos_loopback_interface.loopback_interface](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/loopback_interface) | resource |
 | [nxos_nvo.nvo](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/nvo) | resource |
 | [nxos_ospf.ospf](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/ospf) | resource |
+| [nxos_ospfv3.ospfv3](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/ospfv3) | resource |
 | [nxos_physical_interface.physical_interface](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/physical_interface) | resource |
 | [nxos_pim.pim](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/pim) | resource |
 | [nxos_port_channel_interface.port_channel_interface](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/port_channel_interface) | resource |

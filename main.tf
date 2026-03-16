@@ -36,6 +36,7 @@ resource "nxos_save_config" "save_config" {
     nxos_physical_interface.physical_interface,
     nxos_nvo.nvo,
     nxos_ospf.ospf,
+    nxos_ospfv3.ospfv3,
     nxos_pim.pim,
     nxos_route_policy.route_policy,
     nxos_system.system,
