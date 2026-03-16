@@ -1,214 +1,54 @@
-locals {
-  routing_ipv4_prefix_list_rule = flatten([
-    for device in local.devices : [
-      for ipv4_prefix_list in try(local.device_config[device.name].routing.ipv4_prefix_lists, []) : {
-        key    = format("%s/%s", device.name, ipv4_prefix_list.name),
-        device = device.name,
-        name   = ipv4_prefix_list.name
-      }
-    ]
-  ])
-}
+resource "nxos_route_policy" "route_policy" {
+  for_each = { for device in local.devices : device.name => device
+    if length(try(local.device_config[device.name].routing.ipv4_prefix_lists, [])) > 0 ||
+  length(try(local.device_config[device.name].routing.route_maps, [])) > 0 }
+  device = each.key
 
-resource "nxos_ipv4_prefix_list_rule" "ipv4_prefix_list_rule" {
-  for_each = { for v in local.routing_ipv4_prefix_list_rule : v.key => v }
-  device   = each.value.device
-  name     = each.value.name
-}
+  ipv4_prefix_lists = { for pl in try(local.device_config[each.key].routing.ipv4_prefix_lists, []) : pl.name => {
+    description = try(pl.description, local.defaults.nxos.devices.configuration.routing.ipv4_prefix_lists.description, null)
 
-locals {
-  routing_ipv4_prefix_list_rule_entry = flatten([
-    for device in local.devices : [
-      for ipv4_prefix_list in try(local.device_config[device.name].routing.ipv4_prefix_lists, []) : [
-        for entry in try(ipv4_prefix_list.entries, []) : {
-          key        = format("%s/%s/%s", device.name, ipv4_prefix_list.name, entry.order),
-          device     = device.name,
-          rule_name  = ipv4_prefix_list.name,
-          order      = entry.order,
-          action     = try(entry.action, local.defaults.nxos.configuration.routing.ipv4_prefix_lists.entries.action, "permit"),
-          prefix     = try(entry.prefix, local.defaults.nxos.configuration.routing.ipv4_prefix_lists.entries.prefix, null),
-          criteria   = try(entry.criteria, local.defaults.nxos.configuration.routing.ipv4_prefix_lists.entries.criteria, "exact"),
-          from_range = try(entry.from_range, local.defaults.nxos.configuration.routing.ipv4_prefix_lists.entries.from_range, 0),
-          to_range   = try(entry.to_range, local.defaults.nxos.configuration.routing.ipv4_prefix_lists.entries.to_range, 0)
-        }
-      ]
-    ]
-  ])
-}
+    entries = { for entry in try(pl.entries, []) : entry.order => {
+      action     = try(entry.action, local.defaults.nxos.devices.configuration.routing.ipv4_prefix_lists.entries.action, null)
+      criteria   = try(entry.criteria, local.defaults.nxos.devices.configuration.routing.ipv4_prefix_lists.entries.criteria, null)
+      prefix     = try(entry.prefix, local.defaults.nxos.devices.configuration.routing.ipv4_prefix_lists.entries.prefix, null)
+      from_range = try(entry.from_range, local.defaults.nxos.devices.configuration.routing.ipv4_prefix_lists.entries.from_range, null)
+      to_range   = try(entry.to_range, local.defaults.nxos.devices.configuration.routing.ipv4_prefix_lists.entries.to_range, null)
+      mask       = try(entry.mask, local.defaults.nxos.devices.configuration.routing.ipv4_prefix_lists.entries.mask, null)
+    } }
+  } }
 
-resource "nxos_ipv4_prefix_list_rule_entry" "ipv4_prefix_list_rule_entry" {
-  for_each   = { for v in local.routing_ipv4_prefix_list_rule_entry : v.key => v }
-  device     = each.value.device
-  rule_name  = each.value.rule_name
-  order      = each.value.order
-  action     = each.value.action
-  prefix     = each.value.prefix
-  criteria   = each.value.criteria
-  to_range   = each.value.to_range
-  from_range = each.value.from_range
+  route_maps = { for rm in try(local.device_config[each.key].routing.route_maps, []) : rm.name => {
+    pbr_statistics = try(rm.pbr_statistics, local.defaults.nxos.devices.configuration.routing.route_maps.pbr_statistics, null) != null ? (try(rm.pbr_statistics, local.defaults.nxos.devices.configuration.routing.route_maps.pbr_statistics) ? "enabled" : "disabled") : null
 
-  depends_on = [nxos_ipv4_prefix_list_rule.ipv4_prefix_list_rule]
-}
+    entries = { for entry in try(rm.entries, []) : entry.order => {
+      action                  = try(entry.action, local.defaults.nxos.devices.configuration.routing.route_maps.entries.action, null)
+      description             = try(entry.description, local.defaults.nxos.devices.configuration.routing.route_maps.entries.description, null)
+      drop_on_fail_v4         = try(entry.drop_on_fail_v4, local.defaults.nxos.devices.configuration.routing.route_maps.entries.drop_on_fail_v4, null) != null ? (try(entry.drop_on_fail_v4, local.defaults.nxos.devices.configuration.routing.route_maps.entries.drop_on_fail_v4) ? "enabled" : "disabled") : null
+      drop_on_fail_v6         = try(entry.drop_on_fail_v6, local.defaults.nxos.devices.configuration.routing.route_maps.entries.drop_on_fail_v6, null) != null ? (try(entry.drop_on_fail_v6, local.defaults.nxos.devices.configuration.routing.route_maps.entries.drop_on_fail_v6) ? "enabled" : "disabled") : null
+      force_order_v4          = try(entry.force_order_v4, local.defaults.nxos.devices.configuration.routing.route_maps.entries.force_order_v4, null) != null ? (try(entry.force_order_v4, local.defaults.nxos.devices.configuration.routing.route_maps.entries.force_order_v4) ? "enabled" : "disabled") : null
+      force_order_v6          = try(entry.force_order_v6, local.defaults.nxos.devices.configuration.routing.route_maps.entries.force_order_v6, null) != null ? (try(entry.force_order_v6, local.defaults.nxos.devices.configuration.routing.route_maps.entries.force_order_v6) ? "enabled" : "disabled") : null
+      load_share_v4           = try(entry.load_share_v4, local.defaults.nxos.devices.configuration.routing.route_maps.entries.load_share_v4, null) != null ? (try(entry.load_share_v4, local.defaults.nxos.devices.configuration.routing.route_maps.entries.load_share_v4) ? "enabled" : "disabled") : null
+      load_share_v6           = try(entry.load_share_v6, local.defaults.nxos.devices.configuration.routing.route_maps.entries.load_share_v6, null) != null ? (try(entry.load_share_v6, local.defaults.nxos.devices.configuration.routing.route_maps.entries.load_share_v6) ? "enabled" : "disabled") : null
+      set_default_next_hop_v4 = try(entry.set_default_next_hop_v4, local.defaults.nxos.devices.configuration.routing.route_maps.entries.set_default_next_hop_v4, null) != null ? (try(entry.set_default_next_hop_v4, local.defaults.nxos.devices.configuration.routing.route_maps.entries.set_default_next_hop_v4) ? "enabled" : "disabled") : null
+      set_default_next_hop_v6 = try(entry.set_default_next_hop_v6, local.defaults.nxos.devices.configuration.routing.route_maps.entries.set_default_next_hop_v6, null) != null ? (try(entry.set_default_next_hop_v6, local.defaults.nxos.devices.configuration.routing.route_maps.entries.set_default_next_hop_v6) ? "enabled" : "disabled") : null
+      set_vrf_v4              = try(entry.set_vrf_v4, local.defaults.nxos.devices.configuration.routing.route_maps.entries.set_vrf_v4, null) != null ? (try(entry.set_vrf_v4, local.defaults.nxos.devices.configuration.routing.route_maps.entries.set_vrf_v4) ? "enabled" : "disabled") : null
+      set_vrf_v6              = try(entry.set_vrf_v6, local.defaults.nxos.devices.configuration.routing.route_maps.entries.set_vrf_v6, null) != null ? (try(entry.set_vrf_v6, local.defaults.nxos.devices.configuration.routing.route_maps.entries.set_vrf_v6) ? "enabled" : "disabled") : null
+      verify_availability_v4  = try(entry.verify_availability_v4, local.defaults.nxos.devices.configuration.routing.route_maps.entries.verify_availability_v4, null) != null ? (try(entry.verify_availability_v4, local.defaults.nxos.devices.configuration.routing.route_maps.entries.verify_availability_v4) ? "enabled" : "disabled") : null
+      verify_availability_v6  = try(entry.verify_availability_v6, local.defaults.nxos.devices.configuration.routing.route_maps.entries.verify_availability_v6, null) != null ? (try(entry.verify_availability_v6, local.defaults.nxos.devices.configuration.routing.route_maps.entries.verify_availability_v6) ? "enabled" : "disabled") : null
 
-locals {
-  routing_route_map_rule = flatten([
-    for device in local.devices : [
-      for route_map in try(local.device_config[device.name].routing.route_maps, []) : {
-        key    = format("%s/%s", device.name, route_map.name),
-        device = device.name,
-        name   = route_map.name
-      }
-    ]
-  ])
-}
+      match_route_prefix_lists = try(entry.match_prefix_list, local.defaults.nxos.devices.configuration.routing.route_maps.entries.match_prefix_list, null) != null ? {
+        "sys/rpm/pfxlistv4-[${try(entry.match_prefix_list, local.defaults.nxos.devices.configuration.routing.route_maps.entries.match_prefix_list)}]" = {}
+      } : {}
 
-resource "nxos_route_map_rule" "route_map_rule" {
-  for_each = { for v in local.routing_route_map_rule : v.key => v }
-  device   = each.value.device
-  name     = each.value.name
-}
+      set_regular_community_additive     = try(entry.additive, local.defaults.nxos.devices.configuration.routing.route_maps.entries.additive, null) != null ? (try(entry.additive, local.defaults.nxos.devices.configuration.routing.route_maps.entries.additive) ? "enabled" : "disabled") : null
+      set_regular_community_no_community = try(entry.no_community, local.defaults.nxos.devices.configuration.routing.route_maps.entries.no_community, null) != null ? (try(entry.no_community, local.defaults.nxos.devices.configuration.routing.route_maps.entries.no_community) ? "enabled" : "disabled") : null
+      set_regular_community_criteria     = try(entry.set_criteria, local.defaults.nxos.devices.configuration.routing.route_maps.entries.set_criteria, null)
 
-locals {
-  routing_route_map_rule_entry = flatten([
-    for device in local.devices : [
-      for route_map in try(local.device_config[device.name].routing.route_maps, []) : [
-        for entry in try(route_map.entries, []) : {
-          key       = format("%s/%s/%s", device.name, route_map.name, entry.order),
-          device    = device.name,
-          rule_name = route_map.name,
-          order     = entry.order,
-          action    = try(entry.action, local.defaults.nxos.configuration.routing.route_maps.entries.action, "permit"),
-        }
-      ]
-    ]
-  ])
-}
+      set_regular_community_items = try(entry.community, local.defaults.nxos.devices.configuration.routing.route_maps.entries.community, null) != null ? {
+        try(entry.community, local.defaults.nxos.devices.configuration.routing.route_maps.entries.community) = {}
+      } : {}
 
-resource "nxos_route_map_rule_entry" "route_map_rule_entry" {
-  for_each   = { for v in local.routing_route_map_rule_entry : v.key => v }
-  device     = each.value.device
-  rule_name  = each.value.rule_name
-  order      = each.value.order
-  action     = each.value.action
-  depends_on = [nxos_route_map_rule.route_map_rule]
-}
-
-locals {
-  routing_route_map_rule_entry_match_route = flatten([
-    for device in local.devices : [
-      for route_map in try(local.device_config[device.name].routing.route_maps, []) : [
-        for entry in try(route_map.entries, []) : (
-          try(entry.match_prefix_list, null) != null ? [
-            {
-              key       = format("%s/%s/%s", device.name, route_map.name, entry.order),
-              device    = device.name,
-              rule_name = route_map.name,
-              order     = entry.order,
-            }
-          ] : []
-        )
-      ]
-    ]
-  ])
-}
-
-resource "nxos_route_map_rule_entry_match_route" "route_map_rule_entry_match_route" {
-  for_each   = { for v in local.routing_route_map_rule_entry_match_route : v.key => v }
-  device     = each.value.device
-  rule_name  = each.value.rule_name
-  order      = each.value.order
-  depends_on = [nxos_route_map_rule_entry.route_map_rule_entry]
-}
-
-locals {
-  routing_route_map_rule_entry_match_route_prefix_list = flatten([
-    for device in local.devices : [
-      for route_map in try(local.device_config[device.name].routing.route_maps, []) : [
-        for entry in try(route_map.entries, []) : (
-          try(entry.match_prefix_list, null) != null ? [
-            {
-              key            = format("%s/%s/%s", device.name, route_map.name, entry.order),
-              device         = device.name,
-              rule_name      = route_map.name,
-              order          = entry.order,
-              prefix_list_dn = format("sys/rpm/pfxlistv4-[%s]", entry.match_prefix_list)
-            }
-          ] : []
-        )
-      ]
-    ]
-  ])
-}
-
-resource "nxos_route_map_rule_entry_match_route_prefix_list" "route_map_rule_entry_match_route_prefix_list" {
-  for_each       = { for v in local.routing_route_map_rule_entry_match_route_prefix_list : v.key => v }
-  device         = each.value.device
-  rule_name      = each.value.rule_name
-  order          = each.value.order
-  prefix_list_dn = each.value.prefix_list_dn
-  depends_on     = [nxos_route_map_rule_entry_match_route.route_map_rule_entry_match_route]
-}
-
-locals {
-  routing_route_map_rule_entry_set_regular_community = flatten([
-    for device in local.devices : [
-      for route_map in try(local.device_config[device.name].routing.route_maps, []) : [
-        for entry in try(route_map.entries, []) : [
-          for option in ["additive", "no_community", "set_criteria"] : (
-            try(entry[option], null) != null ? [
-              {
-                key          = format("%s/%s/%s/%s", device.name, route_map.name, entry.order, option),
-                device       = device.name,
-                rule_name    = route_map.name,
-                order        = entry.order,
-                additive     = try(entry.additive, local.defaults.nxos.configuration.routing.route_maps.entries.additive, false) ? "enabled" : "disabled",
-                no_community = try(entry.no_community, local.defaults.nxos.configuration.routing.route_maps.entries.no_community, false) ? "enabled" : "disabled",
-                set_criteria = try(entry.set_criteria, local.defaults.nxos.configuration.routing.route_maps.entries.set_criteria, "none")
-              }
-            ] : []
-          )
-        ]
-      ]
-    ]
-  ])
-}
-
-resource "nxos_route_map_rule_entry_set_regular_community" "route_map_rule_entry_set_regular_community" {
-  for_each     = { for v in local.routing_route_map_rule_entry_set_regular_community : v.key => v }
-  device       = each.value.device
-  rule_name    = each.value.rule_name
-  order        = each.value.order
-  additive     = each.value.additive
-  no_community = each.value.no_community
-  set_criteria = each.value.set_criteria
-  depends_on   = [nxos_route_map_rule_entry.route_map_rule_entry]
-}
-
-locals {
-  routing_route_map_rule_entry_set_regular_community_item = flatten([
-    for device in local.devices : [
-      for route_map in try(local.device_config[device.name].routing.route_maps, []) : [
-        for entry in try(route_map.entries, []) : (
-          try(entry.community, null) != null ? [
-            {
-              key       = format("%s/%s/%s", device.name, route_map.name, entry.order),
-              device    = device.name,
-              rule_name = route_map.name,
-              order     = entry.order,
-              community = try(entry.community, local.defaults.nxos.configuration.routing.route_maps.entries.community)
-            }
-          ] : []
-        )
-      ]
-    ]
-  ])
-}
-
-resource "nxos_route_map_rule_entry_set_regular_community_item" "route_map_rule_entry_set_regular_community_item" {
-  for_each   = { for v in local.routing_route_map_rule_entry_set_regular_community_item : v.key => v }
-  device     = each.value.device
-  rule_name  = each.value.rule_name
-  order      = each.value.order
-  community  = each.value.community
-  depends_on = [nxos_route_map_rule_entry_set_regular_community.route_map_rule_entry_set_regular_community]
+      match_tags = { for tag in try(entry.match_tags, local.defaults.nxos.devices.configuration.routing.route_maps.entries.match_tags, []) : tag => {} }
+    } }
+  } }
 }
