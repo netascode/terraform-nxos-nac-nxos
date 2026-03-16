@@ -103,11 +103,6 @@ module "nxos" {
 | [nxos_svi_interface.svi_interface](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/svi_interface) | resource |
 | [nxos_system.system](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/system) | resource |
 | [nxos_vrf.vrf](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/vrf) | resource |
-| [nxos_vrf_address_family.vrf_address_family](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/vrf_address_family) | resource |
-| [nxos_vrf_route_target.vrf_route_target](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/vrf_route_target) | resource |
-| [nxos_vrf_route_target_address_family.vrf_route_target_address_family](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/vrf_route_target_address_family) | resource |
-| [nxos_vrf_route_target_direction.vrf_route_target_direction](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/vrf_route_target_direction) | resource |
-| [nxos_vrf_routing.vrf_routing](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/vrf_routing) | resource |
 ## Modules
 
 | Name | Source | Version |

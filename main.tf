@@ -44,7 +44,7 @@ resource "nxos_save_config" "save_config" {
     nxos_pim.pim,
     nxos_system.system,
     nxos_bridge_domain.bridge_domain,
-    nxos_vrf_route_target.vrf_route_target,
+    nxos_vrf.vrf,
     nxos_ipv4_vrf.ipv4_vrf,
     nxos_ipv4_vrf.ipv4_vrf_default,
     nxos_port_channel_interface.port_channel_interface,
