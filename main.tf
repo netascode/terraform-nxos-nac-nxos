@@ -34,7 +34,7 @@ resource "nxos_save_config" "save_config" {
     nxos_hmm.hmm,
     nxos_feature.feature,
     nxos_physical_interface.physical_interface,
-    nxos_nve_vni_ingress_replication.nve_vni_ingress_replication,
+    nxos_nvo.nvo,
     nxos_ospf.ospf,
     nxos_pim.pim,
     nxos_route_policy.route_policy,
