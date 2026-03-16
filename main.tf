@@ -51,6 +51,7 @@ resource "nxos_save_config" "save_config" {
     nxos_hsrp.hsrp,
     nxos_isis.isis,
     nxos_keychain.keychain,
-    nxos_user_management.user_management
+    nxos_user_management.user_management,
+    nxos_spanning_tree.spanning_tree
   ]
 }
