@@ -113,14 +113,11 @@ module "nxos" {
 | [nxos_hmm_interface.hmm_interface](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/hmm_interface) | resource |
 | [nxos_ipv4_interface.ethernet_ipv4_interface](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/ipv4_interface) | resource |
 | [nxos_ipv4_interface.loopback_ipv4_interface](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/ipv4_interface) | resource |
-| [nxos_ipv4_interface.port_channel_ipv4_interface](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/ipv4_interface) | resource |
 | [nxos_ipv4_interface.svi_ipv4_interface](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/ipv4_interface) | resource |
 | [nxos_ipv4_interface_address.ethernet_ipv4_interface_address](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/ipv4_interface_address) | resource |
 | [nxos_ipv4_interface_address.ethernet_ipv4_secondary_interface_address](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/ipv4_interface_address) | resource |
 | [nxos_ipv4_interface_address.loopback_ipv4_interface_address](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/ipv4_interface_address) | resource |
 | [nxos_ipv4_interface_address.loopback_ipv4_secondary_interface_address](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/ipv4_interface_address) | resource |
-| [nxos_ipv4_interface_address.port_channel_ipv4_interface_address](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/ipv4_interface_address) | resource |
-| [nxos_ipv4_interface_address.port_channel_ipv4_secondary_interface_address](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/ipv4_interface_address) | resource |
 | [nxos_ipv4_interface_address.svi_ipv4_interface_address](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/ipv4_interface_address) | resource |
 | [nxos_ipv4_interface_address.svi_ipv4_secondary_interface_address](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/ipv4_interface_address) | resource |
 | [nxos_ipv4_prefix_list_rule.ipv4_prefix_list_rule](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/ipv4_prefix_list_rule) | resource |
@@ -128,7 +125,6 @@ module "nxos" {
 | [nxos_ipv4_vrf.ipv4_vrf](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/ipv4_vrf) | resource |
 | [nxos_ipv4_vrf.ipv4_vrf_default](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/ipv4_vrf) | resource |
 | [nxos_loopback_interface.loopback_interface](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/loopback_interface) | resource |
-| [nxos_loopback_interface_vrf.loopback_interface_vrf](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/loopback_interface_vrf) | resource |
 | [nxos_nve_interface.nve_interface](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/nve_interface) | resource |
 | [nxos_nve_vni.nve_vni](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/nve_vni) | resource |
 | [nxos_nve_vni_container.nve_vni_container](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/nve_vni_container) | resource |
@@ -140,7 +136,6 @@ module "nxos" {
 | [nxos_ospf_interface.ospf_interface](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/ospf_interface) | resource |
 | [nxos_ospf_vrf.ospf_vrf](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/ospf_vrf) | resource |
 | [nxos_physical_interface.physical_interface](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/physical_interface) | resource |
-| [nxos_physical_interface_vrf.physical_interface_vrf](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/physical_interface_vrf) | resource |
 | [nxos_pim.pim](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/pim) | resource |
 | [nxos_pim_anycast_rp.pim_anycast_rp](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/pim_anycast_rp) | resource |
 | [nxos_pim_anycast_rp_peer.pim_anycast_rp_peer](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/pim_anycast_rp_peer) | resource |
@@ -151,8 +146,6 @@ module "nxos" {
 | [nxos_pim_static_rp_policy.pim_static_rp_policy](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/pim_static_rp_policy) | resource |
 | [nxos_pim_vrf.pim_vrf](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/pim_vrf) | resource |
 | [nxos_port_channel_interface.port_channel_interface](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/port_channel_interface) | resource |
-| [nxos_port_channel_interface_member.port_channel_interface_member](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/port_channel_interface_member) | resource |
-| [nxos_port_channel_interface_vrf.port_channel_interface_vrf](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/port_channel_interface_vrf) | resource |
 | [nxos_route_map_rule.route_map_rule](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/route_map_rule) | resource |
 | [nxos_route_map_rule_entry.route_map_rule_entry](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/route_map_rule_entry) | resource |
 | [nxos_route_map_rule_entry_match_route.route_map_rule_entry_match_route](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/route_map_rule_entry_match_route) | resource |
@@ -161,7 +154,6 @@ module "nxos" {
 | [nxos_route_map_rule_entry_set_regular_community_item.route_map_rule_entry_set_regular_community_item](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/route_map_rule_entry_set_regular_community_item) | resource |
 | [nxos_save_config.save_config](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/save_config) | resource |
 | [nxos_svi_interface.svi_interface](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/svi_interface) | resource |
-| [nxos_svi_interface_vrf.svi_interface_vrf](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/svi_interface_vrf) | resource |
 | [nxos_system.system](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/system) | resource |
 | [nxos_vrf.vrf](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/vrf) | resource |
 | [nxos_vrf_address_family.vrf_address_family](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/vrf_address_family) | resource |

@@ -59,6 +59,7 @@ resource "nxos_save_config" "save_config" {
     nxos_feature_udld.udld,
     nxos_feature_vn_segment.vn_segment,
     nxos_feature_vpc.vpc,
+    nxos_physical_interface.physical_interface,
     nxos_ipv4_interface_address.ethernet_ipv4_interface_address,
     nxos_ipv4_interface_address.loopback_ipv4_interface_address,
     nxos_ipv4_interface_address.loopback_ipv4_secondary_interface_address,
@@ -75,6 +76,7 @@ resource "nxos_save_config" "save_config" {
     nxos_bridge_domain.bridge_domain,
     nxos_vrf_route_target.vrf_route_target,
     nxos_ipv4_vrf.ipv4_vrf,
-    nxos_ipv4_vrf.ipv4_vrf_default
+    nxos_ipv4_vrf.ipv4_vrf_default,
+    nxos_port_channel_interface.port_channel_interface
   ]
 }
