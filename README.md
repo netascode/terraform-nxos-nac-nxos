@@ -88,6 +88,7 @@ module "nxos" {
 | [nxos_physical_interface.physical_interface](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/physical_interface) | resource |
 | [nxos_pim.pim](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/pim) | resource |
 | [nxos_port_channel_interface.port_channel_interface](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/port_channel_interface) | resource |
+| [nxos_queuing_qos.queuing_qos](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/queuing_qos) | resource |
 | [nxos_route_policy.route_policy](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/route_policy) | resource |
 | [nxos_save_config.save_config](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/save_config) | resource |
 | [nxos_spanning_tree.spanning_tree](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/spanning_tree) | resource |

@@ -57,6 +57,7 @@ resource "nxos_save_config" "save_config" {
     nxos_default_qos.default_qos,
     nxos_dhcp.dhcp,
     nxos_logging.logging,
-    nxos_ntp.ntp
+    nxos_ntp.ntp,
+    nxos_queuing_qos.queuing_qos
   ]
 }
