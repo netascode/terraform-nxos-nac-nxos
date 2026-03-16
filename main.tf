@@ -50,6 +50,7 @@ resource "nxos_save_config" "save_config" {
     nxos_ipv6.ipv6,
     nxos_hsrp.hsrp,
     nxos_isis.isis,
-    nxos_keychain.keychain
+    nxos_keychain.keychain,
+    nxos_user_management.user_management
   ]
 }
