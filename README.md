@@ -107,11 +107,6 @@ module "nxos" {
 | [nxos_nve_vni_container.nve_vni_container](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/nve_vni_container) | resource |
 | [nxos_nve_vni_ingress_replication.nve_vni_ingress_replication](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/nve_vni_ingress_replication) | resource |
 | [nxos_ospf.ospf](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/ospf) | resource |
-| [nxos_ospf_area.ospf_area](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/ospf_area) | resource |
-| [nxos_ospf_authentication.ospf_authentication](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/ospf_authentication) | resource |
-| [nxos_ospf_instance.ospf_instance](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/ospf_instance) | resource |
-| [nxos_ospf_interface.ospf_interface](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/ospf_interface) | resource |
-| [nxos_ospf_vrf.ospf_vrf](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/ospf_vrf) | resource |
 | [nxos_physical_interface.physical_interface](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/physical_interface) | resource |
 | [nxos_pim.pim](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/pim) | resource |
 | [nxos_port_channel_interface.port_channel_interface](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/port_channel_interface) | resource |

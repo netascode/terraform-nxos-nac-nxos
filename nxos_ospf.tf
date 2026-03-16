@@ -1,131 +1,96 @@
+locals {
+  ospf_interfaces = concat(local.interfaces_ethernets, local.interfaces_loopbacks, local.interfaces_vlans, local.interfaces_port_channels)
+}
+
 resource "nxos_ospf" "ospf" {
   for_each    = { for device in local.devices : device.name => device if try(local.device_config[device.name].system.feature.ospf, local.defaults.nxos.devices.configuration.system.feature.ospf, false) }
   device      = each.key
   admin_state = "enabled"
 
+  instances = { for proc in try(local.device_config[each.key].routing.ospf_processes, []) : proc.name => {
+    admin_state = "enabled"
+
+    vrfs = { for vrf in try(proc.vrfs, []) : vrf.vrf => {
+      admin_state              = try(vrf.admin_state, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.admin_state, false) ? "enabled" : "disabled"
+      bandwidth_reference      = try(vrf.bandwidth_reference, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.bandwidth_reference, null)
+      bandwidth_reference_unit = try(vrf.bandwidth_reference_unit, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.bandwidth_reference_unit, null)
+      capability_vrf_lite      = try(vrf.capability_vrf_lite, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.capability_vrf_lite, null)
+      control = join(",", sort(compact([
+        try(vrf.bfd, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.bfd, false) ? "bfd" : "",
+        try(vrf.default_passive, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.default_passive, false) ? "default-passive" : "",
+        try(vrf.name_lookup, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.name_lookup, false) ? "name-lookup" : "",
+      ])))
+      default_metric                = try(vrf.default_metric, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.default_metric, null)
+      default_route_nssa_pbit_clear = try(vrf.default_route_nssa_pbit_clear, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.default_route_nssa_pbit_clear, null)
+      discard_route = join(",", sort(compact([
+        try(vrf.discard_route_external, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.discard_route_external, false) ? "ext" : "",
+        try(vrf.discard_route_internal, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.discard_route_internal, false) ? "int" : "",
+      ])))
+      distance              = try(vrf.distance, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.distance, null)
+      down_bit_ignore       = try(vrf.down_bit_ignore, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.down_bit_ignore, null)
+      log_adjacency_changes = try(vrf.log_adjacency_changes, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.log_adjacency_changes, null)
+      max_ecmp              = try(vrf.max_ecmp, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.max_ecmp, null)
+      name_lookup_vrf       = try(vrf.name_lookup_vrf, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.name_lookup_vrf, null)
+      rfc1583_compatible    = try(vrf.rfc1583_compatible, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.rfc1583_compatible, null)
+      router_id             = try(vrf.router_id, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.router_id, null)
+
+      max_metric_await_convergence_bgp_asn = try(vrf.max_metric.await_convergence_bgp_asn, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.max_metric.await_convergence_bgp_asn, null)
+      max_metric_control = join(",", sort(compact([
+        try(vrf.max_metric.external_lsa, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.max_metric.external_lsa, false) ? "external-lsa" : "",
+        try(vrf.max_metric.startup, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.max_metric.startup, false) ? "startup" : "",
+        try(vrf.max_metric.stub, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.max_metric.stub, false) ? "stub" : "",
+        try(vrf.max_metric.summary_lsa, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.max_metric.summary_lsa, false) ? "summary-lsa" : "",
+      ])))
+      max_metric_external_lsa     = try(vrf.max_metric.external_lsa_max_metric, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.max_metric.external_lsa_max_metric, null)
+      max_metric_summary_lsa      = try(vrf.max_metric.summary_lsa_max_metric, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.max_metric.summary_lsa_max_metric, null)
+      max_metric_startup_interval = try(vrf.max_metric.startup_interval, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.max_metric.startup_interval, null)
+
+      areas = { for area in try(vrf.areas, []) : area.area => {
+        authentication_type = try(area.authentication_type, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.areas.authentication_type, null)
+        cost                = try(area.cost, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.areas.cost, null)
+        control = join(",", sort(compact([
+          try(area.filter_redistribute, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.areas.filter_redistribute, false) ? "redistribute" : "",
+          try(area.filter_summary, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.areas.filter_summary, false) ? "summary" : "",
+          try(area.suppress_forwarding_address, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.areas.suppress_forwarding_address, false) ? "suppress-fa" : "",
+        ])))
+        nssa_translator_role = try(area.nssa_translator_role, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.areas.nssa_translator_role, null)
+        segment_routing_mpls = try(area.segment_routing_mpls, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.areas.segment_routing_mpls, false) ? "mpls" : "unspecified"
+        type                 = try(area.type, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.areas.type, null)
+      } }
+
+      interfaces = { for int in local.ospf_interfaces : "${int.type}${int.id}" => {
+        advertise_secondaries = int.ospf_advertise_secondaries
+        area                  = int.ospf_area
+        bfd                   = int.ospf_bfd
+        cost                  = int.ospf_cost
+        dead_interval         = int.ospf_dead_interval
+        hello_interval        = int.ospf_hello_interval
+        network_type          = int.ospf_network_type
+        passive               = int.ospf_passive
+        priority              = int.ospf_priority
+        control = join(",", sort(compact([
+          int.ospf_advertise_subnet ? "advert-subnet" : "",
+          int.ospf_mtu_ignore ? "mtu-ignore" : "",
+        ])))
+        node_flag                          = int.ospf_node_flag
+        retransmit_interval                = int.ospf_retransmit_interval
+        transmit_delay                     = int.ospf_transmit_delay
+        authentication_key                 = int.ospf_authentication_key
+        authentication_key_id              = int.ospf_authentication_key_id
+        authentication_key_secure_mode     = int.ospf_authentication_key_secure_mode
+        authentication_keychain            = int.ospf_authentication_keychain
+        authentication_md5_key             = int.ospf_authentication_md5_key
+        authentication_md5_key_secure_mode = int.ospf_authentication_md5_key_secure_mode
+        authentication_type                = int.ospf_authentication_type
+      } if int.device == each.key && int.ospf_process_name == proc.name && int.vrf == vrf.vrf }
+    } }
+  } }
+
   depends_on = [
-    nxos_feature.feature
+    nxos_feature.feature,
+    nxos_physical_interface.physical_interface,
+    nxos_loopback_interface.loopback_interface,
+    nxos_svi_interface.svi_interface,
+    nxos_port_channel_interface.port_channel_interface
   ]
-}
-
-locals {
-  routing_ospf_processes = flatten([
-    for device in local.devices : [
-      for proc in try(local.device_config[device.name].routing.ospf_processes, []) : {
-        key    = format("%s/%s", device.name, proc.name)
-        device = device.name
-        name   = proc.name
-      }
-    ]
-  ])
-}
-
-resource "nxos_ospf_instance" "ospf_instance" {
-  for_each = { for v in local.routing_ospf_processes : v.key => v }
-  device   = each.value.device
-  name     = each.value.name
-
-  depends_on = [
-    nxos_ospf.ospf
-  ]
-}
-
-locals {
-  routing_ospf_processes_vrfs = flatten([
-    for device in local.devices : [
-      for proc in try(local.device_config[device.name].routing.ospf_processes, []) : [
-        for vrf in try(proc.vrfs, []) : {
-          key                     = format("%s/%s/%s", device.name, proc.name, vrf.vrf)
-          device                  = device.name
-          proc_key                = format("%s/%s", device.name, proc.name)
-          vrf                     = vrf.vrf
-          admin_state             = try(vrf.admin_state, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.admin_state, false) ? "enabled" : "disabled"
-          bandwidth_reference     = try(vrf.bandwidth_reference, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.bandwidth_reference, null)
-          banwidth_reference_unit = try(vrf.banwidth_reference_unit, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.banwidth_reference_unit, null)
-          distance                = try(vrf.distance, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.distance, null)
-          router_id               = try(vrf.router_id, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.router_id, null)
-        }
-      ]
-    ]
-  ])
-}
-
-resource "nxos_ospf_vrf" "ospf_vrf" {
-  for_each                 = { for v in local.routing_ospf_processes_vrfs : v.key => v }
-  device                   = each.value.device
-  instance_name            = nxos_ospf_instance.ospf_instance[each.value.proc_key].name
-  name                     = each.value.vrf
-  admin_state              = each.value.admin_state
-  bandwidth_reference      = each.value.bandwidth_reference
-  bandwidth_reference_unit = each.value.banwidth_reference_unit
-  distance                 = each.value.distance
-  router_id                = each.value.router_id
-}
-
-locals {
-  routing_ospf_processes_vrfs_areas = flatten([
-    for device in local.devices : [
-      for proc in try(local.device_config[device.name].routing.ospf_processes, []) : [
-        for vrf in try(proc.vrfs, []) : [
-          for area in try(vrf.areas, []) : {
-            key                 = format("%s/%s/%s/%s", device.name, proc.name, vrf.vrf, area.area)
-            device              = device.name
-            process             = proc.name
-            vrf_key             = format("%s/%s/%s", device.name, proc.name, vrf.vrf)
-            area                = area.area
-            authentication_type = try(area.authentication_type, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.areas.authentication_type, null)
-            cost                = try(area.cost, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.areas.cost, null)
-            type                = try(area.type, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.areas.type, null)
-          }
-        ]
-      ]
-    ]
-  ])
-}
-
-resource "nxos_ospf_area" "ospf_area" {
-  for_each            = { for v in local.routing_ospf_processes_vrfs_areas : v.key => v }
-  device              = each.value.device
-  instance_name       = each.value.process
-  vrf_name            = nxos_ospf_vrf.ospf_vrf[each.value.vrf_key].name
-  area_id             = each.value.area
-  authentication_type = each.value.authentication_type
-  cost                = each.value.cost
-  type                = each.value.type
-}
-
-locals {
-  ospf_interfaces = concat(local.interfaces_ethernets, local.interfaces_loopbacks, local.interfaces_vlans, local.interfaces_port_channels)
-}
-
-resource "nxos_ospf_interface" "ospf_interface" {
-  for_each              = { for v in local.ospf_interfaces : v.key => v if v.ospf_process_name != null }
-  device                = each.value.device
-  instance_name         = each.value.ospf_process_name
-  vrf_name              = nxos_ospf_vrf.ospf_vrf["${each.value.device}/${each.value.ospf_process_name}/${each.value.vrf}"].name
-  interface_id          = "${each.value.type}${each.value.id}"
-  advertise_secondaries = each.value.ospf_advertise_secondaries
-  area                  = each.value.ospf_area
-  bfd                   = each.value.ospf_bfd
-  cost                  = each.value.ospf_cost
-  dead_interval         = each.value.ospf_dead_interval
-  hello_interval        = each.value.ospf_hello_interval
-  network_type          = each.value.ospf_network_type
-  passive               = each.value.ospf_passive
-  priority              = each.value.ospf_priority
-}
-
-resource "nxos_ospf_authentication" "ospf_authentication" {
-  for_each            = { for v in local.ospf_interfaces : v.key => v if v.ospf_authentication_type == "simple" || v.ospf_authentication_type == "md5" }
-  device              = each.value.device
-  instance_name       = each.value.ospf_process_name
-  vrf_name            = each.value.vrf
-  interface_id        = nxos_ospf_interface.ospf_interface[each.key].interface_id
-  key                 = each.value.ospf_authentication_key
-  key_id              = each.value.ospf_authentication_key_id
-  key_secure_mode     = each.value.ospf_authentication_key_secure_mode
-  keychain            = each.value.ospf_authentication_keychain
-  md5_key             = each.value.ospf_authentication_md5_key
-  md5_key_secure_mode = each.value.ospf_authentication_md5_key_secure_mode
-  type                = each.value.ospf_authentication_type
 }
