@@ -34,7 +34,7 @@ resource "nxos_save_config" "save_config" {
     nxos_bgp_peer_template_address_family.bgp_peer_template_address_family,
     nxos_bgp_peer_address_family.bgpPeerAf,
     nxos_evpn_vni_route_target.evpn_vni_route_target,
-    nxos_hmm_interface.hmm_interface,
+    nxos_hmm.hmm,
     nxos_feature.feature,
     nxos_physical_interface.physical_interface,
     nxos_ipv4_interface_address.ethernet_ipv4_interface_address,

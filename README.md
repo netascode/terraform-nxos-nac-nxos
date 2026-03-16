@@ -85,8 +85,6 @@ module "nxos" {
 | [nxos_evpn_vni_route_target_direction.evpn_vni_route_target_direction](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/evpn_vni_route_target_direction) | resource |
 | [nxos_feature.feature](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/feature) | resource |
 | [nxos_hmm.hmm](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/hmm) | resource |
-| [nxos_hmm_instance.hmm_instance](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/hmm_instance) | resource |
-| [nxos_hmm_interface.hmm_interface](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/hmm_interface) | resource |
 | [nxos_icmpv4.icmpv4](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/icmpv4) | resource |
 | [nxos_ipv4_interface.ethernet_ipv4_interface](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/ipv4_interface) | resource |
 | [nxos_ipv4_interface.loopback_ipv4_interface](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/ipv4_interface) | resource |
