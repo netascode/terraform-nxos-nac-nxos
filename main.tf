@@ -49,7 +49,6 @@ resource "nxos_save_config" "save_config" {
     nxos_pim_anycast_rp_peer.pim_anycast_rp_peer,
     nxos_pim_interface.pim_interface,
     nxos_system.system,
-    nxos_ethernet.ethernet,
     nxos_bridge_domain.bridge_domain,
     nxos_vrf_route_target.vrf_route_target,
     nxos_ipv4_vrf.ipv4_vrf,
