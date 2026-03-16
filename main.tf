@@ -29,6 +29,7 @@ resource "nxos_save_config" "save_config" {
   for_each = { for device in local.devices : device.name => device if var.save_config }
   device   = each.key
   depends_on = [
+    nxos_access_list.access_list,
     nxos_bgp.bgp,
     nxos_evpn.evpn,
     nxos_hmm.hmm,

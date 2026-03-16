@@ -65,6 +65,7 @@ module "nxos" {
 
 | Name | Type |
 |------|------|
+| [nxos_access_list.access_list](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/access_list) | resource |
 | [nxos_bgp.bgp](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/bgp) | resource |
 | [nxos_bridge_domain.bridge_domain](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/bridge_domain) | resource |
 | [nxos_evpn.evpn](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/evpn) | resource |
