@@ -72,6 +72,7 @@ module "nxos" {
 | [nxos_hmm.hmm](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/hmm) | resource |
 | [nxos_icmpv4.icmpv4](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/icmpv4) | resource |
 | [nxos_ipv4.ipv4](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/ipv4) | resource |
+| [nxos_ipv6.ipv6](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/ipv6) | resource |
 | [nxos_loopback_interface.loopback_interface](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/loopback_interface) | resource |
 | [nxos_nve_interface.nve_interface](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/nve_interface) | resource |
 | [nxos_nve_vni.nve_vni](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/nve_vni) | resource |
