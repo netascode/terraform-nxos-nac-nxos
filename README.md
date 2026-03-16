@@ -68,6 +68,16 @@ module "nxos" {
 | [nxos_access_list.access_list](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/access_list) | resource |
 | [nxos_bgp.bgp](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/bgp) | resource |
 | [nxos_bridge_domain.bridge_domain](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/bridge_domain) | resource |
+| [nxos_cli.cli_0](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/cli) | resource |
+| [nxos_cli.cli_1](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/cli) | resource |
+| [nxos_cli.cli_2](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/cli) | resource |
+| [nxos_cli.cli_3](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/cli) | resource |
+| [nxos_cli.cli_4](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/cli) | resource |
+| [nxos_cli.cli_5](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/cli) | resource |
+| [nxos_cli.cli_6](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/cli) | resource |
+| [nxos_cli.cli_7](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/cli) | resource |
+| [nxos_cli.cli_8](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/cli) | resource |
+| [nxos_cli.cli_9](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/cli) | resource |
 | [nxos_default_qos.default_qos](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/default_qos) | resource |
 | [nxos_dhcp.dhcp](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/dhcp) | resource |
 | [nxos_evpn.evpn](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0-beta7/docs/resources/evpn) | resource |

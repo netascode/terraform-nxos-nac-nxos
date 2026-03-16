@@ -25,9 +25,105 @@ provider "nxos" {
   devices = local.provider_devices
 }
 
-resource "nxos_save_config" "save_config" {
-  for_each = { for device in local.devices : device.name => device if var.save_config }
-  device   = each.key
+locals {
+  cli_templates_0 = flatten([
+    for device in local.devices : [
+      for template in try(device.cli_templates, []) : {
+        key     = format("%s/%s", device.name, template.name)
+        device  = device.name
+        content = template.content
+      } if try(template.order, local.defaults.nxos.templates.order) == 0
+    ]
+  ])
+  cli_templates_1 = flatten([
+    for device in local.devices : [
+      for template in try(device.cli_templates, []) : {
+        key     = format("%s/%s", device.name, template.name)
+        device  = device.name
+        content = template.content
+      } if try(template.order, local.defaults.nxos.templates.order) == 1
+    ]
+  ])
+  cli_templates_2 = flatten([
+    for device in local.devices : [
+      for template in try(device.cli_templates, []) : {
+        key     = format("%s/%s", device.name, template.name)
+        device  = device.name
+        content = template.content
+      } if try(template.order, local.defaults.nxos.templates.order) == 2
+    ]
+  ])
+  cli_templates_3 = flatten([
+    for device in local.devices : [
+      for template in try(device.cli_templates, []) : {
+        key     = format("%s/%s", device.name, template.name)
+        device  = device.name
+        content = template.content
+      } if try(template.order, local.defaults.nxos.templates.order) == 3
+    ]
+  ])
+  cli_templates_4 = flatten([
+    for device in local.devices : [
+      for template in try(device.cli_templates, []) : {
+        key     = format("%s/%s", device.name, template.name)
+        device  = device.name
+        content = template.content
+      } if try(template.order, local.defaults.nxos.templates.order) == 4
+    ]
+  ])
+  cli_templates_5 = flatten([
+    for device in local.devices : [
+      for template in try(device.cli_templates, []) : {
+        key     = format("%s/%s", device.name, template.name)
+        device  = device.name
+        content = template.content
+      } if try(template.order, local.defaults.nxos.templates.order) == 5
+    ]
+  ])
+  cli_templates_6 = flatten([
+    for device in local.devices : [
+      for template in try(device.cli_templates, []) : {
+        key     = format("%s/%s", device.name, template.name)
+        device  = device.name
+        content = template.content
+      } if try(template.order, local.defaults.nxos.templates.order) == 6
+    ]
+  ])
+  cli_templates_7 = flatten([
+    for device in local.devices : [
+      for template in try(device.cli_templates, []) : {
+        key     = format("%s/%s", device.name, template.name)
+        device  = device.name
+        content = template.content
+      } if try(template.order, local.defaults.nxos.templates.order) == 7
+    ]
+  ])
+  cli_templates_8 = flatten([
+    for device in local.devices : [
+      for template in try(device.cli_templates, []) : {
+        key     = format("%s/%s", device.name, template.name)
+        device  = device.name
+        content = template.content
+      } if try(template.order, local.defaults.nxos.templates.order) == 8
+    ]
+  ])
+  cli_templates_9 = flatten([
+    for device in local.devices : [
+      for template in try(device.cli_templates, []) : {
+        key     = format("%s/%s", device.name, template.name)
+        device  = device.name
+        content = template.content
+      } if try(template.order, local.defaults.nxos.templates.order) == 9
+    ]
+  ])
+}
+
+resource "nxos_cli" "cli_0" {
+  for_each = { for e in local.cli_templates_0 : e.key => e }
+  device   = each.value.device
+
+  cli = each.value.content
+
   depends_on = [
     nxos_access_list.access_list,
     nxos_bgp.bgp,
@@ -59,5 +155,112 @@ resource "nxos_save_config" "save_config" {
     nxos_logging.logging,
     nxos_ntp.ntp,
     nxos_queuing_qos.queuing_qos
+  ]
+}
+
+resource "nxos_cli" "cli_1" {
+  for_each = { for e in local.cli_templates_1 : e.key => e }
+  device   = each.value.device
+
+  cli = each.value.content
+
+  depends_on = [
+    nxos_cli.cli_0
+  ]
+}
+
+resource "nxos_cli" "cli_2" {
+  for_each = { for e in local.cli_templates_2 : e.key => e }
+  device   = each.value.device
+
+  cli = each.value.content
+
+  depends_on = [
+    nxos_cli.cli_1
+  ]
+}
+
+resource "nxos_cli" "cli_3" {
+  for_each = { for e in local.cli_templates_3 : e.key => e }
+  device   = each.value.device
+
+  cli = each.value.content
+
+  depends_on = [
+    nxos_cli.cli_2
+  ]
+}
+
+resource "nxos_cli" "cli_4" {
+  for_each = { for e in local.cli_templates_4 : e.key => e }
+  device   = each.value.device
+
+  cli = each.value.content
+
+  depends_on = [
+    nxos_cli.cli_3
+  ]
+}
+
+resource "nxos_cli" "cli_5" {
+  for_each = { for e in local.cli_templates_5 : e.key => e }
+  device   = each.value.device
+
+  cli = each.value.content
+
+  depends_on = [
+    nxos_cli.cli_4
+  ]
+}
+
+resource "nxos_cli" "cli_6" {
+  for_each = { for e in local.cli_templates_6 : e.key => e }
+  device   = each.value.device
+
+  cli = each.value.content
+
+  depends_on = [
+    nxos_cli.cli_5
+  ]
+}
+
+resource "nxos_cli" "cli_7" {
+  for_each = { for e in local.cli_templates_7 : e.key => e }
+  device   = each.value.device
+
+  cli = each.value.content
+
+  depends_on = [
+    nxos_cli.cli_6
+  ]
+}
+
+resource "nxos_cli" "cli_8" {
+  for_each = { for e in local.cli_templates_8 : e.key => e }
+  device   = each.value.device
+
+  cli = each.value.content
+
+  depends_on = [
+    nxos_cli.cli_7
+  ]
+}
+
+resource "nxos_cli" "cli_9" {
+  for_each = { for e in local.cli_templates_9 : e.key => e }
+  device   = each.value.device
+
+  cli = each.value.content
+
+  depends_on = [
+    nxos_cli.cli_8
+  ]
+}
+
+resource "nxos_save_config" "save_config" {
+  for_each = { for device in local.devices : device.name => device if var.save_config }
+  device   = each.key
+  depends_on = [
+    nxos_cli.cli_9
   ]
 }
