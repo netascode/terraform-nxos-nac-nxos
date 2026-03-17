@@ -169,4 +169,5 @@ resource "nxos_ipv6" "ipv6" {
       } if int.device == each.key && int.vrf == vrf.name }
     } }
   )
+  depends_on = [nxos_feature.feature, nxos_physical_interface.physical_interface, nxos_svi_interface.svi_interface, nxos_port_channel_interface.port_channel_interface, nxos_subinterface.subinterface]
 }

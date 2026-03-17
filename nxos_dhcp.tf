@@ -3,7 +3,7 @@ locals {
     for device in local.devices : concat(
       [for int in try(local.device_config[device.name].interfaces.ethernets, []) : {
         device       = device.name
-        interface_id = int.id
+        interface_id = "eth${int.id}"
         dhcp_relay   = int.dhcp_relay
       } if try(int.dhcp_relay, null) != null],
       [for int in try(local.device_config[device.name].interfaces.vlans, []) : {
@@ -74,4 +74,5 @@ resource "nxos_dhcp" "dhcp" {
       counter = try(addr.counter, local.defaults.nxos.devices.configuration.interfaces.ethernets.dhcp_relay.addresses.counter, null)
     } }
   } if item.device == each.key }
+  depends_on = [nxos_feature.feature, nxos_physical_interface.physical_interface, nxos_svi_interface.svi_interface, nxos_port_channel_interface.port_channel_interface]
 }
