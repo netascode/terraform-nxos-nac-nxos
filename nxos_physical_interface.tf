@@ -125,7 +125,7 @@ resource "nxos_physical_interface" "physical_interface" {
   device = each.key
   physical_interfaces = { for int in try(local.device_config[each.key].interfaces.ethernets, []) : "eth${int.id}" => {
     fec_mode                           = try(int.fec_mode, local.defaults.nxos.devices.configuration.interfaces.ethernets.fec_mode, null)
-    access_vlan                        = try(int.layer3, local.defaults.nxos.devices.configuration.interfaces.ethernets.layer3, false) ? "unknown" : "vlan-${try(int.access_vlan, local.defaults.nxos.devices.configuration.interfaces.ethernets.access_vlan, 1)}"
+    access_vlan                        = try(int.port_channel, null) != null ? null : (try(int.layer3, local.defaults.nxos.devices.configuration.interfaces.ethernets.layer3, false) ? "unknown" : "vlan-${try(int.access_vlan, local.defaults.nxos.devices.configuration.interfaces.ethernets.access_vlan, 1)}")
     admin_state                        = try(int.admin_state, local.defaults.nxos.devices.configuration.interfaces.ethernets.admin_state, false) ? "up" : "down"
     auto_negotiation                   = try(int.auto_negotiation, local.defaults.nxos.devices.configuration.interfaces.ethernets.auto_negotiation, null)
     bandwidth                          = try(int.bandwidth, local.defaults.nxos.devices.configuration.interfaces.ethernets.bandwidth, null)
@@ -139,7 +139,7 @@ resource "nxos_physical_interface" "physical_interface" {
     equalization_delay                 = try(int.equalization_delay, local.defaults.nxos.devices.configuration.interfaces.ethernets.equalization_delay, null)
     inherit_bandwidth                  = try(int.inherit_bandwidth, local.defaults.nxos.devices.configuration.interfaces.ethernets.inherit_bandwidth, null)
     itu_channel                        = try(int.itu_channel, local.defaults.nxos.devices.configuration.interfaces.ethernets.itu_channel, null)
-    layer                              = try(int.layer3, local.defaults.nxos.devices.configuration.interfaces.ethernets.layer3, false) ? "Layer3" : "Layer2"
+    layer                              = try(int.port_channel, null) != null ? null : (try(int.layer3, local.defaults.nxos.devices.configuration.interfaces.ethernets.layer3, false) ? "Layer3" : "Layer2")
     link_active_jitter_management      = try(int.link_active_jitter_management, local.defaults.nxos.devices.configuration.interfaces.ethernets.link_active_jitter_management, null) != null ? (try(int.link_active_jitter_management, local.defaults.nxos.devices.configuration.interfaces.ethernets.link_active_jitter_management) ? "enable" : "disable") : null
     link_debounce_down                 = try(int.link_debounce_down, local.defaults.nxos.devices.configuration.interfaces.ethernets.link_debounce_down, null)
     link_debounce_up                   = try(int.link_debounce_up, local.defaults.nxos.devices.configuration.interfaces.ethernets.link_debounce_up, null)
@@ -156,7 +156,7 @@ resource "nxos_physical_interface" "physical_interface" {
     medium                             = try(int.medium, local.defaults.nxos.devices.configuration.interfaces.ethernets.medium, null)
     mode                               = try(int.mode, local.defaults.nxos.devices.configuration.interfaces.ethernets.mode, null)
     mtu                                = try(int.mtu, local.defaults.nxos.devices.configuration.interfaces.ethernets.mtu, null)
-    native_vlan                        = try(int.layer3, local.defaults.nxos.devices.configuration.interfaces.ethernets.layer3, false) ? "unknown" : "vlan-${try(int.native_vlan, local.defaults.nxos.devices.configuration.interfaces.ethernets.native_vlan, 1)}"
+    native_vlan                        = try(int.port_channel, null) != null ? null : (try(int.layer3, local.defaults.nxos.devices.configuration.interfaces.ethernets.layer3, false) ? "unknown" : "vlan-${try(int.native_vlan, local.defaults.nxos.devices.configuration.interfaces.ethernets.native_vlan, 1)}")
     optics_loopback                    = try(int.optics_loopback, local.defaults.nxos.devices.configuration.interfaces.ethernets.optics_loopback, null)
     packet_timestamp_egress_source_id  = try(int.packet_timestamp_egress_source_id, local.defaults.nxos.devices.configuration.interfaces.ethernets.packet_timestamp_egress_source_id, null)
     packet_timestamp_ingress_source_id = try(int.packet_timestamp_ingress_source_id, local.defaults.nxos.devices.configuration.interfaces.ethernets.packet_timestamp_ingress_source_id, null)
@@ -169,14 +169,14 @@ resource "nxos_physical_interface" "physical_interface" {
     squelch                            = try(int.squelch, local.defaults.nxos.devices.configuration.interfaces.ethernets.squelch, null) != null ? (try(int.squelch, local.defaults.nxos.devices.configuration.interfaces.ethernets.squelch) ? "enable" : "disable") : null
     transparent_mode                   = try(int.transparent_mode, local.defaults.nxos.devices.configuration.interfaces.ethernets.transparent_mode, null)
     trunk_logging                      = try(int.trunk_logging, local.defaults.nxos.devices.configuration.interfaces.ethernets.trunk_logging, null) != null ? (try(int.trunk_logging, local.defaults.nxos.devices.configuration.interfaces.ethernets.trunk_logging) ? "enable" : "disable") : null
-    trunk_vlans                        = try(int.layer3, local.defaults.nxos.devices.configuration.interfaces.ethernets.layer3, false) ? "1-4094" : try(int.trunk_vlans, local.defaults.nxos.devices.configuration.interfaces.ethernets.trunk_vlans, null)
+    trunk_vlans                        = try(int.port_channel, null) != null ? null : (try(int.layer3, local.defaults.nxos.devices.configuration.interfaces.ethernets.layer3, false) ? "1-4094" : try(int.trunk_vlans, local.defaults.nxos.devices.configuration.interfaces.ethernets.trunk_vlans, null))
     uni_directional_ethernet           = try(int.uni_directional_ethernet, local.defaults.nxos.devices.configuration.interfaces.ethernets.uni_directional_ethernet, null)
-    user_configured_flags              = "admin_layer,admin_mtu,admin_state"
+    user_configured_flags              = try(int.port_channel, null) != null ? null : "admin_layer,admin_mtu,admin_state"
     voice_port_cos                     = try(int.voice_port_cos, local.defaults.nxos.devices.configuration.interfaces.ethernets.voice_port_cos, null)
     voice_port_trust                   = try(int.voice_port_trust, local.defaults.nxos.devices.configuration.interfaces.ethernets.voice_port_trust, null) != null ? (try(int.voice_port_trust, local.defaults.nxos.devices.configuration.interfaces.ethernets.voice_port_trust) ? "enable" : "disable") : null
     voice_vlan_id                      = try(int.voice_vlan, local.defaults.nxos.devices.configuration.interfaces.ethernets.voice_vlan, null)
     voice_vlan_type                    = try(int.voice_vlan_type, local.defaults.nxos.devices.configuration.interfaces.ethernets.voice_vlan_type, null)
-    vrf_dn                             = try(int.layer3, local.defaults.nxos.devices.configuration.interfaces.ethernets.layer3, false) ? "sys/inst-${try(int.vrf, local.defaults.nxos.devices.configuration.interfaces.ethernets.vrf, "default")}" : null
+    vrf_dn                             = try(int.port_channel, null) != null ? null : (try(int.layer3, local.defaults.nxos.devices.configuration.interfaces.ethernets.layer3, false) ? "sys/inst-${try(int.vrf, local.defaults.nxos.devices.configuration.interfaces.ethernets.vrf, "default")}" : null)
   } }
 
   depends_on = [
