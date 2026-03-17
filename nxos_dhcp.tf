@@ -70,7 +70,7 @@ resource "nxos_dhcp" "dhcp" {
     options             = try(item.dhcp_relay.options, local.defaults.nxos.devices.configuration.interfaces.ethernets.dhcp_relay.options, null)
     subnet_selection    = try(item.dhcp_relay.relay_source_subnet, local.defaults.nxos.devices.configuration.interfaces.ethernets.dhcp_relay.relay_source_subnet, null)
     v6_smart_relay      = try(item.dhcp_relay.ipv6_smart_relay, local.defaults.nxos.devices.configuration.interfaces.ethernets.dhcp_relay.ipv6_smart_relay, null)
-    addresses = { for addr in try(item.dhcp_relay.addresses, []) : "${try(addr.vrf, "default")};${addr.address}" => {
+    addresses = { for addr in try(item.dhcp_relay.addresses, []) : "${try(addr.vrf, "!unspecified")};${addr.address}" => {
       counter = try(addr.counter, local.defaults.nxos.devices.configuration.interfaces.ethernets.dhcp_relay.addresses.counter, null)
     } }
   } if item.device == each.key }
