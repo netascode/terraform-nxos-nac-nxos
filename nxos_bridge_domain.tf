@@ -3,7 +3,7 @@ resource "nxos_bridge_domain" "bridge_domain" {
     if try(local.device_config[device.name].system.svi_autostate, local.defaults.nxos.devices.configuration.system.svi_autostate, null) != null ||
   length(try(local.device_config[device.name].vlans, [])) > 0 }
   device        = each.key
-  svi_autostate = try(local.device_config[each.key].system.svi_autostate, local.defaults.nxos.devices.configuration.system.svi_autostate, null)
+  svi_autostate = try(local.device_config[each.key].system.svi_autostate, local.defaults.nxos.devices.configuration.system.svi_autostate, null) == null ? null : try(local.device_config[each.key].system.svi_autostate, local.defaults.nxos.devices.configuration.system.svi_autostate) ? "enable" : "disable"
   bridge_domains = { for vlan in try(local.device_config[each.key].vlans, []) : "vlan-${vlan.id}" => {
     access_encap = try(vlan.vni, local.defaults.nxos.devices.configuration.vlans.vni, null) != null ? "vxlan-${try(vlan.vni, local.defaults.nxos.devices.configuration.vlans.vni)}" : null
     name         = try(vlan.name, local.defaults.nxos.devices.configuration.vlans.name, null)
