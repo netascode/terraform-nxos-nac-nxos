@@ -27,7 +27,7 @@ resource "nxos_isis" "isis" {
       mtu                      = try(vrf.mtu, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.mtu, null)
       net                      = try(vrf.net, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.net, null)
       passive_default          = try(vrf.passive_default, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.passive_default, null)
-      control                  = try(vrf.log_adjacency_changes, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.log_adjacency_changes, false) ? "log-adj-changes" : "unspecified"
+      control                  = try(vrf.log_adjacency_changes, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.log_adjacency_changes, null) != null ? (try(vrf.log_adjacency_changes, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.log_adjacency_changes) ? "log-adj-changes" : "unspecified") : null
       lsp_lifetime             = try(vrf.lsp_lifetime, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.lsp_lifetime, null)
       queue_limit              = try(vrf.queue_limit, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.queue_limit, null)
       overload_admin_state     = try(vrf.overload_admin_state, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.overload_admin_state, null)
