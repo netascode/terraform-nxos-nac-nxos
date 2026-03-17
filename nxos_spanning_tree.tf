@@ -33,4 +33,9 @@ resource "nxos_spanning_tree" "spanning_tree" {
       priority    = try(int.spanning_tree.priority, local.defaults.nxos.devices.configuration.interfaces.port_channels.spanning_tree.priority, null)
     } if try(int.spanning_tree, null) != null },
   )
+
+  depends_on = [
+    nxos_physical_interface.physical_interface,
+    nxos_port_channel_interface.port_channel_interface,
+  ]
 }

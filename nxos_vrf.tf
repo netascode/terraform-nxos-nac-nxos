@@ -151,4 +151,8 @@ resource "nxos_vrf" "vrf" {
       }
     } }
   } }
+
+  depends_on = [
+    nxos_feature.feature,
+  ]
 }

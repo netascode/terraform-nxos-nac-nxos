@@ -121,5 +121,7 @@ resource "nxos_svi_interface" "svi_interface" {
 
   depends_on = [
     nxos_feature.feature,
+    nxos_bridge_domain.bridge_domain,
+    nxos_vrf.vrf,
   ]
 }

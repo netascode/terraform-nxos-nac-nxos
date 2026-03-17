@@ -108,4 +108,8 @@ resource "nxos_loopback_interface" "loopback_interface" {
     link_logging = try(int.link_logging, local.defaults.nxos.devices.configuration.interfaces.loopbacks.link_logging, null)
     vrf_dn       = "sys/inst-${try(int.vrf, local.defaults.nxos.devices.configuration.interfaces.loopbacks.vrf, "default")}"
   } }
+
+  depends_on = [
+    nxos_vrf.vrf,
+  ]
 }

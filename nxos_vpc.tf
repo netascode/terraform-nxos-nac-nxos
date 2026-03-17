@@ -57,4 +57,9 @@ resource "nxos_vpc" "vpc" {
   interfaces = { for int in try(local.device_config[each.key].interfaces.port_channels, []) : tostring(int.vpc_id) => {
     port_channel_interface_dn = "sys/intf/aggr-[po${int.id}]"
   } if try(int.vpc_id, null) != null }
+
+  depends_on = [
+    nxos_feature.feature,
+    nxos_port_channel_interface.port_channel_interface,
+  ]
 }

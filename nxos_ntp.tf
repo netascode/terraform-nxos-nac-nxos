@@ -27,4 +27,8 @@ resource "nxos_ntp" "ntp" {
     max_poll  = try(server.max_poll, local.defaults.nxos.devices.configuration.ntp.servers.max_poll, null)
     preferred = try(server.prefer, local.defaults.nxos.devices.configuration.ntp.servers.prefer, null)
   } }
+
+  depends_on = [
+    nxos_vrf.vrf,
+  ]
 }

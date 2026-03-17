@@ -61,9 +61,10 @@ resource "nxos_ospfv3" "ospfv3" {
 
   depends_on = [
     nxos_feature.feature,
-    nxos_physical_interface.physical_interface,
     nxos_loopback_interface.loopback_interface,
+    nxos_physical_interface.physical_interface,
+    nxos_port_channel_interface.port_channel_interface,
     nxos_svi_interface.svi_interface,
-    nxos_port_channel_interface.port_channel_interface
+    nxos_vrf.vrf,
   ]
 }

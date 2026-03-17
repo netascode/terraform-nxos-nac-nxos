@@ -84,4 +84,8 @@ resource "nxos_user_management" "user_management" {
     source_interface = try(group.source_interface, local.defaults.nxos.devices.configuration.tacacs.server_groups.source_interface, null)
     vrf              = try(group.vrf, local.defaults.nxos.devices.configuration.tacacs.server_groups.vrf, null)
   } }
+
+  depends_on = [
+    nxos_feature.feature,
+  ]
 }

@@ -139,4 +139,12 @@ resource "nxos_system" "system" {
       router_preference              = try(nd.router_preference, null)
     } }
   } }
+
+  depends_on = [
+    nxos_loopback_interface.loopback_interface,
+    nxos_physical_interface.physical_interface,
+    nxos_port_channel_interface.port_channel_interface,
+    nxos_svi_interface.svi_interface,
+    nxos_vrf.vrf,
+  ]
 }

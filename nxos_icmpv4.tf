@@ -69,5 +69,12 @@ resource "nxos_icmpv4" "icmpv4" {
     } if int.device == each.key && int.vrf == entry.vrf }
   } if entry.device == each.key }
 
-  depends_on = [nxos_feature.feature, nxos_physical_interface.physical_interface, nxos_svi_interface.svi_interface, nxos_port_channel_interface.port_channel_interface]
+  depends_on = [
+    nxos_feature.feature,
+    nxos_loopback_interface.loopback_interface,
+    nxos_physical_interface.physical_interface,
+    nxos_port_channel_interface.port_channel_interface,
+    nxos_svi_interface.svi_interface,
+    nxos_vrf.vrf,
+  ]
 }

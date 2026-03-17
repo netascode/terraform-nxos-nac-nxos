@@ -39,5 +39,10 @@ resource "nxos_subinterface" "subinterface" {
       vrf_dn                  = try(sub.vrf, local.defaults.nxos.devices.configuration.interfaces.port_channels.subinterfaces.vrf, null) != null ? "sys/inst-${try(sub.vrf, local.defaults.nxos.devices.configuration.interfaces.port_channels.subinterfaces.vrf)}" : null
     } },
   )
-  depends_on = [nxos_physical_interface.physical_interface, nxos_port_channel_interface.port_channel_interface]
+
+  depends_on = [
+    nxos_physical_interface.physical_interface,
+    nxos_port_channel_interface.port_channel_interface,
+    nxos_vrf.vrf,
+  ]
 }

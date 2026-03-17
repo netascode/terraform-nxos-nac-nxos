@@ -44,6 +44,9 @@ resource "nxos_nvo" "nvo" {
   } }
 
   depends_on = [
-    nxos_feature.feature
+    nxos_bridge_domain.bridge_domain,
+    nxos_evpn.evpn,
+    nxos_feature.feature,
+    nxos_loopback_interface.loopback_interface,
   ]
 }

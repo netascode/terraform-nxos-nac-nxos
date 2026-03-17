@@ -113,6 +113,8 @@ resource "nxos_evpn" "evpn" {
   } }
 
   depends_on = [
-    nxos_feature.feature
+    nxos_bgp.bgp,
+    nxos_bridge_domain.bridge_domain,
+    nxos_feature.feature,
   ]
 }

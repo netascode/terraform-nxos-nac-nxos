@@ -176,6 +176,9 @@ resource "nxos_physical_interface" "physical_interface" {
     voice_port_trust                   = try(int.voice_port_trust, local.defaults.nxos.devices.configuration.interfaces.ethernets.voice_port_trust, null) != null ? (try(int.voice_port_trust, local.defaults.nxos.devices.configuration.interfaces.ethernets.voice_port_trust) ? "enable" : "disable") : null
     voice_vlan_id                      = try(int.voice_vlan, local.defaults.nxos.devices.configuration.interfaces.ethernets.voice_vlan, null)
     voice_vlan_type                    = try(int.voice_vlan_type, local.defaults.nxos.devices.configuration.interfaces.ethernets.voice_vlan_type, null)
-    vrf_dn                             = try(int.layer3, local.defaults.nxos.devices.configuration.interfaces.ethernets.layer3, false) ? "sys/inst-${try(int.vrf, local.defaults.nxos.devices.configuration.interfaces.ethernets.vrf, "default")}" : null
   } }
+
+  depends_on = [
+    nxos_vrf.vrf,
+  ]
 }

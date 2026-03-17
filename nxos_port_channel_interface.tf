@@ -145,5 +145,10 @@ resource "nxos_port_channel_interface" "port_channel_interface" {
       force = try(eth.port_channel_force, local.defaults.nxos.devices.configuration.interfaces.ethernets.port_channel_force, false)
     } if try(eth.port_channel, null) == int.id }
   } }
-  depends_on = [nxos_physical_interface.physical_interface]
+
+  depends_on = [
+    nxos_feature.feature,
+    nxos_physical_interface.physical_interface,
+    nxos_vrf.vrf,
+  ]
 }
