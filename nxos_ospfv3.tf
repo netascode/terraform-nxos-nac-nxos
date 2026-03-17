@@ -1,5 +1,8 @@
 locals {
   ospfv3_interfaces = concat(local.interfaces_ethernets, local.interfaces_loopbacks, local.interfaces_vlans, local.interfaces_port_channels)
+  ospfv3_address_family_map = {
+    "ipv6_unicast" = "ipv6-ucast"
+  }
 }
 
 resource "nxos_ospfv3" "ospfv3" {
@@ -32,7 +35,7 @@ resource "nxos_ospfv3" "ospfv3" {
         suppress_forward_address = try(area.suppress_forward_address, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.vrfs.areas.suppress_forward_address, null)
       } }
 
-      address_families = { for af in try(vrf.address_families, []) : replace(af.address_family, "_", "-") => {
+      address_families = { for af in try(vrf.address_families, []) : local.ospfv3_address_family_map[af.address_family] => {
         administrative_distance       = try(af.administrative_distance, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.vrfs.address_families.administrative_distance, null)
         default_metric                = try(af.default_metric, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.vrfs.address_families.default_metric, null)
         default_route_nssa_pbit_clear = try(af.default_route_nssa_pbit_clear, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.vrfs.address_families.default_route_nssa_pbit_clear, null)
