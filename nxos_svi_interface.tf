@@ -118,4 +118,8 @@ resource "nxos_svi_interface" "svi_interface" {
     mtu         = try(int.mtu, local.defaults.nxos.devices.configuration.interfaces.vlans.mtu, null)
     vrf_dn      = "sys/inst-${try(int.vrf, local.defaults.nxos.devices.configuration.interfaces.vlans.vrf, "default")}"
   } }
+
+  depends_on = [
+    nxos_feature.feature,
+  ]
 }
