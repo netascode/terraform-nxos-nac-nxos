@@ -40,9 +40,9 @@ resource "nxos_route_policy" "route_policy" {
         "sys/rpm/pfxlistv4-[${try(entry.match_prefix_list, local.defaults.nxos.devices.configuration.routing.route_maps.entries.match_prefix_list)}]" = {}
       } : {}
 
-      set_regular_community_additive     = try(entry.additive, local.defaults.nxos.devices.configuration.routing.route_maps.entries.additive, null) != null ? (try(entry.additive, local.defaults.nxos.devices.configuration.routing.route_maps.entries.additive) ? "enabled" : "disabled") : null
-      set_regular_community_no_community = try(entry.no_community, local.defaults.nxos.devices.configuration.routing.route_maps.entries.no_community, null) != null ? (try(entry.no_community, local.defaults.nxos.devices.configuration.routing.route_maps.entries.no_community) ? "enabled" : "disabled") : null
-      set_regular_community_criteria     = try(entry.set_criteria, local.defaults.nxos.devices.configuration.routing.route_maps.entries.set_criteria, null)
+      set_regular_community_additive     = try(entry.community, local.defaults.nxos.devices.configuration.routing.route_maps.entries.community, null) != null ? (try(entry.additive, local.defaults.nxos.devices.configuration.routing.route_maps.entries.additive, null) != null ? (try(entry.additive, local.defaults.nxos.devices.configuration.routing.route_maps.entries.additive) ? "enabled" : "disabled") : "disabled") : null
+      set_regular_community_no_community = try(entry.community, local.defaults.nxos.devices.configuration.routing.route_maps.entries.community, null) != null ? (try(entry.no_community, local.defaults.nxos.devices.configuration.routing.route_maps.entries.no_community, null) != null ? (try(entry.no_community, local.defaults.nxos.devices.configuration.routing.route_maps.entries.no_community) ? "enabled" : "disabled") : "disabled") : null
+      set_regular_community_criteria     = try(entry.community, local.defaults.nxos.devices.configuration.routing.route_maps.entries.community, null) != null ? try(entry.set_criteria, local.defaults.nxos.devices.configuration.routing.route_maps.entries.set_criteria, "none") : null
 
       set_regular_community_items = try(entry.community, local.defaults.nxos.devices.configuration.routing.route_maps.entries.community, null) != null ? {
         try(entry.community, local.defaults.nxos.devices.configuration.routing.route_maps.entries.community) = {}
