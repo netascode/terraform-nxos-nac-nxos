@@ -8,6 +8,7 @@ locals {
         ipv4_redirect         = try(int.ipv4_redirect, local.defaults.nxos.devices.configuration.interfaces.ethernets.ipv4_redirect, null)
         ipv4_unreachable      = try(int.ipv4_unreachable, local.defaults.nxos.devices.configuration.interfaces.ethernets.ipv4_unreachable, null)
         ipv4_port_unreachable = try(int.ipv4_port_unreachable, local.defaults.nxos.devices.configuration.interfaces.ethernets.ipv4_port_unreachable, null)
+        is_svi_with_vpc       = false
         } if try(int.ipv4_redirect, local.defaults.nxos.devices.configuration.interfaces.ethernets.ipv4_redirect, null) != null ||
         try(int.ipv4_unreachable, local.defaults.nxos.devices.configuration.interfaces.ethernets.ipv4_unreachable, null) != null ||
         try(int.ipv4_port_unreachable, local.defaults.nxos.devices.configuration.interfaces.ethernets.ipv4_port_unreachable, null) != null
@@ -19,6 +20,7 @@ locals {
         ipv4_redirect         = try(int.ipv4_redirect, local.defaults.nxos.devices.configuration.interfaces.loopbacks.ipv4_redirect, null)
         ipv4_unreachable      = try(int.ipv4_unreachable, local.defaults.nxos.devices.configuration.interfaces.loopbacks.ipv4_unreachable, null)
         ipv4_port_unreachable = try(int.ipv4_port_unreachable, local.defaults.nxos.devices.configuration.interfaces.loopbacks.ipv4_port_unreachable, null)
+        is_svi_with_vpc       = false
         } if try(int.ipv4_redirect, local.defaults.nxos.devices.configuration.interfaces.loopbacks.ipv4_redirect, null) != null ||
         try(int.ipv4_unreachable, local.defaults.nxos.devices.configuration.interfaces.loopbacks.ipv4_unreachable, null) != null ||
         try(int.ipv4_port_unreachable, local.defaults.nxos.devices.configuration.interfaces.loopbacks.ipv4_port_unreachable, null) != null
@@ -30,6 +32,7 @@ locals {
         ipv4_redirect         = try(int.ipv4_redirect, local.defaults.nxos.devices.configuration.interfaces.vlans.ipv4_redirect, null)
         ipv4_unreachable      = try(int.ipv4_unreachable, local.defaults.nxos.devices.configuration.interfaces.vlans.ipv4_unreachable, null)
         ipv4_port_unreachable = try(int.ipv4_port_unreachable, local.defaults.nxos.devices.configuration.interfaces.vlans.ipv4_port_unreachable, null)
+        is_svi_with_vpc       = try(local.device_config[device.name].vpc.domain_id, null) != null
         } if try(int.ipv4_redirect, local.defaults.nxos.devices.configuration.interfaces.vlans.ipv4_redirect, null) != null ||
         try(int.ipv4_unreachable, local.defaults.nxos.devices.configuration.interfaces.vlans.ipv4_unreachable, null) != null ||
         try(int.ipv4_port_unreachable, local.defaults.nxos.devices.configuration.interfaces.vlans.ipv4_port_unreachable, null) != null
@@ -41,6 +44,7 @@ locals {
         ipv4_redirect         = try(int.ipv4_redirect, local.defaults.nxos.devices.configuration.interfaces.port_channels.ipv4_redirect, null)
         ipv4_unreachable      = try(int.ipv4_unreachable, local.defaults.nxos.devices.configuration.interfaces.port_channels.ipv4_unreachable, null)
         ipv4_port_unreachable = try(int.ipv4_port_unreachable, local.defaults.nxos.devices.configuration.interfaces.port_channels.ipv4_port_unreachable, null)
+        is_svi_with_vpc       = false
         } if try(int.ipv4_redirect, local.defaults.nxos.devices.configuration.interfaces.port_channels.ipv4_redirect, null) != null ||
         try(int.ipv4_unreachable, local.defaults.nxos.devices.configuration.interfaces.port_channels.ipv4_unreachable, null) != null ||
         try(int.ipv4_port_unreachable, local.defaults.nxos.devices.configuration.interfaces.port_channels.ipv4_port_unreachable, null) != null
@@ -63,7 +67,7 @@ resource "nxos_icmpv4" "icmpv4" {
     interfaces = { for int in local.icmpv4_interfaces : int.id => {
       control = join(",", sort(compact([
         try(int.ipv4_port_unreachable, false) == true ? "port-unreachable" : "",
-        try(int.ipv4_redirect, false) == true ? "redirect" : "",
+        try(int.ipv4_redirect, false) == true && !int.is_svi_with_vpc ? "redirect" : "",
         try(int.ipv4_unreachable, false) == true ? "unreachable" : "",
       ])))
     } if int.device == each.key && int.vrf == entry.vrf }
