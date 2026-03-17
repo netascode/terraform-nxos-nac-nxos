@@ -105,7 +105,7 @@ resource "nxos_loopback_interface" "loopback_interface" {
   loopback_interfaces = { for int in try(local.device_config[each.key].interfaces.loopbacks, []) : "lo${int.id}" => {
     admin_state  = try(int.admin_state, local.defaults.nxos.devices.configuration.interfaces.loopbacks.admin_state, false) ? "up" : "down"
     description  = try(int.description, local.defaults.nxos.devices.configuration.interfaces.loopbacks.description, null)
-    link_logging = try(int.link_logging, local.defaults.nxos.devices.configuration.interfaces.loopbacks.link_logging, null)
+    link_logging = try(int.link_logging, local.defaults.nxos.devices.configuration.interfaces.loopbacks.link_logging, null) == null ? null : try(int.link_logging, local.defaults.nxos.devices.configuration.interfaces.loopbacks.link_logging, null) ? "enable" : "disable"
     vrf_dn       = "sys/inst-${try(int.vrf, local.defaults.nxos.devices.configuration.interfaces.loopbacks.vrf, "default")}"
   } }
 
