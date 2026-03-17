@@ -24,7 +24,7 @@ locals {
       [for int in try(local.device_config[device.name].interfaces.ethernets, []) : {
         device       = device.name
         vrf          = try(int.vrf, "default")
-        interface_id = int.id
+        interface_id = "eth${int.id}"
         nd           = try(int.nd, {})
       } if try(int.nd, null) != null],
       [for int in try(local.device_config[device.name].interfaces.port_channels, []) : {

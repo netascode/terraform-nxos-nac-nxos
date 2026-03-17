@@ -14,7 +14,7 @@ resource "nxos_spanning_tree" "spanning_tree" {
   mode                     = try(local.device_config[each.key].spanning_tree.mode, local.defaults.nxos.devices.configuration.spanning_tree.mode, null)
   pathcost_option          = try(local.device_config[each.key].spanning_tree.pathcost_option, local.defaults.nxos.devices.configuration.spanning_tree.pathcost_option, null)
   interfaces = merge(
-    { for int in try(local.device_config[each.key].interfaces.ethernets, []) : int.id => {
+    { for int in try(local.device_config[each.key].interfaces.ethernets, []) : "eth${int.id}" => {
       bpdu_filter = try(int.spanning_tree.bpdu_filter, local.defaults.nxos.devices.configuration.interfaces.ethernets.spanning_tree.bpdu_filter, null)
       bpdu_guard  = try(int.spanning_tree.bpdu_guard, local.defaults.nxos.devices.configuration.interfaces.ethernets.spanning_tree.bpdu_guard, null)
       cost        = try(int.spanning_tree.cost, local.defaults.nxos.devices.configuration.interfaces.ethernets.spanning_tree.cost, null)

@@ -9,9 +9,9 @@ locals {
         defaults_path = local.defaults.nxos.devices.configuration.interfaces.vlans
       } if try(int.hsrp, null) != null],
       [for int in try(local.device_config[device.name].interfaces.ethernets, []) : {
-        key           = format("%s/%s", device.name, int.id)
+        key           = format("%s/eth%s", device.name, int.id)
         device        = device.name
-        id            = int.id
+        id            = "eth${int.id}"
         hsrp          = try(int.hsrp, null)
         defaults_path = local.defaults.nxos.devices.configuration.interfaces.ethernets
       } if try(int.hsrp, null) != null],
