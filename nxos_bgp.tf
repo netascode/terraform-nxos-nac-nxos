@@ -111,7 +111,7 @@ resource "nxos_bgp" "bgp" {
         evpn      = try(prefix.evpn, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.address_families.networks.evpn, false) ? "enabled" : "disabled"
       } }
 
-      redistributions = { for redist in try(af.redistributions, []) : "${redist.protocol}/${try(redist.protocol_instance, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.address_families.redistributions.protocol_instance, "none")}" => {
+      redistributions = { for redist in try(af.redistributions, []) : "${redist.protocol};${try(redist.protocol_instance, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.address_families.redistributions.protocol_instance, "none")}" => {
         route_map        = try(redist.route_map, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.address_families.redistributions.route_map, null)
         scope            = try(redist.scope, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.address_families.redistributions.scope, null)
         srv6_prefix_type = try(redist.srv6_prefix_type, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.address_families.redistributions.srv6_prefix_type, null)
