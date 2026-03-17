@@ -62,10 +62,12 @@ resource "nxos_icmpv4" "icmpv4" {
   vrfs = { for key, entry in local.icmpv4_vrfs : entry.vrf => {
     interfaces = { for int in local.icmpv4_interfaces : int.id => {
       control = join(",", sort(compact([
-        try(int.ipv4_port_unreachable, false) ? "port-unreachable" : "",
-        try(int.ipv4_redirect, false) ? "redirect" : "",
-        try(int.ipv4_unreachable, false) ? "unreachable" : "",
+        try(int.ipv4_port_unreachable, false) == true ? "port-unreachable" : "",
+        try(int.ipv4_redirect, false) == true ? "redirect" : "",
+        try(int.ipv4_unreachable, false) == true ? "unreachable" : "",
       ])))
     } if int.device == each.key && int.vrf == entry.vrf }
   } if entry.device == each.key }
+
+  depends_on = [nxos_feature.feature, nxos_physical_interface.physical_interface, nxos_svi_interface.svi_interface, nxos_port_channel_interface.port_channel_interface]
 }
