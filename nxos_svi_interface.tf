@@ -114,7 +114,7 @@ resource "nxos_svi_interface" "svi_interface" {
     bandwidth   = try(int.bandwidth, local.defaults.nxos.devices.configuration.interfaces.vlans.bandwidth, null)
     delay       = try(int.delay, local.defaults.nxos.devices.configuration.interfaces.vlans.delay, null)
     description = try(int.description, local.defaults.nxos.devices.configuration.interfaces.vlans.description, null)
-    medium      = try(int.medium, local.defaults.nxos.devices.configuration.interfaces.vlans.medium, null)
+    medium      = try(int.medium, local.defaults.nxos.devices.configuration.interfaces.vlans.medium, null) == "broadcast" ? "bcast" : try(int.medium, local.defaults.nxos.devices.configuration.interfaces.vlans.medium, null)
     mtu         = try(int.mtu, local.defaults.nxos.devices.configuration.interfaces.vlans.mtu, null)
     vrf_dn      = "sys/inst-${try(int.vrf, local.defaults.nxos.devices.configuration.interfaces.vlans.vrf, "default")}"
   } }
