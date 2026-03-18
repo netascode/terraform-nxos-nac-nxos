@@ -6,7 +6,7 @@ resource "nxos_keychain" "keychain" {
     keys = { for key in try(keychain.keys, []) : key.id => {
       cryptographic_algorithm = try(key.cryptographic_algorithm, local.defaults.nxos.devices.configuration.keychains.keys.cryptographic_algorithm, null)
       encryption_type         = try(key.encryption_type, local.defaults.nxos.devices.configuration.keychains.keys.encryption_type, null)
-      key_string              = try(key.key, local.defaults.nxos.devices.configuration.keychains.keys.key, null)
+      key_string              = try(key.key_string, local.defaults.nxos.devices.configuration.keychains.keys.key_string, null)
     } }
   } }
 }
