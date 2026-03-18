@@ -120,8 +120,8 @@ resource "nxos_pim" "pim" {
         }
       } }
 
-      anycast_rp_local_interface  = try(vrf.anycast_rp_local_interface, local.defaults.nxos.devices.configuration.routing.pim.vrfs.anycast_rp_local_interface, null)
-      anycast_rp_source_interface = try(vrf.anycast_rp_source_interface, local.defaults.nxos.devices.configuration.routing.pim.vrfs.anycast_rp_source_interface, null)
+      anycast_rp_local_interface  = try(vrf.anycast_rp_local_interface_type, local.defaults.nxos.devices.configuration.routing.pim.vrfs.anycast_rp_local_interface_type, null) != null ? "${local.intf_prefix_map[try(vrf.anycast_rp_local_interface_type, local.defaults.nxos.devices.configuration.routing.pim.vrfs.anycast_rp_local_interface_type)]}${try(vrf.anycast_rp_local_interface_id, local.defaults.nxos.devices.configuration.routing.pim.vrfs.anycast_rp_local_interface_id, "")}" : null
+      anycast_rp_source_interface = try(vrf.anycast_rp_source_interface_type, local.defaults.nxos.devices.configuration.routing.pim.vrfs.anycast_rp_source_interface_type, null) != null ? "${local.intf_prefix_map[try(vrf.anycast_rp_source_interface_type, local.defaults.nxos.devices.configuration.routing.pim.vrfs.anycast_rp_source_interface_type)]}${try(vrf.anycast_rp_source_interface_id, local.defaults.nxos.devices.configuration.routing.pim.vrfs.anycast_rp_source_interface_id, "")}" : null
 
       anycast_rp_peers = { for rp in try(vrf.anycast_rps, []) :
         "${rp.address}/32;${rp.set_address}/32" => {}

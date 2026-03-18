@@ -58,7 +58,7 @@ resource "nxos_user_management" "user_management" {
   tacacs_key              = try(local.device_config[each.key].aaa.tacacs.key, local.defaults.nxos.devices.configuration.aaa.tacacs.key, null)
   tacacs_key_encryption   = try(local.device_config[each.key].aaa.tacacs.key_encryption, local.defaults.nxos.devices.configuration.aaa.tacacs.key_encryption, null)
   tacacs_retries          = try(local.device_config[each.key].aaa.tacacs.retries, local.defaults.nxos.devices.configuration.aaa.tacacs.retries, null)
-  tacacs_source_interface = try(local.device_config[each.key].aaa.tacacs.source_interface, local.defaults.nxos.devices.configuration.aaa.tacacs.source_interface, null)
+  tacacs_source_interface = try(local.device_config[each.key].aaa.tacacs.source_interface_type, local.defaults.nxos.devices.configuration.aaa.tacacs.source_interface_type, null) != null ? "${local.intf_prefix_map[try(local.device_config[each.key].aaa.tacacs.source_interface_type, local.defaults.nxos.devices.configuration.aaa.tacacs.source_interface_type)]}${try(local.device_config[each.key].aaa.tacacs.source_interface_id, local.defaults.nxos.devices.configuration.aaa.tacacs.source_interface_id, "")}" : null
   tacacs_timeout          = try(local.device_config[each.key].aaa.tacacs.timeout, local.defaults.nxos.devices.configuration.aaa.tacacs.timeout, null)
 
   # TACACS+ providers (aaaTacacsPlusProvider) — data model path: tacacs.servers
@@ -81,7 +81,7 @@ resource "nxos_user_management" "user_management" {
   tacacs_provider_groups = { for group in try(local.device_config[each.key].aaa.tacacs.server_groups, []) : group.name => {
     deadtime         = try(group.deadtime, local.defaults.nxos.devices.configuration.aaa.tacacs.server_groups.deadtime, null)
     description      = try(group.description, local.defaults.nxos.devices.configuration.aaa.tacacs.server_groups.description, null)
-    source_interface = try(group.source_interface, local.defaults.nxos.devices.configuration.aaa.tacacs.server_groups.source_interface, null)
+    source_interface = try(group.source_interface_type, local.defaults.nxos.devices.configuration.aaa.tacacs.server_groups.source_interface_type, null) != null ? "${local.intf_prefix_map[try(group.source_interface_type, local.defaults.nxos.devices.configuration.aaa.tacacs.server_groups.source_interface_type)]}${try(group.source_interface_id, local.defaults.nxos.devices.configuration.aaa.tacacs.server_groups.source_interface_id, "")}" : null
     vrf              = try(group.vrf, local.defaults.nxos.devices.configuration.aaa.tacacs.server_groups.vrf, null)
   } }
 

@@ -123,7 +123,7 @@ resource "nxos_bgp" "bgp" {
       remote_asn                     = try(pt.remote_as, local.defaults.nxos.devices.configuration.routing.bgp.peer_templates.remote_as, null)
       description                    = try(pt.description, local.defaults.nxos.devices.configuration.routing.bgp.peer_templates.description, null)
       peer_type                      = try(pt.peer_type, local.defaults.nxos.devices.configuration.routing.bgp.peer_templates.peer_type, null)
-      source_interface               = try(pt.update_source, local.defaults.nxos.devices.configuration.routing.bgp.peer_templates.update_source, null)
+      source_interface               = try(pt.update_source_interface_type, local.defaults.nxos.devices.configuration.routing.bgp.peer_templates.update_source_interface_type, null) != null ? "${local.intf_prefix_map[try(pt.update_source_interface_type, local.defaults.nxos.devices.configuration.routing.bgp.peer_templates.update_source_interface_type)]}${try(pt.update_source_interface_id, local.defaults.nxos.devices.configuration.routing.bgp.peer_templates.update_source_interface_id, "")}" : null
       admin_state                    = try(pt.admin_state, local.defaults.nxos.devices.configuration.routing.bgp.peer_templates.admin_state, false) ? "enabled" : "disabled"
       affinity_group                 = try(pt.affinity_group, local.defaults.nxos.devices.configuration.routing.bgp.peer_templates.affinity_group, null)
       asn_type                       = try(pt.remote_as_type, local.defaults.nxos.devices.configuration.routing.bgp.peer_templates.remote_as_type, null)
@@ -179,7 +179,7 @@ resource "nxos_bgp" "bgp" {
       description                    = try(nei.description, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.neighbors.description, null)
       peer_template                  = try(nei.inherit_peer, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.neighbors.inherit_peer, null)
       peer_type                      = try(nei.peer_type, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.neighbors.peer_type, null)
-      source_interface               = try(nei.update_source, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.neighbors.update_source, null)
+      source_interface               = try(nei.update_source_interface_type, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.neighbors.update_source_interface_type, null) != null ? "${local.intf_prefix_map[try(nei.update_source_interface_type, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.neighbors.update_source_interface_type)]}${try(nei.update_source_interface_id, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.neighbors.update_source_interface_id, "")}" : null
       hold_time                      = try(nei.hold_time, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.neighbors.hold_time, null)
       keepalive_interval             = try(nei.keepalive_interval, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.neighbors.keepalive_interval, null)
       ebgp_multihop_ttl              = try(nei.ebgp_multihop_ttl, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.neighbors.ebgp_multihop_ttl, null)

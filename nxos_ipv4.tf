@@ -144,7 +144,7 @@ resource "nxos_ipv4" "ipv4" {
     # VRFs from configuration.vrfs[]
     { for vrf in try(local.device_config[each.key].vrfs, []) : vrf.name => {
       auto_discard                 = try(vrf.auto_discard, local.defaults.nxos.devices.configuration.vrfs.auto_discard, null) != null ? (try(vrf.auto_discard, local.defaults.nxos.devices.configuration.vrfs.auto_discard) ? "enabled" : "disabled") : null
-      icmp_errors_source_interface = try(vrf.icmp_errors_source_interface, local.defaults.nxos.devices.configuration.vrfs.icmp_errors_source_interface, null)
+      icmp_errors_source_interface = try(vrf.icmp_errors_source_interface_type, local.defaults.nxos.devices.configuration.vrfs.icmp_errors_source_interface_type, null) != null ? "${local.intf_prefix_map[try(vrf.icmp_errors_source_interface_type, local.defaults.nxos.devices.configuration.vrfs.icmp_errors_source_interface_type)]}${try(vrf.icmp_errors_source_interface_id, local.defaults.nxos.devices.configuration.vrfs.icmp_errors_source_interface_id, "")}" : null
 
       static_routes = { for route in try(local.ipv4_static_routes_by_device_vrf["${each.key}/${vrf.name}"], []) : route.route.prefix => {
         control     = try(route.route.bfd, local.defaults.nxos.devices.configuration.routing.ipv4_static_routes.bfd, false) ? "bfd" : (try(route.route.pervasive, local.defaults.nxos.devices.configuration.routing.ipv4_static_routes.pervasive, false) ? "pervasive" : null)

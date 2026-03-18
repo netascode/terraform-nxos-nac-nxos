@@ -19,6 +19,14 @@ locals {
     device.name => try(device.configuration, {})
   }
   provider_devices = module.model.devices
+  intf_prefix_map = {
+    "ethernet"     = "eth"
+    "loopback"     = "lo"
+    "mgmt"         = "mgmt"
+    "port-channel" = "po"
+    "vlan"         = "vlan"
+    "vni"          = "vni"
+  }
 }
 
 provider "nxos" {
