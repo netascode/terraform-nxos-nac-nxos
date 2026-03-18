@@ -4,7 +4,7 @@ resource "nxos_route_policy" "route_policy" {
   length(try(local.device_config[device.name].routing.route_maps, [])) > 0 }
   device = each.key
 
-  ip_prefix_lists = { for pl in try(local.device_config[each.key].routing.ip_prefix_lists, []) : pl.name => {
+  ipv4_prefix_lists = { for pl in try(local.device_config[each.key].routing.ip_prefix_lists, []) : pl.name => {
     description = try(pl.description, local.defaults.nxos.devices.configuration.routing.ip_prefix_lists.description, null)
 
     entries = { for entry in try(pl.entries, []) : entry.order => {
