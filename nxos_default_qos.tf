@@ -5,7 +5,7 @@ resource "nxos_default_qos" "default_qos" {
   device = each.key
   class_maps = { for cm in try(local.device_config[each.key].qos.class_maps, []) : cm.name => {
     match_type = try(cm.match_type, local.defaults.nxos.devices.configuration.qos.class_maps.match_type, null)
-    dscp_values = { for dscp in try(cm.dscp_values, local.defaults.nxos.devices.configuration.qos.class_maps.dscp_values, []) : dscp => {
+    dscp_values = { for dscp in try(cm.match_dscp_values, local.defaults.nxos.devices.configuration.qos.class_maps.match_dscp_values, []) : dscp => {
     } }
   } }
   policy_maps = { for pm in try(local.device_config[each.key].qos.policy_maps, []) : pm.name => {
