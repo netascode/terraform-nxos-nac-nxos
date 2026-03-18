@@ -25,18 +25,18 @@ resource "nxos_ospfv3" "ospfv3" {
       discard_route_external    = try(vrf.discard_route_external, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.vrfs.discard_route_external, null)
       discard_route_internal    = try(vrf.discard_route_internal, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.vrfs.discard_route_internal, null)
       name_lookup               = try(vrf.name_lookup, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.vrfs.name_lookup, null)
-      passive_interface_default = try(vrf.passive_interface_default, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.vrfs.passive_interface_default, null)
+      passive_interface_default = try(vrf.default_passive, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.vrfs.default_passive, null)
 
       areas = { for area in try(vrf.areas, []) : area.area => {
         type                     = try(area.type, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.vrfs.areas.type, null)
         redistribute             = try(area.redistribute, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.vrfs.areas.redistribute, null)
         nssa_translator_role     = try(area.nssa_translator_role, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.vrfs.areas.nssa_translator_role, null)
         summary                  = try(area.summary, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.vrfs.areas.summary, null)
-        suppress_forward_address = try(area.suppress_forward_address, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.vrfs.areas.suppress_forward_address, null)
+        suppress_forward_address = try(area.suppress_forwarding_address, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.vrfs.areas.suppress_forwarding_address, null)
       } }
 
       address_families = { for af in try(vrf.address_families, []) : local.ospfv3_address_family_map[af.address_family] => {
-        administrative_distance       = try(af.administrative_distance, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.vrfs.address_families.administrative_distance, null)
+        administrative_distance       = try(af.distance, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.vrfs.address_families.distance, null)
         default_metric                = try(af.default_metric, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.vrfs.address_families.default_metric, null)
         default_route_nssa_pbit_clear = try(af.default_route_nssa_pbit_clear, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.vrfs.address_families.default_route_nssa_pbit_clear, null)
         max_ecmp_cost                 = try(af.maximum_paths, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.vrfs.address_families.maximum_paths, null)
