@@ -9,8 +9,6 @@ locals {
         vni                 = try(vrf.vni, local.defaults.nxos.devices.configuration.vrfs.vni, null)
         l3vni               = try(vrf.l3vni, local.defaults.nxos.devices.configuration.vrfs.l3vni, null)
         route_distinguisher = try(vrf.route_distinguisher, local.defaults.nxos.devices.configuration.vrfs.route_distinguisher, null)
-        routing_encap       = try(vrf.routing_encap, local.defaults.nxos.devices.configuration.vrfs.routing_encap, null)
-        controller_id       = try(vrf.controller_id, local.defaults.nxos.devices.configuration.vrfs.controller_id, null)
         oui                 = try(vrf.oui, local.defaults.nxos.devices.configuration.vrfs.oui, null)
         vpn_id              = try(vrf.vpn_id, local.defaults.nxos.devices.configuration.vrfs.vpn_id, null)
         address_families    = try(vrf.address_families, [])
@@ -126,12 +124,10 @@ resource "nxos_vrf" "vrf" {
 
   vrfs = { for vrf in [for v in local.vrfs_rd_dme_format : v if v.device == each.key && v.name != "default"] : vrf.name => {
     description         = vrf.description
-    controller_id       = vrf.controller_id
     encap               = vrf.vni != null ? "vxlan-${vrf.vni}" : null
     l3vni               = vrf.l3vni
     oui                 = vrf.oui
     vpn_id              = vrf.vpn_id
-    routing_encap       = vrf.routing_encap
     route_distinguisher = vrf.rd_dme_format
 
     address_families = { for af in vrf.address_families : local.vrf_address_family_names_map[af.address_family] => {
