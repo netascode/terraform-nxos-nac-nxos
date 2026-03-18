@@ -44,7 +44,7 @@ resource "nxos_dhcp" "dhcp" {
   relay_sub_option_type_cisco                 = try(local.device_config[each.key].dhcp.relay_sub_option_type_cisco, local.defaults.nxos.devices.configuration.dhcp.relay_sub_option_type_cisco, null)
   relay_sub_option_format_non_tlv             = try(local.device_config[each.key].dhcp.relay_sub_option_format_non_tlv, local.defaults.nxos.devices.configuration.dhcp.relay_sub_option_format_non_tlv, null)
   smart_relay_global                          = try(local.device_config[each.key].dhcp.smart_relay_global, local.defaults.nxos.devices.configuration.dhcp.smart_relay_global, null)
-  v4_relay                                    = try(local.device_config[each.key].dhcp.ipv4_relay, local.defaults.nxos.devices.configuration.dhcp.ipv4_relay, null)
+  v4_relay                                    = try(local.device_config[each.key].dhcp.ip_relay, local.defaults.nxos.devices.configuration.dhcp.ip_relay, null)
   v6_relay                                    = try(local.device_config[each.key].dhcp.ipv6_relay, local.defaults.nxos.devices.configuration.dhcp.ipv6_relay, null)
   relay_v4_over_v6                            = try(local.device_config[each.key].dhcp.relay_v4_over_v6, local.defaults.nxos.devices.configuration.dhcp.relay_v4_over_v6, null)
   relay_v6_iapd_route_add                     = try(local.device_config[each.key].dhcp.relay_v6_iapd_route_add, local.defaults.nxos.devices.configuration.dhcp.relay_v6_iapd_route_add, null)

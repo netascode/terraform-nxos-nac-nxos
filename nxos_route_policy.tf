@@ -1,19 +1,19 @@
 resource "nxos_route_policy" "route_policy" {
   for_each = { for device in local.devices : device.name => device
-    if length(try(local.device_config[device.name].routing.ipv4_prefix_lists, [])) > 0 ||
+    if length(try(local.device_config[device.name].routing.ip_prefix_lists, [])) > 0 ||
   length(try(local.device_config[device.name].routing.route_maps, [])) > 0 }
   device = each.key
 
-  ipv4_prefix_lists = { for pl in try(local.device_config[each.key].routing.ipv4_prefix_lists, []) : pl.name => {
-    description = try(pl.description, local.defaults.nxos.devices.configuration.routing.ipv4_prefix_lists.description, null)
+  ip_prefix_lists = { for pl in try(local.device_config[each.key].routing.ip_prefix_lists, []) : pl.name => {
+    description = try(pl.description, local.defaults.nxos.devices.configuration.routing.ip_prefix_lists.description, null)
 
     entries = { for entry in try(pl.entries, []) : entry.order => {
-      action     = try(entry.action, local.defaults.nxos.devices.configuration.routing.ipv4_prefix_lists.entries.action, null)
-      criteria   = try(entry.criteria, local.defaults.nxos.devices.configuration.routing.ipv4_prefix_lists.entries.criteria, null)
-      prefix     = try(entry.prefix, local.defaults.nxos.devices.configuration.routing.ipv4_prefix_lists.entries.prefix, null)
-      from_range = try(entry.from_range, local.defaults.nxos.devices.configuration.routing.ipv4_prefix_lists.entries.from_range, null)
-      to_range   = try(entry.to_range, local.defaults.nxos.devices.configuration.routing.ipv4_prefix_lists.entries.to_range, null)
-      mask       = try(entry.mask, local.defaults.nxos.devices.configuration.routing.ipv4_prefix_lists.entries.mask, null)
+      action     = try(entry.action, local.defaults.nxos.devices.configuration.routing.ip_prefix_lists.entries.action, null)
+      criteria   = try(entry.criteria, local.defaults.nxos.devices.configuration.routing.ip_prefix_lists.entries.criteria, null)
+      prefix     = try(entry.prefix, local.defaults.nxos.devices.configuration.routing.ip_prefix_lists.entries.prefix, null)
+      from_range = try(entry.from_range, local.defaults.nxos.devices.configuration.routing.ip_prefix_lists.entries.from_range, null)
+      to_range   = try(entry.to_range, local.defaults.nxos.devices.configuration.routing.ip_prefix_lists.entries.to_range, null)
+      mask       = try(entry.mask, local.defaults.nxos.devices.configuration.routing.ip_prefix_lists.entries.mask, null)
     } }
   } }
 

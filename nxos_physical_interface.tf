@@ -29,7 +29,7 @@ locals {
         vrf                                     = try(int.vrf, local.defaults.nxos.devices.configuration.interfaces.ethernets.vrf, "default")
         ip_unnumbered                           = try(int.ip_unnumbered, local.defaults.nxos.devices.configuration.interfaces.ethernets.ip_unnumbered, null)
         urpf                                    = try(int.urpf, local.defaults.nxos.devices.configuration.interfaces.ethernets.urpf, null)
-        ipv4_address                            = try(int.ipv4_address, local.defaults.nxos.devices.configuration.interfaces.ethernets.ipv4_address, null)
+        ip_address                              = try(int.ip_address, local.defaults.nxos.devices.configuration.interfaces.ethernets.ip_address, null)
         ospf_process_name                       = try(int.ospf.process, local.defaults.nxos.devices.configuration.interfaces.ethernets.ospf.process, null)
         ospf_advertise_secondaries              = try(int.ospf.advertise_secondaries, local.defaults.nxos.devices.configuration.interfaces.ethernets.ospf.advertise_secondaries, false)
         ospf_area                               = try(int.ospf.area, local.defaults.nxos.devices.configuration.interfaces.ethernets.ospf.area, null)
