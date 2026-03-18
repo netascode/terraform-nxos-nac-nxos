@@ -7,25 +7,28 @@ defaults:
       configuration:
         interfaces:
           loopbacks:
-            shutdown: false
+            admin_state: true
             ospf:
               advertise_secondaries: true
           vlans:
-            shutdown: false
+            admin_state: true
             ospf:
               advertise_secondaries: true
           ethernets:
-            shutdown: false
+            admin_state: true
             ospf:
               advertise_secondaries: true
           port_channels:
-            shutdown: false
+            admin_state: true
             ospf:
               advertise_secondaries: true
         routing:
+          pim:
+            vrfs:
+              admin_state: true
           ospf_processes:
             vrfs:
-              shutdown: false
+              admin_state: true
           ip_prefix_lists:
             entries:
               action: permit
