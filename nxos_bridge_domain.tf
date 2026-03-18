@@ -13,7 +13,6 @@ resource "nxos_bridge_domain" "bridge_domain" {
       try(vlan.policy_enforced, local.defaults.nxos.devices.configuration.vlan.vlans.policy_enforced, false) ? "policy-enforced" : "",
       try(vlan.untagged, local.defaults.nxos.devices.configuration.vlan.vlans.untagged, false) ? "untagged" : "",
     ])))
-    forwarding_control = null
     forwarding_mode = join(",", sort(compact([
       try(vlan.forwarding_mode_bridge, local.defaults.nxos.devices.configuration.vlan.vlans.forwarding_mode_bridge, false) ? "bridge" : "",
       try(vlan.forwarding_mode_route, local.defaults.nxos.devices.configuration.vlan.vlans.forwarding_mode_route, false) ? "route" : "",
