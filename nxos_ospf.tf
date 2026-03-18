@@ -11,7 +11,7 @@ resource "nxos_ospf" "ospf" {
     admin_state = "enabled"
 
     vrfs = { for vrf in try(proc.vrfs, []) : vrf.vrf => {
-      admin_state              = try(vrf.admin_state, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.admin_state, false) ? "enabled" : "disabled"
+      admin_state              = try(vrf.shutdown, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.shutdown, false) ? "disabled" : "enabled"
       bandwidth_reference      = try(vrf.bandwidth_reference, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.bandwidth_reference, null)
       bandwidth_reference_unit = try(vrf.bandwidth_reference_unit, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.bandwidth_reference_unit, null)
       capability_vrf_lite      = try(vrf.capability_vrf_lite, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.capability_vrf_lite, null)

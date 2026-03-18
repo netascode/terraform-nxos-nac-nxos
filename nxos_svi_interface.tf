@@ -6,7 +6,7 @@ locals {
         device                                  = device.name
         id                                      = int.id
         type                                    = "vlan"
-        admin_state                             = try(int.admin_state, local.defaults.nxos.devices.configuration.interfaces.vlans.admin_state, false)
+        shutdown                                = try(int.shutdown, local.defaults.nxos.devices.configuration.interfaces.vlans.shutdown, false)
         description                             = try(int.description, local.defaults.nxos.devices.configuration.interfaces.vlans.description, null)
         vrf                                     = try(int.vrf, local.defaults.nxos.devices.configuration.interfaces.vlans.vrf, "default")
         ip_address                              = try(int.ip_address, local.defaults.nxos.devices.configuration.interfaces.vlans.ip_address, null)
@@ -109,7 +109,7 @@ resource "nxos_svi_interface" "svi_interface" {
   if length(try(local.device_config[device.name].interfaces.vlans, [])) > 0 }
   device = each.key
   svi_interfaces = { for int in try(local.device_config[each.key].interfaces.vlans, []) : "vlan${int.id}" => {
-    admin_state = try(int.admin_state, local.defaults.nxos.devices.configuration.interfaces.vlans.admin_state, false) ? "up" : "down"
+    admin_state = try(int.shutdown, local.defaults.nxos.devices.configuration.interfaces.vlans.shutdown, false) ? "down" : "up"
     bandwidth   = try(int.bandwidth, local.defaults.nxos.devices.configuration.interfaces.vlans.bandwidth, null)
     delay       = try(int.delay, local.defaults.nxos.devices.configuration.interfaces.vlans.delay, null)
     description = try(int.description, local.defaults.nxos.devices.configuration.interfaces.vlans.description, null)

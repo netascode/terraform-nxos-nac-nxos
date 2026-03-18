@@ -104,7 +104,7 @@ resource "nxos_port_channel_interface" "port_channel_interface" {
     maximum_links          = try(int.maximum_links, local.defaults.nxos.devices.configuration.interfaces.port_channels.maximum_links, null)
     suspend_individual     = try(int.suspend_individual, local.defaults.nxos.devices.configuration.interfaces.port_channels.suspend_individual, null) != null ? (try(int.suspend_individual, local.defaults.nxos.devices.configuration.interfaces.port_channels.suspend_individual) ? "enable" : "disable") : null
     access_vlan            = try(int.layer3, local.defaults.nxos.devices.configuration.interfaces.port_channels.layer3, false) ? "unknown" : "vlan-${try(int.access_vlan, local.defaults.nxos.devices.configuration.interfaces.port_channels.access_vlan, 1)}"
-    admin_state            = try(int.admin_state, local.defaults.nxos.devices.configuration.interfaces.port_channels.admin_state, false) ? "up" : "down"
+    admin_state            = try(int.shutdown, local.defaults.nxos.devices.configuration.interfaces.port_channels.shutdown, false) ? "down" : "up"
     auto_negotiation       = try(int.auto_negotiation, local.defaults.nxos.devices.configuration.interfaces.port_channels.auto_negotiation, null)
     bandwidth              = try(int.bandwidth, local.defaults.nxos.devices.configuration.interfaces.port_channels.bandwidth, null)
     delay                  = try(int.delay, local.defaults.nxos.devices.configuration.interfaces.port_channels.delay, null)

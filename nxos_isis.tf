@@ -8,12 +8,12 @@ resource "nxos_isis" "isis" {
   admin_state = "enabled"
 
   instances = { for inst in try(local.device_config[each.key].routing.isis_instances, []) : inst.name => {
-    admin_state  = try(inst.admin_state, local.defaults.nxos.devices.configuration.routing.isis_instances.admin_state, false) ? "enabled" : "disabled"
+    admin_state  = try(inst.shutdown, local.defaults.nxos.devices.configuration.routing.isis_instances.shutdown, false) ? "disabled" : "enabled"
     flush_routes = try(inst.flush_routes, local.defaults.nxos.devices.configuration.routing.isis_instances.flush_routes, null)
     isolate      = try(inst.isolate, local.defaults.nxos.devices.configuration.routing.isis_instances.isolate, null)
 
     vrfs = { for vrf in try(inst.vrfs, []) : vrf.vrf => {
-      admin_state              = try(vrf.admin_state, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.admin_state, false) ? "enabled" : "disabled"
+      admin_state              = try(vrf.shutdown, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.shutdown, false) ? "disabled" : "enabled"
       authentication_check_l1  = try(vrf.authentication_check_l1, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.authentication_check_l1, null)
       authentication_check_l2  = try(vrf.authentication_check_l2, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.authentication_check_l2, null)
       authentication_key_l1    = try(vrf.authentication_key_l1, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.authentication_key_l1, null)
@@ -30,7 +30,7 @@ resource "nxos_isis" "isis" {
       control                  = try(vrf.log_adjacency_changes, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.log_adjacency_changes, null) != null ? (try(vrf.log_adjacency_changes, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.log_adjacency_changes) ? "log-adj-changes" : "unspecified") : null
       lsp_lifetime             = try(vrf.lsp_lifetime, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.lsp_lifetime, null)
       queue_limit              = try(vrf.queue_limit, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.queue_limit, null)
-      overload_admin_state     = try(vrf.overload_admin_state, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.overload_admin_state, null)
+      overload_admin_state     = try(vrf.set_overload_bit, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.set_overload_bit, null)
       overload_startup_time    = try(vrf.overload_startup_time, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.overload_startup_time, null)
       overload_bgp_as_number   = try(vrf.overload_bgp_as_number, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.overload_bgp_as_number, null)
       overload_suppress        = try(vrf.overload_suppress, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.overload_suppress, null)

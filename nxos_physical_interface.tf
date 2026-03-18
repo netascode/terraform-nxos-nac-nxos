@@ -7,7 +7,7 @@ locals {
         id                                      = int.id
         type                                    = "eth"
         access_vlan                             = try(int.access_vlan, local.defaults.nxos.devices.configuration.interfaces.ethernets.access_vlan, 1)
-        admin_state                             = try(int.admin_state, local.defaults.nxos.devices.configuration.interfaces.ethernets.admin_state, false)
+        shutdown                                = try(int.shutdown, local.defaults.nxos.devices.configuration.interfaces.ethernets.shutdown, false)
         auto_negotiation                        = try(int.auto_negotiation, local.defaults.nxos.devices.configuration.interfaces.ethernets.auto_negotiation, null)
         bandwidth                               = try(int.bandwidth, local.defaults.nxos.devices.configuration.interfaces.ethernets.bandwidth, null)
         delay                                   = try(int.delay, local.defaults.nxos.devices.configuration.interfaces.ethernets.delay, null)
@@ -125,7 +125,7 @@ resource "nxos_physical_interface" "physical_interface" {
   physical_interfaces = { for int in try(local.device_config[each.key].interfaces.ethernets, []) : "eth${int.id}" => {
     fec_mode                           = try(int.fec_mode, local.defaults.nxos.devices.configuration.interfaces.ethernets.fec_mode, null)
     access_vlan                        = try(int.port_channel, null) != null ? null : (try(int.layer3, local.defaults.nxos.devices.configuration.interfaces.ethernets.layer3, false) ? "unknown" : "vlan-${try(int.access_vlan, local.defaults.nxos.devices.configuration.interfaces.ethernets.access_vlan, 1)}")
-    admin_state                        = try(int.admin_state, local.defaults.nxos.devices.configuration.interfaces.ethernets.admin_state, false) ? "up" : "down"
+    admin_state                        = try(int.shutdown, local.defaults.nxos.devices.configuration.interfaces.ethernets.shutdown, false) ? "down" : "up"
     auto_negotiation                   = try(int.auto_negotiation, local.defaults.nxos.devices.configuration.interfaces.ethernets.auto_negotiation, null)
     bandwidth                          = try(int.bandwidth, local.defaults.nxos.devices.configuration.interfaces.ethernets.bandwidth, null)
     beacon                             = try(int.beacon, local.defaults.nxos.devices.configuration.interfaces.ethernets.beacon, null) != null ? (try(int.beacon, local.defaults.nxos.devices.configuration.interfaces.ethernets.beacon) ? "on" : "off") : null
