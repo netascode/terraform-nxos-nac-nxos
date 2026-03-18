@@ -1,9 +1,9 @@
 resource "nxos_bridge_domain" "bridge_domain" {
   for_each = { for device in local.devices : device.name => device
-    if try(local.device_config[device.name].system.svi_autostate, local.defaults.nxos.devices.configuration.system.svi_autostate, null) != null ||
+    if try(local.device_config[device.name].system.interface_vlan_autostate, local.defaults.nxos.devices.configuration.system.interface_vlan_autostate, null) != null ||
   length(try(local.device_config[device.name].vlan.vlans, [])) > 0 }
   device        = each.key
-  svi_autostate = try(local.device_config[each.key].system.svi_autostate, local.defaults.nxos.devices.configuration.system.svi_autostate, null) == null ? null : try(local.device_config[each.key].system.svi_autostate, local.defaults.nxos.devices.configuration.system.svi_autostate) ? "enable" : "disable"
+  svi_autostate = try(local.device_config[each.key].system.interface_vlan_autostate, local.defaults.nxos.devices.configuration.system.interface_vlan_autostate, null) == null ? null : try(local.device_config[each.key].system.interface_vlan_autostate, local.defaults.nxos.devices.configuration.system.interface_vlan_autostate) ? "enable" : "disable"
   bridge_domains = { for vlan in try(local.device_config[each.key].vlan.vlans, []) : "vlan-${vlan.id}" => {
     access_encap = try(vlan.vni, local.defaults.nxos.devices.configuration.vlan.vlans.vni, null) != null ? "vxlan-${try(vlan.vni, local.defaults.nxos.devices.configuration.vlan.vlans.vni)}" : null
     name         = try(vlan.name, local.defaults.nxos.devices.configuration.vlan.vlans.name, null)

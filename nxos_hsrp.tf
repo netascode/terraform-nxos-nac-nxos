@@ -47,14 +47,14 @@ locals {
 resource "nxos_hsrp" "hsrp" {
   for_each = { for device in local.devices : device.name => device
     if try(local.device_config[device.name].system.hsrp_bfd, null) != null ||
-    try(local.device_config[device.name].system.hsrp_extended_hold_interval, null) != null ||
+    try(local.device_config[device.name].system.hsrp_timers_extended_hold, null) != null ||
   length([for int in local.hsrp_interfaces : int if int.device == device.name]) > 0 }
   device                               = each.key
   admin_state                          = "enabled"
   instance_admin_state                 = "enabled"
   bfd                                  = try(local.device_config[each.key].system.hsrp_bfd, local.defaults.nxos.devices.configuration.system.hsrp_bfd, null) == null ? null : (try(local.device_config[each.key].system.hsrp_bfd, local.defaults.nxos.devices.configuration.system.hsrp_bfd) ? "enabled" : "disabled")
-  extended_hold_interval               = try(local.device_config[each.key].system.hsrp_extended_hold_interval, local.defaults.nxos.devices.configuration.system.hsrp_extended_hold_interval, null)
-  extended_hold_interval_configuration = try(local.device_config[each.key].system.hsrp_extended_hold_interval, local.defaults.nxos.devices.configuration.system.hsrp_extended_hold_interval, null) != null ? "enabled" : null
+  extended_hold_interval               = try(local.device_config[each.key].system.hsrp_timers_extended_hold, local.defaults.nxos.devices.configuration.system.hsrp_timers_extended_hold, null)
+  extended_hold_interval_configuration = try(local.device_config[each.key].system.hsrp_timers_extended_hold, local.defaults.nxos.devices.configuration.system.hsrp_timers_extended_hold, null) != null ? "enabled" : null
 
   interfaces = { for int in local.hsrp_interfaces : int.id => {
     admin_state                        = "enabled"
