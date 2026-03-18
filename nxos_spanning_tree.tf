@@ -11,25 +11,25 @@ resource "nxos_spanning_tree" "spanning_tree" {
   linecard_issu            = try(local.device_config[each.key].spanning_tree.linecard_issu, local.defaults.nxos.devices.configuration.spanning_tree.linecard_issu, null)
   loopguard                = try(local.device_config[each.key].spanning_tree.loopguard, local.defaults.nxos.devices.configuration.spanning_tree.loopguard, null) != null ? (try(local.device_config[each.key].spanning_tree.loopguard, local.defaults.nxos.devices.configuration.spanning_tree.loopguard) ? "enabled" : "disabled") : null
   mode                     = try(local.device_config[each.key].spanning_tree.mode, local.defaults.nxos.devices.configuration.spanning_tree.mode, null)
-  pathcost_method          = try(local.device_config[each.key].spanning_tree.pathcost_method, local.defaults.nxos.devices.configuration.spanning_tree.pathcost_method, null)
+  pathcost_option          = try(local.device_config[each.key].spanning_tree.pathcost_method, local.defaults.nxos.devices.configuration.spanning_tree.pathcost_method, null)
   interfaces = merge(
     { for int in try(local.device_config[each.key].interfaces.ethernets, []) : "eth${int.id}" => {
-      bpdu_filter   = try(int.spanning_tree.bpdu_filter, local.defaults.nxos.devices.configuration.interfaces.ethernets.spanning_tree.bpdu_filter, null)
-      bpdu_guard    = try(int.spanning_tree.bpdu_guard, local.defaults.nxos.devices.configuration.interfaces.ethernets.spanning_tree.bpdu_guard, null)
-      cost          = try(int.spanning_tree.cost, local.defaults.nxos.devices.configuration.interfaces.ethernets.spanning_tree.cost, null)
-      guard         = try(int.spanning_tree.guard, local.defaults.nxos.devices.configuration.interfaces.ethernets.spanning_tree.guard, null)
-      link_type     = try(int.spanning_tree.link_type, local.defaults.nxos.devices.configuration.interfaces.ethernets.spanning_tree.link_type, null)
-      mode          = try(int.spanning_tree.port_type, local.defaults.nxos.devices.configuration.interfaces.ethernets.spanning_tree.port_type, null)
-      port_priority = try(int.spanning_tree.port_priority, local.defaults.nxos.devices.configuration.interfaces.ethernets.spanning_tree.port_priority, null)
+      bpdu_filter = try(int.spanning_tree.bpdu_filter, local.defaults.nxos.devices.configuration.interfaces.ethernets.spanning_tree.bpdu_filter, null)
+      bpdu_guard  = try(int.spanning_tree.bpdu_guard, local.defaults.nxos.devices.configuration.interfaces.ethernets.spanning_tree.bpdu_guard, null)
+      cost        = try(int.spanning_tree.cost, local.defaults.nxos.devices.configuration.interfaces.ethernets.spanning_tree.cost, null)
+      guard       = try(int.spanning_tree.guard, local.defaults.nxos.devices.configuration.interfaces.ethernets.spanning_tree.guard, null)
+      link_type   = try(int.spanning_tree.link_type, local.defaults.nxos.devices.configuration.interfaces.ethernets.spanning_tree.link_type, null)
+      mode        = try(int.spanning_tree.port_type, local.defaults.nxos.devices.configuration.interfaces.ethernets.spanning_tree.port_type, null)
+      priority    = try(int.spanning_tree.port_priority, local.defaults.nxos.devices.configuration.interfaces.ethernets.spanning_tree.port_priority, null)
     } if try(int.spanning_tree, null) != null },
     { for int in try(local.device_config[each.key].interfaces.port_channels, []) : "po${int.id}" => {
-      bpdu_filter   = try(int.spanning_tree.bpdu_filter, local.defaults.nxos.devices.configuration.interfaces.port_channels.spanning_tree.bpdu_filter, null)
-      bpdu_guard    = try(int.spanning_tree.bpdu_guard, local.defaults.nxos.devices.configuration.interfaces.port_channels.spanning_tree.bpdu_guard, null)
-      cost          = try(int.spanning_tree.cost, local.defaults.nxos.devices.configuration.interfaces.port_channels.spanning_tree.cost, null)
-      guard         = try(int.spanning_tree.guard, local.defaults.nxos.devices.configuration.interfaces.port_channels.spanning_tree.guard, null)
-      link_type     = try(int.spanning_tree.link_type, local.defaults.nxos.devices.configuration.interfaces.port_channels.spanning_tree.link_type, null)
-      mode          = try(int.spanning_tree.port_type, local.defaults.nxos.devices.configuration.interfaces.port_channels.spanning_tree.port_type, null)
-      port_priority = try(int.spanning_tree.port_priority, local.defaults.nxos.devices.configuration.interfaces.port_channels.spanning_tree.port_priority, null)
+      bpdu_filter = try(int.spanning_tree.bpdu_filter, local.defaults.nxos.devices.configuration.interfaces.port_channels.spanning_tree.bpdu_filter, null)
+      bpdu_guard  = try(int.spanning_tree.bpdu_guard, local.defaults.nxos.devices.configuration.interfaces.port_channels.spanning_tree.bpdu_guard, null)
+      cost        = try(int.spanning_tree.cost, local.defaults.nxos.devices.configuration.interfaces.port_channels.spanning_tree.cost, null)
+      guard       = try(int.spanning_tree.guard, local.defaults.nxos.devices.configuration.interfaces.port_channels.spanning_tree.guard, null)
+      link_type   = try(int.spanning_tree.link_type, local.defaults.nxos.devices.configuration.interfaces.port_channels.spanning_tree.link_type, null)
+      mode        = try(int.spanning_tree.port_type, local.defaults.nxos.devices.configuration.interfaces.port_channels.spanning_tree.port_type, null)
+      priority    = try(int.spanning_tree.port_priority, local.defaults.nxos.devices.configuration.interfaces.port_channels.spanning_tree.port_priority, null)
     } if try(int.spanning_tree, null) != null },
   )
 
