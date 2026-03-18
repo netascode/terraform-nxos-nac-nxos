@@ -39,7 +39,7 @@ resource "nxos_ospfv3" "ospfv3" {
         administrative_distance       = try(af.administrative_distance, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.vrfs.address_families.administrative_distance, null)
         default_metric                = try(af.default_metric, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.vrfs.address_families.default_metric, null)
         default_route_nssa_pbit_clear = try(af.default_route_nssa_pbit_clear, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.vrfs.address_families.default_route_nssa_pbit_clear, null)
-        max_ecmp_cost                 = try(af.max_ecmp, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.vrfs.address_families.max_ecmp, null)
+        max_ecmp_cost                 = try(af.maximum_paths, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.vrfs.address_families.maximum_paths, null)
       } }
     } }
   } }

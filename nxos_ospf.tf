@@ -29,7 +29,7 @@ resource "nxos_ospf" "ospf" {
       distance              = try(vrf.distance, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.distance, null)
       down_bit_ignore       = try(vrf.down_bit_ignore, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.down_bit_ignore, null)
       log_adjacency_changes = try(vrf.log_adjacency_changes, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.log_adjacency_changes, null)
-      max_ecmp              = try(vrf.max_ecmp, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.max_ecmp, null)
+      max_ecmp              = try(vrf.maximum_paths, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.maximum_paths, null)
       name_lookup_vrf       = try(vrf.name_lookup_vrf, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.name_lookup_vrf, null)
       rfc1583_compatible    = try(vrf.rfc1583_compatible, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.rfc1583_compatible, null)
       router_id             = try(vrf.router_id, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.router_id, null)
@@ -37,17 +37,17 @@ resource "nxos_ospf" "ospf" {
       max_metric_await_convergence_bgp_asn = try(vrf.max_metric.await_convergence_bgp_asn, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.max_metric.await_convergence_bgp_asn, null)
       max_metric_control = join(",", sort(compact([
         try(vrf.max_metric.external_lsa, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.max_metric.external_lsa, false) ? "external-lsa" : "",
-        try(vrf.max_metric.startup, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.max_metric.startup, false) ? "startup" : "",
-        try(vrf.max_metric.stub, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.max_metric.stub, false) ? "stub" : "",
+        try(vrf.max_metric.on_startup, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.max_metric.on_startup, false) ? "startup" : "",
+        try(vrf.max_metric.include_stub, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.max_metric.include_stub, false) ? "stub" : "",
         try(vrf.max_metric.summary_lsa, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.max_metric.summary_lsa, false) ? "summary-lsa" : "",
       ])))
       max_metric_external_lsa     = try(vrf.max_metric.external_lsa_max_metric, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.max_metric.external_lsa_max_metric, null)
       max_metric_summary_lsa      = try(vrf.max_metric.summary_lsa_max_metric, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.max_metric.summary_lsa_max_metric, null)
-      max_metric_startup_interval = try(vrf.max_metric.startup_interval, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.max_metric.startup_interval, null)
+      max_metric_startup_interval = try(vrf.max_metric.on_startup_timeout, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.max_metric.on_startup_timeout, null)
 
       areas = { for area in try(vrf.areas, []) : area.area => {
         authentication_type = try(area.authentication_type, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.areas.authentication_type, null)
-        cost                = try(area.cost, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.areas.cost, null)
+        cost                = try(area.default_cost, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.areas.default_cost, null)
         control = join(",", sort(compact([
           try(area.filter_redistribute, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.areas.filter_redistribute, false) ? "redistribute" : "",
           try(area.filter_summary, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.areas.filter_summary, false) ? "summary" : "",
