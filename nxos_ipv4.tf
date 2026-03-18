@@ -79,29 +79,29 @@ locals {
 
 resource "nxos_ipv4" "ipv4" {
   for_each = { for device in local.devices : device.name => device
-    if try(local.device_config[device.name].ipv4.routing, local.defaults.nxos.devices.configuration.ipv4.routing, null) != null ||
-    try(local.device_config[device.name].ipv4.access_list_match_local, local.defaults.nxos.devices.configuration.ipv4.access_list_match_local, null) != null ||
-    try(local.device_config[device.name].ipv4.hardware_ecmp_hash_offset_concatenation, local.defaults.nxos.devices.configuration.ipv4.hardware_ecmp_hash_offset_concatenation, null) != null ||
-    try(local.device_config[device.name].ipv4.hardware_ecmp_hash_offset_value, local.defaults.nxos.devices.configuration.ipv4.hardware_ecmp_hash_offset_value, null) != null ||
-    try(local.device_config[device.name].ipv4.hardware_ecmp_hash_polynomial, local.defaults.nxos.devices.configuration.ipv4.hardware_ecmp_hash_polynomial, null) != null ||
-    try(local.device_config[device.name].ipv4.logging_level, local.defaults.nxos.devices.configuration.ipv4.logging_level, null) != null ||
-    try(local.device_config[device.name].ipv4.redirect_syslog, local.defaults.nxos.devices.configuration.ipv4.redirect_syslog, null) != null ||
-    try(local.device_config[device.name].ipv4.redirect_syslog_interval, local.defaults.nxos.devices.configuration.ipv4.redirect_syslog_interval, null) != null ||
-    try(local.device_config[device.name].ipv4.source_route, local.defaults.nxos.devices.configuration.ipv4.source_route, null) != null ||
+    if try(local.device_config[device.name].system.ip_routing, local.defaults.nxos.devices.configuration.system.ip_routing, null) != null ||
+    try(local.device_config[device.name].system.ip_access_list_match_local, local.defaults.nxos.devices.configuration.system.ip_access_list_match_local, null) != null ||
+    try(local.device_config[device.name].system.hardware_ecmp_hash_offset_concatenation, local.defaults.nxos.devices.configuration.system.hardware_ecmp_hash_offset_concatenation, null) != null ||
+    try(local.device_config[device.name].system.hardware_ecmp_hash_offset_value, local.defaults.nxos.devices.configuration.system.hardware_ecmp_hash_offset_value, null) != null ||
+    try(local.device_config[device.name].system.hardware_ecmp_hash_polynomial, local.defaults.nxos.devices.configuration.system.hardware_ecmp_hash_polynomial, null) != null ||
+    try(local.device_config[device.name].system.ip_logging_level, local.defaults.nxos.devices.configuration.system.ip_logging_level, null) != null ||
+    try(local.device_config[device.name].system.ip_redirect_syslog, local.defaults.nxos.devices.configuration.system.ip_redirect_syslog, null) != null ||
+    try(local.device_config[device.name].system.ip_redirect_syslog_interval, local.defaults.nxos.devices.configuration.system.ip_redirect_syslog_interval, null) != null ||
+    try(local.device_config[device.name].system.ip_source_route, local.defaults.nxos.devices.configuration.system.ip_source_route, null) != null ||
     length(try(local.device_config[device.name].vrfs, [])) > 0 ||
     length(try(local.device_config[device.name].routing.ipv4_static_routes, [])) > 0 ||
   length([for int in local.ipv4_interfaces : int if int.device == device.name]) > 0 }
   device = each.key
 
-  instance_admin_state                    = try(local.device_config[each.key].ipv4.routing, local.defaults.nxos.devices.configuration.ipv4.routing, null) != null ? (try(local.device_config[each.key].ipv4.routing, local.defaults.nxos.devices.configuration.ipv4.routing) ? "enabled" : "disabled") : null
-  access_list_match_local                 = try(local.device_config[each.key].ipv4.access_list_match_local, local.defaults.nxos.devices.configuration.ipv4.access_list_match_local, null) != null ? (try(local.device_config[each.key].ipv4.access_list_match_local, local.defaults.nxos.devices.configuration.ipv4.access_list_match_local) ? "enabled" : "disabled") : null
-  hardware_ecmp_hash_offset_concatenation = try(local.device_config[each.key].ipv4.hardware_ecmp_hash_offset_concatenation, local.defaults.nxos.devices.configuration.ipv4.hardware_ecmp_hash_offset_concatenation, null) != null ? (try(local.device_config[each.key].ipv4.hardware_ecmp_hash_offset_concatenation, local.defaults.nxos.devices.configuration.ipv4.hardware_ecmp_hash_offset_concatenation) ? "enabled" : "disabled") : null
-  hardware_ecmp_hash_offset_value         = try(local.device_config[each.key].ipv4.hardware_ecmp_hash_offset_value, local.defaults.nxos.devices.configuration.ipv4.hardware_ecmp_hash_offset_value, null)
-  hardware_ecmp_hash_polynomial           = try(local.device_config[each.key].ipv4.hardware_ecmp_hash_polynomial, local.defaults.nxos.devices.configuration.ipv4.hardware_ecmp_hash_polynomial, null)
-  logging_level                           = try(local.device_config[each.key].ipv4.logging_level, local.defaults.nxos.devices.configuration.ipv4.logging_level, null)
-  redirect_syslog                         = try(local.device_config[each.key].ipv4.redirect_syslog, local.defaults.nxos.devices.configuration.ipv4.redirect_syslog, null) != null ? (try(local.device_config[each.key].ipv4.redirect_syslog, local.defaults.nxos.devices.configuration.ipv4.redirect_syslog) ? "enabled" : "disabled") : null
-  redirect_syslog_interval                = try(local.device_config[each.key].ipv4.redirect_syslog_interval, local.defaults.nxos.devices.configuration.ipv4.redirect_syslog_interval, null)
-  source_route                            = try(local.device_config[each.key].ipv4.source_route, local.defaults.nxos.devices.configuration.ipv4.source_route, null) != null ? (try(local.device_config[each.key].ipv4.source_route, local.defaults.nxos.devices.configuration.ipv4.source_route) ? "enabled" : "disabled") : null
+  instance_admin_state                    = try(local.device_config[each.key].system.ip_routing, local.defaults.nxos.devices.configuration.system.ip_routing, null) != null ? (try(local.device_config[each.key].system.ip_routing, local.defaults.nxos.devices.configuration.system.ip_routing) ? "enabled" : "disabled") : null
+  access_list_match_local                 = try(local.device_config[each.key].system.ip_access_list_match_local, local.defaults.nxos.devices.configuration.system.ip_access_list_match_local, null) != null ? (try(local.device_config[each.key].system.ip_access_list_match_local, local.defaults.nxos.devices.configuration.system.ip_access_list_match_local) ? "enabled" : "disabled") : null
+  hardware_ecmp_hash_offset_concatenation = try(local.device_config[each.key].system.hardware_ecmp_hash_offset_concatenation, local.defaults.nxos.devices.configuration.system.hardware_ecmp_hash_offset_concatenation, null) != null ? (try(local.device_config[each.key].system.hardware_ecmp_hash_offset_concatenation, local.defaults.nxos.devices.configuration.system.hardware_ecmp_hash_offset_concatenation) ? "enabled" : "disabled") : null
+  hardware_ecmp_hash_offset_value         = try(local.device_config[each.key].system.hardware_ecmp_hash_offset_value, local.defaults.nxos.devices.configuration.system.hardware_ecmp_hash_offset_value, null)
+  hardware_ecmp_hash_polynomial           = try(local.device_config[each.key].system.hardware_ecmp_hash_polynomial, local.defaults.nxos.devices.configuration.system.hardware_ecmp_hash_polynomial, null)
+  logging_level                           = try(local.device_config[each.key].system.ip_logging_level, local.defaults.nxos.devices.configuration.system.ip_logging_level, null)
+  redirect_syslog                         = try(local.device_config[each.key].system.ip_redirect_syslog, local.defaults.nxos.devices.configuration.system.ip_redirect_syslog, null) != null ? (try(local.device_config[each.key].system.ip_redirect_syslog, local.defaults.nxos.devices.configuration.system.ip_redirect_syslog) ? "enabled" : "disabled") : null
+  redirect_syslog_interval                = try(local.device_config[each.key].system.ip_redirect_syslog_interval, local.defaults.nxos.devices.configuration.system.ip_redirect_syslog_interval, null)
+  source_route                            = try(local.device_config[each.key].system.ip_source_route, local.defaults.nxos.devices.configuration.system.ip_source_route, null) != null ? (try(local.device_config[each.key].system.ip_source_route, local.defaults.nxos.devices.configuration.system.ip_source_route) ? "enabled" : "disabled") : null
 
   vrfs = merge(
     # "default" VRF

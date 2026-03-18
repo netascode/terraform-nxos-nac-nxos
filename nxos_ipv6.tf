@@ -79,23 +79,23 @@ locals {
 
 resource "nxos_ipv6" "ipv6" {
   for_each = { for device in local.devices : device.name => device
-    if try(local.device_config[device.name].ipv6.routing, local.defaults.nxos.devices.configuration.ipv6.routing, null) != null ||
-    try(local.device_config[device.name].ipv6.access_list_match_local, local.defaults.nxos.devices.configuration.ipv6.access_list_match_local, null) != null ||
-    try(local.device_config[device.name].ipv6.drop_nd_fragments, local.defaults.nxos.devices.configuration.ipv6.drop_nd_fragments, null) != null ||
-    try(local.device_config[device.name].ipv6.queue_packets, local.defaults.nxos.devices.configuration.ipv6.queue_packets, null) != null ||
-    try(local.device_config[device.name].ipv6.static_neighbor_outside_subnet, local.defaults.nxos.devices.configuration.ipv6.static_neighbor_outside_subnet, null) != null ||
-    try(local.device_config[device.name].ipv6.switch_packets, local.defaults.nxos.devices.configuration.ipv6.switch_packets, null) != null ||
+    if try(local.device_config[device.name].system.ipv6_routing, local.defaults.nxos.devices.configuration.system.ipv6_routing, null) != null ||
+    try(local.device_config[device.name].system.ipv6_access_list_match_local, local.defaults.nxos.devices.configuration.system.ipv6_access_list_match_local, null) != null ||
+    try(local.device_config[device.name].system.ipv6_drop_nd_fragments, local.defaults.nxos.devices.configuration.system.ipv6_drop_nd_fragments, null) != null ||
+    try(local.device_config[device.name].system.ipv6_queue_packets, local.defaults.nxos.devices.configuration.system.ipv6_queue_packets, null) != null ||
+    try(local.device_config[device.name].system.ipv6_static_neighbor_outside_subnet, local.defaults.nxos.devices.configuration.system.ipv6_static_neighbor_outside_subnet, null) != null ||
+    try(local.device_config[device.name].system.ipv6_switch_packets, local.defaults.nxos.devices.configuration.system.ipv6_switch_packets, null) != null ||
     length(try(local.device_config[device.name].vrfs, [])) > 0 ||
     length(try(local.device_config[device.name].routing.ipv6_static_routes, [])) > 0 ||
   length([for int in local.ipv6_interfaces : int if int.device == device.name]) > 0 }
   device = each.key
 
-  access_list_match_local        = try(local.device_config[each.key].ipv6.access_list_match_local, local.defaults.nxos.devices.configuration.ipv6.access_list_match_local, null) != null ? (try(local.device_config[each.key].ipv6.access_list_match_local, local.defaults.nxos.devices.configuration.ipv6.access_list_match_local) ? "enabled" : "disabled") : null
-  admin_state                    = try(local.device_config[each.key].ipv6.routing, local.defaults.nxos.devices.configuration.ipv6.routing, null) != null ? (try(local.device_config[each.key].ipv6.routing, local.defaults.nxos.devices.configuration.ipv6.routing) ? "enabled" : "disabled") : null
-  drop_nd_fragments              = try(local.device_config[each.key].ipv6.drop_nd_fragments, local.defaults.nxos.devices.configuration.ipv6.drop_nd_fragments, null) != null ? (try(local.device_config[each.key].ipv6.drop_nd_fragments, local.defaults.nxos.devices.configuration.ipv6.drop_nd_fragments) ? "enabled" : "disabled") : null
-  queue_packets                  = try(local.device_config[each.key].ipv6.queue_packets, local.defaults.nxos.devices.configuration.ipv6.queue_packets, null) != null ? (try(local.device_config[each.key].ipv6.queue_packets, local.defaults.nxos.devices.configuration.ipv6.queue_packets) ? "enabled" : "disabled") : null
-  static_neighbor_outside_subnet = try(local.device_config[each.key].ipv6.static_neighbor_outside_subnet, local.defaults.nxos.devices.configuration.ipv6.static_neighbor_outside_subnet, null) != null ? (try(local.device_config[each.key].ipv6.static_neighbor_outside_subnet, local.defaults.nxos.devices.configuration.ipv6.static_neighbor_outside_subnet) ? "enabled" : "disabled") : null
-  switch_packets                 = try(local.device_config[each.key].ipv6.switch_packets, local.defaults.nxos.devices.configuration.ipv6.switch_packets, null)
+  access_list_match_local        = try(local.device_config[each.key].system.ipv6_access_list_match_local, local.defaults.nxos.devices.configuration.system.ipv6_access_list_match_local, null) != null ? (try(local.device_config[each.key].system.ipv6_access_list_match_local, local.defaults.nxos.devices.configuration.system.ipv6_access_list_match_local) ? "enabled" : "disabled") : null
+  admin_state                    = try(local.device_config[each.key].system.ipv6_routing, local.defaults.nxos.devices.configuration.system.ipv6_routing, null) != null ? (try(local.device_config[each.key].system.ipv6_routing, local.defaults.nxos.devices.configuration.system.ipv6_routing) ? "enabled" : "disabled") : null
+  drop_nd_fragments              = try(local.device_config[each.key].system.ipv6_drop_nd_fragments, local.defaults.nxos.devices.configuration.system.ipv6_drop_nd_fragments, null) != null ? (try(local.device_config[each.key].system.ipv6_drop_nd_fragments, local.defaults.nxos.devices.configuration.system.ipv6_drop_nd_fragments) ? "enabled" : "disabled") : null
+  queue_packets                  = try(local.device_config[each.key].system.ipv6_queue_packets, local.defaults.nxos.devices.configuration.system.ipv6_queue_packets, null) != null ? (try(local.device_config[each.key].system.ipv6_queue_packets, local.defaults.nxos.devices.configuration.system.ipv6_queue_packets) ? "enabled" : "disabled") : null
+  static_neighbor_outside_subnet = try(local.device_config[each.key].system.ipv6_static_neighbor_outside_subnet, local.defaults.nxos.devices.configuration.system.ipv6_static_neighbor_outside_subnet, null) != null ? (try(local.device_config[each.key].system.ipv6_static_neighbor_outside_subnet, local.defaults.nxos.devices.configuration.system.ipv6_static_neighbor_outside_subnet) ? "enabled" : "disabled") : null
+  switch_packets                 = try(local.device_config[each.key].system.ipv6_switch_packets, local.defaults.nxos.devices.configuration.system.ipv6_switch_packets, null)
 
   vrfs = merge(
     # "default" VRF
