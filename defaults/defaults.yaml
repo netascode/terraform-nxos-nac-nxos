@@ -23,9 +23,6 @@ defaults:
             ospf:
               advertise_secondaries: true
         routing:
-          pim:
-            vrfs:
-              admin_state: true
           ospf_processes:
             vrfs:
               admin_state: true

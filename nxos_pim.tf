@@ -5,7 +5,6 @@ locals {
         device               = device.name
         vrf                  = try(int.vrf, local.defaults.nxos.devices.configuration.interfaces.ethernets.vrf, "default")
         interface_id         = "eth${int.id}"
-        admin_state          = try(int.pim.admin_state, local.defaults.nxos.devices.configuration.interfaces.ethernets.pim.admin_state, null)
         bfd                  = try(int.pim.bfd, local.defaults.nxos.devices.configuration.interfaces.ethernets.pim.bfd, null)
         dr_priority          = try(int.pim.dr_priority, local.defaults.nxos.devices.configuration.interfaces.ethernets.pim.dr_priority, null)
         passive              = try(int.pim.passive, local.defaults.nxos.devices.configuration.interfaces.ethernets.pim.passive, null)
@@ -17,12 +16,11 @@ locals {
         neighbor_route_map   = try(int.pim.neighbor_route_map, local.defaults.nxos.devices.configuration.interfaces.ethernets.pim.neighbor_route_map, null)
         neighbor_prefix_list = try(int.pim.neighbor_prefix_list, local.defaults.nxos.devices.configuration.interfaces.ethernets.pim.neighbor_prefix_list, null)
         rfc_strict           = try(int.pim.rfc_strict, local.defaults.nxos.devices.configuration.interfaces.ethernets.pim.rfc_strict, null)
-      } if try(int.pim.admin_state, local.defaults.nxos.devices.configuration.interfaces.ethernets.pim.admin_state, null) != null],
+      } if try(int.pim, null) != null],
       [for int in try(local.device_config[device.name].interfaces.port_channels, []) : {
         device               = device.name
         vrf                  = try(int.vrf, local.defaults.nxos.devices.configuration.interfaces.port_channels.vrf, "default")
         interface_id         = "po${int.id}"
-        admin_state          = try(int.pim.admin_state, local.defaults.nxos.devices.configuration.interfaces.port_channels.pim.admin_state, null)
         bfd                  = try(int.pim.bfd, local.defaults.nxos.devices.configuration.interfaces.port_channels.pim.bfd, null)
         dr_priority          = try(int.pim.dr_priority, local.defaults.nxos.devices.configuration.interfaces.port_channels.pim.dr_priority, null)
         passive              = try(int.pim.passive, local.defaults.nxos.devices.configuration.interfaces.port_channels.pim.passive, null)
@@ -34,12 +32,11 @@ locals {
         neighbor_route_map   = try(int.pim.neighbor_route_map, local.defaults.nxos.devices.configuration.interfaces.port_channels.pim.neighbor_route_map, null)
         neighbor_prefix_list = try(int.pim.neighbor_prefix_list, local.defaults.nxos.devices.configuration.interfaces.port_channels.pim.neighbor_prefix_list, null)
         rfc_strict           = try(int.pim.rfc_strict, local.defaults.nxos.devices.configuration.interfaces.port_channels.pim.rfc_strict, null)
-      } if try(int.pim.admin_state, local.defaults.nxos.devices.configuration.interfaces.port_channels.pim.admin_state, null) != null],
+      } if try(int.pim, null) != null],
       [for int in try(local.device_config[device.name].interfaces.loopbacks, []) : {
         device               = device.name
         vrf                  = try(int.vrf, local.defaults.nxos.devices.configuration.interfaces.loopbacks.vrf, "default")
         interface_id         = "lo${int.id}"
-        admin_state          = try(int.pim.admin_state, local.defaults.nxos.devices.configuration.interfaces.loopbacks.pim.admin_state, null)
         bfd                  = try(int.pim.bfd, local.defaults.nxos.devices.configuration.interfaces.loopbacks.pim.bfd, null)
         dr_priority          = try(int.pim.dr_priority, local.defaults.nxos.devices.configuration.interfaces.loopbacks.pim.dr_priority, null)
         passive              = try(int.pim.passive, local.defaults.nxos.devices.configuration.interfaces.loopbacks.pim.passive, null)
@@ -51,12 +48,11 @@ locals {
         neighbor_route_map   = try(int.pim.neighbor_route_map, local.defaults.nxos.devices.configuration.interfaces.loopbacks.pim.neighbor_route_map, null)
         neighbor_prefix_list = try(int.pim.neighbor_prefix_list, local.defaults.nxos.devices.configuration.interfaces.loopbacks.pim.neighbor_prefix_list, null)
         rfc_strict           = try(int.pim.rfc_strict, local.defaults.nxos.devices.configuration.interfaces.loopbacks.pim.rfc_strict, null)
-      } if try(int.pim.admin_state, local.defaults.nxos.devices.configuration.interfaces.loopbacks.pim.admin_state, null) != null],
+      } if try(int.pim, null) != null],
       [for int in try(local.device_config[device.name].interfaces.vlans, []) : {
         device               = device.name
         vrf                  = try(int.vrf, local.defaults.nxos.devices.configuration.interfaces.vlans.vrf, "default")
         interface_id         = "vlan${int.id}"
-        admin_state          = try(int.pim.admin_state, local.defaults.nxos.devices.configuration.interfaces.vlans.pim.admin_state, null)
         bfd                  = try(int.pim.bfd, local.defaults.nxos.devices.configuration.interfaces.vlans.pim.bfd, null)
         dr_priority          = try(int.pim.dr_priority, local.defaults.nxos.devices.configuration.interfaces.vlans.pim.dr_priority, null)
         passive              = try(int.pim.passive, local.defaults.nxos.devices.configuration.interfaces.vlans.pim.passive, null)
@@ -68,7 +64,7 @@ locals {
         neighbor_route_map   = try(int.pim.neighbor_route_map, local.defaults.nxos.devices.configuration.interfaces.vlans.pim.neighbor_route_map, null)
         neighbor_prefix_list = try(int.pim.neighbor_prefix_list, local.defaults.nxos.devices.configuration.interfaces.vlans.pim.neighbor_prefix_list, null)
         rfc_strict           = try(int.pim.rfc_strict, local.defaults.nxos.devices.configuration.interfaces.vlans.pim.rfc_strict, null)
-      } if try(int.pim.admin_state, local.defaults.nxos.devices.configuration.interfaces.vlans.pim.admin_state, null) != null],
+      } if try(int.pim, null) != null],
     )
   ])
   pim_interfaces_by_device_vrf = { for item in local.pim_interfaces :
@@ -92,7 +88,6 @@ resource "nxos_pim" "pim" {
 
   vrfs = merge(
     { for vrf in try(local.device_config[each.key].routing.pim.vrfs, []) : vrf.vrf => {
-      admin_state          = try(vrf.admin_state, local.defaults.nxos.devices.configuration.routing.pim.vrfs.admin_state, null) != null ? (try(vrf.admin_state, local.defaults.nxos.devices.configuration.routing.pim.vrfs.admin_state) ? "enabled" : "disabled") : null
       bfd                  = try(vrf.bfd, local.defaults.nxos.devices.configuration.routing.pim.vrfs.bfd, null)
       auto_enable          = try(vrf.auto_enable, local.defaults.nxos.devices.configuration.routing.pim.vrfs.auto_enable, null)
       flush_routes         = try(vrf.flush_routes, local.defaults.nxos.devices.configuration.routing.pim.vrfs.flush_routes, null)
@@ -128,7 +123,6 @@ resource "nxos_pim" "pim" {
       }
 
       interfaces = { for int in try(local.pim_interfaces_by_device_vrf["${each.key}/${vrf.vrf}"], []) : int.interface_id => {
-        admin_state          = int.admin_state != null ? (int.admin_state ? "enabled" : "disabled") : null
         bfd                  = int.bfd
         dr_priority          = int.dr_priority
         passive              = int.passive
@@ -145,7 +139,6 @@ resource "nxos_pim" "pim" {
     # Create VRF entries for PIM interfaces that belong to VRFs not explicitly listed in routing.pim.vrfs
     { for vrf_key, ints in local.pim_interfaces_by_device_vrf :
       split("/", vrf_key)[1] => {
-        admin_state          = null
         bfd                  = null
         auto_enable          = null
         flush_routes         = null
@@ -172,7 +165,6 @@ resource "nxos_pim" "pim" {
         anycast_rp_peers = {}
 
         interfaces = { for int in ints : int.interface_id => {
-          admin_state          = int.admin_state != null ? (int.admin_state ? "enabled" : "disabled") : null
           bfd                  = int.bfd
           dr_priority          = int.dr_priority
           passive              = int.passive

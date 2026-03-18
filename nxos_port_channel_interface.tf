@@ -43,7 +43,6 @@ locals {
         ospfv3_mtu_ignore                       = try(int.ospfv3.mtu_ignore, local.defaults.nxos.devices.configuration.interfaces.port_channels.ospfv3.mtu_ignore, null)
         ospfv3_retransmit_interval              = try(int.ospfv3.retransmit_interval, local.defaults.nxos.devices.configuration.interfaces.port_channels.ospfv3.retransmit_interval, null)
         ospfv3_transmit_delay                   = try(int.ospfv3.transmit_delay, local.defaults.nxos.devices.configuration.interfaces.port_channels.ospfv3.transmit_delay, null)
-        pim_admin_state                         = try(int.pim.admin_state, local.defaults.nxos.devices.configuration.interfaces.port_channels.pim.admin_state, null)
         pim_bfd                                 = try(int.pim.bfd, local.defaults.nxos.devices.configuration.interfaces.port_channels.pim.bfd, null)
         pim_dr_priority                         = try(int.pim.dr_priority, local.defaults.nxos.devices.configuration.interfaces.port_channels.pim.dr_priority, null)
         pim_passive                             = try(int.pim.passive, local.defaults.nxos.devices.configuration.interfaces.port_channels.pim.passive, null)
