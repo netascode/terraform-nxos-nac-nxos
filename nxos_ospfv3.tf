@@ -11,12 +11,12 @@ resource "nxos_ospfv3" "ospfv3" {
   admin_state = "enabled"
 
   instances = { for proc in try(local.device_config[each.key].routing.ospfv3_processes, []) : proc.name => {
-    admin_state  = try(proc.admin_state, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.admin_state, false) ? "enabled" : "disabled"
+    admin_state  = try(proc.shutdown, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.shutdown, false) ? "disabled" : "enabled"
     flush_routes = try(proc.flush_routes, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.flush_routes, null)
     isolate      = try(proc.isolate, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.isolate, null)
 
     vrfs = { for vrf in try(proc.vrfs, []) : vrf.vrf => {
-      admin_state               = try(vrf.admin_state, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.vrfs.admin_state, false) ? "enabled" : "disabled"
+      admin_state               = try(vrf.shutdown, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.vrfs.shutdown, false) ? "disabled" : "enabled"
       bandwidth_reference       = try(vrf.bandwidth_reference, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.vrfs.bandwidth_reference, null)
       bandwidth_reference_unit  = try(vrf.bandwidth_reference_unit, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.vrfs.bandwidth_reference_unit, null)
       router_id                 = try(vrf.router_id, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.vrfs.router_id, null)

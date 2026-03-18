@@ -7,7 +7,7 @@ locals {
         id                                      = int.id
         type                                    = "eth"
         access_vlan                             = try(int.access_vlan, local.defaults.nxos.devices.configuration.interfaces.ethernets.access_vlan, 1)
-        admin_state                             = try(int.admin_state, local.defaults.nxos.devices.configuration.interfaces.ethernets.admin_state, false)
+        admin_state                             = try(int.shutdown, local.defaults.nxos.devices.configuration.interfaces.ethernets.shutdown, false)
         auto_negotiation                        = try(int.auto_negotiation, local.defaults.nxos.devices.configuration.interfaces.ethernets.auto_negotiation, null)
         bandwidth                               = try(int.bandwidth, local.defaults.nxos.devices.configuration.interfaces.ethernets.bandwidth, null)
         delay                                   = try(int.delay, local.defaults.nxos.devices.configuration.interfaces.ethernets.delay, null)
@@ -66,7 +66,6 @@ locals {
         ospfv3_mtu_ignore                       = try(int.ospfv3.mtu_ignore, local.defaults.nxos.devices.configuration.interfaces.ethernets.ospfv3.mtu_ignore, null)
         ospfv3_retransmit_interval              = try(int.ospfv3.retransmit_interval, local.defaults.nxos.devices.configuration.interfaces.ethernets.ospfv3.retransmit_interval, null)
         ospfv3_transmit_delay                   = try(int.ospfv3.transmit_delay, local.defaults.nxos.devices.configuration.interfaces.ethernets.ospfv3.transmit_delay, null)
-        pim_admin_state                         = try(int.pim.admin_state, local.defaults.nxos.devices.configuration.interfaces.ethernets.pim.admin_state, null)
         pim_bfd                                 = try(int.pim.bfd, local.defaults.nxos.devices.configuration.interfaces.ethernets.pim.bfd, null)
         pim_dr_priority                         = try(int.pim.dr_priority, local.defaults.nxos.devices.configuration.interfaces.ethernets.pim.dr_priority, null)
         pim_passive                             = try(int.pim.passive, local.defaults.nxos.devices.configuration.interfaces.ethernets.pim.passive, null)
@@ -126,7 +125,7 @@ resource "nxos_physical_interface" "physical_interface" {
   physical_interfaces = { for int in try(local.device_config[each.key].interfaces.ethernets, []) : "eth${int.id}" => {
     fec_mode                           = try(int.fec_mode, local.defaults.nxos.devices.configuration.interfaces.ethernets.fec_mode, null)
     access_vlan                        = try(int.port_channel, null) != null ? null : (try(int.layer3, local.defaults.nxos.devices.configuration.interfaces.ethernets.layer3, false) ? "unknown" : "vlan-${try(int.access_vlan, local.defaults.nxos.devices.configuration.interfaces.ethernets.access_vlan, 1)}")
-    admin_state                        = try(int.admin_state, local.defaults.nxos.devices.configuration.interfaces.ethernets.admin_state, false) ? "up" : "down"
+    admin_state                        = try(int.shutdown, local.defaults.nxos.devices.configuration.interfaces.ethernets.shutdown, false) ? "down" : "up"
     auto_negotiation                   = try(int.auto_negotiation, local.defaults.nxos.devices.configuration.interfaces.ethernets.auto_negotiation, null)
     bandwidth                          = try(int.bandwidth, local.defaults.nxos.devices.configuration.interfaces.ethernets.bandwidth, null)
     beacon                             = try(int.beacon, local.defaults.nxos.devices.configuration.interfaces.ethernets.beacon, null) != null ? (try(int.beacon, local.defaults.nxos.devices.configuration.interfaces.ethernets.beacon) ? "on" : "off") : null

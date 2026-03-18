@@ -7,7 +7,7 @@ resource "nxos_bridge_domain" "bridge_domain" {
   bridge_domains = { for vlan in try(local.device_config[each.key].vlan.vlans, []) : "vlan-${vlan.id}" => {
     access_encap = try(vlan.vni, local.defaults.nxos.devices.configuration.vlan.vlans.vni, null) != null ? "vxlan-${try(vlan.vni, local.defaults.nxos.devices.configuration.vlan.vlans.vni)}" : null
     name         = try(vlan.name, local.defaults.nxos.devices.configuration.vlan.vlans.name, null)
-    admin_state  = try(vlan.admin_state, local.defaults.nxos.devices.configuration.vlan.vlans.admin_state, null) == null ? null : try(vlan.admin_state, local.defaults.nxos.devices.configuration.vlan.vlans.admin_state) ? "active" : "suspend"
+    admin_state  = try(vlan.state_active, local.defaults.nxos.devices.configuration.vlan.vlans.state_active, null) == null ? null : try(vlan.state_active, local.defaults.nxos.devices.configuration.vlan.vlans.state_active) ? "active" : "suspend"
     bridge_mode  = try(vlan.bridge_mode, local.defaults.nxos.devices.configuration.vlan.vlans.bridge_mode, null)
     control = join(",", sort(compact([
       try(vlan.policy_enforced, local.defaults.nxos.devices.configuration.vlan.vlans.policy_enforced, false) ? "policy-enforced" : "",

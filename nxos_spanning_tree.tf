@@ -4,7 +4,6 @@ resource "nxos_spanning_tree" "spanning_tree" {
     length([for int in try(local.device_config[device.name].interfaces.ethernets, []) : int if try(int.spanning_tree, null) != null]) > 0 ||
   length([for int in try(local.device_config[device.name].interfaces.port_channels, []) : int if try(int.spanning_tree, null) != null]) > 0 }
   device                   = each.key
-  admin_state              = try(local.device_config[each.key].spanning_tree.admin_state, local.defaults.nxos.devices.configuration.spanning_tree.admin_state, null) != null ? (try(local.device_config[each.key].spanning_tree.admin_state, local.defaults.nxos.devices.configuration.spanning_tree.admin_state) ? "enabled" : "disabled") : null
   bridge_assurance         = try(local.device_config[each.key].spanning_tree.bridge_assurance, local.defaults.nxos.devices.configuration.spanning_tree.bridge_assurance, null) != null ? (try(local.device_config[each.key].spanning_tree.bridge_assurance, local.defaults.nxos.devices.configuration.spanning_tree.bridge_assurance) ? "enabled" : "disabled") : null
   fcoe                     = try(local.device_config[each.key].spanning_tree.fcoe, local.defaults.nxos.devices.configuration.spanning_tree.fcoe, null) != null ? (try(local.device_config[each.key].spanning_tree.fcoe, local.defaults.nxos.devices.configuration.spanning_tree.fcoe) ? "enabled" : "disabled") : null
   l2_gateway_stp_domain_id = try(local.device_config[each.key].spanning_tree.l2_gateway_stp_domain_id, local.defaults.nxos.devices.configuration.spanning_tree.l2_gateway_stp_domain_id, null)

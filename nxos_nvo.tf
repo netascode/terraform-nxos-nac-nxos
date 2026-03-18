@@ -8,7 +8,7 @@ resource "nxos_nvo" "nvo" {
   vxlan_udp_source_port_mode = try(local.device_config[each.key].system.nv_overlay_vxlan_udp_source_port_mode, local.defaults.nxos.devices.configuration.system.nv_overlay_vxlan_udp_source_port_mode, null)
 
   nve_interfaces = { for nve_id in try(local.device_config[each.key].interfaces.nve, null) != null ? ["1"] : [] : nve_id => {
-    admin_state                        = try(local.device_config[each.key].interfaces.nve.admin_state, local.defaults.nxos.devices.configuration.interfaces.nve.admin_state, false) ? "enabled" : "disabled"
+    admin_state                        = try(local.device_config[each.key].interfaces.nve.shutdown, local.defaults.nxos.devices.configuration.interfaces.nve.shutdown, false) ? "disabled" : "enabled"
     advertise_virtual_mac              = try(local.device_config[each.key].interfaces.nve.advertise_virtual_mac, local.defaults.nxos.devices.configuration.interfaces.nve.advertise_virtual_mac, null)
     anycast_source_interface           = try(local.device_config[each.key].interfaces.nve.anycast_source_interface_type, local.defaults.nxos.devices.configuration.interfaces.nve.anycast_source_interface_type, null) != null ? "${local.intf_prefix_map[try(local.device_config[each.key].interfaces.nve.anycast_source_interface_type, local.defaults.nxos.devices.configuration.interfaces.nve.anycast_source_interface_type)]}${try(local.device_config[each.key].interfaces.nve.anycast_source_interface_id, local.defaults.nxos.devices.configuration.interfaces.nve.anycast_source_interface_id, "")}" : null
     configuration_source               = try(local.device_config[each.key].interfaces.nve.configuration_source, local.defaults.nxos.devices.configuration.interfaces.nve.configuration_source, null)
