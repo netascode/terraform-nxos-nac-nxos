@@ -83,7 +83,6 @@ resource "nxos_pim" "pim" {
   device                         = each.key
   admin_state                    = "enabled"
   instance_admin_state           = "enabled"
-  control                        = try(local.device_config[each.key].routing.pim.stateful_ha, local.defaults.nxos.devices.configuration.routing.pim.stateful_ha, false) ? "stateful-ha" : null
   evpn_border_leaf               = try(local.device_config[each.key].routing.pim.evpn_border_leaf, local.defaults.nxos.devices.configuration.routing.pim.evpn_border_leaf, null)
   extra_net                      = try(local.device_config[each.key].routing.pim.extra_net, local.defaults.nxos.devices.configuration.routing.pim.extra_net, null)
   join_prune_delay               = try(local.device_config[each.key].routing.pim.join_prune_delay, local.defaults.nxos.devices.configuration.routing.pim.join_prune_delay, null)

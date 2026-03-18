@@ -81,7 +81,6 @@ resource "nxos_ipv4" "ipv4" {
   for_each = { for device in local.devices : device.name => device
     if try(local.device_config[device.name].ipv4.routing, local.defaults.nxos.devices.configuration.ipv4.routing, null) != null ||
     try(local.device_config[device.name].ipv4.access_list_match_local, local.defaults.nxos.devices.configuration.ipv4.access_list_match_local, null) != null ||
-    try(local.device_config[device.name].ipv4.stateful_ha, local.defaults.nxos.devices.configuration.ipv4.stateful_ha, null) != null ||
     try(local.device_config[device.name].ipv4.hardware_ecmp_hash_offset_concatenation, local.defaults.nxos.devices.configuration.ipv4.hardware_ecmp_hash_offset_concatenation, null) != null ||
     try(local.device_config[device.name].ipv4.hardware_ecmp_hash_offset_value, local.defaults.nxos.devices.configuration.ipv4.hardware_ecmp_hash_offset_value, null) != null ||
     try(local.device_config[device.name].ipv4.hardware_ecmp_hash_polynomial, local.defaults.nxos.devices.configuration.ipv4.hardware_ecmp_hash_polynomial, null) != null ||
@@ -96,7 +95,6 @@ resource "nxos_ipv4" "ipv4" {
 
   instance_admin_state                    = try(local.device_config[each.key].ipv4.routing, local.defaults.nxos.devices.configuration.ipv4.routing, null) != null ? (try(local.device_config[each.key].ipv4.routing, local.defaults.nxos.devices.configuration.ipv4.routing) ? "enabled" : "disabled") : null
   access_list_match_local                 = try(local.device_config[each.key].ipv4.access_list_match_local, local.defaults.nxos.devices.configuration.ipv4.access_list_match_local, null) != null ? (try(local.device_config[each.key].ipv4.access_list_match_local, local.defaults.nxos.devices.configuration.ipv4.access_list_match_local) ? "enabled" : "disabled") : null
-  control                                 = try(local.device_config[each.key].ipv4.stateful_ha, local.defaults.nxos.devices.configuration.ipv4.stateful_ha, null) != null ? (try(local.device_config[each.key].ipv4.stateful_ha, local.defaults.nxos.devices.configuration.ipv4.stateful_ha) ? "stateful-ha" : "") : null
   hardware_ecmp_hash_offset_concatenation = try(local.device_config[each.key].ipv4.hardware_ecmp_hash_offset_concatenation, local.defaults.nxos.devices.configuration.ipv4.hardware_ecmp_hash_offset_concatenation, null) != null ? (try(local.device_config[each.key].ipv4.hardware_ecmp_hash_offset_concatenation, local.defaults.nxos.devices.configuration.ipv4.hardware_ecmp_hash_offset_concatenation) ? "enabled" : "disabled") : null
   hardware_ecmp_hash_offset_value         = try(local.device_config[each.key].ipv4.hardware_ecmp_hash_offset_value, local.defaults.nxos.devices.configuration.ipv4.hardware_ecmp_hash_offset_value, null)
   hardware_ecmp_hash_polynomial           = try(local.device_config[each.key].ipv4.hardware_ecmp_hash_polynomial, local.defaults.nxos.devices.configuration.ipv4.hardware_ecmp_hash_polynomial, null)

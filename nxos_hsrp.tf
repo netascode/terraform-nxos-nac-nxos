@@ -52,7 +52,6 @@ resource "nxos_hsrp" "hsrp" {
   admin_state                          = "enabled"
   instance_admin_state                 = "enabled"
   bfd                                  = try(local.device_config[each.key].hsrp.bfd, local.defaults.nxos.devices.configuration.hsrp.bfd, null) == null ? null : (try(local.device_config[each.key].hsrp.bfd, local.defaults.nxos.devices.configuration.hsrp.bfd) ? "enabled" : "disabled")
-  control                              = try(local.device_config[each.key].hsrp.stateful_ha, local.defaults.nxos.devices.configuration.hsrp.stateful_ha, null) == null ? null : (try(local.device_config[each.key].hsrp.stateful_ha, local.defaults.nxos.devices.configuration.hsrp.stateful_ha) ? "stateful-ha" : "")
   extended_hold_interval               = try(local.device_config[each.key].hsrp.extended_hold_interval, local.defaults.nxos.devices.configuration.hsrp.extended_hold_interval, null)
   extended_hold_interval_configuration = try(local.device_config[each.key].hsrp.extended_hold_interval, local.defaults.nxos.devices.configuration.hsrp.extended_hold_interval, null) != null ? "enabled" : null
 
