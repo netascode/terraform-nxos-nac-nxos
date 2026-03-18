@@ -9,7 +9,7 @@ locals {
         admin_state                             = try(int.admin_state, local.defaults.nxos.devices.configuration.interfaces.vlans.admin_state, false)
         description                             = try(int.description, local.defaults.nxos.devices.configuration.interfaces.vlans.description, null)
         vrf                                     = try(int.vrf, local.defaults.nxos.devices.configuration.interfaces.vlans.vrf, "default")
-        ipv4_address                            = try(int.ipv4_address, local.defaults.nxos.devices.configuration.interfaces.vlans.ipv4_address, null)
+        ip_address                              = try(int.ip_address, local.defaults.nxos.devices.configuration.interfaces.vlans.ip_address, null)
         delay                                   = try(int.delay, local.defaults.nxos.devices.configuration.interfaces.vlans.delay, null)
         bandwidth                               = try(int.bandwidth, local.defaults.nxos.devices.configuration.interfaces.vlans.bandwidth, null)
         ip_forward                              = try(int.ip_forward, local.defaults.nxos.devices.configuration.interfaces.vlans.ip_forward, false)

@@ -29,7 +29,7 @@ defaults:
           ospf_processes:
             vrfs:
               admin_state: true
-          ipv4_prefix_lists:
+          ip_prefix_lists:
             entries:
               action: permit
               criteria: exact
