@@ -4,7 +4,7 @@ resource "nxos_access_list" "access_list" {
   device = each.key
   access_lists = { for acl in try(local.device_config[each.key].access_lists, []) : acl.name => {
     fragments          = try(acl.fragments, local.defaults.nxos.devices.configuration.access_lists.fragments, null)
-    per_ace_statistics = try(acl.per_ace_statistics, local.defaults.nxos.devices.configuration.access_lists.per_ace_statistics, false) ? "on" : "off"
+    per_ace_statistics = try(acl.statistics_per_entry, local.defaults.nxos.devices.configuration.access_lists.statistics_per_entry, false) ? "on" : "off"
     entries = { for entry in try(acl.entries, []) : entry.sequence_number => {
       remark                    = try(entry.remark, local.defaults.nxos.devices.configuration.access_lists.entries.remark, null)
       action                    = try(entry.action, local.defaults.nxos.devices.configuration.access_lists.entries.action, null)
@@ -37,8 +37,8 @@ resource "nxos_access_list" "access_list" {
       urg                       = try(entry.urg, local.defaults.nxos.devices.configuration.access_lists.entries.urg, null)
       icmp_type                 = try(entry.icmp_type, local.defaults.nxos.devices.configuration.access_lists.entries.icmp_type, null)
       icmp_code                 = try(entry.icmp_code, local.defaults.nxos.devices.configuration.access_lists.entries.icmp_code, null)
-      icmp_string               = try(entry.icmp_string, local.defaults.nxos.devices.configuration.access_lists.entries.icmp_string, null)
-      http_option_type          = try(entry.http_option_type, local.defaults.nxos.devices.configuration.access_lists.entries.http_option_type, null)
+      icmp_string               = try(entry.icmp_message, local.defaults.nxos.devices.configuration.access_lists.entries.icmp_message, null)
+      http_option_type          = try(entry.http_method, local.defaults.nxos.devices.configuration.access_lists.entries.http_method, null)
       time_range                = try(entry.time_range, local.defaults.nxos.devices.configuration.access_lists.entries.time_range, null)
       redirect                  = try(entry.redirect, local.defaults.nxos.devices.configuration.access_lists.entries.redirect, null)
       packet_length_operator    = try(entry.packet_length_operator, local.defaults.nxos.devices.configuration.access_lists.entries.packet_length_operator, null)
