@@ -6,18 +6,18 @@ resource "nxos_user_management" "user_management" {
   device = each.key
 
   # Top-level attributes (aaaUserEp) — data model path: users
-  alphabet_sequence         = try(local.device_config[each.key].aaa.users.alphabet_sequence, local.defaults.nxos.devices.configuration.aaa.users.alphabet_sequence, null)
+  alphabet_sequence         = try(local.device_config[each.key].aaa.users.userpassphrase.sequence_alphabet_length, local.defaults.nxos.devices.configuration.aaa.users.userpassphrase.sequence_alphabet_length, null)
   description               = try(local.device_config[each.key].aaa.users.description, local.defaults.nxos.devices.configuration.aaa.users.description, null)
-  keyboard_sequence         = try(local.device_config[each.key].aaa.users.keyboard_sequence, local.defaults.nxos.devices.configuration.aaa.users.keyboard_sequence, null)
+  keyboard_sequence         = try(local.device_config[each.key].aaa.users.userpassphrase.sequence_keyboard_length, local.defaults.nxos.devices.configuration.aaa.users.userpassphrase.sequence_keyboard_length, null)
   max_logins                = try(local.device_config[each.key].aaa.users.max_logins, local.defaults.nxos.devices.configuration.aaa.users.max_logins, null)
-  min_unique                = try(local.device_config[each.key].aaa.users.min_unique, local.defaults.nxos.devices.configuration.aaa.users.min_unique, null)
-  password_grace_time       = try(local.device_config[each.key].aaa.users.passphrase_gracetime, local.defaults.nxos.devices.configuration.aaa.users.passphrase_gracetime, null)
-  password_life_time        = try(local.device_config[each.key].aaa.users.passphrase_lifetime, local.defaults.nxos.devices.configuration.aaa.users.passphrase_lifetime, null)
-  password_max_length       = try(local.device_config[each.key].aaa.users.passphrase_max_length, local.defaults.nxos.devices.configuration.aaa.users.passphrase_max_length, null)
-  password_min_length       = try(local.device_config[each.key].aaa.users.passphrase_min_length, local.defaults.nxos.devices.configuration.aaa.users.passphrase_min_length, null)
+  min_unique                = try(local.device_config[each.key].aaa.users.userpassphrase.min_unique, local.defaults.nxos.devices.configuration.aaa.users.userpassphrase.min_unique, null)
+  password_grace_time       = try(local.device_config[each.key].aaa.users.userpassphrase.default_gracetime, local.defaults.nxos.devices.configuration.aaa.users.userpassphrase.default_gracetime, null)
+  password_life_time        = try(local.device_config[each.key].aaa.users.userpassphrase.default_lifetime, local.defaults.nxos.devices.configuration.aaa.users.userpassphrase.default_lifetime, null)
+  password_max_length       = try(local.device_config[each.key].aaa.users.userpassphrase.max_length, local.defaults.nxos.devices.configuration.aaa.users.userpassphrase.max_length, null)
+  password_min_length       = try(local.device_config[each.key].aaa.users.userpassphrase.min_length, local.defaults.nxos.devices.configuration.aaa.users.userpassphrase.min_length, null)
   password_secure_mode      = try(local.device_config[each.key].aaa.users.password_secure_mode, local.defaults.nxos.devices.configuration.aaa.users.password_secure_mode, null) == null ? null : (try(local.device_config[each.key].aaa.users.password_secure_mode, local.defaults.nxos.devices.configuration.aaa.users.password_secure_mode) ? "yes" : "no")
   password_strength_check   = try(local.device_config[each.key].aaa.users.password_strength_check, local.defaults.nxos.devices.configuration.aaa.users.password_strength_check, null) == null ? null : (try(local.device_config[each.key].aaa.users.password_strength_check, local.defaults.nxos.devices.configuration.aaa.users.password_strength_check) ? "yes" : "no")
-  password_warning_time     = try(local.device_config[each.key].aaa.users.passphrase_warntime, local.defaults.nxos.devices.configuration.aaa.users.passphrase_warntime, null)
+  password_warning_time     = try(local.device_config[each.key].aaa.users.userpassphrase.default_warntime, local.defaults.nxos.devices.configuration.aaa.users.userpassphrase.default_warntime, null)
   service_password_recovery = try(local.device_config[each.key].aaa.users.service_password_recovery, local.defaults.nxos.devices.configuration.aaa.users.service_password_recovery, null) == null ? null : (try(local.device_config[each.key].aaa.users.service_password_recovery, local.defaults.nxos.devices.configuration.aaa.users.service_password_recovery) ? "yes" : "no")
 
   # Pre-login banner (aaaPreLoginBanner) — data model path: banner.motd
