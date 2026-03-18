@@ -5,7 +5,7 @@ locals {
         key                    = format("%s/%s", device.name, vni.vni)
         device                 = device.name
         vni                    = vni.vni
-        route_distinguisher    = try(vni.route_distinguisher, local.defaults.nxos.devices.configuration.evpn.vnis.route_distinguisher, null)
+        rd                     = try(vni.rd, local.defaults.nxos.devices.configuration.evpn.vnis.rd, null)
         route_target_both_auto = try(vni.route_target_both_auto, local.defaults.nxos.devices.configuration.evpn.vnis.route_target_both_auto, false)
         route_target_imports   = try(vni.route_target_both_auto, local.defaults.nxos.devices.configuration.evpn.vnis.route_target_both_auto, false) ? concat(["auto"], try(vni.route_target_imports, local.defaults.nxos.devices.configuration.evpn.vnis.route_target_imports, [])) : try(vni.route_target_imports, local.defaults.nxos.devices.configuration.evpn.vnis.route_target_imports, [])
         route_target_exports   = try(vni.route_target_both_auto, local.defaults.nxos.devices.configuration.evpn.vnis.route_target_both_auto, false) ? concat(["auto"], try(vni.route_target_exports, local.defaults.nxos.devices.configuration.evpn.vnis.route_target_exports, [])) : try(vni.route_target_exports, local.defaults.nxos.devices.configuration.evpn.vnis.route_target_exports, [])
@@ -17,11 +17,11 @@ locals {
 
   evpn_vnis_rd = [
     for vni in local.evpn_vnis : merge(vni, {
-      rd_none = vni.route_distinguisher == null ? true : false
-      rd_auto = vni.route_distinguisher == "auto" ? true : false
-      rd_ipv4 = can(regex("\\.", vni.route_distinguisher)) ? true : false
-      rd_as2  = !can(regex("\\.", vni.route_distinguisher)) && can(regex(":", vni.route_distinguisher)) ? (tonumber(split(":", vni.route_distinguisher)[0]) <= 65535 ? true : false) : false
-      rd_as4  = !can(regex("\\.", vni.route_distinguisher)) && can(regex(":", vni.route_distinguisher)) ? (tonumber(split(":", vni.route_distinguisher)[0]) >= 65536 ? true : false) : false
+      rd_none = vni.rd == null ? true : false
+      rd_auto = vni.rd == "auto" ? true : false
+      rd_ipv4 = can(regex("\\.", vni.rd)) ? true : false
+      rd_as2  = !can(regex("\\.", vni.rd)) && can(regex(":", vni.rd)) ? (tonumber(split(":", vni.rd)[0]) <= 65535 ? true : false) : false
+      rd_as4  = !can(regex("\\.", vni.rd)) && can(regex(":", vni.rd)) ? (tonumber(split(":", vni.rd)[0]) >= 65536 ? true : false) : false
     })
   ]
 
@@ -29,9 +29,9 @@ locals {
     for vni in local.evpn_vnis_rd : merge(vni, {
       rd_dme_format = vni.rd_none ? "unknown:unknown:0:0" : (
         vni.rd_auto ? "rd:unknown:0:0" : (
-          vni.rd_ipv4 ? "rd:ipv4-nn2:${vni.route_distinguisher}" : (
-            vni.rd_as2 ? "rd:as2-nn2:${vni.route_distinguisher}" : (
-              vni.rd_as4 ? "rd:as4-nn2:${vni.route_distinguisher}" : "unexpected_rd_format"
+          vni.rd_ipv4 ? "rd:ipv4-nn2:${vni.rd}" : (
+            vni.rd_as2 ? "rd:as2-nn2:${vni.rd}" : (
+              vni.rd_as4 ? "rd:as4-nn2:${vni.rd}" : "unexpected_rd_format"
       ))))
     })
   ]
