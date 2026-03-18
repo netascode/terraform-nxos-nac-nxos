@@ -6,7 +6,7 @@ locals {
         device                                  = device.name
         id                                      = int.id
         type                                    = "lo"
-        shutdown                                = try(int.shutdown, local.defaults.nxos.devices.configuration.interfaces.loopbacks.shutdown, false)
+        admin_state                             = try(int.shutdown, local.defaults.nxos.devices.configuration.interfaces.loopbacks.shutdown, false)
         description                             = try(int.description, local.defaults.nxos.devices.configuration.interfaces.loopbacks.description, null)
         vrf                                     = try(int.vrf, local.defaults.nxos.devices.configuration.interfaces.loopbacks.vrf, "default")
         ip_address                              = try(int.ip_address, local.defaults.nxos.devices.configuration.interfaces.loopbacks.ip_address, null)

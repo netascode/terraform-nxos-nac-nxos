@@ -7,7 +7,7 @@ locals {
         id                                      = int.id
         type                                    = "eth"
         access_vlan                             = try(int.access_vlan, local.defaults.nxos.devices.configuration.interfaces.ethernets.access_vlan, 1)
-        shutdown                                = try(int.shutdown, local.defaults.nxos.devices.configuration.interfaces.ethernets.shutdown, false)
+        admin_state                             = try(int.shutdown, local.defaults.nxos.devices.configuration.interfaces.ethernets.shutdown, false)
         auto_negotiation                        = try(int.auto_negotiation, local.defaults.nxos.devices.configuration.interfaces.ethernets.auto_negotiation, null)
         bandwidth                               = try(int.bandwidth, local.defaults.nxos.devices.configuration.interfaces.ethernets.bandwidth, null)
         delay                                   = try(int.delay, local.defaults.nxos.devices.configuration.interfaces.ethernets.delay, null)
