@@ -21,7 +21,7 @@ locals {
         vrf                                      = try(int.vrf, local.defaults.nxos.devices.configuration.interfaces.ethernets.vrf, "default")
         id                                       = "eth${int.id}"
         ipv6_address_autoconfig                  = try(int.ipv6_address_autoconfig, local.defaults.nxos.devices.configuration.interfaces.ethernets.ipv6_address_autoconfig, null)
-        ipv6_default_route                       = try(int.ipv6_default_route, local.defaults.nxos.devices.configuration.interfaces.ethernets.ipv6_default_route, null)
+        ipv6_nd_default_route                    = try(int.ipv6_nd_default_route, local.defaults.nxos.devices.configuration.interfaces.ethernets.ipv6_nd_default_route, null)
         ipv6_forward                             = try(int.ipv6_forward, local.defaults.nxos.devices.configuration.interfaces.ethernets.ipv6_forward, null)
         ipv6_address_use_link_local_only_bia     = try(int.ipv6_address_use_link_local_only_bia, local.defaults.nxos.devices.configuration.interfaces.ethernets.ipv6_address_use_link_local_only_bia, null)
         ipv6_address_use_link_local_only         = try(int.ipv6_address_use_link_local_only, local.defaults.nxos.devices.configuration.interfaces.ethernets.ipv6_address_use_link_local_only, null)
@@ -36,7 +36,7 @@ locals {
         vrf                                      = try(int.vrf, local.defaults.nxos.devices.configuration.interfaces.loopbacks.vrf, "default")
         id                                       = "lo${int.id}"
         ipv6_address_autoconfig                  = try(int.ipv6_address_autoconfig, local.defaults.nxos.devices.configuration.interfaces.loopbacks.ipv6_address_autoconfig, null)
-        ipv6_default_route                       = try(int.ipv6_default_route, local.defaults.nxos.devices.configuration.interfaces.loopbacks.ipv6_default_route, null)
+        ipv6_nd_default_route                    = try(int.ipv6_nd_default_route, local.defaults.nxos.devices.configuration.interfaces.loopbacks.ipv6_nd_default_route, null)
         ipv6_forward                             = try(int.ipv6_forward, local.defaults.nxos.devices.configuration.interfaces.loopbacks.ipv6_forward, null)
         ipv6_address_use_link_local_only_bia     = try(int.ipv6_address_use_link_local_only_bia, local.defaults.nxos.devices.configuration.interfaces.loopbacks.ipv6_address_use_link_local_only_bia, null)
         ipv6_address_use_link_local_only         = try(int.ipv6_address_use_link_local_only, local.defaults.nxos.devices.configuration.interfaces.loopbacks.ipv6_address_use_link_local_only, null)
@@ -50,7 +50,7 @@ locals {
         vrf                                      = try(int.vrf, local.defaults.nxos.devices.configuration.interfaces.vlans.vrf, "default")
         id                                       = "vlan${int.id}"
         ipv6_address_autoconfig                  = try(int.ipv6_address_autoconfig, local.defaults.nxos.devices.configuration.interfaces.vlans.ipv6_address_autoconfig, null)
-        ipv6_default_route                       = try(int.ipv6_default_route, local.defaults.nxos.devices.configuration.interfaces.vlans.ipv6_default_route, null)
+        ipv6_nd_default_route                    = try(int.ipv6_nd_default_route, local.defaults.nxos.devices.configuration.interfaces.vlans.ipv6_nd_default_route, null)
         ipv6_forward                             = try(int.ipv6_forward, local.defaults.nxos.devices.configuration.interfaces.vlans.ipv6_forward, null)
         ipv6_address_use_link_local_only_bia     = try(int.ipv6_address_use_link_local_only_bia, local.defaults.nxos.devices.configuration.interfaces.vlans.ipv6_address_use_link_local_only_bia, null)
         ipv6_address_use_link_local_only         = try(int.ipv6_address_use_link_local_only, local.defaults.nxos.devices.configuration.interfaces.vlans.ipv6_address_use_link_local_only, null)
@@ -64,7 +64,7 @@ locals {
         vrf                                      = try(int.vrf, local.defaults.nxos.devices.configuration.interfaces.port_channels.vrf, "default")
         id                                       = "po${int.id}"
         ipv6_address_autoconfig                  = try(int.ipv6_address_autoconfig, local.defaults.nxos.devices.configuration.interfaces.port_channels.ipv6_address_autoconfig, null)
-        ipv6_default_route                       = try(int.ipv6_default_route, local.defaults.nxos.devices.configuration.interfaces.port_channels.ipv6_default_route, null)
+        ipv6_nd_default_route                    = try(int.ipv6_nd_default_route, local.defaults.nxos.devices.configuration.interfaces.port_channels.ipv6_nd_default_route, null)
         ipv6_forward                             = try(int.ipv6_forward, local.defaults.nxos.devices.configuration.interfaces.port_channels.ipv6_forward, null)
         ipv6_address_use_link_local_only_bia     = try(int.ipv6_address_use_link_local_only_bia, local.defaults.nxos.devices.configuration.interfaces.port_channels.ipv6_address_use_link_local_only_bia, null)
         ipv6_address_use_link_local_only         = try(int.ipv6_address_use_link_local_only, local.defaults.nxos.devices.configuration.interfaces.port_channels.ipv6_address_use_link_local_only, null)
@@ -115,7 +115,7 @@ resource "nxos_ipv6" "ipv6" {
 
         interfaces = { for int in local.ipv6_interfaces : int.id => {
           auto_configuration                     = int.ipv6_address_autoconfig != null ? (int.ipv6_address_autoconfig ? "enabled" : "disabled") : null
-          default_route                          = int.ipv6_default_route != null ? (int.ipv6_default_route ? "enabled" : "disabled") : null
+          default_route                          = int.ipv6_nd_default_route != null ? (int.ipv6_nd_default_route ? "enabled" : "disabled") : null
           forward                                = int.ipv6_forward != null ? (int.ipv6_forward ? "enabled" : "disabled") : null
           link_local_address_use_bia             = int.ipv6_address_use_link_local_only_bia != null ? (int.ipv6_address_use_link_local_only_bia ? "enabled" : "disabled") : null
           use_link_local_address                 = int.ipv6_address_use_link_local_only != null ? (int.ipv6_address_use_link_local_only ? "enabled" : "disabled") : null
@@ -147,7 +147,7 @@ resource "nxos_ipv6" "ipv6" {
 
       interfaces = { for int in local.ipv6_interfaces : int.id => {
         auto_configuration                     = int.ipv6_address_autoconfig != null ? (int.ipv6_address_autoconfig ? "enabled" : "disabled") : null
-        default_route                          = int.ipv6_default_route != null ? (int.ipv6_default_route ? "enabled" : "disabled") : null
+        default_route                          = int.ipv6_nd_default_route != null ? (int.ipv6_nd_default_route ? "enabled" : "disabled") : null
         forward                                = int.ipv6_forward != null ? (int.ipv6_forward ? "enabled" : "disabled") : null
         link_local_address_use_bia             = int.ipv6_address_use_link_local_only_bia != null ? (int.ipv6_address_use_link_local_only_bia ? "enabled" : "disabled") : null
         use_link_local_address                 = int.ipv6_address_use_link_local_only != null ? (int.ipv6_address_use_link_local_only ? "enabled" : "disabled") : null
