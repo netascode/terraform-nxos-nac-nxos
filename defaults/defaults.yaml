@@ -37,6 +37,6 @@ defaults:
               to_range: 0
           route_maps:
             entries:
-              additive: false
-              no_community: false
-              set_criteria: none
+              set_community_additive: false
+              set_community_none: false
+              set_community_criteria: none
