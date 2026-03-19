@@ -7,10 +7,8 @@ locals {
         interface_id         = "eth${int.id}"
         bfd                  = try(int.pim.bfd_instance, local.defaults.nxos.devices.configuration.interfaces.ethernets.pim.bfd_instance, null)
         dr_priority          = try(int.pim.dr_priority, local.defaults.nxos.devices.configuration.interfaces.ethernets.pim.dr_priority, null)
-        passive              = try(int.pim.passive, local.defaults.nxos.devices.configuration.interfaces.ethernets.pim.passive, null)
         sparse_mode          = try(int.pim.sparse_mode, local.defaults.nxos.devices.configuration.interfaces.ethernets.pim.sparse_mode, null)
         border               = try(int.pim.border, local.defaults.nxos.devices.configuration.interfaces.ethernets.pim.border, null)
-        border_router        = try(int.pim.border_router, local.defaults.nxos.devices.configuration.interfaces.ethernets.pim.border_router, null)
         dr_delay             = try(int.pim.dr_delay, local.defaults.nxos.devices.configuration.interfaces.ethernets.pim.dr_delay, null)
         join_prune_route_map = try(int.pim.jp_policy, local.defaults.nxos.devices.configuration.interfaces.ethernets.pim.jp_policy, null)
         neighbor_route_map   = try(int.pim.neighbor_policy, local.defaults.nxos.devices.configuration.interfaces.ethernets.pim.neighbor_policy, null)
@@ -23,10 +21,8 @@ locals {
         interface_id         = "po${int.id}"
         bfd                  = try(int.pim.bfd_instance, local.defaults.nxos.devices.configuration.interfaces.port_channels.pim.bfd_instance, null)
         dr_priority          = try(int.pim.dr_priority, local.defaults.nxos.devices.configuration.interfaces.port_channels.pim.dr_priority, null)
-        passive              = try(int.pim.passive, local.defaults.nxos.devices.configuration.interfaces.port_channels.pim.passive, null)
         sparse_mode          = try(int.pim.sparse_mode, local.defaults.nxos.devices.configuration.interfaces.port_channels.pim.sparse_mode, null)
         border               = try(int.pim.border, local.defaults.nxos.devices.configuration.interfaces.port_channels.pim.border, null)
-        border_router        = try(int.pim.border_router, local.defaults.nxos.devices.configuration.interfaces.port_channels.pim.border_router, null)
         dr_delay             = try(int.pim.dr_delay, local.defaults.nxos.devices.configuration.interfaces.port_channels.pim.dr_delay, null)
         join_prune_route_map = try(int.pim.jp_policy, local.defaults.nxos.devices.configuration.interfaces.port_channels.pim.jp_policy, null)
         neighbor_route_map   = try(int.pim.neighbor_policy, local.defaults.nxos.devices.configuration.interfaces.port_channels.pim.neighbor_policy, null)
@@ -39,10 +35,8 @@ locals {
         interface_id         = "lo${int.id}"
         bfd                  = try(int.pim.bfd_instance, local.defaults.nxos.devices.configuration.interfaces.loopbacks.pim.bfd_instance, null)
         dr_priority          = try(int.pim.dr_priority, local.defaults.nxos.devices.configuration.interfaces.loopbacks.pim.dr_priority, null)
-        passive              = try(int.pim.passive, local.defaults.nxos.devices.configuration.interfaces.loopbacks.pim.passive, null)
         sparse_mode          = try(int.pim.sparse_mode, local.defaults.nxos.devices.configuration.interfaces.loopbacks.pim.sparse_mode, null)
         border               = try(int.pim.border, local.defaults.nxos.devices.configuration.interfaces.loopbacks.pim.border, null)
-        border_router        = try(int.pim.border_router, local.defaults.nxos.devices.configuration.interfaces.loopbacks.pim.border_router, null)
         dr_delay             = try(int.pim.dr_delay, local.defaults.nxos.devices.configuration.interfaces.loopbacks.pim.dr_delay, null)
         join_prune_route_map = try(int.pim.jp_policy, local.defaults.nxos.devices.configuration.interfaces.loopbacks.pim.jp_policy, null)
         neighbor_route_map   = try(int.pim.neighbor_policy, local.defaults.nxos.devices.configuration.interfaces.loopbacks.pim.neighbor_policy, null)
@@ -55,10 +49,8 @@ locals {
         interface_id         = "vlan${int.id}"
         bfd                  = try(int.pim.bfd_instance, local.defaults.nxos.devices.configuration.interfaces.vlans.pim.bfd_instance, null)
         dr_priority          = try(int.pim.dr_priority, local.defaults.nxos.devices.configuration.interfaces.vlans.pim.dr_priority, null)
-        passive              = try(int.pim.passive, local.defaults.nxos.devices.configuration.interfaces.vlans.pim.passive, null)
         sparse_mode          = try(int.pim.sparse_mode, local.defaults.nxos.devices.configuration.interfaces.vlans.pim.sparse_mode, null)
         border               = try(int.pim.border, local.defaults.nxos.devices.configuration.interfaces.vlans.pim.border, null)
-        border_router        = try(int.pim.border_router, local.defaults.nxos.devices.configuration.interfaces.vlans.pim.border_router, null)
         dr_delay             = try(int.pim.dr_delay, local.defaults.nxos.devices.configuration.interfaces.vlans.pim.dr_delay, null)
         join_prune_route_map = try(int.pim.jp_policy, local.defaults.nxos.devices.configuration.interfaces.vlans.pim.jp_policy, null)
         neighbor_route_map   = try(int.pim.neighbor_policy, local.defaults.nxos.devices.configuration.interfaces.vlans.pim.neighbor_policy, null)
@@ -76,26 +68,20 @@ resource "nxos_pim" "pim" {
   for_each = { for device in local.devices : device.name => device
     if try(local.device_config[device.name].routing.pim, null) != null ||
   length([for int in local.pim_interfaces : int if int.device == device.name]) > 0 }
-  device                         = each.key
-  admin_state                    = "enabled"
-  instance_admin_state           = "enabled"
-  evpn_border_leaf               = try(local.device_config[each.key].routing.pim.evpn_border_leaf, local.defaults.nxos.devices.configuration.routing.pim.evpn_border_leaf, null)
-  extra_net                      = try(local.device_config[each.key].routing.pim.extranet, local.defaults.nxos.devices.configuration.routing.pim.extranet, null)
-  join_prune_delay               = try(local.device_config[each.key].routing.pim.jp_delay, local.defaults.nxos.devices.configuration.routing.pim.jp_delay, null)
-  null_register_delay            = try(local.device_config[each.key].routing.pim.null_register_delay, local.defaults.nxos.devices.configuration.routing.pim.null_register_delay, null)
-  null_register_number_of_routes = try(local.device_config[each.key].routing.pim.null_register_number_of_routes, local.defaults.nxos.devices.configuration.routing.pim.null_register_number_of_routes, null)
-  register_stop                  = try(local.device_config[each.key].routing.pim.register_stop, local.defaults.nxos.devices.configuration.routing.pim.register_stop, null)
+  device               = each.key
+  admin_state          = "enabled"
+  instance_admin_state = "enabled"
+  evpn_border_leaf     = try(local.device_config[each.key].routing.pim.evpn_border_leaf, local.defaults.nxos.devices.configuration.routing.pim.evpn_border_leaf, null)
+  extra_net            = try(local.device_config[each.key].routing.pim.extranet, local.defaults.nxos.devices.configuration.routing.pim.extranet, null)
+  join_prune_delay     = try(local.device_config[each.key].routing.pim.jp_delay, local.defaults.nxos.devices.configuration.routing.pim.jp_delay, null)
 
   vrfs = merge(
     { for vrf in try(local.device_config[each.key].routing.pim.vrfs, []) : vrf.vrf => {
       bfd                  = try(vrf.bfd, local.defaults.nxos.devices.configuration.routing.pim.vrfs.bfd, null)
-      auto_enable          = try(vrf.auto_enable, local.defaults.nxos.devices.configuration.routing.pim.vrfs.auto_enable, null)
       flush_routes         = try(vrf.flush_routes, local.defaults.nxos.devices.configuration.routing.pim.vrfs.flush_routes, null)
       join_prune_delay     = try(vrf.jp_delay, local.defaults.nxos.devices.configuration.routing.pim.vrfs.jp_delay, null)
       log_neighbor_changes = try(vrf.log_neighbor_changes, local.defaults.nxos.devices.configuration.routing.pim.vrfs.log_neighbor_changes, null)
-      mtu                  = try(vrf.mtu, local.defaults.nxos.devices.configuration.routing.pim.vrfs.mtu, null)
       register_rate_limit  = try(vrf.register_rate_limit, local.defaults.nxos.devices.configuration.routing.pim.vrfs.register_rate_limit, null)
-      rfc_strict           = try(vrf.rfc_strict, local.defaults.nxos.devices.configuration.routing.pim.vrfs.rfc_strict, null)
       spt_switch_graceful  = try(vrf.spt_switch_graceful, local.defaults.nxos.devices.configuration.routing.pim.vrfs.spt_switch_graceful, null)
 
       ssm_range_group_list_1 = try(vrf.ssm.range_1, local.defaults.nxos.devices.configuration.routing.pim.vrfs.ssm.range_1, null)
@@ -125,28 +111,22 @@ resource "nxos_pim" "pim" {
       interfaces = { for int in try(local.pim_interfaces_by_device_vrf["${each.key}/${vrf.vrf}"], []) : int.interface_id => {
         bfd                  = int.bfd
         dr_priority          = int.dr_priority
-        passive              = int.passive
         sparse_mode          = int.sparse_mode
         border               = int.border
-        border_router        = int.border_router
         dr_delay             = int.dr_delay
         join_prune_route_map = int.join_prune_route_map
         neighbor_route_map   = int.neighbor_route_map
         neighbor_prefix_list = int.neighbor_prefix_list
-        rfc_strict           = int.rfc_strict
       } }
     } },
     # Create VRF entries for PIM interfaces that belong to VRFs not explicitly listed in routing.pim.vrfs
     { for vrf_key, ints in local.pim_interfaces_by_device_vrf :
       split("/", vrf_key)[1] => {
         bfd                  = null
-        auto_enable          = null
         flush_routes         = null
         join_prune_delay     = null
         log_neighbor_changes = null
-        mtu                  = null
         register_rate_limit  = null
-        rfc_strict           = null
         spt_switch_graceful  = null
 
         ssm_range_group_list_1 = null
@@ -167,15 +147,12 @@ resource "nxos_pim" "pim" {
         interfaces = { for int in ints : int.interface_id => {
           bfd                  = int.bfd
           dr_priority          = int.dr_priority
-          passive              = int.passive
           sparse_mode          = int.sparse_mode
           border               = int.border
-          border_router        = int.border_router
           dr_delay             = int.dr_delay
           join_prune_route_map = int.join_prune_route_map
           neighbor_route_map   = int.neighbor_route_map
           neighbor_prefix_list = int.neighbor_prefix_list
-          rfc_strict           = int.rfc_strict
         } }
       }
       if split("/", vrf_key)[0] == each.key &&
