@@ -102,17 +102,14 @@ resource "nxos_ipv6" "ipv6" {
     {
       "default" = {
         static_routes = { for route in try(local.ipv6_static_routes_by_device_vrf["${each.key}/default"], []) : route.route.prefix => {
-          description = try(route.route.description, local.defaults.nxos.devices.configuration.routing.ipv6_static_routes.description, null)
-          preference  = try(route.route.preference, local.defaults.nxos.devices.configuration.routing.ipv6_static_routes.preference, null)
-          tag         = try(route.route.tag, local.defaults.nxos.devices.configuration.routing.ipv6_static_routes.tag, null)
+          preference = try(route.route.preference, local.defaults.nxos.devices.configuration.routing.ipv6_static_routes.preference, null)
+          tag        = try(route.route.tag, local.defaults.nxos.devices.configuration.routing.ipv6_static_routes.tag, null)
 
           next_hops = { for nh in try(route.route.next_hops, []) : "${try(nh.interface, local.defaults.nxos.devices.configuration.routing.ipv6_static_routes.next_hops.interface, "unspecified")};${try(nh.address, local.defaults.nxos.devices.configuration.routing.ipv6_static_routes.next_hops.address, "::")};${try(nh.vrf, local.defaults.nxos.devices.configuration.routing.ipv6_static_routes.next_hops.vrf, "default")}" => {
-            description           = try(nh.description, local.defaults.nxos.devices.configuration.routing.ipv6_static_routes.next_hops.description, null)
-            object                = try(nh.track, local.defaults.nxos.devices.configuration.routing.ipv6_static_routes.next_hops.track, null)
-            preference            = try(nh.preference, local.defaults.nxos.devices.configuration.routing.ipv6_static_routes.next_hops.preference, null)
-            tag                   = try(nh.tag, local.defaults.nxos.devices.configuration.routing.ipv6_static_routes.next_hops.tag, null)
-            name                  = try(nh.name, local.defaults.nxos.devices.configuration.routing.ipv6_static_routes.next_hops.name, null)
-            rewrite_encapsulation = try(nh.rewrite_encapsulation, local.defaults.nxos.devices.configuration.routing.ipv6_static_routes.next_hops.rewrite_encapsulation, null)
+            object     = try(nh.track, local.defaults.nxos.devices.configuration.routing.ipv6_static_routes.next_hops.track, null)
+            preference = try(nh.preference, local.defaults.nxos.devices.configuration.routing.ipv6_static_routes.next_hops.preference, null)
+            tag        = try(nh.tag, local.defaults.nxos.devices.configuration.routing.ipv6_static_routes.next_hops.tag, null)
+            name       = try(nh.name, local.defaults.nxos.devices.configuration.routing.ipv6_static_routes.next_hops.name, null)
           } }
         } }
 
@@ -137,17 +134,14 @@ resource "nxos_ipv6" "ipv6" {
     # VRFs from configuration.vrfs[]
     { for vrf in try(local.device_config[each.key].vrfs, []) : vrf.name => {
       static_routes = { for route in try(local.ipv6_static_routes_by_device_vrf["${each.key}/${vrf.name}"], []) : route.route.prefix => {
-        description = try(route.route.description, local.defaults.nxos.devices.configuration.routing.ipv6_static_routes.description, null)
-        preference  = try(route.route.preference, local.defaults.nxos.devices.configuration.routing.ipv6_static_routes.preference, null)
-        tag         = try(route.route.tag, local.defaults.nxos.devices.configuration.routing.ipv6_static_routes.tag, null)
+        preference = try(route.route.preference, local.defaults.nxos.devices.configuration.routing.ipv6_static_routes.preference, null)
+        tag        = try(route.route.tag, local.defaults.nxos.devices.configuration.routing.ipv6_static_routes.tag, null)
 
         next_hops = { for nh in try(route.route.next_hops, []) : "${try(nh.interface, local.defaults.nxos.devices.configuration.routing.ipv6_static_routes.next_hops.interface, "unspecified")};${try(nh.address, local.defaults.nxos.devices.configuration.routing.ipv6_static_routes.next_hops.address, "::")};${try(nh.vrf, local.defaults.nxos.devices.configuration.routing.ipv6_static_routes.next_hops.vrf, "default")}" => {
-          description           = try(nh.description, local.defaults.nxos.devices.configuration.routing.ipv6_static_routes.next_hops.description, null)
-          object                = try(nh.track, local.defaults.nxos.devices.configuration.routing.ipv6_static_routes.next_hops.track, null)
-          preference            = try(nh.preference, local.defaults.nxos.devices.configuration.routing.ipv6_static_routes.next_hops.preference, null)
-          tag                   = try(nh.tag, local.defaults.nxos.devices.configuration.routing.ipv6_static_routes.next_hops.tag, null)
-          name                  = try(nh.name, local.defaults.nxos.devices.configuration.routing.ipv6_static_routes.next_hops.name, null)
-          rewrite_encapsulation = try(nh.rewrite_encapsulation, local.defaults.nxos.devices.configuration.routing.ipv6_static_routes.next_hops.rewrite_encapsulation, null)
+          object     = try(nh.track, local.defaults.nxos.devices.configuration.routing.ipv6_static_routes.next_hops.track, null)
+          preference = try(nh.preference, local.defaults.nxos.devices.configuration.routing.ipv6_static_routes.next_hops.preference, null)
+          tag        = try(nh.tag, local.defaults.nxos.devices.configuration.routing.ipv6_static_routes.next_hops.tag, null)
+          name       = try(nh.name, local.defaults.nxos.devices.configuration.routing.ipv6_static_routes.next_hops.name, null)
         } }
       } }
 
