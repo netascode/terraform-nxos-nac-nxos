@@ -17,7 +17,7 @@ locals {
         switchport                              = !try(int.switchport, local.defaults.nxos.devices.configuration.interfaces.ethernets.switchport, true)
         link_debounce_time                      = try(int.link_debounce_time, local.defaults.nxos.devices.configuration.interfaces.ethernets.link_debounce_time, null)
         link_debounce_link_up                   = try(int.link_debounce_link_up, local.defaults.nxos.devices.configuration.interfaces.ethernets.link_debounce_link_up, null)
-        logging_event_link_status               = try(int.logging_event_link_status, local.defaults.nxos.devices.configuration.interfaces.ethernets.logging_event_link_status, null)
+        logging_event_port_link_status          = try(int.logging_event_port_link_status, local.defaults.nxos.devices.configuration.interfaces.ethernets.logging_event_port_link_status, null)
         medium                                  = try(int.medium, local.defaults.nxos.devices.configuration.interfaces.ethernets.medium, null)
         mode                                    = try(int.switchport_mode, local.defaults.nxos.devices.configuration.interfaces.ethernets.switchport_mode, null)
         mtu                                     = try(int.mtu, local.defaults.nxos.devices.configuration.interfaces.ethernets.mtu, null)
@@ -143,7 +143,7 @@ resource "nxos_physical_interface" "physical_interface" {
     link_flap_err_disable              = try(int.link_flap_err_disable, local.defaults.nxos.devices.configuration.interfaces.ethernets.link_flap_err_disable, null) != null ? (try(int.link_flap_err_disable, local.defaults.nxos.devices.configuration.interfaces.ethernets.link_flap_err_disable) ? "enable" : "disable") : null
     link_flap_err_disable_max          = try(int.link_flap_err_disable_max, local.defaults.nxos.devices.configuration.interfaces.ethernets.link_flap_err_disable_max, null)
     link_flap_err_disable_interval     = try(int.link_flap_err_disable_interval, local.defaults.nxos.devices.configuration.interfaces.ethernets.link_flap_err_disable_interval, null)
-    logging_event_port_link_status     = try(int.logging_event_link_status, local.defaults.nxos.devices.configuration.interfaces.ethernets.logging_event_link_status, null) != null ? (try(int.logging_event_link_status, local.defaults.nxos.devices.configuration.interfaces.ethernets.logging_event_link_status) ? "enable" : "disable") : null
+    logging_event_port_link_status     = try(int.logging_event_port_link_status, local.defaults.nxos.devices.configuration.interfaces.ethernets.logging_event_port_link_status, null) != null ? (try(int.logging_event_port_link_status, local.defaults.nxos.devices.configuration.interfaces.ethernets.logging_event_port_link_status) ? "enable" : "disable") : null
     loopback                           = try(int.loopback, local.defaults.nxos.devices.configuration.interfaces.ethernets.loopback, null) != null ? (try(int.loopback, local.defaults.nxos.devices.configuration.interfaces.ethernets.loopback) ? "enable" : "disable") : null
     link_mac_up_timer                  = try(int.link_mac_up_timer, local.defaults.nxos.devices.configuration.interfaces.ethernets.link_mac_up_timer, null)
     link_max_bring_up_timer            = try(int.link_max_bring_up_timer, local.defaults.nxos.devices.configuration.interfaces.ethernets.link_max_bring_up_timer, null)

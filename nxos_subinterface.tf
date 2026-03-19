@@ -12,7 +12,7 @@ resource "nxos_subinterface" "subinterface" {
       delay                          = try(sub.delay, local.defaults.nxos.devices.configuration.interfaces.ethernets.subinterfaces.delay, null)
       description                    = try(sub.description, local.defaults.nxos.devices.configuration.interfaces.ethernets.subinterfaces.description, null)
       encap                          = try(sub.encapsulation, local.defaults.nxos.devices.configuration.interfaces.ethernets.subinterfaces.encapsulation, null)
-      logging_event_port_link_status = try(sub.logging_event_link_status, local.defaults.nxos.devices.configuration.interfaces.ethernets.subinterfaces.logging_event_link_status, null) != null ? (try(sub.logging_event_link_status, local.defaults.nxos.devices.configuration.interfaces.ethernets.subinterfaces.logging_event_link_status) ? "enable" : "disable") : null
+      logging_event_port_link_status = try(sub.logging_event_port_link_status, local.defaults.nxos.devices.configuration.interfaces.ethernets.subinterfaces.logging_event_port_link_status, null) != null ? (try(sub.logging_event_port_link_status, local.defaults.nxos.devices.configuration.interfaces.ethernets.subinterfaces.logging_event_port_link_status) ? "enable" : "disable") : null
       medium                         = try(sub.medium, local.defaults.nxos.devices.configuration.interfaces.ethernets.subinterfaces.medium, null)
       mtu                            = try(sub.mtu, local.defaults.nxos.devices.configuration.interfaces.ethernets.subinterfaces.mtu, null)
       mtu_inherit                    = try(sub.mtu_inherit, local.defaults.nxos.devices.configuration.interfaces.ethernets.subinterfaces.mtu_inherit, null)
@@ -28,7 +28,7 @@ resource "nxos_subinterface" "subinterface" {
       delay                          = try(sub.delay, local.defaults.nxos.devices.configuration.interfaces.port_channels.subinterfaces.delay, null)
       description                    = try(sub.description, local.defaults.nxos.devices.configuration.interfaces.port_channels.subinterfaces.description, null)
       encap                          = try(sub.encapsulation, local.defaults.nxos.devices.configuration.interfaces.port_channels.subinterfaces.encapsulation, null)
-      logging_event_port_link_status = try(sub.logging_event_link_status, local.defaults.nxos.devices.configuration.interfaces.port_channels.subinterfaces.logging_event_link_status, null) != null ? (try(sub.logging_event_link_status, local.defaults.nxos.devices.configuration.interfaces.port_channels.subinterfaces.logging_event_link_status) ? "enable" : "disable") : null
+      logging_event_port_link_status = try(sub.logging_event_port_link_status, local.defaults.nxos.devices.configuration.interfaces.port_channels.subinterfaces.logging_event_port_link_status, null) != null ? (try(sub.logging_event_port_link_status, local.defaults.nxos.devices.configuration.interfaces.port_channels.subinterfaces.logging_event_port_link_status) ? "enable" : "disable") : null
       medium                         = try(sub.medium, local.defaults.nxos.devices.configuration.interfaces.port_channels.subinterfaces.medium, null)
       mtu                            = try(sub.mtu, local.defaults.nxos.devices.configuration.interfaces.port_channels.subinterfaces.mtu, null)
       mtu_inherit                    = try(sub.mtu_inherit, local.defaults.nxos.devices.configuration.interfaces.port_channels.subinterfaces.mtu_inherit, null)
