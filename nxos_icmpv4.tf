@@ -27,7 +27,7 @@ locals {
       ],
       [for int in try(local.device_config[device.name].interfaces.vlans, []) : {
         device              = device.name
-        vrf                 = try(int.vrf, local.defaults.nxos.devices.configuration.interfaces.vlans.vrf, "default")
+        vrf                 = try(int.vrf_member, local.defaults.nxos.devices.configuration.interfaces.vlans.vrf_member, "default")
         id                  = "vlan${int.id}"
         ip_redirects        = try(int.ip_redirects, local.defaults.nxos.devices.configuration.interfaces.vlans.ip_redirects, null)
         ip_unreachables     = try(int.ip_unreachables, local.defaults.nxos.devices.configuration.interfaces.vlans.ip_unreachables, null)

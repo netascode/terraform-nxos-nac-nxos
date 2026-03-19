@@ -47,16 +47,16 @@ locals {
       # SVIs
       [for int in try(local.device_config[device.name].interfaces.vlans, []) : {
         device                                   = device.name
-        vrf                                      = try(int.vrf, local.defaults.nxos.devices.configuration.interfaces.vlans.vrf, "default")
+        vrf                                      = try(int.vrf_member, local.defaults.nxos.devices.configuration.interfaces.vlans.vrf_member, "default")
         id                                       = "vlan${int.id}"
         ipv6_address_autoconfig                  = try(int.ipv6_address_autoconfig, local.defaults.nxos.devices.configuration.interfaces.vlans.ipv6_address_autoconfig, null)
         ipv6_default_route                       = try(int.ipv6_default_route, local.defaults.nxos.devices.configuration.interfaces.vlans.ipv6_default_route, null)
         ipv6_forward                             = try(int.ipv6_forward, local.defaults.nxos.devices.configuration.interfaces.vlans.ipv6_forward, null)
-        ipv6_address_use_link_local_only_bia     = try(int.ipv6_address_use_link_local_only_bia, local.defaults.nxos.devices.configuration.interfaces.vlans.ipv6_address_use_link_local_only_bia, null)
+        ipv6_address_use_link_local_only_bia     = try(int.ipv6_address_link_local_use_bia, local.defaults.nxos.devices.configuration.interfaces.vlans.ipv6_address_link_local_use_bia, null)
         ipv6_address_use_link_local_only         = try(int.ipv6_address_use_link_local_only, local.defaults.nxos.devices.configuration.interfaces.vlans.ipv6_address_use_link_local_only, null)
-        ipv6_verify_unicast_source_reachable_via = try(int.ipv6_verify_unicast_source_reachable_via, local.defaults.nxos.devices.configuration.interfaces.vlans.ipv6_verify_unicast_source_reachable_via, null)
-        ipv6_link_local_address                  = try(int.ipv6_link_local_address, local.defaults.nxos.devices.configuration.interfaces.vlans.ipv6_link_local_address, null)
-        ipv6_addresses                           = try(int.ipv6_addresses, [])
+        ipv6_verify_unicast_source_reachable_via = try(int.ipv6_urpf, local.defaults.nxos.devices.configuration.interfaces.vlans.ipv6_urpf, null)
+        ipv6_link_local_address                  = try(int.ipv6_address_link_local, local.defaults.nxos.devices.configuration.interfaces.vlans.ipv6_address_link_local, null)
+        ipv6_addresses                           = try(int.ipv6_address, [])
       }],
       # Port channels (L3 only)
       [for int in try(local.device_config[device.name].interfaces.port_channels, []) : {
