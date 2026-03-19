@@ -27,7 +27,7 @@ locals {
         ip_directed_broadcast                  = try(int.ip_directed_broadcast, local.defaults.nxos.devices.configuration.interfaces.ethernets.ip_directed_broadcast, null)
         ip_directed_broadcast_acl              = try(int.ip_directed_broadcast_acl, local.defaults.nxos.devices.configuration.interfaces.ethernets.ip_directed_broadcast_acl, null)
         ip_address                             = try(int.ip_address, local.defaults.nxos.devices.configuration.interfaces.ethernets.ip_address, null)
-        ip_secondary_addresses                 = try(int.ip_secondary_addresses, [])
+        ip_addresses_secondary                 = try(int.ip_addresses_secondary, [])
         } if !try(int.switchport, local.defaults.nxos.devices.configuration.interfaces.ethernets.switchport, true)
       ],
       # Loopbacks
@@ -42,7 +42,7 @@ locals {
         ip_directed_broadcast                  = null
         ip_directed_broadcast_acl              = null
         ip_address                             = try(int.ip_address, local.defaults.nxos.devices.configuration.interfaces.loopbacks.ip_address, null)
-        ip_secondary_addresses                 = try(int.ip_secondary_addresses, [])
+        ip_addresses_secondary                 = try(int.ip_addresses_secondary, [])
       }],
       # SVIs
       [for int in try(local.device_config[device.name].interfaces.vlans, []) : {
@@ -56,7 +56,7 @@ locals {
         ip_directed_broadcast                  = try(int.ip_directed_broadcast, local.defaults.nxos.devices.configuration.interfaces.vlans.ip_directed_broadcast, null)
         ip_directed_broadcast_acl              = try(int.ip_directed_broadcast_acl, local.defaults.nxos.devices.configuration.interfaces.vlans.ip_directed_broadcast_acl, null)
         ip_address                             = try(int.ip_address, local.defaults.nxos.devices.configuration.interfaces.vlans.ip_address, null)
-        ip_secondary_addresses                 = try(int.ip_secondary_addresses, [])
+        ip_addresses_secondary                 = try(int.ip_addresses_secondary, [])
       }],
       # Port channels (L3 only)
       [for int in try(local.device_config[device.name].interfaces.port_channels, []) : {
@@ -70,7 +70,7 @@ locals {
         ip_directed_broadcast                  = try(int.ip_directed_broadcast, local.defaults.nxos.devices.configuration.interfaces.port_channels.ip_directed_broadcast, null)
         ip_directed_broadcast_acl              = try(int.ip_directed_broadcast_acl, local.defaults.nxos.devices.configuration.interfaces.port_channels.ip_directed_broadcast_acl, null)
         ip_address                             = try(int.ip_address, local.defaults.nxos.devices.configuration.interfaces.port_channels.ip_address, null)
-        ip_secondary_addresses                 = try(int.ip_secondary_addresses, [])
+        ip_addresses_secondary                 = try(int.ip_addresses_secondary, [])
         } if !try(int.switchport, local.defaults.nxos.devices.configuration.interfaces.port_channels.switchport, true)
       ],
     )
@@ -133,7 +133,7 @@ resource "nxos_ipv4" "ipv4" {
 
           addresses = merge(
             int.ip_address != null ? { (int.ip_address) = { type = "primary" } } : {},
-            { for ip in int.ip_secondary_addresses : ip => { type = "secondary" } }
+            { for ip in int.ip_addresses_secondary : ip => { type = "secondary" } }
           )
         } if int.device == each.key && int.vrf == "default" }
       }
@@ -166,7 +166,7 @@ resource "nxos_ipv4" "ipv4" {
 
         addresses = merge(
           int.ip_address != null ? { (int.ip_address) = { type = "primary" } } : {},
-          { for ip in int.ip_secondary_addresses : ip => { type = "secondary" } }
+          { for ip in int.ip_addresses_secondary : ip => { type = "secondary" } }
         )
       } if int.device == each.key && int.vrf == vrf.name }
     } }

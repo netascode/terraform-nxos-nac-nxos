@@ -111,7 +111,7 @@ resource "nxos_port_channel_interface" "port_channel_interface" {
     description                     = try(int.description, local.defaults.nxos.devices.configuration.interfaces.port_channels.description, null)
     duplex                          = try(int.duplex, local.defaults.nxos.devices.configuration.interfaces.port_channels.duplex, null)
     layer                           = !try(int.switchport, local.defaults.nxos.devices.configuration.interfaces.port_channels.switchport, true) ? "Layer3" : "Layer2"
-    logging_event_port_link_status  = try(int.logging_event_port_link_status, local.defaults.nxos.devices.configuration.interfaces.port_channels.logging_event_port_link_status, null) != null ? (try(int.logging_event_port_link_status, local.defaults.nxos.devices.configuration.interfaces.port_channels.logging_event_port_link_status) ? "enable" : "disable") : null
+    logging_event_port_link_status  = try(int.logging_event_link_status, local.defaults.nxos.devices.configuration.interfaces.port_channels.logging_event_link_status, null) != null ? (try(int.logging_event_link_status, local.defaults.nxos.devices.configuration.interfaces.port_channels.logging_event_link_status) ? "enable" : "disable") : null
     medium                          = try(int.medium, local.defaults.nxos.devices.configuration.interfaces.port_channels.medium, null)
     mode                            = try(int.switchport_mode, local.defaults.nxos.devices.configuration.interfaces.port_channels.switchport_mode, null)
     mtu                             = try(int.mtu, local.defaults.nxos.devices.configuration.interfaces.port_channels.mtu, null)
