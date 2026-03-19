@@ -99,41 +99,41 @@ resource "nxos_port_channel_interface" "port_channel_interface" {
   if length(try(local.device_config[device.name].interfaces.port_channels, [])) > 0 }
   device = each.key
   port_channel_interfaces = { for int in try(local.device_config[each.key].interfaces.port_channels, []) : "po${int.id}" => {
-    channel_group_mode              = try([for eth in try(local.device_config[each.key].interfaces.ethernets, []) : try(eth.channel_group_mode, local.defaults.nxos.devices.configuration.interfaces.ethernets.channel_group_mode, null) if try(eth.channel_group, null) == int.id][0], null)
-    minimum_links                   = try(int.lacp_min_links, local.defaults.nxos.devices.configuration.interfaces.port_channels.lacp_min_links, null)
-    maximum_links                   = try(int.lacp_max_bundle, local.defaults.nxos.devices.configuration.interfaces.port_channels.lacp_max_bundle, null)
-    suspend_individual              = try(int.lacp_suspend_individual, local.defaults.nxos.devices.configuration.interfaces.port_channels.lacp_suspend_individual, null) != null ? (try(int.lacp_suspend_individual, local.defaults.nxos.devices.configuration.interfaces.port_channels.lacp_suspend_individual) ? "enable" : "disable") : null
-    switchport_access_vlan          = !try(int.switchport, local.defaults.nxos.devices.configuration.interfaces.port_channels.switchport, true) ? "unknown" : "vlan-${try(int.switchport_access_vlan, local.defaults.nxos.devices.configuration.interfaces.port_channels.switchport_access_vlan, 1)}"
-    admin_state                     = try(int.shutdown, local.defaults.nxos.devices.configuration.interfaces.port_channels.shutdown, false) ? "down" : "up"
-    negotiate_auto                  = try(int.negotiate_auto, local.defaults.nxos.devices.configuration.interfaces.port_channels.negotiate_auto, null)
-    bandwidth                       = try(int.bandwidth, local.defaults.nxos.devices.configuration.interfaces.port_channels.bandwidth, null)
-    delay                           = try(int.delay, local.defaults.nxos.devices.configuration.interfaces.port_channels.delay, null)
-    description                     = try(int.description, local.defaults.nxos.devices.configuration.interfaces.port_channels.description, null)
-    duplex                          = try(int.duplex, local.defaults.nxos.devices.configuration.interfaces.port_channels.duplex, null)
-    layer                           = !try(int.switchport, local.defaults.nxos.devices.configuration.interfaces.port_channels.switchport, true) ? "Layer3" : "Layer2"
-    logging_event_port_link_status  = try(int.logging_event_port_link_status, local.defaults.nxos.devices.configuration.interfaces.port_channels.logging_event_port_link_status, null) != null ? (try(int.logging_event_port_link_status, local.defaults.nxos.devices.configuration.interfaces.port_channels.logging_event_port_link_status) ? "enable" : "disable") : null
-    medium                          = try(int.medium, local.defaults.nxos.devices.configuration.interfaces.port_channels.medium, null)
-    mode                            = try(int.switchport_mode, local.defaults.nxos.devices.configuration.interfaces.port_channels.switchport_mode, null)
-    mtu                             = try(int.mtu, local.defaults.nxos.devices.configuration.interfaces.port_channels.mtu, null)
-    switchport_trunk_native_vlan    = !try(int.switchport, local.defaults.nxos.devices.configuration.interfaces.port_channels.switchport, true) ? "unknown" : "vlan-${try(int.switchport_trunk_native_vlan, local.defaults.nxos.devices.configuration.interfaces.port_channels.switchport_trunk_native_vlan, 1)}"
-    speed                           = try(int.speed, local.defaults.nxos.devices.configuration.interfaces.port_channels.speed, null)
-    switchport_trunk_allowed_vlans  = !try(int.switchport, local.defaults.nxos.devices.configuration.interfaces.port_channels.switchport, true) ? "1-4094" : try(int.switchport_trunk_allowed_vlans, local.defaults.nxos.devices.configuration.interfaces.port_channels.switchport_trunk_allowed_vlans, null)
-    dot1q_ethertype                 = try(int.dot1q_ethertype, local.defaults.nxos.devices.configuration.interfaces.port_channels.dot1q_ethertype, null)
-    graceful_convergence            = try(int.lacp_graceful_convergence, local.defaults.nxos.devices.configuration.interfaces.port_channels.lacp_graceful_convergence, null) != null ? (try(int.lacp_graceful_convergence, local.defaults.nxos.devices.configuration.interfaces.port_channels.lacp_graceful_convergence) ? "enable" : "disable") : null
-    hash_distribution               = try(int.port_channel_hash_distribution, local.defaults.nxos.devices.configuration.interfaces.port_channels.port_channel_hash_distribution, null)
-    itu_channel                     = try(int.itu_channel, local.defaults.nxos.devices.configuration.interfaces.port_channels.itu_channel, null)
-    lacp_delay_mode                 = try(int.lacp_mode_delay, local.defaults.nxos.devices.configuration.interfaces.port_channels.lacp_mode_delay, null) != null ? (try(int.lacp_mode_delay, local.defaults.nxos.devices.configuration.interfaces.port_channels.lacp_mode_delay) ? "enable" : "disable") : null
-    lacp_vpc_convergence            = try(int.lacp_vpc_convergence, local.defaults.nxos.devices.configuration.interfaces.port_channels.lacp_vpc_convergence, null) != null ? (try(int.lacp_vpc_convergence, local.defaults.nxos.devices.configuration.interfaces.port_channels.lacp_vpc_convergence) ? "enable" : "disable") : null
-    link_debounce_time              = try(int.link_debounce_time, local.defaults.nxos.devices.configuration.interfaces.port_channels.link_debounce_time, null)
-    load_defer                      = try(int.port_channel_load_defer, local.defaults.nxos.devices.configuration.interfaces.port_channels.port_channel_load_defer, null) != null ? (try(int.port_channel_load_defer, local.defaults.nxos.devices.configuration.interfaces.port_channels.port_channel_load_defer) ? "enable" : "disable") : null
-    mdix                            = try(int.mdix, local.defaults.nxos.devices.configuration.interfaces.port_channels.mdix, null)
-    router_mac                      = try(int.mac_address, local.defaults.nxos.devices.configuration.interfaces.port_channels.mac_address, null)
-    snmp_trap_state                 = try(int.snmp_trap_link_status, local.defaults.nxos.devices.configuration.interfaces.port_channels.snmp_trap_link_status, null) != null ? (try(int.snmp_trap_link_status, local.defaults.nxos.devices.configuration.interfaces.port_channels.snmp_trap_link_status) ? "enable" : "disable") : null
-    squelch                         = try(int.squelch, local.defaults.nxos.devices.configuration.interfaces.port_channels.squelch, null) != null ? (try(int.squelch, local.defaults.nxos.devices.configuration.interfaces.port_channels.squelch) ? "enable" : "disable") : null
-    transmission_mode               = try(int.switchport_transparent_mode, local.defaults.nxos.devices.configuration.interfaces.port_channels.switchport_transparent_mode, null)
-    logging_event_port_trunk_status = try(int.logging_event_port_trunk_status, local.defaults.nxos.devices.configuration.interfaces.port_channels.logging_event_port_trunk_status, null) != null ? (try(int.logging_event_port_trunk_status, local.defaults.nxos.devices.configuration.interfaces.port_channels.logging_event_port_trunk_status) ? "enable" : "disable") : null
-    user_configured_flags           = "admin_layer,admin_mtu,admin_state"
-    vrf_dn                          = !try(int.switchport, local.defaults.nxos.devices.configuration.interfaces.port_channels.switchport, true) ? "sys/inst-${try(int.vrf, local.defaults.nxos.devices.configuration.interfaces.port_channels.vrf, "default")}" : null
+    channel_group_mode    = try([for eth in try(local.device_config[each.key].interfaces.ethernets, []) : try(eth.channel_group_mode, local.defaults.nxos.devices.configuration.interfaces.ethernets.channel_group_mode, null) if try(eth.channel_group, null) == int.id][0], null)
+    minimum_links         = try(int.lacp_min_links, local.defaults.nxos.devices.configuration.interfaces.port_channels.lacp_min_links, null)
+    maximum_links         = try(int.lacp_max_bundle, local.defaults.nxos.devices.configuration.interfaces.port_channels.lacp_max_bundle, null)
+    suspend_individual    = try(int.lacp_suspend_individual, local.defaults.nxos.devices.configuration.interfaces.port_channels.lacp_suspend_individual, null) != null ? (try(int.lacp_suspend_individual, local.defaults.nxos.devices.configuration.interfaces.port_channels.lacp_suspend_individual) ? "enable" : "disable") : null
+    access_vlan           = !try(int.switchport, local.defaults.nxos.devices.configuration.interfaces.port_channels.switchport, true) ? "unknown" : "vlan-${try(int.switchport_access_vlan, local.defaults.nxos.devices.configuration.interfaces.port_channels.switchport_access_vlan, 1)}"
+    admin_state           = try(int.shutdown, local.defaults.nxos.devices.configuration.interfaces.port_channels.shutdown, false) ? "down" : "up"
+    auto_negotiation      = try(int.negotiate_auto, local.defaults.nxos.devices.configuration.interfaces.port_channels.negotiate_auto, null)
+    bandwidth             = try(int.bandwidth, local.defaults.nxos.devices.configuration.interfaces.port_channels.bandwidth, null)
+    delay                 = try(int.delay, local.defaults.nxos.devices.configuration.interfaces.port_channels.delay, null)
+    description           = try(int.description, local.defaults.nxos.devices.configuration.interfaces.port_channels.description, null)
+    duplex                = try(int.duplex, local.defaults.nxos.devices.configuration.interfaces.port_channels.duplex, null)
+    layer                 = !try(int.switchport, local.defaults.nxos.devices.configuration.interfaces.port_channels.switchport, true) ? "Layer3" : "Layer2"
+    link_logging          = try(int.logging_event_port_link_status, local.defaults.nxos.devices.configuration.interfaces.port_channels.logging_event_port_link_status, null) != null ? (try(int.logging_event_port_link_status, local.defaults.nxos.devices.configuration.interfaces.port_channels.logging_event_port_link_status) ? "enable" : "disable") : null
+    medium                = try(int.medium, local.defaults.nxos.devices.configuration.interfaces.port_channels.medium, null)
+    mode                  = try(int.switchport_mode, local.defaults.nxos.devices.configuration.interfaces.port_channels.switchport_mode, null)
+    mtu                   = try(int.mtu, local.defaults.nxos.devices.configuration.interfaces.port_channels.mtu, null)
+    native_vlan           = !try(int.switchport, local.defaults.nxos.devices.configuration.interfaces.port_channels.switchport, true) ? "unknown" : "vlan-${try(int.switchport_trunk_native_vlan, local.defaults.nxos.devices.configuration.interfaces.port_channels.switchport_trunk_native_vlan, 1)}"
+    speed                 = try(int.speed, local.defaults.nxos.devices.configuration.interfaces.port_channels.speed, null)
+    trunk_vlans           = !try(int.switchport, local.defaults.nxos.devices.configuration.interfaces.port_channels.switchport, true) ? "1-4094" : try(int.switchport_trunk_allowed_vlans, local.defaults.nxos.devices.configuration.interfaces.port_channels.switchport_trunk_allowed_vlans, null)
+    dot1q_ethertype       = try(int.dot1q_ethertype, local.defaults.nxos.devices.configuration.interfaces.port_channels.dot1q_ethertype, null)
+    graceful_convergence  = try(int.lacp_graceful_convergence, local.defaults.nxos.devices.configuration.interfaces.port_channels.lacp_graceful_convergence, null) != null ? (try(int.lacp_graceful_convergence, local.defaults.nxos.devices.configuration.interfaces.port_channels.lacp_graceful_convergence) ? "enable" : "disable") : null
+    hash_distribution     = try(int.port_channel_hash_distribution, local.defaults.nxos.devices.configuration.interfaces.port_channels.port_channel_hash_distribution, null)
+    itu_channel           = try(int.itu_channel, local.defaults.nxos.devices.configuration.interfaces.port_channels.itu_channel, null)
+    lacp_delay_mode       = try(int.lacp_mode_delay, local.defaults.nxos.devices.configuration.interfaces.port_channels.lacp_mode_delay, null) != null ? (try(int.lacp_mode_delay, local.defaults.nxos.devices.configuration.interfaces.port_channels.lacp_mode_delay) ? "enable" : "disable") : null
+    lacp_vpc_convergence  = try(int.lacp_vpc_convergence, local.defaults.nxos.devices.configuration.interfaces.port_channels.lacp_vpc_convergence, null) != null ? (try(int.lacp_vpc_convergence, local.defaults.nxos.devices.configuration.interfaces.port_channels.lacp_vpc_convergence) ? "enable" : "disable") : null
+    link_debounce_down    = try(int.link_debounce_time, local.defaults.nxos.devices.configuration.interfaces.port_channels.link_debounce_time, null)
+    load_defer            = try(int.port_channel_load_defer, local.defaults.nxos.devices.configuration.interfaces.port_channels.port_channel_load_defer, null) != null ? (try(int.port_channel_load_defer, local.defaults.nxos.devices.configuration.interfaces.port_channels.port_channel_load_defer) ? "enable" : "disable") : null
+    mdix                  = try(int.mdix, local.defaults.nxos.devices.configuration.interfaces.port_channels.mdix, null)
+    router_mac            = try(int.mac_address, local.defaults.nxos.devices.configuration.interfaces.port_channels.mac_address, null)
+    snmp_trap_state       = try(int.snmp_trap_link_status, local.defaults.nxos.devices.configuration.interfaces.port_channels.snmp_trap_link_status, null) != null ? (try(int.snmp_trap_link_status, local.defaults.nxos.devices.configuration.interfaces.port_channels.snmp_trap_link_status) ? "enable" : "disable") : null
+    squelch               = try(int.squelch, local.defaults.nxos.devices.configuration.interfaces.port_channels.squelch, null) != null ? (try(int.squelch, local.defaults.nxos.devices.configuration.interfaces.port_channels.squelch) ? "enable" : "disable") : null
+    transmission_mode     = try(int.switchport_transparent_mode, local.defaults.nxos.devices.configuration.interfaces.port_channels.switchport_transparent_mode, null)
+    trunk_logging         = try(int.logging_event_port_trunk_status, local.defaults.nxos.devices.configuration.interfaces.port_channels.logging_event_port_trunk_status, null) != null ? (try(int.logging_event_port_trunk_status, local.defaults.nxos.devices.configuration.interfaces.port_channels.logging_event_port_trunk_status) ? "enable" : "disable") : null
+    user_configured_flags = "admin_layer,admin_mtu,admin_state"
+    vrf_dn                = !try(int.switchport, local.defaults.nxos.devices.configuration.interfaces.port_channels.switchport, true) ? "sys/inst-${try(int.vrf, local.defaults.nxos.devices.configuration.interfaces.port_channels.vrf, "default")}" : null
     members = { for eth in try(local.device_config[each.key].interfaces.ethernets, []) : "sys/intf/phys-[eth${eth.id}]" => {
       force = try(eth.channel_group_force, local.defaults.nxos.devices.configuration.interfaces.ethernets.channel_group_force, false)
     } if try(eth.channel_group, null) == int.id }

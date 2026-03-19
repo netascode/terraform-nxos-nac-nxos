@@ -114,13 +114,13 @@ resource "nxos_ipv6" "ipv6" {
         } }
 
         interfaces = { for int in local.ipv6_interfaces : int.id => {
-          auto_configuration                     = int.ipv6_address_autoconfig != null ? (int.ipv6_address_autoconfig ? "enabled" : "disabled") : null
-          default_route                          = int.ipv6_nd_default_route != null ? (int.ipv6_nd_default_route ? "enabled" : "disabled") : null
-          forward                                = int.ipv6_forward != null ? (int.ipv6_forward ? "enabled" : "disabled") : null
-          link_local_address_use_bia             = int.ipv6_link_local_use_bia != null ? (int.ipv6_link_local_use_bia ? "enabled" : "disabled") : null
-          use_link_local_address                 = int.ipv6_address_use_link_local_only != null ? (int.ipv6_address_use_link_local_only ? "enabled" : "disabled") : null
-          ip_verify_unicast_source_reachable_via = int.ipv6_verify_unicast_source_reachable_via
-          link_local_address                     = int.ipv6_address_link_local
+          auto_configuration         = int.ipv6_address_autoconfig != null ? (int.ipv6_address_autoconfig ? "enabled" : "disabled") : null
+          default_route              = int.ipv6_nd_default_route != null ? (int.ipv6_nd_default_route ? "enabled" : "disabled") : null
+          forward                    = int.ipv6_forward != null ? (int.ipv6_forward ? "enabled" : "disabled") : null
+          link_local_address_use_bia = int.ipv6_link_local_use_bia != null ? (int.ipv6_link_local_use_bia ? "enabled" : "disabled") : null
+          use_link_local_address     = int.ipv6_address_use_link_local_only != null ? (int.ipv6_address_use_link_local_only ? "enabled" : "disabled") : null
+          urpf                       = int.ipv6_verify_unicast_source_reachable_via
+          link_local_address         = int.ipv6_address_link_local
 
           addresses = { for addr in int.ipv6_addresses : addr.address => {
             type       = try(addr.type, null)
@@ -146,13 +146,13 @@ resource "nxos_ipv6" "ipv6" {
       } }
 
       interfaces = { for int in local.ipv6_interfaces : int.id => {
-        auto_configuration                     = int.ipv6_address_autoconfig != null ? (int.ipv6_address_autoconfig ? "enabled" : "disabled") : null
-        default_route                          = int.ipv6_nd_default_route != null ? (int.ipv6_nd_default_route ? "enabled" : "disabled") : null
-        forward                                = int.ipv6_forward != null ? (int.ipv6_forward ? "enabled" : "disabled") : null
-        link_local_address_use_bia             = int.ipv6_link_local_use_bia != null ? (int.ipv6_link_local_use_bia ? "enabled" : "disabled") : null
-        use_link_local_address                 = int.ipv6_address_use_link_local_only != null ? (int.ipv6_address_use_link_local_only ? "enabled" : "disabled") : null
-        ip_verify_unicast_source_reachable_via = int.ipv6_verify_unicast_source_reachable_via
-        link_local_address                     = int.ipv6_address_link_local
+        auto_configuration         = int.ipv6_address_autoconfig != null ? (int.ipv6_address_autoconfig ? "enabled" : "disabled") : null
+        default_route              = int.ipv6_nd_default_route != null ? (int.ipv6_nd_default_route ? "enabled" : "disabled") : null
+        forward                    = int.ipv6_forward != null ? (int.ipv6_forward ? "enabled" : "disabled") : null
+        link_local_address_use_bia = int.ipv6_link_local_use_bia != null ? (int.ipv6_link_local_use_bia ? "enabled" : "disabled") : null
+        use_link_local_address     = int.ipv6_address_use_link_local_only != null ? (int.ipv6_address_use_link_local_only ? "enabled" : "disabled") : null
+        urpf                       = int.ipv6_verify_unicast_source_reachable_via
+        link_local_address         = int.ipv6_address_link_local
 
         addresses = { for addr in int.ipv6_addresses : addr.address => {
           type       = try(addr.type, null)

@@ -124,12 +124,12 @@ resource "nxos_ipv4" "ipv4" {
         } }
 
         interfaces = { for int in local.ip_interfaces : int.id => {
-          drop_glean                             = int.drop_glean
-          forward                                = int.forward
-          unnumbered                             = int.unnumbered
-          ip_verify_unicast_source_reachable_via = int.ip_verify_unicast_source_reachable_via
-          ip_directed_broadcast                  = int.ip_directed_broadcast != null ? (int.ip_directed_broadcast ? "enabled" : "disabled") : null
-          ip_directed_broadcast_acl              = int.ip_directed_broadcast_acl
+          drop_glean             = int.drop_glean
+          forward                = int.forward
+          unnumbered             = int.unnumbered
+          urpf                   = int.ip_verify_unicast_source_reachable_via
+          directed_broadcast     = int.ip_directed_broadcast != null ? (int.ip_directed_broadcast ? "enabled" : "disabled") : null
+          directed_broadcast_acl = int.ip_directed_broadcast_acl
 
           addresses = merge(
             int.ip_address != null ? { (int.ip_address) = { type = "primary" } } : {},
@@ -157,12 +157,12 @@ resource "nxos_ipv4" "ipv4" {
       } }
 
       interfaces = { for int in local.ip_interfaces : int.id => {
-        drop_glean                             = int.drop_glean
-        forward                                = int.forward
-        unnumbered                             = int.unnumbered
-        ip_verify_unicast_source_reachable_via = int.ip_verify_unicast_source_reachable_via
-        ip_directed_broadcast                  = int.ip_directed_broadcast != null ? (int.ip_directed_broadcast ? "enabled" : "disabled") : null
-        ip_directed_broadcast_acl              = int.ip_directed_broadcast_acl
+        drop_glean             = int.drop_glean
+        forward                = int.forward
+        unnumbered             = int.unnumbered
+        urpf                   = int.ip_verify_unicast_source_reachable_via
+        directed_broadcast     = int.ip_directed_broadcast != null ? (int.ip_directed_broadcast ? "enabled" : "disabled") : null
+        directed_broadcast_acl = int.ip_directed_broadcast_acl
 
         addresses = merge(
           int.ip_address != null ? { (int.ip_address) = { type = "primary" } } : {},
