@@ -36,16 +36,16 @@ resource "nxos_route_policy" "route_policy" {
       verify_availability_v4  = try(entry.verify_availability_v4, local.defaults.nxos.devices.configuration.routing.route_maps.entries.verify_availability_v4, null) != null ? (try(entry.verify_availability_v4, local.defaults.nxos.devices.configuration.routing.route_maps.entries.verify_availability_v4) ? "enabled" : "disabled") : null
       verify_availability_v6  = try(entry.verify_availability_v6, local.defaults.nxos.devices.configuration.routing.route_maps.entries.verify_availability_v6, null) != null ? (try(entry.verify_availability_v6, local.defaults.nxos.devices.configuration.routing.route_maps.entries.verify_availability_v6) ? "enabled" : "disabled") : null
 
-      match_route_prefix_lists = try(entry.match_prefix_list, local.defaults.nxos.devices.configuration.routing.route_maps.entries.match_prefix_list, null) != null ? {
-        "sys/rpm/pfxlistv4-[${try(entry.match_prefix_list, local.defaults.nxos.devices.configuration.routing.route_maps.entries.match_prefix_list)}]" = {}
+      match_route_prefix_lists = try(entry.match_ip_prefix_list, local.defaults.nxos.devices.configuration.routing.route_maps.entries.match_ip_prefix_list, null) != null ? {
+        "sys/rpm/pfxlistv4-[${try(entry.match_ip_prefix_list, local.defaults.nxos.devices.configuration.routing.route_maps.entries.match_ip_prefix_list)}]" = {}
       } : {}
 
-      set_regular_community_additive     = try(entry.community, local.defaults.nxos.devices.configuration.routing.route_maps.entries.community, null) != null ? (try(entry.additive, local.defaults.nxos.devices.configuration.routing.route_maps.entries.additive, null) != null ? (try(entry.additive, local.defaults.nxos.devices.configuration.routing.route_maps.entries.additive) ? "enabled" : "disabled") : "disabled") : null
-      set_regular_community_no_community = try(entry.community, local.defaults.nxos.devices.configuration.routing.route_maps.entries.community, null) != null ? (try(entry.no_community, local.defaults.nxos.devices.configuration.routing.route_maps.entries.no_community, null) != null ? (try(entry.no_community, local.defaults.nxos.devices.configuration.routing.route_maps.entries.no_community) ? "enabled" : "disabled") : "disabled") : null
-      set_regular_community_criteria     = try(entry.community, local.defaults.nxos.devices.configuration.routing.route_maps.entries.community, null) != null ? try(entry.set_criteria, local.defaults.nxos.devices.configuration.routing.route_maps.entries.set_criteria, "none") : null
+      set_regular_community_additive     = try(entry.set_community, local.defaults.nxos.devices.configuration.routing.route_maps.entries.set_community, null) != null ? (try(entry.set_community_additive, local.defaults.nxos.devices.configuration.routing.route_maps.entries.set_community_additive, null) != null ? (try(entry.set_community_additive, local.defaults.nxos.devices.configuration.routing.route_maps.entries.set_community_additive) ? "enabled" : "disabled") : "disabled") : null
+      set_regular_community_no_community = try(entry.set_community, local.defaults.nxos.devices.configuration.routing.route_maps.entries.set_community, null) != null ? (try(entry.set_community_none, local.defaults.nxos.devices.configuration.routing.route_maps.entries.set_community_none, null) != null ? (try(entry.set_community_none, local.defaults.nxos.devices.configuration.routing.route_maps.entries.set_community_none) ? "enabled" : "disabled") : "disabled") : null
+      set_regular_community_criteria     = try(entry.set_community, local.defaults.nxos.devices.configuration.routing.route_maps.entries.set_community, null) != null ? try(entry.set_community_criteria, local.defaults.nxos.devices.configuration.routing.route_maps.entries.set_community_criteria, "none") : null
 
-      set_regular_community_items = try(entry.community, local.defaults.nxos.devices.configuration.routing.route_maps.entries.community, null) != null ? {
-        try(entry.community, local.defaults.nxos.devices.configuration.routing.route_maps.entries.community) = {}
+      set_regular_community_items = try(entry.set_community, local.defaults.nxos.devices.configuration.routing.route_maps.entries.set_community, null) != null ? {
+        try(entry.set_community, local.defaults.nxos.devices.configuration.routing.route_maps.entries.set_community) = {}
       } : {}
 
       match_tags = { for tag in try(entry.match_tags, local.defaults.nxos.devices.configuration.routing.route_maps.entries.match_tags, []) : tag => {} }
