@@ -26,7 +26,6 @@ resource "nxos_bgp" "bgp" {
 
   instance_admin_state                     = "enabled"
   asn                                      = try(local.device_config[each.key].routing.bgp.asn, null)
-  enhanced_error_handling                  = try(local.device_config[each.key].routing.bgp.enhanced_error_handling, local.defaults.nxos.devices.configuration.routing.bgp.enhanced_error_handling, null)
   disable_policy_batching                  = try(local.device_config[each.key].routing.bgp.disable_policy_batching, local.defaults.nxos.devices.configuration.routing.bgp.disable_policy_batching, false) ? "enabled" : "disabled"
   disable_policy_batching_nexthop          = try(local.device_config[each.key].routing.bgp.disable_policy_batching_nexthop, local.defaults.nxos.devices.configuration.routing.bgp.disable_policy_batching_nexthop, false) ? "enabled" : "disabled"
   disable_policy_batching_ipv4_prefix_list = try(local.device_config[each.key].routing.bgp.disable_policy_batching_ipv4_prefix_list, local.defaults.nxos.devices.configuration.routing.bgp.disable_policy_batching_ipv4_prefix_list, null)
