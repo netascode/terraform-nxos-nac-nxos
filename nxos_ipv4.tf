@@ -80,11 +80,11 @@ locals {
 resource "nxos_ipv4" "ipv4" {
   for_each = { for device in local.devices : device.name => device
     if try(local.device_config[device.name].system.ip_routing, local.defaults.nxos.devices.configuration.system.ip_routing, null) != null ||
-    try(local.device_config[device.name].system.ip_access_list_match_local, local.defaults.nxos.devices.configuration.system.ip_access_list_match_local, null) != null ||
+    try(local.device_config[device.name].system.ip_access_list_match_local_traffic, local.defaults.nxos.devices.configuration.system.ip_access_list_match_local_traffic, null) != null ||
     try(local.device_config[device.name].system.hardware_ecmp_hash_offset_concatenation, local.defaults.nxos.devices.configuration.system.hardware_ecmp_hash_offset_concatenation, null) != null ||
     try(local.device_config[device.name].system.hardware_ecmp_hash_offset_value, local.defaults.nxos.devices.configuration.system.hardware_ecmp_hash_offset_value, null) != null ||
     try(local.device_config[device.name].system.hardware_ecmp_hash_polynomial, local.defaults.nxos.devices.configuration.system.hardware_ecmp_hash_polynomial, null) != null ||
-    try(local.device_config[device.name].system.ip_logging_level, local.defaults.nxos.devices.configuration.system.ip_logging_level, null) != null ||
+    try(local.device_config[device.name].system.logging_level_ip, local.defaults.nxos.devices.configuration.system.logging_level_ip, null) != null ||
     try(local.device_config[device.name].system.ip_redirect_syslog, local.defaults.nxos.devices.configuration.system.ip_redirect_syslog, null) != null ||
     try(local.device_config[device.name].system.ip_redirect_syslog_interval, local.defaults.nxos.devices.configuration.system.ip_redirect_syslog_interval, null) != null ||
     try(local.device_config[device.name].system.ip_source_route, local.defaults.nxos.devices.configuration.system.ip_source_route, null) != null ||
@@ -94,11 +94,11 @@ resource "nxos_ipv4" "ipv4" {
   device = each.key
 
   instance_admin_state                    = try(local.device_config[each.key].system.ip_routing, local.defaults.nxos.devices.configuration.system.ip_routing, null) != null ? (try(local.device_config[each.key].system.ip_routing, local.defaults.nxos.devices.configuration.system.ip_routing) ? "enabled" : "disabled") : null
-  access_list_match_local                 = try(local.device_config[each.key].system.ip_access_list_match_local, local.defaults.nxos.devices.configuration.system.ip_access_list_match_local, null) != null ? (try(local.device_config[each.key].system.ip_access_list_match_local, local.defaults.nxos.devices.configuration.system.ip_access_list_match_local) ? "enabled" : "disabled") : null
+  access_list_match_local                 = try(local.device_config[each.key].system.ip_access_list_match_local_traffic, local.defaults.nxos.devices.configuration.system.ip_access_list_match_local_traffic, null) != null ? (try(local.device_config[each.key].system.ip_access_list_match_local_traffic, local.defaults.nxos.devices.configuration.system.ip_access_list_match_local_traffic) ? "enabled" : "disabled") : null
   hardware_ecmp_hash_offset_concatenation = try(local.device_config[each.key].system.hardware_ecmp_hash_offset_concatenation, local.defaults.nxos.devices.configuration.system.hardware_ecmp_hash_offset_concatenation, null) != null ? (try(local.device_config[each.key].system.hardware_ecmp_hash_offset_concatenation, local.defaults.nxos.devices.configuration.system.hardware_ecmp_hash_offset_concatenation) ? "enabled" : "disabled") : null
   hardware_ecmp_hash_offset_value         = try(local.device_config[each.key].system.hardware_ecmp_hash_offset_value, local.defaults.nxos.devices.configuration.system.hardware_ecmp_hash_offset_value, null)
   hardware_ecmp_hash_polynomial           = try(local.device_config[each.key].system.hardware_ecmp_hash_polynomial, local.defaults.nxos.devices.configuration.system.hardware_ecmp_hash_polynomial, null)
-  logging_level                           = try(local.device_config[each.key].system.ip_logging_level, local.defaults.nxos.devices.configuration.system.ip_logging_level, null)
+  logging_level                           = try(local.device_config[each.key].system.logging_level_ip, local.defaults.nxos.devices.configuration.system.logging_level_ip, null)
   redirect_syslog                         = try(local.device_config[each.key].system.ip_redirect_syslog, local.defaults.nxos.devices.configuration.system.ip_redirect_syslog, null) != null ? (try(local.device_config[each.key].system.ip_redirect_syslog, local.defaults.nxos.devices.configuration.system.ip_redirect_syslog) ? "enabled" : "disabled") : null
   redirect_syslog_interval                = try(local.device_config[each.key].system.ip_redirect_syslog_interval, local.defaults.nxos.devices.configuration.system.ip_redirect_syslog_interval, null)
   source_route                            = try(local.device_config[each.key].system.ip_source_route, local.defaults.nxos.devices.configuration.system.ip_source_route, null) != null ? (try(local.device_config[each.key].system.ip_source_route, local.defaults.nxos.devices.configuration.system.ip_source_route) ? "enabled" : "disabled") : null
