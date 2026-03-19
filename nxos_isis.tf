@@ -23,12 +23,12 @@ resource "nxos_isis" "isis" {
       bandwidth_reference      = try(vrf.bandwidth_reference, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.bandwidth_reference, null)
       bandwidth_reference_unit = try(vrf.bandwidth_reference_unit, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.bandwidth_reference_unit, null)
       is_type                  = try(vrf.is_type, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.is_type, null)
-      metric_type              = try(vrf.metric_type, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.metric_type, null)
-      mtu                      = try(vrf.mtu, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.mtu, null)
+      metric_type              = try(vrf.metric_style, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.metric_style, null)
+      mtu                      = try(vrf.lsp_mtu, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.lsp_mtu, null)
       net                      = try(vrf.net, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.net, null)
       passive_default          = try(vrf.passive_default, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.passive_default, null)
       control                  = try(vrf.log_adjacency_changes, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.log_adjacency_changes, null) != null ? (try(vrf.log_adjacency_changes, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.log_adjacency_changes) ? "log-adj-changes" : "unspecified") : null
-      lsp_lifetime             = try(vrf.lsp_lifetime, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.lsp_lifetime, null)
+      lsp_lifetime             = try(vrf.max_lsp_lifetime, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.max_lsp_lifetime, null)
       queue_limit              = try(vrf.queue_limit, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.queue_limit, null)
       overload_admin_state     = try(vrf.overload_admin_state, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.overload_admin_state, null)
       overload_startup_time    = try(vrf.overload_startup_time, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.overload_startup_time, null)
@@ -38,8 +38,8 @@ resource "nxos_isis" "isis" {
       address_families = { for af in try(vrf.address_families, []) : replace(replace(af.address_family, "ipv4_unicast", "v4"), "ipv6_unicast", "v6") => {
         segment_routing_mpls                    = try(af.segment_routing_mpls, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.address_families.segment_routing_mpls, null)
         enable_bfd                              = try(af.bfd, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.address_families.bfd, null)
-        prefix_advertise_passive_l1             = try(af.prefix_advertise_passive_l1, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.address_families.prefix_advertise_passive_l1, null)
-        prefix_advertise_passive_l2             = try(af.prefix_advertise_passive_l2, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.address_families.prefix_advertise_passive_l2, null)
+        prefix_advertise_passive_l1             = try(af.advertise_passive_only_l1, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.address_families.advertise_passive_only_l1, null)
+        prefix_advertise_passive_l2             = try(af.advertise_passive_only_l2, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.address_families.advertise_passive_only_l2, null)
         control                                 = try(af.adjacency_check, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.address_families.adjacency_check, null) != null ? (try(af.adjacency_check, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.address_families.adjacency_check) ? "adj-check" : null) : null
         default_information_originate           = try(af.default_information_originate, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.address_families.default_information_originate, null)
         default_information_originate_route_map = try(af.default_information_originate_route_map, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.address_families.default_information_originate_route_map, null)
