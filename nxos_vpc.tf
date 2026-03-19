@@ -53,7 +53,7 @@ resource "nxos_vpc" "vpc" {
   keepalive_type_of_service_value              = local.vpc_keepalive[each.key].tos_is_number ? tonumber(local.vpc_keepalive[each.key].tos_value) : null
   keepalive_udp_port                           = try(local.device_config[each.key].vpc.keepalive.udp_port, local.defaults.nxos.devices.configuration.vpc.keepalive.udp_port, null)
   keepalive_vrf                                = try(local.device_config[each.key].vpc.keepalive.vrf, local.defaults.nxos.devices.configuration.vpc.keepalive.vrf, null)
-  peerlink_interface_id                        = try(local.device_config[each.key].vpc.peer_link_port_channel, local.defaults.nxos.devices.configuration.vpc.peer_link_port_channel, null) != null ? "po${try(local.device_config[each.key].vpc.peer_link_port_channel, local.defaults.nxos.devices.configuration.vpc.peer_link_port_channel)}" : null
+  peerlink_interface_id                        = try(local.device_config[each.key].vpc.peer_link_channel_group, local.defaults.nxos.devices.configuration.vpc.peer_link_channel_group, null) != null ? "po${try(local.device_config[each.key].vpc.peer_link_channel_group, local.defaults.nxos.devices.configuration.vpc.peer_link_channel_group)}" : null
   interfaces = { for int in try(local.device_config[each.key].interfaces.port_channels, []) : tostring(int.vpc_id) => {
     port_channel_interface_dn = "sys/intf/aggr-[po${int.id}]"
   } if try(int.vpc_id, null) != null }

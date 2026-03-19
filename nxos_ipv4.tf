@@ -15,63 +15,63 @@ locals {
   # Collect all IPv4 interfaces across all interface types as a flat list
   ip_interfaces = flatten([
     for device in local.devices : concat(
-      # Ethernets (layer3 only)
+      # Ethernets (L3 only)
       [for int in try(local.device_config[device.name].interfaces.ethernets, []) : {
-        device                 = device.name
-        vrf                    = try(int.vrf, local.defaults.nxos.devices.configuration.interfaces.ethernets.vrf, "default")
-        id                     = "eth${int.id}"
-        drop_glean             = null
-        forward                = null
-        unnumbered             = try(int.ip_unnumbered, local.defaults.nxos.devices.configuration.interfaces.ethernets.ip_unnumbered, null)
-        urpf                   = try(int.urpf, local.defaults.nxos.devices.configuration.interfaces.ethernets.urpf, null)
-        directed_broadcast     = try(int.directed_broadcast, local.defaults.nxos.devices.configuration.interfaces.ethernets.directed_broadcast, null)
-        directed_broadcast_acl = try(int.directed_broadcast_acl, local.defaults.nxos.devices.configuration.interfaces.ethernets.directed_broadcast_acl, null)
-        ip_address             = try(int.ip_address, local.defaults.nxos.devices.configuration.interfaces.ethernets.ip_address, null)
-        ip_secondary_addresses = try(int.ip_secondary_addresses, [])
-        } if try(int.layer3, local.defaults.nxos.devices.configuration.interfaces.ethernets.layer3, false)
+        device                                 = device.name
+        vrf                                    = try(int.vrf, local.defaults.nxos.devices.configuration.interfaces.ethernets.vrf, "default")
+        id                                     = "eth${int.id}"
+        drop_glean                             = null
+        forward                                = null
+        unnumbered                             = try(int.ip_unnumbered, local.defaults.nxos.devices.configuration.interfaces.ethernets.ip_unnumbered, null)
+        ip_verify_unicast_source_reachable_via = try(int.ip_verify_unicast_source_reachable_via, local.defaults.nxos.devices.configuration.interfaces.ethernets.ip_verify_unicast_source_reachable_via, null)
+        ip_directed_broadcast                  = try(int.ip_directed_broadcast, local.defaults.nxos.devices.configuration.interfaces.ethernets.ip_directed_broadcast, null)
+        ip_ip_directed_broadcast_acl           = try(int.ip_ip_directed_broadcast_acl, local.defaults.nxos.devices.configuration.interfaces.ethernets.ip_ip_directed_broadcast_acl, null)
+        ip_address                             = try(int.ip_address, local.defaults.nxos.devices.configuration.interfaces.ethernets.ip_address, null)
+        ip_secondary_addresses                 = try(int.ip_secondary_addresses, [])
+        } if !try(int.switchport, local.defaults.nxos.devices.configuration.interfaces.ethernets.switchport, true)
       ],
       # Loopbacks
       [for int in try(local.device_config[device.name].interfaces.loopbacks, []) : {
-        device                 = device.name
-        vrf                    = try(int.vrf, local.defaults.nxos.devices.configuration.interfaces.loopbacks.vrf, "default")
-        id                     = "lo${int.id}"
-        drop_glean             = null
-        forward                = null
-        unnumbered             = null
-        urpf                   = null
-        directed_broadcast     = null
-        directed_broadcast_acl = null
-        ip_address             = try(int.ip_address, local.defaults.nxos.devices.configuration.interfaces.loopbacks.ip_address, null)
-        ip_secondary_addresses = try(int.ip_secondary_addresses, [])
+        device                                 = device.name
+        vrf                                    = try(int.vrf, local.defaults.nxos.devices.configuration.interfaces.loopbacks.vrf, "default")
+        id                                     = "lo${int.id}"
+        drop_glean                             = null
+        forward                                = null
+        unnumbered                             = null
+        ip_verify_unicast_source_reachable_via = null
+        ip_directed_broadcast                  = null
+        ip_ip_directed_broadcast_acl           = null
+        ip_address                             = try(int.ip_address, local.defaults.nxos.devices.configuration.interfaces.loopbacks.ip_address, null)
+        ip_secondary_addresses                 = try(int.ip_secondary_addresses, [])
       }],
       # SVIs
       [for int in try(local.device_config[device.name].interfaces.vlans, []) : {
-        device                 = device.name
-        vrf                    = try(int.vrf, local.defaults.nxos.devices.configuration.interfaces.vlans.vrf, "default")
-        id                     = "vlan${int.id}"
-        drop_glean             = try(int.ip_drop_glean, local.defaults.nxos.devices.configuration.interfaces.vlans.ip_drop_glean, null) != null ? (try(int.ip_drop_glean, local.defaults.nxos.devices.configuration.interfaces.vlans.ip_drop_glean) ? "enabled" : "disabled") : null
-        forward                = try(int.ip_forward, local.defaults.nxos.devices.configuration.interfaces.vlans.ip_forward, null) != null ? (try(int.ip_forward, local.defaults.nxos.devices.configuration.interfaces.vlans.ip_forward) ? "enabled" : "disabled") : null
-        unnumbered             = null
-        urpf                   = null
-        directed_broadcast     = try(int.directed_broadcast, local.defaults.nxos.devices.configuration.interfaces.vlans.directed_broadcast, null)
-        directed_broadcast_acl = try(int.directed_broadcast_acl, local.defaults.nxos.devices.configuration.interfaces.vlans.directed_broadcast_acl, null)
-        ip_address             = try(int.ip_address, local.defaults.nxos.devices.configuration.interfaces.vlans.ip_address, null)
-        ip_secondary_addresses = try(int.ip_secondary_addresses, [])
+        device                                 = device.name
+        vrf                                    = try(int.vrf, local.defaults.nxos.devices.configuration.interfaces.vlans.vrf, "default")
+        id                                     = "vlan${int.id}"
+        drop_glean                             = try(int.ip_drop_glean, local.defaults.nxos.devices.configuration.interfaces.vlans.ip_drop_glean, null) != null ? (try(int.ip_drop_glean, local.defaults.nxos.devices.configuration.interfaces.vlans.ip_drop_glean) ? "enabled" : "disabled") : null
+        forward                                = try(int.ip_forward, local.defaults.nxos.devices.configuration.interfaces.vlans.ip_forward, null) != null ? (try(int.ip_forward, local.defaults.nxos.devices.configuration.interfaces.vlans.ip_forward) ? "enabled" : "disabled") : null
+        unnumbered                             = null
+        ip_verify_unicast_source_reachable_via = null
+        ip_directed_broadcast                  = try(int.ip_directed_broadcast, local.defaults.nxos.devices.configuration.interfaces.vlans.ip_directed_broadcast, null)
+        ip_ip_directed_broadcast_acl           = try(int.ip_ip_directed_broadcast_acl, local.defaults.nxos.devices.configuration.interfaces.vlans.ip_ip_directed_broadcast_acl, null)
+        ip_address                             = try(int.ip_address, local.defaults.nxos.devices.configuration.interfaces.vlans.ip_address, null)
+        ip_secondary_addresses                 = try(int.ip_secondary_addresses, [])
       }],
-      # Port channels (layer3 only)
+      # Port channels (L3 only)
       [for int in try(local.device_config[device.name].interfaces.port_channels, []) : {
-        device                 = device.name
-        vrf                    = try(int.vrf, local.defaults.nxos.devices.configuration.interfaces.port_channels.vrf, "default")
-        id                     = "po${int.id}"
-        drop_glean             = null
-        forward                = null
-        unnumbered             = try(int.ip_unnumbered, local.defaults.nxos.devices.configuration.interfaces.port_channels.ip_unnumbered, null)
-        urpf                   = try(int.urpf, local.defaults.nxos.devices.configuration.interfaces.port_channels.urpf, null)
-        directed_broadcast     = try(int.directed_broadcast, local.defaults.nxos.devices.configuration.interfaces.port_channels.directed_broadcast, null)
-        directed_broadcast_acl = try(int.directed_broadcast_acl, local.defaults.nxos.devices.configuration.interfaces.port_channels.directed_broadcast_acl, null)
-        ip_address             = try(int.ip_address, local.defaults.nxos.devices.configuration.interfaces.port_channels.ip_address, null)
-        ip_secondary_addresses = try(int.ip_secondary_addresses, [])
-        } if try(int.layer3, local.defaults.nxos.devices.configuration.interfaces.port_channels.layer3, false)
+        device                                 = device.name
+        vrf                                    = try(int.vrf, local.defaults.nxos.devices.configuration.interfaces.port_channels.vrf, "default")
+        id                                     = "po${int.id}"
+        drop_glean                             = null
+        forward                                = null
+        unnumbered                             = try(int.ip_unnumbered, local.defaults.nxos.devices.configuration.interfaces.port_channels.ip_unnumbered, null)
+        ip_verify_unicast_source_reachable_via = try(int.ip_verify_unicast_source_reachable_via, local.defaults.nxos.devices.configuration.interfaces.port_channels.ip_verify_unicast_source_reachable_via, null)
+        ip_directed_broadcast                  = try(int.ip_directed_broadcast, local.defaults.nxos.devices.configuration.interfaces.port_channels.ip_directed_broadcast, null)
+        ip_ip_directed_broadcast_acl           = try(int.ip_ip_directed_broadcast_acl, local.defaults.nxos.devices.configuration.interfaces.port_channels.ip_ip_directed_broadcast_acl, null)
+        ip_address                             = try(int.ip_address, local.defaults.nxos.devices.configuration.interfaces.port_channels.ip_address, null)
+        ip_secondary_addresses                 = try(int.ip_secondary_addresses, [])
+        } if !try(int.switchport, local.defaults.nxos.devices.configuration.interfaces.port_channels.switchport, true)
       ],
     )
   ])
@@ -124,12 +124,12 @@ resource "nxos_ipv4" "ipv4" {
         } }
 
         interfaces = { for int in local.ip_interfaces : int.id => {
-          drop_glean             = int.drop_glean
-          forward                = int.forward
-          unnumbered             = int.unnumbered
-          urpf                   = int.urpf
-          directed_broadcast     = int.directed_broadcast != null ? (int.directed_broadcast ? "enabled" : "disabled") : null
-          directed_broadcast_acl = int.directed_broadcast_acl
+          drop_glean                             = int.drop_glean
+          forward                                = int.forward
+          unnumbered                             = int.unnumbered
+          ip_verify_unicast_source_reachable_via = int.ip_verify_unicast_source_reachable_via
+          ip_directed_broadcast                  = int.ip_directed_broadcast != null ? (int.ip_directed_broadcast ? "enabled" : "disabled") : null
+          ip_ip_directed_broadcast_acl           = int.ip_ip_directed_broadcast_acl
 
           addresses = merge(
             int.ip_address != null ? { (int.ip_address) = { type = "primary" } } : {},
@@ -157,12 +157,12 @@ resource "nxos_ipv4" "ipv4" {
       } }
 
       interfaces = { for int in local.ip_interfaces : int.id => {
-        drop_glean             = int.drop_glean
-        forward                = int.forward
-        unnumbered             = int.unnumbered
-        urpf                   = int.urpf
-        directed_broadcast     = int.directed_broadcast != null ? (int.directed_broadcast ? "enabled" : "disabled") : null
-        directed_broadcast_acl = int.directed_broadcast_acl
+        drop_glean                             = int.drop_glean
+        forward                                = int.forward
+        unnumbered                             = int.unnumbered
+        ip_verify_unicast_source_reachable_via = int.ip_verify_unicast_source_reachable_via
+        ip_directed_broadcast                  = int.ip_directed_broadcast != null ? (int.ip_directed_broadcast ? "enabled" : "disabled") : null
+        ip_ip_directed_broadcast_acl           = int.ip_ip_directed_broadcast_acl
 
         addresses = merge(
           int.ip_address != null ? { (int.ip_address) = { type = "primary" } } : {},
