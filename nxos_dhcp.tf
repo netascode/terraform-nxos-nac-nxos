@@ -4,31 +4,31 @@ locals {
       [for int in try(local.device_config[device.name].interfaces.ethernets, []) : {
         device                    = device.name
         interface_id              = "eth${int.id}"
-        ip_dhcp_relay             = int.ip_dhcp_relay
+        ip_dhcp_relay_address     = int.ip_dhcp_relay_address
         ipv6_dhcp_smart_relay     = try(int.ipv6_dhcp_smart_relay, null)
         ipv6_dhcp_relay_addresses = try(int.ipv6_dhcp_relay_addresses, [])
-      } if try(int.ip_dhcp_relay, null) != null || try(int.ipv6_dhcp_smart_relay, null) != null || try(int.ipv6_dhcp_relay_addresses, null) != null],
+      } if try(int.ip_dhcp_relay_address, null) != null || try(int.ipv6_dhcp_smart_relay, null) != null || try(int.ipv6_dhcp_relay_addresses, null) != null],
       [for int in try(local.device_config[device.name].interfaces.vlans, []) : {
         device                    = device.name
         interface_id              = "vlan${int.id}"
-        ip_dhcp_relay             = int.ip_dhcp_relay
+        ip_dhcp_relay_address     = int.ip_dhcp_relay_address
         ipv6_dhcp_smart_relay     = try(int.ipv6_dhcp_smart_relay, null)
         ipv6_dhcp_relay_addresses = try(int.ipv6_dhcp_relay_addresses, [])
-      } if try(int.ip_dhcp_relay, null) != null || try(int.ipv6_dhcp_smart_relay, null) != null || try(int.ipv6_dhcp_relay_addresses, null) != null],
+      } if try(int.ip_dhcp_relay_address, null) != null || try(int.ipv6_dhcp_smart_relay, null) != null || try(int.ipv6_dhcp_relay_addresses, null) != null],
       [for int in try(local.device_config[device.name].interfaces.loopbacks, []) : {
         device                    = device.name
         interface_id              = "lo${int.id}"
-        ip_dhcp_relay             = int.ip_dhcp_relay
+        ip_dhcp_relay_address     = int.ip_dhcp_relay_address
         ipv6_dhcp_smart_relay     = try(int.ipv6_dhcp_smart_relay, null)
         ipv6_dhcp_relay_addresses = try(int.ipv6_dhcp_relay_addresses, [])
-      } if try(int.ip_dhcp_relay, null) != null || try(int.ipv6_dhcp_smart_relay, null) != null || try(int.ipv6_dhcp_relay_addresses, null) != null],
+      } if try(int.ip_dhcp_relay_address, null) != null || try(int.ipv6_dhcp_smart_relay, null) != null || try(int.ipv6_dhcp_relay_addresses, null) != null],
       [for int in try(local.device_config[device.name].interfaces.port_channels, []) : {
         device                    = device.name
         interface_id              = "po${int.id}"
-        ip_dhcp_relay             = int.ip_dhcp_relay
+        ip_dhcp_relay_address     = int.ip_dhcp_relay_address
         ipv6_dhcp_smart_relay     = try(int.ipv6_dhcp_smart_relay, null)
         ipv6_dhcp_relay_addresses = try(int.ipv6_dhcp_relay_addresses, [])
-      } if try(int.ip_dhcp_relay, null) != null || try(int.ipv6_dhcp_smart_relay, null) != null || try(int.ipv6_dhcp_relay_addresses, null) != null],
+      } if try(int.ip_dhcp_relay_address, null) != null || try(int.ipv6_dhcp_smart_relay, null) != null || try(int.ipv6_dhcp_relay_addresses, null) != null],
     )
   ])
 }
@@ -36,10 +36,10 @@ locals {
 resource "nxos_dhcp" "dhcp" {
   for_each = { for device in local.devices : device.name => device
     if try(local.device_config[device.name].dhcp, null) != null ||
-    length([for int in try(local.device_config[device.name].interfaces.ethernets, []) : int if try(int.ip_dhcp_relay, null) != null || try(int.ipv6_dhcp_smart_relay, null) != null || try(int.ipv6_dhcp_relay_addresses, null) != null]) > 0 ||
-    length([for int in try(local.device_config[device.name].interfaces.vlans, []) : int if try(int.ip_dhcp_relay, null) != null || try(int.ipv6_dhcp_smart_relay, null) != null || try(int.ipv6_dhcp_relay_addresses, null) != null]) > 0 ||
-    length([for int in try(local.device_config[device.name].interfaces.loopbacks, []) : int if try(int.ip_dhcp_relay, null) != null || try(int.ipv6_dhcp_smart_relay, null) != null || try(int.ipv6_dhcp_relay_addresses, null) != null]) > 0 ||
-  length([for int in try(local.device_config[device.name].interfaces.port_channels, []) : int if try(int.ip_dhcp_relay, null) != null || try(int.ipv6_dhcp_smart_relay, null) != null || try(int.ipv6_dhcp_relay_addresses, null) != null]) > 0 }
+    length([for int in try(local.device_config[device.name].interfaces.ethernets, []) : int if try(int.ip_dhcp_relay_address, null) != null || try(int.ipv6_dhcp_smart_relay, null) != null || try(int.ipv6_dhcp_relay_addresses, null) != null]) > 0 ||
+    length([for int in try(local.device_config[device.name].interfaces.vlans, []) : int if try(int.ip_dhcp_relay_address, null) != null || try(int.ipv6_dhcp_smart_relay, null) != null || try(int.ipv6_dhcp_relay_addresses, null) != null]) > 0 ||
+    length([for int in try(local.device_config[device.name].interfaces.loopbacks, []) : int if try(int.ip_dhcp_relay_address, null) != null || try(int.ipv6_dhcp_smart_relay, null) != null || try(int.ipv6_dhcp_relay_addresses, null) != null]) > 0 ||
+  length([for int in try(local.device_config[device.name].interfaces.port_channels, []) : int if try(int.ip_dhcp_relay_address, null) != null || try(int.ipv6_dhcp_smart_relay, null) != null || try(int.ipv6_dhcp_relay_addresses, null) != null]) > 0 }
   device                                      = each.key
   admin_state                                 = "enabled"
   relay_information_option                    = try(local.device_config[each.key].dhcp.ip_dhcp_relay.information_option, local.defaults.nxos.devices.configuration.dhcp.ip_dhcp_relay.information_option, null)
@@ -72,15 +72,15 @@ resource "nxos_dhcp" "dhcp" {
   dai_validate_ip                             = try(local.device_config[each.key].dhcp.ip_arp_inspection.validate_ip, local.defaults.nxos.devices.configuration.dhcp.ip_arp_inspection.validate_ip, null)
   dai_validate_source                         = try(local.device_config[each.key].dhcp.ip_arp_inspection.validate_source, local.defaults.nxos.devices.configuration.dhcp.ip_arp_inspection.validate_source, null)
   relay_interfaces = { for item in local.dhcp_relay_interfaces : item.interface_id => {
-    information_trusted = try(item.ip_dhcp_relay.information_trusted, local.defaults.nxos.devices.configuration.interfaces.ethernets.ip_dhcp_relay.information_trusted, null)
-    smart_relay         = try(item.ip_dhcp_relay.smart_relay, local.defaults.nxos.devices.configuration.interfaces.ethernets.ip_dhcp_relay.smart_relay, null)
-    subnet_broadcast    = try(item.ip_dhcp_relay.subnet_broadcast, local.defaults.nxos.devices.configuration.interfaces.ethernets.ip_dhcp_relay.subnet_broadcast, null)
-    options             = try(item.ip_dhcp_relay.options, local.defaults.nxos.devices.configuration.interfaces.ethernets.ip_dhcp_relay.options, null)
-    subnet_selection    = try(item.ip_dhcp_relay.source_subnet, local.defaults.nxos.devices.configuration.interfaces.ethernets.ip_dhcp_relay.source_subnet, null)
+    information_trusted = try(item.ip_dhcp_relay_address.information_trusted, local.defaults.nxos.devices.configuration.interfaces.ethernets.ip_dhcp_relay_address.information_trusted, null)
+    smart_relay         = try(item.ip_dhcp_relay_address.smart_relay, local.defaults.nxos.devices.configuration.interfaces.ethernets.ip_dhcp_relay_address.smart_relay, null)
+    subnet_broadcast    = try(item.ip_dhcp_relay_address.subnet_broadcast, local.defaults.nxos.devices.configuration.interfaces.ethernets.ip_dhcp_relay_address.subnet_broadcast, null)
+    options             = try(item.ip_dhcp_relay_address.options, local.defaults.nxos.devices.configuration.interfaces.ethernets.ip_dhcp_relay_address.options, null)
+    subnet_selection    = try(item.ip_dhcp_relay_address.source_subnet, local.defaults.nxos.devices.configuration.interfaces.ethernets.ip_dhcp_relay_address.source_subnet, null)
     v6_smart_relay      = try(item.ipv6_dhcp_smart_relay, local.defaults.nxos.devices.configuration.interfaces.ethernets.ipv6_dhcp_smart_relay, null)
     addresses = merge(
-      { for addr in try(item.ip_dhcp_relay.addresses, []) : "${try(addr.vrf, "!unspecified")};${addr.address}" => {
-        counter = try(addr.counter, local.defaults.nxos.devices.configuration.interfaces.ethernets.ip_dhcp_relay.addresses.counter, null)
+      { for addr in try(item.ip_dhcp_relay_address.addresses, []) : "${try(addr.vrf, "!unspecified")};${addr.address}" => {
+        counter = try(addr.counter, local.defaults.nxos.devices.configuration.interfaces.ethernets.ip_dhcp_relay_address.addresses.counter, null)
       } },
       { for addr in try(item.ipv6_dhcp_relay_addresses, []) : "${try(addr.vrf, "!unspecified")};${addr.address}" => {
         counter = try(addr.counter, local.defaults.nxos.devices.configuration.interfaces.ethernets.ipv6_dhcp_relay_addresses.counter, null)
