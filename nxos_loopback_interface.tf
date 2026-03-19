@@ -6,7 +6,7 @@ locals {
         device                                  = device.name
         id                                      = int.id
         type                                    = "lo"
-        admin_state                             = try(int.admin_state, local.defaults.nxos.devices.configuration.interfaces.loopbacks.admin_state, false)
+        admin_state                             = try(int.shutdown, local.defaults.nxos.devices.configuration.interfaces.loopbacks.shutdown, false)
         description                             = try(int.description, local.defaults.nxos.devices.configuration.interfaces.loopbacks.description, null)
         vrf                                     = try(int.vrf, local.defaults.nxos.devices.configuration.interfaces.loopbacks.vrf, "default")
         ip_address                              = try(int.ip_address, local.defaults.nxos.devices.configuration.interfaces.loopbacks.ip_address, null)
@@ -46,7 +46,6 @@ locals {
         ospfv3_mtu_ignore                       = try(int.ospfv3.mtu_ignore, local.defaults.nxos.devices.configuration.interfaces.loopbacks.ospfv3.mtu_ignore, null)
         ospfv3_retransmit_interval              = try(int.ospfv3.retransmit_interval, local.defaults.nxos.devices.configuration.interfaces.loopbacks.ospfv3.retransmit_interval, null)
         ospfv3_transmit_delay                   = try(int.ospfv3.transmit_delay, local.defaults.nxos.devices.configuration.interfaces.loopbacks.ospfv3.transmit_delay, null)
-        pim_admin_state                         = try(int.pim.admin_state, local.defaults.nxos.devices.configuration.interfaces.loopbacks.pim.admin_state, null)
         pim_bfd                                 = try(int.pim.bfd, local.defaults.nxos.devices.configuration.interfaces.loopbacks.pim.bfd, null)
         pim_dr_priority                         = try(int.pim.dr_priority, local.defaults.nxos.devices.configuration.interfaces.loopbacks.pim.dr_priority, null)
         pim_passive                             = try(int.pim.passive, local.defaults.nxos.devices.configuration.interfaces.loopbacks.pim.passive, null)
@@ -103,7 +102,7 @@ resource "nxos_loopback_interface" "loopback_interface" {
   if length(try(local.device_config[device.name].interfaces.loopbacks, [])) > 0 }
   device = each.key
   loopback_interfaces = { for int in try(local.device_config[each.key].interfaces.loopbacks, []) : "lo${int.id}" => {
-    admin_state  = try(int.admin_state, local.defaults.nxos.devices.configuration.interfaces.loopbacks.admin_state, false) ? "up" : "down"
+    admin_state  = try(int.shutdown, local.defaults.nxos.devices.configuration.interfaces.loopbacks.shutdown, false) ? "down" : "up"
     description  = try(int.description, local.defaults.nxos.devices.configuration.interfaces.loopbacks.description, null)
     link_logging = try(int.link_logging, local.defaults.nxos.devices.configuration.interfaces.loopbacks.link_logging, null) == null ? null : try(int.link_logging, local.defaults.nxos.devices.configuration.interfaces.loopbacks.link_logging, null) ? "enable" : "disable"
     vrf_dn       = "sys/inst-${try(int.vrf, local.defaults.nxos.devices.configuration.interfaces.loopbacks.vrf, "default")}"

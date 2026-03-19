@@ -22,7 +22,7 @@ resource "nxos_bgp" "bgp" {
   for_each = { for device in local.devices : device.name => device
   if try(local.device_config[device.name].routing.bgp.asn, null) != null }
   device      = each.key
-  admin_state = try(local.device_config[each.key].routing.bgp.admin_state, local.defaults.nxos.devices.configuration.routing.bgp.admin_state, false) ? "enabled" : "disabled"
+  admin_state = try(local.device_config[each.key].routing.bgp.shutdown, local.defaults.nxos.devices.configuration.routing.bgp.shutdown, false) ? "disabled" : "enabled"
 
   instance_admin_state                     = "enabled"
   asn                                      = try(local.device_config[each.key].routing.bgp.asn, null)
@@ -124,7 +124,7 @@ resource "nxos_bgp" "bgp" {
       description                    = try(pt.description, local.defaults.nxos.devices.configuration.routing.bgp.peer_templates.description, null)
       peer_type                      = try(pt.peer_type, local.defaults.nxos.devices.configuration.routing.bgp.peer_templates.peer_type, null)
       source_interface               = try(pt.update_source_interface_type, local.defaults.nxos.devices.configuration.routing.bgp.peer_templates.update_source_interface_type, null) != null ? "${local.intf_prefix_map[try(pt.update_source_interface_type, local.defaults.nxos.devices.configuration.routing.bgp.peer_templates.update_source_interface_type)]}${try(pt.update_source_interface_id, local.defaults.nxos.devices.configuration.routing.bgp.peer_templates.update_source_interface_id, "")}" : null
-      admin_state                    = try(pt.admin_state, local.defaults.nxos.devices.configuration.routing.bgp.peer_templates.admin_state, false) ? "enabled" : "disabled"
+      admin_state                    = try(pt.shutdown, local.defaults.nxos.devices.configuration.routing.bgp.peer_templates.shutdown, false) ? "disabled" : "enabled"
       affinity_group                 = try(pt.affinity_group, local.defaults.nxos.devices.configuration.routing.bgp.peer_templates.affinity_group, null)
       asn_type                       = try(pt.remote_as_type, local.defaults.nxos.devices.configuration.routing.bgp.peer_templates.remote_as_type, null)
       bfd_type                       = try(pt.bfd_type, local.defaults.nxos.devices.configuration.routing.bgp.peer_templates.bfd_type, null)
@@ -186,7 +186,7 @@ resource "nxos_bgp" "bgp" {
       peer_control                   = join(",", sort(compact([try(nei.bfd, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.neighbors.bfd, false) ? "bfd" : "", try(nei.dont_capability_negotiate, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.neighbors.dont_capability_negotiate, false) ? "cap-neg-off" : "", try(nei.disable_connected_check, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.neighbors.disable_connected_check, false) ? "dis-conn-check" : "", !try(nei.dynamic_capability, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.neighbors.dynamic_capability, true) ? "no-dyn-cap" : ""])))
       password_type                  = try(nei.password_type, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.neighbors.password_type, null)
       password                       = try(nei.password, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.neighbors.password, null)
-      admin_state                    = try(nei.admin_state, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.neighbors.admin_state, false) ? "enabled" : "disabled"
+      admin_state                    = try(nei.shutdown, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.neighbors.shutdown, false) ? "disabled" : "enabled"
       affinity_group                 = try(nei.affinity_group, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.neighbors.affinity_group, null)
       asn_type                       = try(nei.remote_as_type, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.neighbors.remote_as_type, null)
       bfd_type                       = try(nei.bfd_type, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.neighbors.bfd_type, null)
