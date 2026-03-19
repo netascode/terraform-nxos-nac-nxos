@@ -26,7 +26,6 @@ resource "nxos_bgp" "bgp" {
 
   instance_admin_state                     = "enabled"
   asn                                      = try(local.device_config[each.key].routing.bgp.asn, null)
-  enhanced_error_handling                  = try(local.device_config[each.key].routing.bgp.enhanced_error_handling, local.defaults.nxos.devices.configuration.routing.bgp.enhanced_error_handling, null)
   disable_policy_batching                  = try(local.device_config[each.key].routing.bgp.disable_policy_batching, local.defaults.nxos.devices.configuration.routing.bgp.disable_policy_batching, false) ? "enabled" : "disabled"
   disable_policy_batching_nexthop          = try(local.device_config[each.key].routing.bgp.disable_policy_batching_nexthop, local.defaults.nxos.devices.configuration.routing.bgp.disable_policy_batching_nexthop, false) ? "enabled" : "disabled"
   disable_policy_batching_ipv4_prefix_list = try(local.device_config[each.key].routing.bgp.disable_policy_batching_ipv4_prefix_list, local.defaults.nxos.devices.configuration.routing.bgp.disable_policy_batching_ipv4_prefix_list, null)
@@ -64,26 +63,26 @@ resource "nxos_bgp" "bgp" {
     route_control_suppress_routes      = try(vrf.suppress_fib_pending, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.suppress_fib_pending, false) ? "enabled" : "disabled"
 
     graceful_restart_control        = try(vrf.graceful_restart, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.graceful_restart, null)
-    graceful_restart_interval       = try(vrf.graceful_restart_time, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.graceful_restart_time, null)
+    graceful_restart_interval       = try(vrf.graceful_restart_restart_time, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.graceful_restart_restart_time, null)
     graceful_restart_stale_interval = try(vrf.graceful_restart_stalepath_time, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.graceful_restart_stalepath_time, null)
 
     address_families = { for af in try(vrf.address_families, []) : local.address_family_names_map[af.address_family] => {
       critical_nexthop_timeout               = try(af.nexthop_trigger_delay_critical, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.address_families.nexthop_trigger_delay_critical, null)
       non_critical_nexthop_timeout           = try(af.nexthop_trigger_delay_non_critical, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.address_families.nexthop_trigger_delay_non_critical, null)
       advertise_l2vpn_evpn                   = try(af.advertise_l2vpn_evpn, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.address_families.advertise_l2vpn_evpn, false) ? "enabled" : "disabled"
-      advertise_physical_ip_for_type5_routes = try(af.advertise_physical_ip_for_type5_routes, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.address_families.advertise_physical_ip_for_type5_routes, false) ? "enabled" : "disabled"
+      advertise_physical_ip_for_type5_routes = try(af.advertise_pip, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.address_families.advertise_pip, false) ? "enabled" : "disabled"
       max_ecmp_paths                         = try(af.maximum_paths, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.address_families.maximum_paths, null)
       max_external_ecmp_paths                = try(af.maximum_paths_eibgp, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.address_families.maximum_paths_eibgp, null)
       max_external_internal_ecmp_paths       = try(af.maximum_paths_eibgp_ibgp, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.address_families.maximum_paths_eibgp_ibgp, null)
       max_local_ecmp_paths                   = try(af.maximum_paths_local, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.address_families.maximum_paths_local, null)
       max_mixed_ecmp_paths                   = try(af.maximum_paths_mixed, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.address_families.maximum_paths_mixed, null)
       default_information_originate          = try(af.default_information_originate, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.address_families.default_information_originate, false) ? "enabled" : "disabled"
-      next_hop_route_map_name                = try(af.next_hop_route_map, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.address_families.next_hop_route_map, null)
+      next_hop_route_map_name                = try(af.nexthop_route_map, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.address_families.nexthop_route_map, null)
       prefix_priority                        = try(af.prefix_priority, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.address_families.prefix_priority, null)
       retain_rt_all                          = try(af.retain_route_target_all, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.address_families.retain_route_target_all, false) ? "enabled" : "disabled"
       advertise_only_active_routes           = try(af.advertise_only_active_routes, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.address_families.advertise_only_active_routes, false) ? "enabled" : "disabled"
       table_map_route_map_name               = try(af.table_map, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.address_families.table_map, null)
-      vni_ethernet_tag                       = try(af.vni_ethernet_tag, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.address_families.vni_ethernet_tag, false) ? "enabled" : "disabled"
+      vni_ethernet_tag                       = try(af.allow_vni_in_ethertag, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.address_families.allow_vni_in_ethertag, false) ? "enabled" : "disabled"
       wait_igp_converged                     = try(af.wait_igp_convergence, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.address_families.wait_igp_convergence, false) ? "enabled" : "disabled"
       advertise_system_mac                   = try(af.advertise_system_mac, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.address_families.advertise_system_mac, false) ? "enabled" : "disabled"
       allocate_label_all                     = try(af.allocate_label_all, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.address_families.allocate_label_all, false) ? "enabled" : "disabled"
@@ -99,12 +98,12 @@ resource "nxos_bgp" "bgp" {
       max_path_unequal_cost                  = try(af.maximum_paths_unequal_cost, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.address_families.maximum_paths_unequal_cost, false) ? "enabled" : "disabled"
       nexthop_load_balance_egress_multisite  = try(af.nexthop_load_balance_egress_multisite, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.address_families.nexthop_load_balance_egress_multisite, false) ? "enabled" : "disabled"
       originate_map                          = try(af.originate_map, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.address_families.originate_map, null)
-      origin_as_validate                     = try(af.bestpath_origin_as_validate, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.address_families.bestpath_origin_as_validate, false) ? "enabled" : "disabled"
-      origin_as_validate_signal_ibgp         = try(af.bestpath_origin_as_validate_signal_ibgp, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.address_families.bestpath_origin_as_validate_signal_ibgp, false) ? "enabled" : "disabled"
+      origin_as_validate                     = try(af.origin_as_validate, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.address_families.origin_as_validate, false) ? "enabled" : "disabled"
+      origin_as_validate_signal_ibgp         = try(af.origin_as_validate_signal_ibgp, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.address_families.origin_as_validate_signal_ibgp, false) ? "enabled" : "disabled"
       retain_rt_route_map                    = try(af.retain_route_target_route_map, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.address_families.retain_route_target_route_map, null)
       table_map_filter                       = try(af.table_map_filter, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.address_families.table_map_filter, false) ? "enabled" : "disabled"
-      timer_bestpath_defer                   = try(af.timer_bestpath_defer, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.address_families.timer_bestpath_defer, null)
-      timer_bestpath_defer_max               = try(af.timer_bestpath_defer_maximum, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.address_families.timer_bestpath_defer_maximum, null)
+      timer_bestpath_defer                   = try(af.timers_bestpath_defer, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.address_families.timers_bestpath_defer, null)
+      timer_bestpath_defer_max               = try(af.timers_bestpath_defer_maximum, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.address_families.timers_bestpath_defer_maximum, null)
 
       advertised_prefixes = { for prefix in try(af.networks, []) : prefix.prefix => {
         route_map = try(prefix.route_map, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.address_families.networks.route_map, null)
@@ -159,9 +158,9 @@ resource "nxos_bgp" "bgp" {
         default_originate_route_map   = try(af.default_originate_route_map, local.defaults.nxos.devices.configuration.routing.bgp.peer_templates.address_families.default_originate_route_map, null)
         dmz_link_bandwidth            = try(af.dmz_link_bandwidth, local.defaults.nxos.devices.configuration.routing.bgp.peer_templates.address_families.dmz_link_bandwidth, false) ? "enabled" : "disabled"
         encapsulation_mpls            = try(af.encapsulation_mpls, local.defaults.nxos.devices.configuration.routing.bgp.peer_templates.address_families.encapsulation_mpls, false) ? "enabled" : "disabled"
-        link_bandwidth_cumulative     = try(af.dmz_link_bandwidth_cumulative, local.defaults.nxos.devices.configuration.routing.bgp.peer_templates.address_families.dmz_link_bandwidth_cumulative, false) ? "enabled" : "disabled"
+        link_bandwidth_cumulative     = try(af.link_bandwidth_cumulative, local.defaults.nxos.devices.configuration.routing.bgp.peer_templates.address_families.link_bandwidth_cumulative, false) ? "enabled" : "disabled"
         nexthop_thirdparty            = try(af.next_hop_third_party, local.defaults.nxos.devices.configuration.routing.bgp.peer_templates.address_families.next_hop_third_party, false) ? "enabled" : "disabled"
-        rewrite_rt_asn                = try(af.rewrite_rt_asn, local.defaults.nxos.devices.configuration.routing.bgp.peer_templates.address_families.rewrite_rt_asn, false) ? "enabled" : "disabled"
+        rewrite_rt_asn                = try(af.rewrite_evpn_rt_asn, local.defaults.nxos.devices.configuration.routing.bgp.peer_templates.address_families.rewrite_evpn_rt_asn, false) ? "enabled" : "disabled"
         soft_reconfiguration_backup   = try(af.soft_reconfiguration_inbound, local.defaults.nxos.devices.configuration.routing.bgp.peer_templates.address_families.soft_reconfiguration_inbound, null)
         site_of_origin                = try(af.site_of_origin, local.defaults.nxos.devices.configuration.routing.bgp.peer_templates.address_families.site_of_origin, null)
         unsuppress_map                = try(af.unsuppress_map, local.defaults.nxos.devices.configuration.routing.bgp.peer_templates.address_families.unsuppress_map, null)
@@ -218,9 +217,9 @@ resource "nxos_bgp" "bgp" {
         default_originate_route_map   = try(af.default_originate_route_map, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.neighbors.address_families.default_originate_route_map, null)
         dmz_link_bandwidth            = try(af.dmz_link_bandwidth, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.neighbors.address_families.dmz_link_bandwidth, false) ? "enabled" : "disabled"
         encapsulation_mpls            = try(af.encapsulation_mpls, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.neighbors.address_families.encapsulation_mpls, false) ? "enabled" : "disabled"
-        link_bandwidth_cumulative     = try(af.dmz_link_bandwidth_cumulative, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.neighbors.address_families.dmz_link_bandwidth_cumulative, false) ? "enabled" : "disabled"
+        link_bandwidth_cumulative     = try(af.link_bandwidth_cumulative, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.neighbors.address_families.link_bandwidth_cumulative, false) ? "enabled" : "disabled"
         nexthop_thirdparty            = try(af.next_hop_third_party, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.neighbors.address_families.next_hop_third_party, false) ? "enabled" : "disabled"
-        rewrite_rt_asn                = try(af.rewrite_rt_asn, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.neighbors.address_families.rewrite_rt_asn, false) ? "enabled" : "disabled"
+        rewrite_rt_asn                = try(af.rewrite_evpn_rt_asn, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.neighbors.address_families.rewrite_evpn_rt_asn, false) ? "enabled" : "disabled"
         soft_reconfiguration_backup   = try(af.soft_reconfiguration_inbound, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.neighbors.address_families.soft_reconfiguration_inbound, null)
         site_of_origin                = try(af.site_of_origin, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.neighbors.address_families.site_of_origin, null)
         unsuppress_map                = try(af.unsuppress_map, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.neighbors.address_families.unsuppress_map, null)
