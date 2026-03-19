@@ -30,8 +30,8 @@ defaults:
             entries:
               action: permit
               criteria: exact
-              from_range: 0
-              to_range: 0
+              ge: 0
+              le: 0
           route_maps:
             entries:
               set_community_additive: false
