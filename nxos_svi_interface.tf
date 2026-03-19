@@ -47,7 +47,7 @@ locals {
         ospfv3_dead_interval                    = try(int.ospfv3.dead_interval, local.defaults.nxos.devices.configuration.interfaces.vlans.ospfv3.dead_interval, null)
         ospfv3_hello_interval                   = try(int.ospfv3.hello_interval, local.defaults.nxos.devices.configuration.interfaces.vlans.ospfv3.hello_interval, null)
         ospfv3_network_type                     = try(int.ospfv3.network_type, local.defaults.nxos.devices.configuration.interfaces.vlans.ospfv3.network_type, null)
-        ospfv3_passive                          = try(int.ospfv3.passive, local.defaults.nxos.devices.configuration.interfaces.vlans.ospfv3.passive, null)
+        ospfv3_passive_interface                = try(int.ospfv3.passive_interface, local.defaults.nxos.devices.configuration.interfaces.vlans.ospfv3.passive_interface, null)
         ospfv3_priority                         = try(int.ospfv3.priority, local.defaults.nxos.devices.configuration.interfaces.vlans.ospfv3.priority, null)
         ospfv3_instance_id                      = try(int.ospfv3.instance_id, local.defaults.nxos.devices.configuration.interfaces.vlans.ospfv3.instance_id, null)
         ospfv3_mtu_ignore                       = try(int.ospfv3.mtu_ignore, local.defaults.nxos.devices.configuration.interfaces.vlans.ospfv3.mtu_ignore, null)
