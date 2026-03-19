@@ -34,16 +34,16 @@ resource "nxos_ospf" "ospf" {
       rfc1583_compatible    = try(vrf.rfc1583_compatible, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.rfc1583_compatible, null)
       router_id             = try(vrf.router_id, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.router_id, null)
 
-      max_metric_await_convergence_bgp_asn = try(vrf.max_metric.await_convergence_bgp_asn, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.max_metric.await_convergence_bgp_asn, null)
+      max_metric_await_convergence_bgp_asn = try(vrf.max_metric_router_lsa.await_convergence_bgp_asn, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.max_metric_router_lsa.await_convergence_bgp_asn, null)
       max_metric_control = join(",", sort(compact([
-        try(vrf.max_metric.external_lsa, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.max_metric.external_lsa, false) ? "external-lsa" : "",
-        try(vrf.max_metric.on_startup, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.max_metric.on_startup, false) ? "startup" : "",
-        try(vrf.max_metric.include_stub, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.max_metric.include_stub, false) ? "stub" : "",
-        try(vrf.max_metric.summary_lsa, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.max_metric.summary_lsa, false) ? "summary-lsa" : "",
+        try(vrf.max_metric_router_lsa.external_lsa, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.max_metric_router_lsa.external_lsa, false) ? "external-lsa" : "",
+        try(vrf.max_metric_router_lsa.on_startup, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.max_metric_router_lsa.on_startup, false) ? "startup" : "",
+        try(vrf.max_metric_router_lsa.include_stub, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.max_metric_router_lsa.include_stub, false) ? "stub" : "",
+        try(vrf.max_metric_router_lsa.summary_lsa, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.max_metric_router_lsa.summary_lsa, false) ? "summary-lsa" : "",
       ])))
-      max_metric_external_lsa     = try(vrf.max_metric.external_lsa_max_metric, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.max_metric.external_lsa_max_metric, null)
-      max_metric_summary_lsa      = try(vrf.max_metric.summary_lsa_max_metric, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.max_metric.summary_lsa_max_metric, null)
-      max_metric_startup_interval = try(vrf.max_metric.on_startup_timeout, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.max_metric.on_startup_timeout, null)
+      max_metric_external_lsa     = try(vrf.max_metric_router_lsa.external_lsa_max_metric, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.max_metric_router_lsa.external_lsa_max_metric, null)
+      max_metric_summary_lsa      = try(vrf.max_metric_router_lsa.summary_lsa_max_metric, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.max_metric_router_lsa.summary_lsa_max_metric, null)
+      max_metric_startup_interval = try(vrf.max_metric_router_lsa.on_startup_timeout, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.max_metric_router_lsa.on_startup_timeout, null)
 
       areas = { for area in try(vrf.areas, []) : area.area => {
         authentication_type = try(area.authentication_type, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.areas.authentication_type, null)
