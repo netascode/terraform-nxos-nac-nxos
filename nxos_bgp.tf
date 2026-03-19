@@ -70,7 +70,7 @@ resource "nxos_bgp" "bgp" {
       critical_nexthop_timeout               = try(af.nexthop_trigger_delay_critical, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.address_families.nexthop_trigger_delay_critical, null)
       non_critical_nexthop_timeout           = try(af.nexthop_trigger_delay_non_critical, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.address_families.nexthop_trigger_delay_non_critical, null)
       advertise_l2vpn_evpn                   = try(af.advertise_l2vpn_evpn, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.address_families.advertise_l2vpn_evpn, false) ? "enabled" : "disabled"
-      advertise_physical_ip_for_type5_routes = try(af.advertise_physical_ip_for_type5_routes, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.address_families.advertise_physical_ip_for_type5_routes, false) ? "enabled" : "disabled"
+      advertise_physical_ip_for_type5_routes = try(af.advertise_pip, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.address_families.advertise_pip, false) ? "enabled" : "disabled"
       max_ecmp_paths                         = try(af.maximum_paths, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.address_families.maximum_paths, null)
       max_external_ecmp_paths                = try(af.maximum_paths_eibgp, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.address_families.maximum_paths_eibgp, null)
       max_external_internal_ecmp_paths       = try(af.maximum_paths_eibgp_ibgp, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.address_families.maximum_paths_eibgp_ibgp, null)
@@ -98,8 +98,8 @@ resource "nxos_bgp" "bgp" {
       max_path_unequal_cost                  = try(af.maximum_paths_unequal_cost, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.address_families.maximum_paths_unequal_cost, false) ? "enabled" : "disabled"
       nexthop_load_balance_egress_multisite  = try(af.nexthop_load_balance_egress_multisite, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.address_families.nexthop_load_balance_egress_multisite, false) ? "enabled" : "disabled"
       originate_map                          = try(af.originate_map, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.address_families.originate_map, null)
-      origin_as_validate                     = try(af.bestpath_origin_as_validate, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.address_families.bestpath_origin_as_validate, false) ? "enabled" : "disabled"
-      origin_as_validate_signal_ibgp         = try(af.bestpath_origin_as_validate_signal_ibgp, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.address_families.bestpath_origin_as_validate_signal_ibgp, false) ? "enabled" : "disabled"
+      origin_as_validate                     = try(af.origin_as_validate, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.address_families.origin_as_validate, false) ? "enabled" : "disabled"
+      origin_as_validate_signal_ibgp         = try(af.origin_as_validate_signal_ibgp, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.address_families.origin_as_validate_signal_ibgp, false) ? "enabled" : "disabled"
       retain_rt_route_map                    = try(af.retain_route_target_route_map, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.address_families.retain_route_target_route_map, null)
       table_map_filter                       = try(af.table_map_filter, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.address_families.table_map_filter, false) ? "enabled" : "disabled"
       timer_bestpath_defer                   = try(af.timer_bestpath_defer, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.address_families.timer_bestpath_defer, null)
