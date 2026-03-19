@@ -25,7 +25,7 @@ locals {
         unnumbered                             = try(int.ip_unnumbered, local.defaults.nxos.devices.configuration.interfaces.ethernets.ip_unnumbered, null)
         ip_verify_unicast_source_reachable_via = try(int.ip_verify_unicast_source_reachable_via, local.defaults.nxos.devices.configuration.interfaces.ethernets.ip_verify_unicast_source_reachable_via, null)
         ip_directed_broadcast                  = try(int.ip_directed_broadcast, local.defaults.nxos.devices.configuration.interfaces.ethernets.ip_directed_broadcast, null)
-        ip_ip_directed_broadcast_acl           = try(int.ip_ip_directed_broadcast_acl, local.defaults.nxos.devices.configuration.interfaces.ethernets.ip_ip_directed_broadcast_acl, null)
+        ip_directed_broadcast_acl              = try(int.ip_directed_broadcast_acl, local.defaults.nxos.devices.configuration.interfaces.ethernets.ip_directed_broadcast_acl, null)
         ip_address                             = try(int.ip_address, local.defaults.nxos.devices.configuration.interfaces.ethernets.ip_address, null)
         ip_secondary_addresses                 = try(int.ip_secondary_addresses, [])
         } if !try(int.switchport, local.defaults.nxos.devices.configuration.interfaces.ethernets.switchport, true)
@@ -40,7 +40,7 @@ locals {
         unnumbered                             = null
         ip_verify_unicast_source_reachable_via = null
         ip_directed_broadcast                  = null
-        ip_ip_directed_broadcast_acl           = null
+        ip_directed_broadcast_acl              = null
         ip_address                             = try(int.ip_address, local.defaults.nxos.devices.configuration.interfaces.loopbacks.ip_address, null)
         ip_secondary_addresses                 = try(int.ip_secondary_addresses, [])
       }],
@@ -54,7 +54,7 @@ locals {
         unnumbered                             = null
         ip_verify_unicast_source_reachable_via = null
         ip_directed_broadcast                  = try(int.ip_directed_broadcast, local.defaults.nxos.devices.configuration.interfaces.vlans.ip_directed_broadcast, null)
-        ip_ip_directed_broadcast_acl           = try(int.ip_ip_directed_broadcast_acl, local.defaults.nxos.devices.configuration.interfaces.vlans.ip_ip_directed_broadcast_acl, null)
+        ip_directed_broadcast_acl              = try(int.ip_directed_broadcast_acl, local.defaults.nxos.devices.configuration.interfaces.vlans.ip_directed_broadcast_acl, null)
         ip_address                             = try(int.ip_address, local.defaults.nxos.devices.configuration.interfaces.vlans.ip_address, null)
         ip_secondary_addresses                 = try(int.ip_secondary_addresses, [])
       }],
@@ -68,7 +68,7 @@ locals {
         unnumbered                             = try(int.ip_unnumbered, local.defaults.nxos.devices.configuration.interfaces.port_channels.ip_unnumbered, null)
         ip_verify_unicast_source_reachable_via = try(int.ip_verify_unicast_source_reachable_via, local.defaults.nxos.devices.configuration.interfaces.port_channels.ip_verify_unicast_source_reachable_via, null)
         ip_directed_broadcast                  = try(int.ip_directed_broadcast, local.defaults.nxos.devices.configuration.interfaces.port_channels.ip_directed_broadcast, null)
-        ip_ip_directed_broadcast_acl           = try(int.ip_ip_directed_broadcast_acl, local.defaults.nxos.devices.configuration.interfaces.port_channels.ip_ip_directed_broadcast_acl, null)
+        ip_directed_broadcast_acl              = try(int.ip_directed_broadcast_acl, local.defaults.nxos.devices.configuration.interfaces.port_channels.ip_directed_broadcast_acl, null)
         ip_address                             = try(int.ip_address, local.defaults.nxos.devices.configuration.interfaces.port_channels.ip_address, null)
         ip_secondary_addresses                 = try(int.ip_secondary_addresses, [])
         } if !try(int.switchport, local.defaults.nxos.devices.configuration.interfaces.port_channels.switchport, true)
@@ -129,7 +129,7 @@ resource "nxos_ipv4" "ipv4" {
           unnumbered                             = int.unnumbered
           ip_verify_unicast_source_reachable_via = int.ip_verify_unicast_source_reachable_via
           ip_directed_broadcast                  = int.ip_directed_broadcast != null ? (int.ip_directed_broadcast ? "enabled" : "disabled") : null
-          ip_ip_directed_broadcast_acl           = int.ip_ip_directed_broadcast_acl
+          ip_directed_broadcast_acl              = int.ip_directed_broadcast_acl
 
           addresses = merge(
             int.ip_address != null ? { (int.ip_address) = { type = "primary" } } : {},
@@ -162,7 +162,7 @@ resource "nxos_ipv4" "ipv4" {
         unnumbered                             = int.unnumbered
         ip_verify_unicast_source_reachable_via = int.ip_verify_unicast_source_reachable_via
         ip_directed_broadcast                  = int.ip_directed_broadcast != null ? (int.ip_directed_broadcast ? "enabled" : "disabled") : null
-        ip_ip_directed_broadcast_acl           = int.ip_ip_directed_broadcast_acl
+        ip_directed_broadcast_acl              = int.ip_directed_broadcast_acl
 
         addresses = merge(
           int.ip_address != null ? { (int.ip_address) = { type = "primary" } } : {},
