@@ -16,9 +16,9 @@ resource "nxos_subinterface" "subinterface" {
       medium                         = try(sub.medium, local.defaults.nxos.devices.configuration.interfaces.ethernets.subinterfaces.medium, null)
       mtu                            = try(sub.mtu, local.defaults.nxos.devices.configuration.interfaces.ethernets.subinterfaces.mtu, null)
       mtu_inherit                    = try(sub.mtu_inherit, local.defaults.nxos.devices.configuration.interfaces.ethernets.subinterfaces.mtu_inherit, null)
-      router_mac                     = try(sub.mac, local.defaults.nxos.devices.configuration.interfaces.ethernets.subinterfaces.mac, null)
+      router_mac                     = try(sub.mac_address, local.defaults.nxos.devices.configuration.interfaces.ethernets.subinterfaces.mac_address, null)
       router_mac_ipv6_extract        = try(sub.mac_ipv6_extract, local.defaults.nxos.devices.configuration.interfaces.ethernets.subinterfaces.mac_ipv6_extract, null) != null ? (try(sub.mac_ipv6_extract, local.defaults.nxos.devices.configuration.interfaces.ethernets.subinterfaces.mac_ipv6_extract) ? "enable" : "disable") : null
-      snmp_trap                      = try(sub.snmp_trap, local.defaults.nxos.devices.configuration.interfaces.ethernets.subinterfaces.snmp_trap, null) != null ? (try(sub.snmp_trap, local.defaults.nxos.devices.configuration.interfaces.ethernets.subinterfaces.snmp_trap) ? "enable" : "disable") : null
+      snmp_trap                      = try(sub.snmp_trap_link_status, local.defaults.nxos.devices.configuration.interfaces.ethernets.subinterfaces.snmp_trap_link_status, null) != null ? (try(sub.snmp_trap_link_status, local.defaults.nxos.devices.configuration.interfaces.ethernets.subinterfaces.snmp_trap_link_status) ? "enable" : "disable") : null
       vrf_dn                         = try(sub.vrf, local.defaults.nxos.devices.configuration.interfaces.ethernets.subinterfaces.vrf, null) != null ? "sys/inst-${try(sub.vrf, local.defaults.nxos.devices.configuration.interfaces.ethernets.subinterfaces.vrf)}" : null
       } }, { for sub in flatten([for int in try(local.device_config[each.key].interfaces.port_channels, []) : [
         for s in try(int.subinterfaces, []) : merge(s, { parent_id = "po${int.id}" })
@@ -32,9 +32,9 @@ resource "nxos_subinterface" "subinterface" {
       medium                         = try(sub.medium, local.defaults.nxos.devices.configuration.interfaces.port_channels.subinterfaces.medium, null)
       mtu                            = try(sub.mtu, local.defaults.nxos.devices.configuration.interfaces.port_channels.subinterfaces.mtu, null)
       mtu_inherit                    = try(sub.mtu_inherit, local.defaults.nxos.devices.configuration.interfaces.port_channels.subinterfaces.mtu_inherit, null)
-      router_mac                     = try(sub.mac, local.defaults.nxos.devices.configuration.interfaces.port_channels.subinterfaces.mac, null)
+      router_mac                     = try(sub.mac_address, local.defaults.nxos.devices.configuration.interfaces.port_channels.subinterfaces.mac_address, null)
       router_mac_ipv6_extract        = try(sub.mac_ipv6_extract, local.defaults.nxos.devices.configuration.interfaces.port_channels.subinterfaces.mac_ipv6_extract, null) != null ? (try(sub.mac_ipv6_extract, local.defaults.nxos.devices.configuration.interfaces.port_channels.subinterfaces.mac_ipv6_extract) ? "enable" : "disable") : null
-      snmp_trap                      = try(sub.snmp_trap, local.defaults.nxos.devices.configuration.interfaces.port_channels.subinterfaces.snmp_trap, null) != null ? (try(sub.snmp_trap, local.defaults.nxos.devices.configuration.interfaces.port_channels.subinterfaces.snmp_trap) ? "enable" : "disable") : null
+      snmp_trap                      = try(sub.snmp_trap_link_status, local.defaults.nxos.devices.configuration.interfaces.port_channels.subinterfaces.snmp_trap_link_status, null) != null ? (try(sub.snmp_trap_link_status, local.defaults.nxos.devices.configuration.interfaces.port_channels.subinterfaces.snmp_trap_link_status) ? "enable" : "disable") : null
       vrf_dn                         = try(sub.vrf, local.defaults.nxos.devices.configuration.interfaces.port_channels.subinterfaces.vrf, null) != null ? "sys/inst-${try(sub.vrf, local.defaults.nxos.devices.configuration.interfaces.port_channels.subinterfaces.vrf)}" : null
   } }, )
 
