@@ -7,7 +7,7 @@ resource "nxos_subinterface" "subinterface" {
     { for sub in flatten([for int in try(local.device_config[each.key].interfaces.ethernets, []) : [
       for s in try(int.subinterfaces, []) : merge(s, { parent_id = "eth${int.id}" })
       ]]) : "${sub.parent_id}.${sub.id}" => {
-      admin_state                    = try(sub.admin_state, local.defaults.nxos.devices.configuration.interfaces.ethernets.subinterfaces.admin_state, null) != null ? (try(sub.admin_state, local.defaults.nxos.devices.configuration.interfaces.ethernets.subinterfaces.admin_state) ? "up" : "down") : null
+      admin_state                    = try(sub.shutdown, local.defaults.nxos.devices.configuration.interfaces.ethernets.subinterfaces.shutdown, null) != null ? (try(sub.shutdown, local.defaults.nxos.devices.configuration.interfaces.ethernets.subinterfaces.shutdown) ? "down" : "up") : null
       bandwidth                      = try(sub.bandwidth, local.defaults.nxos.devices.configuration.interfaces.ethernets.subinterfaces.bandwidth, null)
       delay                          = try(sub.delay, local.defaults.nxos.devices.configuration.interfaces.ethernets.subinterfaces.delay, null)
       description                    = try(sub.description, local.defaults.nxos.devices.configuration.interfaces.ethernets.subinterfaces.description, null)
@@ -20,10 +20,10 @@ resource "nxos_subinterface" "subinterface" {
       router_mac_ipv6_extract        = try(sub.mac_ipv6_extract, local.defaults.nxos.devices.configuration.interfaces.ethernets.subinterfaces.mac_ipv6_extract, null) != null ? (try(sub.mac_ipv6_extract, local.defaults.nxos.devices.configuration.interfaces.ethernets.subinterfaces.mac_ipv6_extract) ? "enable" : "disable") : null
       snmp_trap                      = try(sub.snmp_trap, local.defaults.nxos.devices.configuration.interfaces.ethernets.subinterfaces.snmp_trap, null) != null ? (try(sub.snmp_trap, local.defaults.nxos.devices.configuration.interfaces.ethernets.subinterfaces.snmp_trap) ? "enable" : "disable") : null
       vrf_dn                         = try(sub.vrf, local.defaults.nxos.devices.configuration.interfaces.ethernets.subinterfaces.vrf, null) != null ? "sys/inst-${try(sub.vrf, local.defaults.nxos.devices.configuration.interfaces.ethernets.subinterfaces.vrf)}" : null
-    } },    { for sub in flatten([for int in try(local.device_config[each.key].interfaces.port_channels, []) : [
-      for s in try(int.subinterfaces, []) : merge(s, { parent_id = "po${int.id}" })
+      } }, { for sub in flatten([for int in try(local.device_config[each.key].interfaces.port_channels, []) : [
+        for s in try(int.subinterfaces, []) : merge(s, { parent_id = "po${int.id}" })
       ]]) : "${sub.parent_id}.${sub.id}" => {
-      admin_state                    = try(sub.admin_state, local.defaults.nxos.devices.configuration.interfaces.port_channels.subinterfaces.admin_state, null) != null ? (try(sub.admin_state, local.defaults.nxos.devices.configuration.interfaces.port_channels.subinterfaces.admin_state) ? "up" : "down") : null
+      admin_state                    = try(sub.shutdown, local.defaults.nxos.devices.configuration.interfaces.port_channels.subinterfaces.shutdown, null) != null ? (try(sub.shutdown, local.defaults.nxos.devices.configuration.interfaces.port_channels.subinterfaces.shutdown) ? "down" : "up") : null
       bandwidth                      = try(sub.bandwidth, local.defaults.nxos.devices.configuration.interfaces.port_channels.subinterfaces.bandwidth, null)
       delay                          = try(sub.delay, local.defaults.nxos.devices.configuration.interfaces.port_channels.subinterfaces.delay, null)
       description                    = try(sub.description, local.defaults.nxos.devices.configuration.interfaces.port_channels.subinterfaces.description, null)
@@ -36,7 +36,7 @@ resource "nxos_subinterface" "subinterface" {
       router_mac_ipv6_extract        = try(sub.mac_ipv6_extract, local.defaults.nxos.devices.configuration.interfaces.port_channels.subinterfaces.mac_ipv6_extract, null) != null ? (try(sub.mac_ipv6_extract, local.defaults.nxos.devices.configuration.interfaces.port_channels.subinterfaces.mac_ipv6_extract) ? "enable" : "disable") : null
       snmp_trap                      = try(sub.snmp_trap, local.defaults.nxos.devices.configuration.interfaces.port_channels.subinterfaces.snmp_trap, null) != null ? (try(sub.snmp_trap, local.defaults.nxos.devices.configuration.interfaces.port_channels.subinterfaces.snmp_trap) ? "enable" : "disable") : null
       vrf_dn                         = try(sub.vrf, local.defaults.nxos.devices.configuration.interfaces.port_channels.subinterfaces.vrf, null) != null ? "sys/inst-${try(sub.vrf, local.defaults.nxos.devices.configuration.interfaces.port_channels.subinterfaces.vrf)}" : null
-    } },  )
+  } }, )
 
   depends_on = [
     nxos_physical_interface.physical_interface,
