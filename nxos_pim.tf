@@ -51,7 +51,7 @@ locals {
       } if try(int.pim, null) != null],
       [for int in try(local.device_config[device.name].interfaces.vlans, []) : {
         device               = device.name
-        vrf                  = try(int.vrf, local.defaults.nxos.devices.configuration.interfaces.vlans.vrf, "default")
+        vrf                  = try(int.vrf_member, local.defaults.nxos.devices.configuration.interfaces.vlans.vrf_member, "default")
         interface_id         = "vlan${int.id}"
         bfd                  = try(int.pim.bfd_instance, local.defaults.nxos.devices.configuration.interfaces.vlans.pim.bfd_instance, null)
         dr_priority          = try(int.pim.dr_priority, local.defaults.nxos.devices.configuration.interfaces.vlans.pim.dr_priority, null)
