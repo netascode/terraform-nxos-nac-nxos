@@ -11,7 +11,7 @@ locals {
     for device in local.devices : concat(
       [for int in try(local.device_config[device.name].interfaces.vlans, []) : {
         device       = device.name
-        vrf          = try(int.vrf_member, "default")
+        vrf          = try(int.vrf, "default")
         interface_id = "vlan${int.id}"
         nd           = try(int.nd, {})
       } if try(int.nd, null) != null],

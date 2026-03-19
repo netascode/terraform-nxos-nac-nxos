@@ -11,7 +11,7 @@ resource "nxos_hmm" "hmm" {
   selective_host_probe    = try(local.device_config[each.key].system.fabric_forwarding.selective_host_probe, local.defaults.nxos.devices.configuration.system.fabric_forwarding.selective_host_probe, false) ? "yes" : "no"
   interfaces = { for int in try(local.device_config[each.key].interfaces.vlans, []) : "vlan${int.id}" => {
     admin_state = "enabled"
-    mode        = { "anycast-gateway" = "anycastGW", "proxy-gateway" = "proxyGW" }[try(int.fabric_forwarding_mode, local.defaults.nxos.devices.configuration.interfaces.vlans.fabric_forwarding_mode, null)]
+    mode        = try(int.fabric_forwarding_mode, local.defaults.nxos.devices.configuration.interfaces.vlans.fabric_forwarding_mode, null)
     description = try(int.fabric_forwarding_description, local.defaults.nxos.devices.configuration.interfaces.vlans.fabric_forwarding_description, null)
   } if try(int.fabric_forwarding_mode, local.defaults.nxos.devices.configuration.interfaces.vlans.fabric_forwarding_mode, null) != null }
 
