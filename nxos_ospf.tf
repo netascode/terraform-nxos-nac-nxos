@@ -45,7 +45,7 @@ resource "nxos_ospf" "ospf" {
       max_metric_summary_lsa      = try(vrf.max_metric_router_lsa.summary_lsa_max_metric, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.max_metric_router_lsa.summary_lsa_max_metric, null)
       max_metric_startup_interval = try(vrf.max_metric_router_lsa.on_startup_timeout, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.max_metric_router_lsa.on_startup_timeout, null)
 
-      areas = { for area in try(vrf.areas, []) : area.area => {
+      areas = { for area in try(vrf.areas, []) : area.id => {
         authentication_type = try(area.authentication, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.areas.authentication, null)
         cost                = try(area.default_cost, local.defaults.nxos.devices.configuration.routing.ospf_processes.vrfs.areas.default_cost, null)
         control = join(",", sort(compact([
