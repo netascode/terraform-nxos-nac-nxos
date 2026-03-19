@@ -15,7 +15,7 @@ locals {
         duplex                                  = try(int.duplex, local.defaults.nxos.devices.configuration.interfaces.ethernets.duplex, null)
         fec_mode                                = try(int.fec_mode, local.defaults.nxos.devices.configuration.interfaces.ethernets.fec_mode, null)
         layer3                                  = try(int.layer3, local.defaults.nxos.devices.configuration.interfaces.ethernets.layer3, false)
-        link_debounce_down                      = try(int.link_debounce_down, local.defaults.nxos.devices.configuration.interfaces.ethernets.link_debounce_down, null)
+        link_debounce_time                      = try(int.link_debounce_time, local.defaults.nxos.devices.configuration.interfaces.ethernets.link_debounce_time, null)
         link_debounce_up                        = try(int.link_debounce_up, local.defaults.nxos.devices.configuration.interfaces.ethernets.link_debounce_up, null)
         link_logging                            = try(int.link_logging, local.defaults.nxos.devices.configuration.interfaces.ethernets.link_logging, null)
         medium                                  = try(int.medium, local.defaults.nxos.devices.configuration.interfaces.ethernets.medium, null)
@@ -136,11 +136,11 @@ resource "nxos_physical_interface" "physical_interface" {
     dot1q_ether_type                   = try(int.dot1q_ether_type, local.defaults.nxos.devices.configuration.interfaces.ethernets.dot1q_ether_type, null)
     duplex                             = try(int.duplex, local.defaults.nxos.devices.configuration.interfaces.ethernets.duplex, null)
     equalization_delay                 = try(int.equalization_delay, local.defaults.nxos.devices.configuration.interfaces.ethernets.equalization_delay, null)
-    inherit_bandwidth                  = try(int.inherit_bandwidth, local.defaults.nxos.devices.configuration.interfaces.ethernets.inherit_bandwidth, null)
+    bandwidth_inherit                  = try(int.bandwidth_inherit, local.defaults.nxos.devices.configuration.interfaces.ethernets.bandwidth_inherit, null)
     itu_channel                        = try(int.itu_channel, local.defaults.nxos.devices.configuration.interfaces.ethernets.itu_channel, null)
     layer                              = try(int.port_channel, null) != null ? null : (try(int.layer3, local.defaults.nxos.devices.configuration.interfaces.ethernets.layer3, false) ? "Layer3" : "Layer2")
     link_active_jitter_management      = try(int.link_active_jitter_management, local.defaults.nxos.devices.configuration.interfaces.ethernets.link_active_jitter_management, null) != null ? (try(int.link_active_jitter_management, local.defaults.nxos.devices.configuration.interfaces.ethernets.link_active_jitter_management) ? "enable" : "disable") : null
-    link_debounce_down                 = try(int.link_debounce_down, local.defaults.nxos.devices.configuration.interfaces.ethernets.link_debounce_down, null)
+    link_debounce_time                 = try(int.link_debounce_time, local.defaults.nxos.devices.configuration.interfaces.ethernets.link_debounce_time, null)
     link_debounce_up                   = try(int.link_debounce_up, local.defaults.nxos.devices.configuration.interfaces.ethernets.link_debounce_up, null)
     link_flap_error_disable            = try(int.link_flap_error_disable, local.defaults.nxos.devices.configuration.interfaces.ethernets.link_flap_error_disable, null) != null ? (try(int.link_flap_error_disable, local.defaults.nxos.devices.configuration.interfaces.ethernets.link_flap_error_disable) ? "enable" : "disable") : null
     link_flap_error_max                = try(int.link_flap_error_max, local.defaults.nxos.devices.configuration.interfaces.ethernets.link_flap_error_max, null)

@@ -122,11 +122,11 @@ resource "nxos_port_channel_interface" "port_channel_interface" {
     equalization_delay     = try(int.equalization_delay, local.defaults.nxos.devices.configuration.interfaces.port_channels.equalization_delay, null)
     graceful_convergence   = try(int.graceful_convergence, local.defaults.nxos.devices.configuration.interfaces.port_channels.graceful_convergence, null) != null ? (try(int.graceful_convergence, local.defaults.nxos.devices.configuration.interfaces.port_channels.graceful_convergence) ? "enable" : "disable") : null
     hash_distribution      = try(int.hash_distribution, local.defaults.nxos.devices.configuration.interfaces.port_channels.hash_distribution, null)
-    inherit_bandwidth      = try(int.inherit_bandwidth, local.defaults.nxos.devices.configuration.interfaces.port_channels.inherit_bandwidth, null)
+    bandwidth_inherit      = try(int.bandwidth_inherit, local.defaults.nxos.devices.configuration.interfaces.port_channels.bandwidth_inherit, null)
     itu_channel            = try(int.itu_channel, local.defaults.nxos.devices.configuration.interfaces.port_channels.itu_channel, null)
     lacp_delay_mode        = try(int.lacp_delay_mode, local.defaults.nxos.devices.configuration.interfaces.port_channels.lacp_delay_mode, null) != null ? (try(int.lacp_delay_mode, local.defaults.nxos.devices.configuration.interfaces.port_channels.lacp_delay_mode) ? "enable" : "disable") : null
     lacp_vpc_convergence   = try(int.lacp_vpc_convergence, local.defaults.nxos.devices.configuration.interfaces.port_channels.lacp_vpc_convergence, null) != null ? (try(int.lacp_vpc_convergence, local.defaults.nxos.devices.configuration.interfaces.port_channels.lacp_vpc_convergence) ? "enable" : "disable") : null
-    link_debounce_down     = try(int.link_debounce_down, local.defaults.nxos.devices.configuration.interfaces.port_channels.link_debounce_down, null)
+    link_debounce_time     = try(int.link_debounce_time, local.defaults.nxos.devices.configuration.interfaces.port_channels.link_debounce_time, null)
     load_defer             = try(int.load_defer, local.defaults.nxos.devices.configuration.interfaces.port_channels.load_defer, null) != null ? (try(int.load_defer, local.defaults.nxos.devices.configuration.interfaces.port_channels.load_defer) ? "enable" : "disable") : null
     mdix                   = try(int.mdix, local.defaults.nxos.devices.configuration.interfaces.port_channels.mdix, null)
     optics_loopback        = try(int.optics_loopback, local.defaults.nxos.devices.configuration.interfaces.port_channels.optics_loopback, null)
