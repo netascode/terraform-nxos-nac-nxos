@@ -63,7 +63,7 @@ resource "nxos_bgp" "bgp" {
     route_control_suppress_routes      = try(vrf.suppress_fib_pending, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.suppress_fib_pending, false) ? "enabled" : "disabled"
 
     graceful_restart_control        = try(vrf.graceful_restart, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.graceful_restart, null)
-    graceful_restart_interval       = try(vrf.graceful_restart_time, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.graceful_restart_time, null)
+    graceful_restart_interval       = try(vrf.graceful_restart_restart_time, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.graceful_restart_restart_time, null)
     graceful_restart_stale_interval = try(vrf.graceful_restart_stalepath_time, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.graceful_restart_stalepath_time, null)
 
     address_families = { for af in try(vrf.address_families, []) : local.address_family_names_map[af.address_family] => {
@@ -102,8 +102,8 @@ resource "nxos_bgp" "bgp" {
       origin_as_validate_signal_ibgp         = try(af.origin_as_validate_signal_ibgp, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.address_families.origin_as_validate_signal_ibgp, false) ? "enabled" : "disabled"
       retain_rt_route_map                    = try(af.retain_route_target_route_map, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.address_families.retain_route_target_route_map, null)
       table_map_filter                       = try(af.table_map_filter, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.address_families.table_map_filter, false) ? "enabled" : "disabled"
-      timer_bestpath_defer                   = try(af.timer_bestpath_defer, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.address_families.timer_bestpath_defer, null)
-      timer_bestpath_defer_max               = try(af.timer_bestpath_defer_maximum, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.address_families.timer_bestpath_defer_maximum, null)
+      timer_bestpath_defer                   = try(af.timers_bestpath_defer, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.address_families.timers_bestpath_defer, null)
+      timer_bestpath_defer_max               = try(af.timers_bestpath_defer_maximum, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.address_families.timers_bestpath_defer_maximum, null)
 
       advertised_prefixes = { for prefix in try(af.networks, []) : prefix.prefix => {
         route_map = try(prefix.route_map, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.address_families.networks.route_map, null)
