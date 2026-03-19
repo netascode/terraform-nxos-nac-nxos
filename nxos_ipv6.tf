@@ -18,7 +18,7 @@ locals {
       # Ethernets (L3 only)
       [for int in try(local.device_config[device.name].interfaces.ethernets, []) : {
         device                                   = device.name
-        vrf                                      = try(int.vrf_member, local.defaults.nxos.devices.configuration.interfaces.ethernets.vrf_member, "default")
+        vrf                                      = try(int.vrf, local.defaults.nxos.devices.configuration.interfaces.ethernets.vrf, "default")
         id                                       = "eth${int.id}"
         ipv6_address_autoconfig                  = try(int.ipv6_address_autoconfig, local.defaults.nxos.devices.configuration.interfaces.ethernets.ipv6_address_autoconfig, null)
         ipv6_default_route                       = try(int.ipv6_default_route, local.defaults.nxos.devices.configuration.interfaces.ethernets.ipv6_default_route, null)
@@ -33,7 +33,7 @@ locals {
       # Loopbacks
       [for int in try(local.device_config[device.name].interfaces.loopbacks, []) : {
         device                                   = device.name
-        vrf                                      = try(int.vrf_member, local.defaults.nxos.devices.configuration.interfaces.loopbacks.vrf_member, "default")
+        vrf                                      = try(int.vrf, local.defaults.nxos.devices.configuration.interfaces.loopbacks.vrf, "default")
         id                                       = "lo${int.id}"
         ipv6_address_autoconfig                  = try(int.ipv6_address_autoconfig, local.defaults.nxos.devices.configuration.interfaces.loopbacks.ipv6_address_autoconfig, null)
         ipv6_default_route                       = try(int.ipv6_default_route, local.defaults.nxos.devices.configuration.interfaces.loopbacks.ipv6_default_route, null)
@@ -47,7 +47,7 @@ locals {
       # SVIs
       [for int in try(local.device_config[device.name].interfaces.vlans, []) : {
         device                                   = device.name
-        vrf                                      = try(int.vrf_member, local.defaults.nxos.devices.configuration.interfaces.vlans.vrf_member, "default")
+        vrf                                      = try(int.vrf, local.defaults.nxos.devices.configuration.interfaces.vlans.vrf, "default")
         id                                       = "vlan${int.id}"
         ipv6_address_autoconfig                  = try(int.ipv6_address_autoconfig, local.defaults.nxos.devices.configuration.interfaces.vlans.ipv6_address_autoconfig, null)
         ipv6_default_route                       = try(int.ipv6_default_route, local.defaults.nxos.devices.configuration.interfaces.vlans.ipv6_default_route, null)
@@ -61,7 +61,7 @@ locals {
       # Port channels (L3 only)
       [for int in try(local.device_config[device.name].interfaces.port_channels, []) : {
         device                                   = device.name
-        vrf                                      = try(int.vrf_member, local.defaults.nxos.devices.configuration.interfaces.port_channels.vrf_member, "default")
+        vrf                                      = try(int.vrf, local.defaults.nxos.devices.configuration.interfaces.port_channels.vrf, "default")
         id                                       = "po${int.id}"
         ipv6_address_autoconfig                  = try(int.ipv6_address_autoconfig, local.defaults.nxos.devices.configuration.interfaces.port_channels.ipv6_address_autoconfig, null)
         ipv6_default_route                       = try(int.ipv6_default_route, local.defaults.nxos.devices.configuration.interfaces.port_channels.ipv6_default_route, null)

@@ -18,7 +18,7 @@ locals {
       # Ethernets (L3 only)
       [for int in try(local.device_config[device.name].interfaces.ethernets, []) : {
         device                                 = device.name
-        vrf                                    = try(int.vrf_member, local.defaults.nxos.devices.configuration.interfaces.ethernets.vrf_member, "default")
+        vrf                                    = try(int.vrf, local.defaults.nxos.devices.configuration.interfaces.ethernets.vrf, "default")
         id                                     = "eth${int.id}"
         drop_glean                             = null
         forward                                = null
@@ -33,7 +33,7 @@ locals {
       # Loopbacks
       [for int in try(local.device_config[device.name].interfaces.loopbacks, []) : {
         device                                 = device.name
-        vrf                                    = try(int.vrf_member, local.defaults.nxos.devices.configuration.interfaces.loopbacks.vrf_member, "default")
+        vrf                                    = try(int.vrf, local.defaults.nxos.devices.configuration.interfaces.loopbacks.vrf, "default")
         id                                     = "lo${int.id}"
         drop_glean                             = null
         forward                                = null
@@ -47,7 +47,7 @@ locals {
       # SVIs
       [for int in try(local.device_config[device.name].interfaces.vlans, []) : {
         device                                 = device.name
-        vrf                                    = try(int.vrf_member, local.defaults.nxos.devices.configuration.interfaces.vlans.vrf_member, "default")
+        vrf                                    = try(int.vrf, local.defaults.nxos.devices.configuration.interfaces.vlans.vrf, "default")
         id                                     = "vlan${int.id}"
         drop_glean                             = try(int.ip_drop_glean, local.defaults.nxos.devices.configuration.interfaces.vlans.ip_drop_glean, null) != null ? (try(int.ip_drop_glean, local.defaults.nxos.devices.configuration.interfaces.vlans.ip_drop_glean) ? "enabled" : "disabled") : null
         forward                                = try(int.ip_forward, local.defaults.nxos.devices.configuration.interfaces.vlans.ip_forward, null) != null ? (try(int.ip_forward, local.defaults.nxos.devices.configuration.interfaces.vlans.ip_forward) ? "enabled" : "disabled") : null
@@ -61,7 +61,7 @@ locals {
       # Port channels (L3 only)
       [for int in try(local.device_config[device.name].interfaces.port_channels, []) : {
         device                                 = device.name
-        vrf                                    = try(int.vrf_member, local.defaults.nxos.devices.configuration.interfaces.port_channels.vrf_member, "default")
+        vrf                                    = try(int.vrf, local.defaults.nxos.devices.configuration.interfaces.port_channels.vrf, "default")
         id                                     = "po${int.id}"
         drop_glean                             = null
         forward                                = null

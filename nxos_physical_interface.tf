@@ -26,7 +26,7 @@ locals {
         speed_group                             = try(int.speed_group, local.defaults.nxos.devices.configuration.interfaces.ethernets.speed_group, null)
         switchport_trunk_allowed_vlans          = try(int.switchport_trunk_allowed_vlans, local.defaults.nxos.devices.configuration.interfaces.ethernets.switchport_trunk_allowed_vlans, null)
         uni_directional_ethernet                = try(int.uni_directional_ethernet, local.defaults.nxos.devices.configuration.interfaces.ethernets.uni_directional_ethernet, null)
-        vrf                                     = try(int.vrf_member, local.defaults.nxos.devices.configuration.interfaces.ethernets.vrf_member, "default")
+        vrf                                     = try(int.vrf, local.defaults.nxos.devices.configuration.interfaces.ethernets.vrf, "default")
         ip_unnumbered                           = try(int.ip_unnumbered, local.defaults.nxos.devices.configuration.interfaces.ethernets.ip_unnumbered, null)
         ip_verify_unicast_source_reachable_via  = try(int.ip_verify_unicast_source_reachable_via, local.defaults.nxos.devices.configuration.interfaces.ethernets.ip_verify_unicast_source_reachable_via, null)
         ip_address                              = try(int.ip_address, local.defaults.nxos.devices.configuration.interfaces.ethernets.ip_address, null)
@@ -172,7 +172,7 @@ resource "nxos_physical_interface" "physical_interface" {
     switchport_voice_trust             = try(int.switchport_voice_trust, local.defaults.nxos.devices.configuration.interfaces.ethernets.switchport_voice_trust, null) != null ? (try(int.switchport_voice_trust, local.defaults.nxos.devices.configuration.interfaces.ethernets.switchport_voice_trust) ? "enable" : "disable") : null
     switchport_voice_vlan_id           = try(int.switchport_voice_vlan, local.defaults.nxos.devices.configuration.interfaces.ethernets.switchport_voice_vlan, null)
     switchport_voice_vlan_type         = try(int.switchport_voice_vlan_type, local.defaults.nxos.devices.configuration.interfaces.ethernets.switchport_voice_vlan_type, null)
-    vrf_dn                             = try(int.channel_group, null) != null ? null : (!try(int.switchport, local.defaults.nxos.devices.configuration.interfaces.ethernets.switchport, true) ? "sys/inst-${try(int.vrf_member, local.defaults.nxos.devices.configuration.interfaces.ethernets.vrf_member, "default")}" : null)
+    vrf_dn                             = try(int.channel_group, null) != null ? null : (!try(int.switchport, local.defaults.nxos.devices.configuration.interfaces.ethernets.switchport, true) ? "sys/inst-${try(int.vrf, local.defaults.nxos.devices.configuration.interfaces.ethernets.vrf, "default")}" : null)
   } }
 
   depends_on = [

@@ -6,7 +6,7 @@ locals {
         device                                  = device.name
         id                                      = int.id
         type                                    = "po"
-        vrf                                     = try(int.vrf_member, local.defaults.nxos.devices.configuration.interfaces.port_channels.vrf_member, "default")
+        vrf                                     = try(int.vrf, local.defaults.nxos.devices.configuration.interfaces.port_channels.vrf, "default")
         ospf_process_name                       = try(int.ospf.process, local.defaults.nxos.devices.configuration.interfaces.port_channels.ospf.process, null)
         ospf_advertise_secondaries              = try(int.ospf.advertise_secondaries, local.defaults.nxos.devices.configuration.interfaces.port_channels.ospf.advertise_secondaries, false)
         ospf_area                               = try(int.ospf.area, local.defaults.nxos.devices.configuration.interfaces.port_channels.ospf.area, null)
