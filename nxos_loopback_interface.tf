@@ -6,7 +6,7 @@ locals {
         device                                  = device.name
         id                                      = int.id
         type                                    = "lo"
-        admin_state                             = try(int.shutdown, local.defaults.nxos.devices.configuration.interfaces.loopbacks.shutdown, false)
+        admin_state                             = try(int.admin_state, local.defaults.nxos.devices.configuration.interfaces.loopbacks.admin_state, false)
         description                             = try(int.description, local.defaults.nxos.devices.configuration.interfaces.loopbacks.description, null)
         vrf                                     = try(int.vrf, local.defaults.nxos.devices.configuration.interfaces.loopbacks.vrf, "default")
         ip_address                              = try(int.ip_address, local.defaults.nxos.devices.configuration.interfaces.loopbacks.ip_address, null)
@@ -102,10 +102,10 @@ resource "nxos_loopback_interface" "loopback_interface" {
   if length(try(local.device_config[device.name].interfaces.loopbacks, [])) > 0 }
   device = each.key
   loopback_interfaces = { for int in try(local.device_config[each.key].interfaces.loopbacks, []) : "lo${int.id}" => {
-    admin_state  = try(int.shutdown, local.defaults.nxos.devices.configuration.interfaces.loopbacks.shutdown, false) ? "down" : "up"
-    description  = try(int.description, local.defaults.nxos.devices.configuration.interfaces.loopbacks.description, null)
-    link_logging = try(int.link_logging, local.defaults.nxos.devices.configuration.interfaces.loopbacks.link_logging, null) == null ? null : try(int.link_logging, local.defaults.nxos.devices.configuration.interfaces.loopbacks.link_logging, null) ? "enable" : "disable"
-    vrf_dn       = "sys/inst-${try(int.vrf, local.defaults.nxos.devices.configuration.interfaces.loopbacks.vrf, "default")}"
+    admin_state                    = try(int.admin_state, local.defaults.nxos.devices.configuration.interfaces.loopbacks.admin_state, false) ? "up" : "down"
+    description                    = try(int.description, local.defaults.nxos.devices.configuration.interfaces.loopbacks.description, null)
+    logging_event_port_link_status = try(int.logging_event_port_link_status, local.defaults.nxos.devices.configuration.interfaces.loopbacks.logging_event_port_link_status, null) == null ? null : try(int.logging_event_port_link_status, local.defaults.nxos.devices.configuration.interfaces.loopbacks.logging_event_port_link_status, null) ? "enable" : "disable"
+    vrf_dn                         = "sys/inst-${try(int.vrf, local.defaults.nxos.devices.configuration.interfaces.loopbacks.vrf, "default")}"
   } }
 
   depends_on = [

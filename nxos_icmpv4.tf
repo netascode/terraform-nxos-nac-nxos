@@ -3,7 +3,7 @@ locals {
     for device in local.devices : concat(
       [for int in try(local.device_config[device.name].interfaces.ethernets, []) : {
         device              = device.name
-        vrf                 = try(int.vrf, local.defaults.nxos.devices.configuration.interfaces.ethernets.vrf, "default")
+        vrf                 = try(int.vrf_member, local.defaults.nxos.devices.configuration.interfaces.ethernets.vrf_member, "default")
         id                  = "eth${int.id}"
         ip_redirects        = try(int.ip_redirects, local.defaults.nxos.devices.configuration.interfaces.ethernets.ip_redirects, null)
         ip_unreachables     = try(int.ip_unreachables, local.defaults.nxos.devices.configuration.interfaces.ethernets.ip_unreachables, null)
@@ -15,7 +15,7 @@ locals {
       ],
       [for int in try(local.device_config[device.name].interfaces.loopbacks, []) : {
         device              = device.name
-        vrf                 = try(int.vrf, local.defaults.nxos.devices.configuration.interfaces.loopbacks.vrf, "default")
+        vrf                 = try(int.vrf_member, local.defaults.nxos.devices.configuration.interfaces.loopbacks.vrf_member, "default")
         id                  = "lo${int.id}"
         ip_redirects        = try(int.ip_redirects, local.defaults.nxos.devices.configuration.interfaces.loopbacks.ip_redirects, null)
         ip_unreachables     = try(int.ip_unreachables, local.defaults.nxos.devices.configuration.interfaces.loopbacks.ip_unreachables, null)
@@ -27,7 +27,7 @@ locals {
       ],
       [for int in try(local.device_config[device.name].interfaces.vlans, []) : {
         device              = device.name
-        vrf                 = try(int.vrf, local.defaults.nxos.devices.configuration.interfaces.vlans.vrf, "default")
+        vrf                 = try(int.vrf_member, local.defaults.nxos.devices.configuration.interfaces.vlans.vrf_member, "default")
         id                  = "vlan${int.id}"
         ip_redirects        = try(int.ip_redirects, local.defaults.nxos.devices.configuration.interfaces.vlans.ip_redirects, null)
         ip_unreachables     = try(int.ip_unreachables, local.defaults.nxos.devices.configuration.interfaces.vlans.ip_unreachables, null)
@@ -39,7 +39,7 @@ locals {
       ],
       [for int in try(local.device_config[device.name].interfaces.port_channels, []) : {
         device              = device.name
-        vrf                 = try(int.vrf, local.defaults.nxos.devices.configuration.interfaces.port_channels.vrf, "default")
+        vrf                 = try(int.vrf_member, local.defaults.nxos.devices.configuration.interfaces.port_channels.vrf_member, "default")
         id                  = "po${int.id}"
         ip_redirects        = try(int.ip_redirects, local.defaults.nxos.devices.configuration.interfaces.port_channels.ip_redirects, null)
         ip_unreachables     = try(int.ip_unreachables, local.defaults.nxos.devices.configuration.interfaces.port_channels.ip_unreachables, null)
