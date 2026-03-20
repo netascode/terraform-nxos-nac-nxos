@@ -1,3 +1,10 @@
+locals {
+  bridge_domain_mode_map = {
+    "ce"          = "CE"
+    "fabric-path" = "FabricPath"
+  }
+}
+
 resource "nxos_bridge_domain" "bridge_domain" {
   for_each = { for device in local.devices : device.name => device
     if try(local.device_config[device.name].system.interface_vlan_autostate, local.defaults.nxos.devices.configuration.system.interface_vlan_autostate, null) != null ||
@@ -19,7 +26,7 @@ resource "nxos_bridge_domain" "bridge_domain" {
     ])))
     long_name           = try(vlan.long_name, local.defaults.nxos.devices.configuration.vlan.vlans.long_name, null)
     mac_packet_classify = try(vlan.mac_packet_classify, local.defaults.nxos.devices.configuration.vlan.vlans.mac_packet_classify, null) == null ? null : try(vlan.mac_packet_classify, local.defaults.nxos.devices.configuration.vlan.vlans.mac_packet_classify) ? "enable" : "disable"
-    mode                = try(vlan.mode, local.defaults.nxos.devices.configuration.vlan.vlans.mode, null)
+    mode                = try(local.bridge_domain_mode_map[try(vlan.mode, local.defaults.nxos.devices.configuration.vlan.vlans.mode)], null)
     vrf_name            = try(vlan.vrf, local.defaults.nxos.devices.configuration.vlan.vlans.vrf, null)
     cross_connect       = try(vlan.cross_connect, local.defaults.nxos.devices.configuration.vlan.vlans.cross_connect, null) == null ? null : try(vlan.cross_connect, local.defaults.nxos.devices.configuration.vlan.vlans.cross_connect) ? "enable" : "disable"
   } }

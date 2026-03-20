@@ -136,7 +136,7 @@ resource "nxos_physical_interface" "physical_interface" {
     dot1q_ethertype                    = try(int.dot1q_ethertype, local.defaults.nxos.devices.configuration.interfaces.ethernets.dot1q_ethertype, null)
     duplex                             = try(int.duplex, local.defaults.nxos.devices.configuration.interfaces.ethernets.duplex, null)
     itu_channel                        = try(int.itu_channel, local.defaults.nxos.devices.configuration.interfaces.ethernets.itu_channel, null)
-    layer                              = try(int.channel_group, null) != null ? null : (!try(int.switchport, local.defaults.nxos.devices.configuration.interfaces.ethernets.switchport, true) ? "layer3" : "layer2")
+    layer                              = try(int.channel_group, null) != null ? null : (!try(int.switchport, local.defaults.nxos.devices.configuration.interfaces.ethernets.switchport, true) ? "Layer3" : "Layer2")
     link_active_jitter_management      = try(int.link_active_jitter_management, local.defaults.nxos.devices.configuration.interfaces.ethernets.link_active_jitter_management, null) != null ? (try(int.link_active_jitter_management, local.defaults.nxos.devices.configuration.interfaces.ethernets.link_active_jitter_management) ? "enable" : "disable") : null
     link_debounce_down                 = try(int.link_debounce_time, local.defaults.nxos.devices.configuration.interfaces.ethernets.link_debounce_time, null)
     link_debounce_up                   = try(int.link_debounce_link_up, local.defaults.nxos.devices.configuration.interfaces.ethernets.link_debounce_link_up, null)

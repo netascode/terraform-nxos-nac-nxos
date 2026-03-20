@@ -1,3 +1,11 @@
+locals {
+  user_privilege_type_map = {
+    "no-data-priv" = "noDataPriv"
+    "read-priv"    = "readPriv"
+    "write-priv"   = "writePriv"
+  }
+}
+
 resource "nxos_user_management" "user_management" {
   for_each = { for device in local.devices : device.name => device
     if try(local.device_config[device.name].aaa.users, null) != null ||
@@ -48,7 +56,7 @@ resource "nxos_user_management" "user_management" {
     # User roles (aaaUserRole via aaaUserDomain) — data model path: users.accounts.roles
     roles = { for role in try(user.roles, []) : role.name => {
       description    = try(role.description, local.defaults.nxos.devices.configuration.aaa.users.accounts.roles.description, null)
-      privilege_type = try(role.privilege_type, local.defaults.nxos.devices.configuration.aaa.users.accounts.roles.privilege_type, null)
+      privilege_type = try(local.user_privilege_type_map[try(role.privilege_type, local.defaults.nxos.devices.configuration.aaa.users.accounts.roles.privilege_type)], null)
     } }
   } }
 

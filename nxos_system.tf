@@ -6,6 +6,10 @@ locals {
     "trunk-status-default" = "trunkStatusDefault"
     "trunk-status-enable"  = "trunkStatusEnable"
   }
+  layer_map = {
+    "layer2" = "Layer2"
+    "layer3" = "Layer3"
+  }
 
   nd_interfaces = flatten([
     for device in local.devices : concat(
@@ -74,7 +78,7 @@ resource "nxos_system" "system" {
   ethernet_allow_unsupported_sfp                = try(local.device_config[each.key].system.ethernet.service_unsupported_transceiver, local.defaults.nxos.devices.configuration.system.ethernet.service_unsupported_transceiver, null)
   ethernet_interface_syslog_info                = try(local.device_config[each.key].system.ethernet.interface_syslog_info, local.defaults.nxos.devices.configuration.system.ethernet.interface_syslog_info, null)
   ethernet_log_event                            = try(local.device_config[each.key].system.ethernet.logging_event_port, local.defaults.nxos.devices.configuration.system.ethernet.logging_event_port, null) != null ? try(local.log_event_map[try(local.device_config[each.key].system.ethernet.logging_event_port, local.defaults.nxos.devices.configuration.system.ethernet.logging_event_port)], null) : null
-  ethernet_default_layer                        = try(local.device_config[each.key].system.ethernet.default_switchport, local.defaults.nxos.devices.configuration.system.ethernet.default_switchport, null)
+  ethernet_default_layer                        = try(local.layer_map[try(local.device_config[each.key].system.ethernet.default_switchport, local.defaults.nxos.devices.configuration.system.ethernet.default_switchport)], null)
   ethernet_system_interface_admin_state         = try(local.device_config[each.key].system.ethernet.default_interface_shutdown, local.defaults.nxos.devices.configuration.system.ethernet.default_interface_shutdown, null)
   ethernet_system_link_failure_laser_on         = try(local.device_config[each.key].system.ethernet.link_failure_laser_on, local.defaults.nxos.devices.configuration.system.ethernet.link_failure_laser_on, null)
   ethernet_system_storm_control_multi_threshold = try(local.device_config[each.key].system.ethernet.storm_control_multicast, local.defaults.nxos.devices.configuration.system.ethernet.storm_control_multicast, null)

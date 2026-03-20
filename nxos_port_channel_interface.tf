@@ -110,7 +110,7 @@ resource "nxos_port_channel_interface" "port_channel_interface" {
     delay                 = try(int.delay, local.defaults.nxos.devices.configuration.interfaces.port_channels.delay, null)
     description           = try(int.description, local.defaults.nxos.devices.configuration.interfaces.port_channels.description, null)
     duplex                = try(int.duplex, local.defaults.nxos.devices.configuration.interfaces.port_channels.duplex, null)
-    layer                 = !try(int.switchport, local.defaults.nxos.devices.configuration.interfaces.port_channels.switchport, true) ? "layer3" : "layer2"
+    layer                 = !try(int.switchport, local.defaults.nxos.devices.configuration.interfaces.port_channels.switchport, true) ? "Layer3" : "Layer2"
     link_logging          = try(int.logging_event_port_link_status, local.defaults.nxos.devices.configuration.interfaces.port_channels.logging_event_port_link_status, null) != null ? (try(int.logging_event_port_link_status, local.defaults.nxos.devices.configuration.interfaces.port_channels.logging_event_port_link_status) ? "enable" : "disable") : null
     medium                = try(int.medium, local.defaults.nxos.devices.configuration.interfaces.port_channels.medium, null)
     mode                  = try(int.switchport_mode, local.defaults.nxos.devices.configuration.interfaces.port_channels.switchport_mode, null)
