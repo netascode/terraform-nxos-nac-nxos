@@ -1,4 +1,8 @@
 locals {
+  switchport_mode_map = {
+    "trunk-secondary"   = "trunk_secondary"
+    "trunk-promiscuous" = "trunk_promiscuous"
+  }
   interfaces_ethernets = flatten([
     for device in local.devices : [
       for int in try(local.device_config[device.name].interfaces.ethernets, []) : {
@@ -19,7 +23,7 @@ locals {
         link_debounce_link_up                   = try(int.link_debounce_link_up, local.defaults.nxos.devices.configuration.interfaces.ethernets.link_debounce_link_up, null)
         logging_event_port_link_status          = try(int.logging_event_port_link_status, local.defaults.nxos.devices.configuration.interfaces.ethernets.logging_event_port_link_status, null)
         medium                                  = try(int.medium, local.defaults.nxos.devices.configuration.interfaces.ethernets.medium, null)
-        mode                                    = try(int.switchport_mode, local.defaults.nxos.devices.configuration.interfaces.ethernets.switchport_mode, null)
+        mode                                    = try(local.switchport_mode_map[try(int.switchport_mode, local.defaults.nxos.devices.configuration.interfaces.ethernets.switchport_mode)], try(int.switchport_mode, local.defaults.nxos.devices.configuration.interfaces.ethernets.switchport_mode, null))
         mtu                                     = try(int.mtu, local.defaults.nxos.devices.configuration.interfaces.ethernets.mtu, null)
         switchport_trunk_native_vlan            = try(int.switchport_trunk_native_vlan, local.defaults.nxos.devices.configuration.interfaces.ethernets.switchport_trunk_native_vlan, 1)
         speed                                   = try(int.speed, local.defaults.nxos.devices.configuration.interfaces.ethernets.speed, null)
@@ -151,7 +155,7 @@ resource "nxos_physical_interface" "physical_interface" {
     mdix                               = try(int.mdix, local.defaults.nxos.devices.configuration.interfaces.ethernets.mdix, null)
     media_type                         = try(int.media_type, local.defaults.nxos.devices.configuration.interfaces.ethernets.media_type, null)
     medium                             = try(int.medium, local.defaults.nxos.devices.configuration.interfaces.ethernets.medium, null)
-    mode                               = try(int.switchport_mode, local.defaults.nxos.devices.configuration.interfaces.ethernets.switchport_mode, null)
+    mode                               = try(local.switchport_mode_map[try(int.switchport_mode, local.defaults.nxos.devices.configuration.interfaces.ethernets.switchport_mode)], try(int.switchport_mode, local.defaults.nxos.devices.configuration.interfaces.ethernets.switchport_mode, null))
     mtu                                = try(int.mtu, local.defaults.nxos.devices.configuration.interfaces.ethernets.mtu, null)
     native_vlan                        = try(int.channel_group, null) != null ? null : (!try(int.switchport, local.defaults.nxos.devices.configuration.interfaces.ethernets.switchport, true) ? "unknown" : "vlan-${try(int.switchport_trunk_native_vlan, local.defaults.nxos.devices.configuration.interfaces.ethernets.switchport_trunk_native_vlan, 1)}")
     packet_timestamp_egress_source_id  = try(int.packet_timestamp_egress_source_id, local.defaults.nxos.devices.configuration.interfaces.ethernets.packet_timestamp_egress_source_id, null)

@@ -113,7 +113,7 @@ resource "nxos_port_channel_interface" "port_channel_interface" {
     layer                 = !try(int.switchport, local.defaults.nxos.devices.configuration.interfaces.port_channels.switchport, true) ? "Layer3" : "Layer2"
     link_logging          = try(int.logging_event_port_link_status, local.defaults.nxos.devices.configuration.interfaces.port_channels.logging_event_port_link_status, null) != null ? (try(int.logging_event_port_link_status, local.defaults.nxos.devices.configuration.interfaces.port_channels.logging_event_port_link_status) ? "enable" : "disable") : null
     medium                = try(int.medium, local.defaults.nxos.devices.configuration.interfaces.port_channels.medium, null)
-    mode                  = try(int.switchport_mode, local.defaults.nxos.devices.configuration.interfaces.port_channels.switchport_mode, null)
+    mode                  = try(local.switchport_mode_map[try(int.switchport_mode, local.defaults.nxos.devices.configuration.interfaces.port_channels.switchport_mode)], try(int.switchport_mode, local.defaults.nxos.devices.configuration.interfaces.port_channels.switchport_mode, null))
     mtu                   = try(int.mtu, local.defaults.nxos.devices.configuration.interfaces.port_channels.mtu, null)
     native_vlan           = !try(int.switchport, local.defaults.nxos.devices.configuration.interfaces.port_channels.switchport, true) ? "unknown" : "vlan-${try(int.switchport_trunk_native_vlan, local.defaults.nxos.devices.configuration.interfaces.port_channels.switchport_trunk_native_vlan, 1)}"
     speed                 = try(int.speed, local.defaults.nxos.devices.configuration.interfaces.port_channels.speed, null)
