@@ -59,7 +59,7 @@ resource "nxos_system" "system" {
     try(local.device_config[device.name].system.mtu, local.defaults.nxos.devices.configuration.system.mtu, null) != null ||
     try(local.device_config[device.name].system.ethernet, null) != null ||
     try(local.device_config[device.name].arp, null) != null ||
-    try(local.device_config[device.name].system.ipv6_nd, null) != null ||
+    try(local.device_config[device.name].nd, null) != null ||
   length(try(local.nd_interfaces_by_device[device.name], [])) > 0 }
   device = each.key
 
@@ -106,14 +106,14 @@ resource "nxos_system" "system" {
   # ndEntity / ndInst attributes
   nd_admin_state                         = "enabled"
   nd_instance_admin_state                = "enabled"
-  nd_accept_solicit_neighbor_entry       = try(local.device_config[each.key].system.ipv6_nd.accept_solicit_neighbor_entry, local.defaults.nxos.devices.configuration.system.ipv6_nd.accept_solicit_neighbor_entry, null)
-  nd_aging_interval                      = try(local.device_config[each.key].system.ipv6_nd.aging_interval, local.defaults.nxos.devices.configuration.system.ipv6_nd.aging_interval, null)
-  nd_cache_limit                         = try(local.device_config[each.key].system.ipv6_nd.cache_limit, local.defaults.nxos.devices.configuration.system.ipv6_nd.cache_limit, null)
-  nd_cache_syslog_rate                   = try(local.device_config[each.key].system.ipv6_nd.cache_syslog_rate, local.defaults.nxos.devices.configuration.system.ipv6_nd.cache_syslog_rate, null)
-  nd_ipv6_adjacency_route_distance       = try(local.device_config[each.key].system.ipv6_nd.adjacency_route_distance, local.defaults.nxos.devices.configuration.system.ipv6_nd.adjacency_route_distance, null)
-  nd_off_list_timeout                    = try(local.device_config[each.key].system.ipv6_nd.off_list_timeout, local.defaults.nxos.devices.configuration.system.ipv6_nd.off_list_timeout, null)
-  nd_probe_interval_for_solicit_neighbor = try(local.device_config[each.key].system.ipv6_nd.probe_interval_for_solicit_neighbor, local.defaults.nxos.devices.configuration.system.ipv6_nd.probe_interval_for_solicit_neighbor, null)
-  nd_solicit_neighbor_advertisement      = try(local.device_config[each.key].system.ipv6_nd.solicit_neighbor_advertisement, local.defaults.nxos.devices.configuration.system.ipv6_nd.solicit_neighbor_advertisement, null) != null ? (try(local.device_config[each.key].system.ipv6_nd.solicit_neighbor_advertisement, local.defaults.nxos.devices.configuration.system.ipv6_nd.solicit_neighbor_advertisement) ? "enabled" : "disabled") : null
+  nd_accept_solicit_neighbor_entry       = try(local.device_config[each.key].nd.accept_solicit_neighbor_entry, local.defaults.nxos.devices.configuration.nd.accept_solicit_neighbor_entry, null)
+  nd_aging_interval                      = try(local.device_config[each.key].nd.aging_interval, local.defaults.nxos.devices.configuration.nd.aging_interval, null)
+  nd_cache_limit                         = try(local.device_config[each.key].nd.cache_limit, local.defaults.nxos.devices.configuration.nd.cache_limit, null)
+  nd_cache_syslog_rate                   = try(local.device_config[each.key].nd.cache_syslog_rate, local.defaults.nxos.devices.configuration.nd.cache_syslog_rate, null)
+  nd_ipv6_adjacency_route_distance       = try(local.device_config[each.key].nd.adjacency_route_distance, local.defaults.nxos.devices.configuration.nd.adjacency_route_distance, null)
+  nd_off_list_timeout                    = try(local.device_config[each.key].nd.off_list_timeout, local.defaults.nxos.devices.configuration.nd.off_list_timeout, null)
+  nd_probe_interval_for_solicit_neighbor = try(local.device_config[each.key].nd.probe_interval_for_solicit_neighbor, local.defaults.nxos.devices.configuration.nd.probe_interval_for_solicit_neighbor, null)
+  nd_solicit_neighbor_advertisement      = try(local.device_config[each.key].nd.solicit_neighbor_advertisement, local.defaults.nxos.devices.configuration.nd.solicit_neighbor_advertisement, null) != null ? (try(local.device_config[each.key].nd.solicit_neighbor_advertisement, local.defaults.nxos.devices.configuration.nd.solicit_neighbor_advertisement) ? "enabled" : "disabled") : null
 
   # ndDom -> ndIf nested maps (VRF -> interfaces)
   nd_vrfs = { for vrf_name, vrf_data in try(local.nd_vrfs_by_device[each.key], {}) : vrf_name => {

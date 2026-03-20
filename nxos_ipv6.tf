@@ -81,10 +81,10 @@ resource "nxos_ipv6" "ipv6" {
   for_each = { for device in local.devices : device.name => device
     if try(local.device_config[device.name].system.ipv6_routing, local.defaults.nxos.devices.configuration.system.ipv6_routing, null) != null ||
     try(local.device_config[device.name].system.ipv6_access_list_match_local_traffic, local.defaults.nxos.devices.configuration.system.ipv6_access_list_match_local_traffic, null) != null ||
-    try(local.device_config[device.name].system.ipv6_nd_drop_nd_fragments, local.defaults.nxos.devices.configuration.system.ipv6_nd_drop_nd_fragments, null) != null ||
-    try(local.device_config[device.name].system.ipv6_queue_packets, local.defaults.nxos.devices.configuration.system.ipv6_queue_packets, null) != null ||
-    try(local.device_config[device.name].system.ipv6_nd_allow_static_neighbor_outside_subnet, local.defaults.nxos.devices.configuration.system.ipv6_nd_allow_static_neighbor_outside_subnet, null) != null ||
-    try(local.device_config[device.name].system.ipv6_nd_switch_packets, local.defaults.nxos.devices.configuration.system.ipv6_nd_switch_packets, null) != null ||
+    try(local.device_config[device.name].nd.drop_nd_fragments, local.defaults.nxos.devices.configuration.nd.drop_nd_fragments, null) != null ||
+    try(local.device_config[device.name].nd.queue_packets, local.defaults.nxos.devices.configuration.nd.queue_packets, null) != null ||
+    try(local.device_config[device.name].nd.allow_static_neighbor_outside_subnet, local.defaults.nxos.devices.configuration.nd.allow_static_neighbor_outside_subnet, null) != null ||
+    try(local.device_config[device.name].nd.switch_packets, local.defaults.nxos.devices.configuration.nd.switch_packets, null) != null ||
     length(try(local.device_config[device.name].vrfs, [])) > 0 ||
     length(try(local.device_config[device.name].routing.ipv6_static_routes, [])) > 0 ||
   length([for int in local.ipv6_interfaces : int if int.device == device.name]) > 0 }
@@ -92,10 +92,10 @@ resource "nxos_ipv6" "ipv6" {
 
   access_list_match_local        = try(local.device_config[each.key].system.ipv6_access_list_match_local_traffic, local.defaults.nxos.devices.configuration.system.ipv6_access_list_match_local_traffic, null) != null ? (try(local.device_config[each.key].system.ipv6_access_list_match_local_traffic, local.defaults.nxos.devices.configuration.system.ipv6_access_list_match_local_traffic) ? "enabled" : "disabled") : null
   admin_state                    = try(local.device_config[each.key].system.ipv6_routing, local.defaults.nxos.devices.configuration.system.ipv6_routing, null) != null ? (try(local.device_config[each.key].system.ipv6_routing, local.defaults.nxos.devices.configuration.system.ipv6_routing) ? "enabled" : "disabled") : null
-  drop_nd_fragments              = try(local.device_config[each.key].system.ipv6_nd_drop_nd_fragments, local.defaults.nxos.devices.configuration.system.ipv6_nd_drop_nd_fragments, null) != null ? (try(local.device_config[each.key].system.ipv6_nd_drop_nd_fragments, local.defaults.nxos.devices.configuration.system.ipv6_nd_drop_nd_fragments) ? "enabled" : "disabled") : null
-  queue_packets                  = try(local.device_config[each.key].system.ipv6_queue_packets, local.defaults.nxos.devices.configuration.system.ipv6_queue_packets, null) != null ? (try(local.device_config[each.key].system.ipv6_queue_packets, local.defaults.nxos.devices.configuration.system.ipv6_queue_packets) ? "enabled" : "disabled") : null
-  static_neighbor_outside_subnet = try(local.device_config[each.key].system.ipv6_nd_allow_static_neighbor_outside_subnet, local.defaults.nxos.devices.configuration.system.ipv6_nd_allow_static_neighbor_outside_subnet, null) != null ? (try(local.device_config[each.key].system.ipv6_nd_allow_static_neighbor_outside_subnet, local.defaults.nxos.devices.configuration.system.ipv6_nd_allow_static_neighbor_outside_subnet) ? "enabled" : "disabled") : null
-  switch_packets                 = try(local.device_config[each.key].system.ipv6_nd_switch_packets, local.defaults.nxos.devices.configuration.system.ipv6_nd_switch_packets, null)
+  drop_nd_fragments              = try(local.device_config[each.key].nd.drop_nd_fragments, local.defaults.nxos.devices.configuration.nd.drop_nd_fragments, null) != null ? (try(local.device_config[each.key].nd.drop_nd_fragments, local.defaults.nxos.devices.configuration.nd.drop_nd_fragments) ? "enabled" : "disabled") : null
+  queue_packets                  = try(local.device_config[each.key].nd.queue_packets, local.defaults.nxos.devices.configuration.nd.queue_packets, null) != null ? (try(local.device_config[each.key].nd.queue_packets, local.defaults.nxos.devices.configuration.nd.queue_packets) ? "enabled" : "disabled") : null
+  static_neighbor_outside_subnet = try(local.device_config[each.key].nd.allow_static_neighbor_outside_subnet, local.defaults.nxos.devices.configuration.nd.allow_static_neighbor_outside_subnet, null) != null ? (try(local.device_config[each.key].nd.allow_static_neighbor_outside_subnet, local.defaults.nxos.devices.configuration.nd.allow_static_neighbor_outside_subnet) ? "enabled" : "disabled") : null
+  switch_packets                 = try(local.device_config[each.key].nd.switch_packets, local.defaults.nxos.devices.configuration.nd.switch_packets, null)
 
   vrfs = merge(
     # "default" VRF

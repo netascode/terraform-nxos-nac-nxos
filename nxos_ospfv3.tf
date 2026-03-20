@@ -6,7 +6,7 @@ locals {
 }
 
 resource "nxos_ospfv3" "ospfv3" {
-  for_each    = { for device in local.devices : device.name => device if try(local.device_config[device.name].system.feature.ospfv3, local.defaults.nxos.devices.configuration.system.feature.ospfv3, false) }
+  for_each    = { for device in local.devices : device.name => device if try(local.device_config[device.name].feature.ospfv3, local.defaults.nxos.devices.configuration.feature.ospfv3, false) }
   device      = each.key
   admin_state = "enabled"
 

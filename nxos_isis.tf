@@ -3,7 +3,7 @@ locals {
 }
 
 resource "nxos_isis" "isis" {
-  for_each    = { for device in local.devices : device.name => device if try(local.device_config[device.name].system.feature.isis, local.defaults.nxos.devices.configuration.system.feature.isis, false) }
+  for_each    = { for device in local.devices : device.name => device if try(local.device_config[device.name].feature.isis, local.defaults.nxos.devices.configuration.feature.isis, false) }
   device      = each.key
   admin_state = "enabled"
 
