@@ -14,12 +14,12 @@ resource "nxos_isis" "isis" {
 
     vrfs = { for vrf in try(inst.vrfs, []) : vrf.vrf => {
       admin_state              = try(vrf.shutdown, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.shutdown, false) ? "disabled" : "enabled"
-      authentication_check_l1  = try(vrf.authentication_check_l1, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.authentication_check_l1, null)
-      authentication_check_l2  = try(vrf.authentication_check_l2, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.authentication_check_l2, null)
-      authentication_key_l1    = try(vrf.authentication_key_l1, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.authentication_key_l1, null)
-      authentication_key_l2    = try(vrf.authentication_key_l2, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.authentication_key_l2, null)
-      authentication_type_l1   = try(vrf.authentication_type_l1, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.authentication_type_l1, null)
-      authentication_type_l2   = try(vrf.authentication_type_l2, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.authentication_type_l2, null)
+      authentication_check_l1  = try(vrf.authentication_check_level_1, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.authentication_check_level_1, null)
+      authentication_check_l2  = try(vrf.authentication_check_level_2, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.authentication_check_level_2, null)
+      authentication_key_l1    = try(vrf.authentication_key_chain_level_1, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.authentication_key_chain_level_1, null)
+      authentication_key_l2    = try(vrf.authentication_key_chain_level_2, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.authentication_key_chain_level_2, null)
+      authentication_type_l1   = try(vrf.authentication_type_level_1, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.authentication_type_level_1, null)
+      authentication_type_l2   = try(vrf.authentication_type_level_2, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.authentication_type_level_2, null)
       bandwidth_reference      = try(vrf.bandwidth_reference, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.bandwidth_reference, null)
       bandwidth_reference_unit = try(vrf.bandwidth_reference_unit, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.bandwidth_reference_unit, null)
       is_type                  = try(vrf.is_type, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.is_type, null)
@@ -55,14 +55,14 @@ resource "nxos_isis" "isis" {
 
     interfaces = { for int in local.isis_interfaces : "${int.type}${int.id}" => {
       authentication_check         = int.isis_authentication_check
-      authentication_check_l1      = int.isis_authentication_check_l1
-      authentication_check_l2      = int.isis_authentication_check_l2
-      authentication_key           = int.isis_authentication_key
-      authentication_key_l1        = int.isis_authentication_key_l1
-      authentication_key_l2        = int.isis_authentication_key_l2
+      authentication_check_l1      = int.isis_authentication_check_level_1
+      authentication_check_l2      = int.isis_authentication_check_level_2
+      authentication_key           = int.isis_authentication_key_chain
+      authentication_key_l1        = int.isis_authentication_key_chain_level_1
+      authentication_key_l2        = int.isis_authentication_key_chain_level_2
       authentication_type          = int.isis_authentication_type
-      authentication_type_l1       = int.isis_authentication_type_l1
-      authentication_type_l2       = int.isis_authentication_type_l2
+      authentication_type_l1       = int.isis_authentication_type_level_1
+      authentication_type_l2       = int.isis_authentication_type_level_2
       circuit_type                 = int.isis_circuit_type
       vrf                          = int.vrf
       hello_interval               = int.isis_hello_interval
