@@ -23,7 +23,7 @@ locals {
         ospf_authentication_key                 = try(int.ospf.authentication_key, local.defaults.nxos.devices.configuration.interfaces.loopbacks.ospf.authentication_key, null)
         ospf_authentication_key_id              = try(int.ospf.authentication_key_id, local.defaults.nxos.devices.configuration.interfaces.loopbacks.ospf.authentication_key_id, null)
         ospf_authentication_key_secure_mode     = try(int.ospf.authentication_key_secure_mode, local.defaults.nxos.devices.configuration.interfaces.loopbacks.ospf.authentication_key_secure_mode, false)
-        ospf_authentication_keychain            = try(int.ospf.authentication_keychain, local.defaults.nxos.devices.configuration.interfaces.loopbacks.ospf.authentication_keychain, null)
+        ospf_authentication_keychain            = try(int.ospf.authentication_key_chain, local.defaults.nxos.devices.configuration.interfaces.loopbacks.ospf.authentication_key_chain, null)
         ospf_authentication_md5_key             = try(int.ospf.authentication_md5_key, local.defaults.nxos.devices.configuration.interfaces.loopbacks.ospf.authentication_md5_key, null)
         ospf_authentication_md5_key_secure_mode = try(int.ospf.authentication_md5_key_secure_mode, local.defaults.nxos.devices.configuration.interfaces.loopbacks.ospf.authentication_md5_key_secure_mode, false)
         ospf_authentication_type                = try(int.ospf.authentication_type, local.defaults.nxos.devices.configuration.interfaces.loopbacks.ospf.authentication_type, null)
