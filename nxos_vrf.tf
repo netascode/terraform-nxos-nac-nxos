@@ -38,8 +38,8 @@ locals {
   ]
 
   vrf_address_family_names_map = {
-    "ipv4_unicast" : "ipv4-ucast"
-    "ipv6_unicast" : "ipv6-ucast"
+    "ipv4-unicast" : "ipv4-ucast"
+    "ipv6-unicast" : "ipv6-ucast"
   }
 
   # Convert a single human-readable RT value to DME format

@@ -35,7 +35,7 @@ resource "nxos_isis" "isis" {
       overload_bgp_as_number   = try(vrf.overload_bgp_as_number, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.overload_bgp_as_number, null)
       overload_suppress        = try(vrf.overload_suppress, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.overload_suppress, null)
 
-      address_families = { for af in try(vrf.address_families, []) : replace(replace(af.address_family, "ipv4_unicast", "v4"), "ipv6_unicast", "v6") => {
+      address_families = { for af in try(vrf.address_families, []) : replace(replace(af.address_family, "ipv4-unicast", "v4"), "ipv6-unicast", "v6") => {
         segment_routing_mpls                    = try(af.segment_routing_mpls, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.address_families.segment_routing_mpls, null)
         enable_bfd                              = try(af.bfd, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.address_families.bfd, null)
         prefix_advertise_passive_l1             = try(af.advertise_passive_only_l1, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.address_families.advertise_passive_only_l1, null)
@@ -45,7 +45,7 @@ resource "nxos_isis" "isis" {
         default_information_originate_route_map = try(af.default_information_originate_route_map, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.address_families.default_information_originate_route_map, null)
         distance                                = try(af.distance, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.address_families.distance, null)
         max_ecmp                                = try(af.maximum_paths, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.address_families.maximum_paths, null)
-        multi_topology                          = try(replace(replace(replace(af.multi_topology, "standard", "st"), "multi_topology_transition", "mtt"), "multi_topology", "mt"), replace(replace(replace(local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.address_families.multi_topology, "standard", "st"), "multi_topology_transition", "mtt"), "multi_topology", "mt"), null)
+        multi_topology                          = try(replace(replace(replace(af.multi_topology, "standard", "st"), "multi-topology-transition", "mtt"), "multi-topology", "mt"), replace(replace(replace(local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.address_families.multi_topology, "standard", "st"), "multi-topology-transition", "mtt"), "multi-topology", "mt"), null)
         router_id_interface                     = try(af.router_id_interface_type, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.address_families.router_id_interface_type, null) != null ? "${local.intf_prefix_map[try(af.router_id_interface_type, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.address_families.router_id_interface_type)]}${try(af.router_id_interface_id, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.address_families.router_id_interface_id, "")}" : null
         router_id_ip_address                    = try(af.router_id_ip_address, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.address_families.router_id_ip_address, null)
         table_map                               = try(af.table_map, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.address_families.table_map, null)

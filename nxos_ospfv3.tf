@@ -1,7 +1,7 @@
 locals {
   ospfv3_interfaces = concat(local.interfaces_ethernets, local.interfaces_loopbacks, local.interfaces_vlans, local.interfaces_port_channels)
   ospfv3_address_family_map = {
-    "ipv6_unicast" = "ipv6-ucast"
+    "ipv6-unicast" = "ipv6-ucast"
   }
 }
 
