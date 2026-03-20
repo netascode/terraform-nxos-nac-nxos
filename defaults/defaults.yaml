@@ -22,18 +22,18 @@ defaults:
             shutdown: false
             ospf:
               advertise_secondaries: true
+        ip_prefix_lists:
+          entries:
+            action: permit
+            criteria: exact
+            ge: 0
+            le: 0
+        route_maps:
+          entries:
+            set_community_additive: false
+            set_community_none: false
+            set_community_criteria: none
         routing:
           ospf_processes:
             vrfs:
               shutdown: false
-          ip_prefix_lists:
-            entries:
-              action: permit
-              criteria: exact
-              ge: 0
-              le: 0
-          route_maps:
-            entries:
-              set_community_additive: false
-              set_community_none: false
-              set_community_criteria: none
