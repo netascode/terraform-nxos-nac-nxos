@@ -19,8 +19,8 @@ resource "nxos_nvo" "nvo" {
     hold_down_time                     = try(local.device_config[each.key].interfaces.nve.source_interface_hold_down_time, local.defaults.nxos.devices.configuration.interfaces.nve.source_interface_hold_down_time, null)
     host_reachability_protocol         = try(local.device_config[each.key].interfaces.nve.host_reachability_protocol, local.defaults.nxos.devices.configuration.interfaces.nve.host_reachability_protocol, null)
     ingress_replication_protocol_bgp   = try(local.device_config[each.key].interfaces.nve.global_ingress_replication_protocol_bgp, local.defaults.nxos.devices.configuration.interfaces.nve.global_ingress_replication_protocol_bgp, null)
-    multicast_group_l2                 = try(local.device_config[each.key].interfaces.nve.global_multicast_group_l2, local.defaults.nxos.devices.configuration.interfaces.nve.global_multicast_group_l2, null)
-    multicast_group_l3                 = try(local.device_config[each.key].interfaces.nve.global_multicast_group_l3, local.defaults.nxos.devices.configuration.interfaces.nve.global_multicast_group_l3, null)
+    multicast_group_l2                 = try(local.device_config[each.key].interfaces.nve.global_mcast_group_l2, local.defaults.nxos.devices.configuration.interfaces.nve.global_mcast_group_l2, null)
+    multicast_group_l3                 = try(local.device_config[each.key].interfaces.nve.global_mcast_group_l3, local.defaults.nxos.devices.configuration.interfaces.nve.global_mcast_group_l3, null)
     multicast_routing_source_interface = try(local.device_config[each.key].interfaces.nve.multicast_routing_source_interface_type, local.defaults.nxos.devices.configuration.interfaces.nve.multicast_routing_source_interface_type, null) != null ? "${local.intf_prefix_map[try(local.device_config[each.key].interfaces.nve.multicast_routing_source_interface_type, local.defaults.nxos.devices.configuration.interfaces.nve.multicast_routing_source_interface_type)]}${try(local.device_config[each.key].interfaces.nve.multicast_routing_source_interface_id, local.defaults.nxos.devices.configuration.interfaces.nve.multicast_routing_source_interface_id, "")}" : null
     multisite_source_interface         = try(local.device_config[each.key].interfaces.nve.multisite_border_gateway_interface_type, local.defaults.nxos.devices.configuration.interfaces.nve.multisite_border_gateway_interface_type, null) != null ? "${local.intf_prefix_map[try(local.device_config[each.key].interfaces.nve.multisite_border_gateway_interface_type, local.defaults.nxos.devices.configuration.interfaces.nve.multisite_border_gateway_interface_type)]}${try(local.device_config[each.key].interfaces.nve.multisite_border_gateway_interface_id, local.defaults.nxos.devices.configuration.interfaces.nve.multisite_border_gateway_interface_id, "")}" : null
     multisite_virtual_mac              = try(local.device_config[each.key].interfaces.nve.multisite_virtual_rmac, local.defaults.nxos.devices.configuration.interfaces.nve.multisite_virtual_rmac, null)
@@ -32,10 +32,9 @@ resource "nxos_nvo" "nvo" {
 
     vnis = { for vni in try(local.device_config[each.key].interfaces.nve.vnis, []) : vni.vni => {
       associate_vrf                 = try(vni.associate_vrf, local.defaults.nxos.devices.configuration.interfaces.nve.vnis.associate_vrf, null)
-      legacy_mode                   = try(vni.legacy_mode, local.defaults.nxos.devices.configuration.interfaces.nve.vnis.legacy_mode, null)
-      multicast_group               = try(vni.multicast_group, local.defaults.nxos.devices.configuration.interfaces.nve.vnis.multicast_group, null)
+      multicast_group               = try(vni.mcast_group, local.defaults.nxos.devices.configuration.interfaces.nve.vnis.mcast_group, null)
       multisite_ingress_replication = try(vni.multisite_ingress_replication, local.defaults.nxos.devices.configuration.interfaces.nve.vnis.multisite_ingress_replication, null)
-      multisite_multicast_group     = try(vni.multisite_multicast_group, local.defaults.nxos.devices.configuration.interfaces.nve.vnis.multisite_multicast_group, null)
+      multisite_multicast_group     = try(vni.multisite_mcast_group, local.defaults.nxos.devices.configuration.interfaces.nve.vnis.multisite_mcast_group, null)
       spine_anycast_gateway         = try(vni.spine_anycast_gateway, local.defaults.nxos.devices.configuration.interfaces.nve.vnis.spine_anycast_gateway, null)
       suppress_arp                  = try(vni.suppress_arp, local.defaults.nxos.devices.configuration.interfaces.nve.vnis.suppress_arp, null)
 
