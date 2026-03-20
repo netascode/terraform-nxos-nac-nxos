@@ -36,6 +36,7 @@ locals {
 resource "nxos_dhcp" "dhcp" {
   for_each = { for device in local.devices : device.name => device
     if try(local.device_config[device.name].dhcp, null) != null ||
+    try(local.device_config[device.name].arp.inspection, null) != null ||
     length([for int in try(local.device_config[device.name].interfaces.ethernets, []) : int if try(int.ip_dhcp_relay_address, null) != null || try(int.ipv6_dhcp_smart_relay, null) != null || try(int.ipv6_dhcp_relay_addresses, null) != null]) > 0 ||
     length([for int in try(local.device_config[device.name].interfaces.vlans, []) : int if try(int.ip_dhcp_relay_address, null) != null || try(int.ipv6_dhcp_smart_relay, null) != null || try(int.ipv6_dhcp_relay_addresses, null) != null]) > 0 ||
     length([for int in try(local.device_config[device.name].interfaces.loopbacks, []) : int if try(int.ip_dhcp_relay_address, null) != null || try(int.ipv6_dhcp_smart_relay, null) != null || try(int.ipv6_dhcp_relay_addresses, null) != null]) > 0 ||
@@ -56,7 +57,6 @@ resource "nxos_dhcp" "dhcp" {
   v6_relay                                    = try(local.device_config[each.key].dhcp.ipv6_dhcp_relay.enabled, local.defaults.nxos.devices.configuration.dhcp.ipv6_dhcp_relay.enabled, null)
   relay_v4_over_v6                            = try(local.device_config[each.key].dhcp.ip_dhcp_relay.v4_over_v6, local.defaults.nxos.devices.configuration.dhcp.ip_dhcp_relay.v4_over_v6, null)
   relay_v6_iapd_route_add                     = try(local.device_config[each.key].dhcp.ipv6_dhcp_relay.iapd_route_add, local.defaults.nxos.devices.configuration.dhcp.ipv6_dhcp_relay.iapd_route_add, null)
-  relay_dai                                   = try(local.device_config[each.key].dhcp.ip_arp_inspection.relay, local.defaults.nxos.devices.configuration.dhcp.ip_arp_inspection.relay, null)
   ipv6_relay_information_option_vpn           = try(local.device_config[each.key].dhcp.ipv6_dhcp_relay.information_option_vpn, local.defaults.nxos.devices.configuration.dhcp.ipv6_dhcp_relay.information_option_vpn, null)
   ipv6_relay_option_type_cisco                = try(local.device_config[each.key].dhcp.ipv6_dhcp_relay.option_type_cisco, local.defaults.nxos.devices.configuration.dhcp.ipv6_dhcp_relay.option_type_cisco, null)
   ipv6_relay_option79                         = try(local.device_config[each.key].dhcp.ipv6_dhcp_relay.option79, local.defaults.nxos.devices.configuration.dhcp.ipv6_dhcp_relay.option79, null)
@@ -67,10 +67,10 @@ resource "nxos_dhcp" "dhcp" {
   snooping_verify_mac_address                 = try(local.device_config[each.key].dhcp.ip_dhcp_snooping.verify_mac_address, local.defaults.nxos.devices.configuration.dhcp.ip_dhcp_snooping.verify_mac_address, null)
   snooping_sub_option_format_non_tlv          = try(local.device_config[each.key].dhcp.ip_dhcp_snooping.sub_option_format_non_tlv, local.defaults.nxos.devices.configuration.dhcp.ip_dhcp_snooping.sub_option_format_non_tlv, null)
   snoop_sub_option_circuit_id_format_string   = try(local.device_config[each.key].dhcp.ip_dhcp_snooping.sub_option_circuit_id_format_string, local.defaults.nxos.devices.configuration.dhcp.ip_dhcp_snooping.sub_option_circuit_id_format_string, null)
-  dai_log_buffer_entries                      = try(local.device_config[each.key].dhcp.ip_arp_inspection.log_buffer_entries, local.defaults.nxos.devices.configuration.dhcp.ip_arp_inspection.log_buffer_entries, null)
-  dai_validate_destination                    = try(local.device_config[each.key].dhcp.ip_arp_inspection.validate_destination, local.defaults.nxos.devices.configuration.dhcp.ip_arp_inspection.validate_destination, null)
-  dai_validate_ip                             = try(local.device_config[each.key].dhcp.ip_arp_inspection.validate_ip, local.defaults.nxos.devices.configuration.dhcp.ip_arp_inspection.validate_ip, null)
-  dai_validate_source                         = try(local.device_config[each.key].dhcp.ip_arp_inspection.validate_source, local.defaults.nxos.devices.configuration.dhcp.ip_arp_inspection.validate_source, null)
+  dai_log_buffer_entries                      = try(local.device_config[each.key].arp.inspection.log_buffer_entries, local.defaults.nxos.devices.configuration.arp.inspection.log_buffer_entries, null)
+  dai_validate_destination                    = try(local.device_config[each.key].arp.inspection.validate_destination, local.defaults.nxos.devices.configuration.arp.inspection.validate_destination, null)
+  dai_validate_ip                             = try(local.device_config[each.key].arp.inspection.validate_ip, local.defaults.nxos.devices.configuration.arp.inspection.validate_ip, null)
+  dai_validate_source                         = try(local.device_config[each.key].arp.inspection.validate_source, local.defaults.nxos.devices.configuration.arp.inspection.validate_source, null)
   relay_interfaces = { for item in local.dhcp_relay_interfaces : item.interface_id => {
     information_trusted = try(item.ip_dhcp_relay_address.information_trusted, local.defaults.nxos.devices.configuration.interfaces.ethernets.ip_dhcp_relay_address.information_trusted, null)
     smart_relay         = try(item.ip_dhcp_relay_address.smart_relay, local.defaults.nxos.devices.configuration.interfaces.ethernets.ip_dhcp_relay_address.smart_relay, null)
