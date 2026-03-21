@@ -155,21 +155,49 @@ locals {
                 { for k, v in try(local.device_config[device.name].interfaces, {}) : k => v if !contains(["ethernets", "port_channels", "loopbacks", "vlans"], k) },
                 {
                   "ethernets" = [
-                    for ethernet in try(local.device_config[device.name].interfaces.ethernets, []) : merge(
-                      yamldecode(provider::utils::yaml_merge(concat(
-                        [for g in try(ethernet.interface_groups, []) : try([for ig in local.interface_groups_config[device.name] : yamlencode(ig.configuration) if ig.name == g][0], "")],
-                        [yamlencode(ethernet)]
-                      )))
+                    for ethernet in [
+                      for eth in try(local.device_config[device.name].interfaces.ethernets, []) : merge(
+                        yamldecode(provider::utils::yaml_merge(concat(
+                          [for g in try(eth.interface_groups, []) : try([for ig in local.interface_groups_config[device.name] : yamlencode(ig.configuration) if ig.name == g][0], "")],
+                          [yamlencode(eth)]
+                        )))
+                      )
+                      ] : merge(
+                      { for k, v in ethernet : k => v if k != "subinterfaces" },
+                      {
+                        subinterfaces = [
+                          for sub in try(ethernet.subinterfaces, []) : merge(
+                            yamldecode(provider::utils::yaml_merge(concat(
+                              [for g in try(sub.interface_groups, []) : try([for ig in local.interface_groups_config[device.name] : yamlencode(ig.configuration) if ig.name == g][0], "")],
+                              [yamlencode(sub)]
+                            )))
+                          )
+                        ]
+                      }
                     )
                   ]
                 },
                 {
                   "port_channels" = [
-                    for port_channel in try(local.device_config[device.name].interfaces.port_channels, []) : merge(
-                      yamldecode(provider::utils::yaml_merge(concat(
-                        [for g in try(port_channel.interface_groups, []) : try([for ig in local.interface_groups_config[device.name] : yamlencode(ig.configuration) if ig.name == g][0], "")],
-                        [yamlencode(port_channel)]
-                      )))
+                    for port_channel in [
+                      for pc in try(local.device_config[device.name].interfaces.port_channels, []) : merge(
+                        yamldecode(provider::utils::yaml_merge(concat(
+                          [for g in try(pc.interface_groups, []) : try([for ig in local.interface_groups_config[device.name] : yamlencode(ig.configuration) if ig.name == g][0], "")],
+                          [yamlencode(pc)]
+                        )))
+                      )
+                      ] : merge(
+                      { for k, v in port_channel : k => v if k != "subinterfaces" },
+                      {
+                        subinterfaces = [
+                          for sub in try(port_channel.subinterfaces, []) : merge(
+                            yamldecode(provider::utils::yaml_merge(concat(
+                              [for g in try(sub.interface_groups, []) : try([for ig in local.interface_groups_config[device.name] : yamlencode(ig.configuration) if ig.name == g][0], "")],
+                              [yamlencode(sub)]
+                            )))
+                          )
+                        ]
+                      }
                     )
                   ]
                 },
