@@ -5,7 +5,7 @@ locals {
       for device in local.devices : [
         for route in try(local.device_config[device.name].routing.ipv6_static_routes, []) : {
           device = device.name
-          vrf    = route.vrf
+          vrf    = try(route.vrf, "default")
           route  = route
         }
       ]

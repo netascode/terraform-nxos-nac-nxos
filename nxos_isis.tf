@@ -8,50 +8,95 @@ resource "nxos_isis" "isis" {
   admin_state = "enabled"
 
   instances = { for inst in try(local.device_config[each.key].routing.isis_instances, []) : inst.name => {
-    admin_state  = try(inst.shutdown, local.defaults.nxos.devices.configuration.routing.isis_instances.shutdown, false) ? "disabled" : "enabled"
     flush_routes = try(inst.flush_routes, local.defaults.nxos.devices.configuration.routing.isis_instances.flush_routes, null)
     isolate      = try(inst.isolate, local.defaults.nxos.devices.configuration.routing.isis_instances.isolate, null)
 
-    vrfs = { for vrf in try(inst.vrfs, []) : vrf.vrf => {
-      admin_state              = try(vrf.shutdown, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.shutdown, false) ? "disabled" : "enabled"
-      authentication_check_l1  = try(vrf.authentication_check_level_1, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.authentication_check_level_1, null)
-      authentication_check_l2  = try(vrf.authentication_check_level_2, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.authentication_check_level_2, null)
-      authentication_key_l1    = try(vrf.authentication_key_chain_level_1, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.authentication_key_chain_level_1, null)
-      authentication_key_l2    = try(vrf.authentication_key_chain_level_2, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.authentication_key_chain_level_2, null)
-      authentication_type_l1   = try(vrf.authentication_type_level_1, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.authentication_type_level_1, null)
-      authentication_type_l2   = try(vrf.authentication_type_level_2, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.authentication_type_level_2, null)
-      bandwidth_reference      = try(vrf.bandwidth_reference, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.bandwidth_reference, null)
-      bandwidth_reference_unit = try(vrf.bandwidth_reference_unit, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.bandwidth_reference_unit, null)
-      is_type                  = try(vrf.is_type, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.is_type, null)
-      metric_type              = try(vrf.metric_style, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.metric_style, null)
-      mtu                      = try(vrf.lsp_mtu, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.lsp_mtu, null)
-      net                      = try(vrf.net, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.net, null)
-      passive_default          = try(vrf.passive_default, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.passive_default, null)
-      control                  = try(vrf.log_adjacency_changes, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.log_adjacency_changes, null) != null ? (try(vrf.log_adjacency_changes, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.log_adjacency_changes) ? "log-adj-changes" : "unspecified") : null
-      lsp_lifetime             = try(vrf.max_lsp_lifetime, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.max_lsp_lifetime, null)
-      queue_limit              = try(vrf.queue_limit, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.queue_limit, null)
-      overload_admin_state     = try(vrf.set_overload_bit, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.set_overload_bit, null)
-      overload_startup_time    = try(vrf.overload_startup_time, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.overload_startup_time, null)
-      overload_bgp_as_number   = try(vrf.overload_bgp_as_number, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.overload_bgp_as_number, null)
-      overload_suppress        = try(vrf.overload_suppress, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.overload_suppress, null)
+    vrfs = merge(
+      # Synthetic "default" VRF from instance-level attributes
+      {
+        "default" = {
+          admin_state              = try(inst.shutdown, local.defaults.nxos.devices.configuration.routing.isis_instances.shutdown, false) ? "disabled" : "enabled"
+          authentication_check_l1  = try(inst.authentication_check_level_1, local.defaults.nxos.devices.configuration.routing.isis_instances.authentication_check_level_1, null)
+          authentication_check_l2  = try(inst.authentication_check_level_2, local.defaults.nxos.devices.configuration.routing.isis_instances.authentication_check_level_2, null)
+          authentication_key_l1    = try(inst.authentication_key_chain_level_1, local.defaults.nxos.devices.configuration.routing.isis_instances.authentication_key_chain_level_1, null)
+          authentication_key_l2    = try(inst.authentication_key_chain_level_2, local.defaults.nxos.devices.configuration.routing.isis_instances.authentication_key_chain_level_2, null)
+          authentication_type_l1   = try(inst.authentication_type_level_1, local.defaults.nxos.devices.configuration.routing.isis_instances.authentication_type_level_1, null)
+          authentication_type_l2   = try(inst.authentication_type_level_2, local.defaults.nxos.devices.configuration.routing.isis_instances.authentication_type_level_2, null)
+          bandwidth_reference      = try(inst.bandwidth_reference, local.defaults.nxos.devices.configuration.routing.isis_instances.bandwidth_reference, null)
+          bandwidth_reference_unit = try(inst.bandwidth_reference_unit, local.defaults.nxos.devices.configuration.routing.isis_instances.bandwidth_reference_unit, null)
+          is_type                  = try(inst.is_type, local.defaults.nxos.devices.configuration.routing.isis_instances.is_type, null)
+          metric_type              = try(inst.metric_style, local.defaults.nxos.devices.configuration.routing.isis_instances.metric_style, null)
+          mtu                      = try(inst.lsp_mtu, local.defaults.nxos.devices.configuration.routing.isis_instances.lsp_mtu, null)
+          net                      = try(inst.net, local.defaults.nxos.devices.configuration.routing.isis_instances.net, null)
+          passive_default          = try(inst.passive_default, local.defaults.nxos.devices.configuration.routing.isis_instances.passive_default, null)
+          control                  = try(inst.log_adjacency_changes, local.defaults.nxos.devices.configuration.routing.isis_instances.log_adjacency_changes, null) != null ? (try(inst.log_adjacency_changes, local.defaults.nxos.devices.configuration.routing.isis_instances.log_adjacency_changes) ? "log-adj-changes" : "unspecified") : null
+          lsp_lifetime             = try(inst.max_lsp_lifetime, local.defaults.nxos.devices.configuration.routing.isis_instances.max_lsp_lifetime, null)
+          queue_limit              = try(inst.queue_limit, local.defaults.nxos.devices.configuration.routing.isis_instances.queue_limit, null)
+          overload_admin_state     = try(inst.set_overload_bit, local.defaults.nxos.devices.configuration.routing.isis_instances.set_overload_bit, null)
+          overload_startup_time    = try(inst.overload_startup_time, local.defaults.nxos.devices.configuration.routing.isis_instances.overload_startup_time, null)
+          overload_bgp_as_number   = try(inst.overload_bgp_as_number, local.defaults.nxos.devices.configuration.routing.isis_instances.overload_bgp_as_number, null)
+          overload_suppress        = try(inst.overload_suppress, local.defaults.nxos.devices.configuration.routing.isis_instances.overload_suppress, null)
 
-      address_families = { for af in try(vrf.address_families, []) : replace(replace(af.address_family, "ipv4-unicast", "v4"), "ipv6-unicast", "v6") => {
-        segment_routing_mpls                    = try(af.segment_routing_mpls, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.address_families.segment_routing_mpls, null)
-        enable_bfd                              = try(af.bfd, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.address_families.bfd, null)
-        prefix_advertise_passive_l1             = try(af.advertise_passive_only_l1, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.address_families.advertise_passive_only_l1, null)
-        prefix_advertise_passive_l2             = try(af.advertise_passive_only_l2, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.address_families.advertise_passive_only_l2, null)
-        control                                 = try(af.adjacency_check, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.address_families.adjacency_check, null) != null ? (try(af.adjacency_check, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.address_families.adjacency_check) ? "adj-check" : null) : null
-        default_information_originate           = try(af.default_information_originate, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.address_families.default_information_originate, null)
-        default_information_originate_route_map = try(af.default_information_originate_route_map, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.address_families.default_information_originate_route_map, null)
-        distance                                = try(af.distance, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.address_families.distance, null)
-        max_ecmp                                = try(af.maximum_paths, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.address_families.maximum_paths, null)
-        multi_topology                          = try(replace(replace(replace(af.multi_topology, "standard", "st"), "multi-topology-transition", "mtt"), "multi-topology", "mt"), replace(replace(replace(local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.address_families.multi_topology, "standard", "st"), "multi-topology-transition", "mtt"), "multi-topology", "mt"), null)
-        router_id_interface                     = try(af.router_id_interface_type, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.address_families.router_id_interface_type, null) != null ? "${local.intf_prefix_map[try(af.router_id_interface_type, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.address_families.router_id_interface_type)]}${try(af.router_id_interface_id, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.address_families.router_id_interface_id, "")}" : null
-        router_id_ip_address                    = try(af.router_id_ip_address, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.address_families.router_id_ip_address, null)
-        table_map                               = try(af.table_map, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.address_families.table_map, null)
-        table_map_filter                        = try(af.table_map_filter, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.address_families.table_map_filter, null) != null ? (try(af.table_map_filter, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.address_families.table_map_filter) ? "enabled" : "disabled") : null
+          address_families = { for af in try(inst.address_families, []) : replace(replace(af.address_family, "ipv4-unicast", "v4"), "ipv6-unicast", "v6") => {
+            segment_routing_mpls                    = try(af.segment_routing_mpls, local.defaults.nxos.devices.configuration.routing.isis_instances.address_families.segment_routing_mpls, null)
+            enable_bfd                              = try(af.bfd, local.defaults.nxos.devices.configuration.routing.isis_instances.address_families.bfd, null)
+            prefix_advertise_passive_l1             = try(af.advertise_passive_only_l1, local.defaults.nxos.devices.configuration.routing.isis_instances.address_families.advertise_passive_only_l1, null)
+            prefix_advertise_passive_l2             = try(af.advertise_passive_only_l2, local.defaults.nxos.devices.configuration.routing.isis_instances.address_families.advertise_passive_only_l2, null)
+            control                                 = try(af.adjacency_check, local.defaults.nxos.devices.configuration.routing.isis_instances.address_families.adjacency_check, null) != null ? (try(af.adjacency_check, local.defaults.nxos.devices.configuration.routing.isis_instances.address_families.adjacency_check) ? "adj-check" : null) : null
+            default_information_originate           = try(af.default_information_originate, local.defaults.nxos.devices.configuration.routing.isis_instances.address_families.default_information_originate, null)
+            default_information_originate_route_map = try(af.default_information_originate_route_map, local.defaults.nxos.devices.configuration.routing.isis_instances.address_families.default_information_originate_route_map, null)
+            distance                                = try(af.distance, local.defaults.nxos.devices.configuration.routing.isis_instances.address_families.distance, null)
+            max_ecmp                                = try(af.maximum_paths, local.defaults.nxos.devices.configuration.routing.isis_instances.address_families.maximum_paths, null)
+            multi_topology                          = try(replace(replace(replace(af.multi_topology, "standard", "st"), "multi-topology-transition", "mtt"), "multi-topology", "mt"), replace(replace(replace(local.defaults.nxos.devices.configuration.routing.isis_instances.address_families.multi_topology, "standard", "st"), "multi-topology-transition", "mtt"), "multi-topology", "mt"), null)
+            router_id_interface                     = try(af.router_id_interface_type, local.defaults.nxos.devices.configuration.routing.isis_instances.address_families.router_id_interface_type, null) != null ? "${local.intf_prefix_map[try(af.router_id_interface_type, local.defaults.nxos.devices.configuration.routing.isis_instances.address_families.router_id_interface_type)]}${try(af.router_id_interface_id, local.defaults.nxos.devices.configuration.routing.isis_instances.address_families.router_id_interface_id, "")}" : null
+            router_id_ip_address                    = try(af.router_id_ip_address, local.defaults.nxos.devices.configuration.routing.isis_instances.address_families.router_id_ip_address, null)
+            table_map                               = try(af.table_map, local.defaults.nxos.devices.configuration.routing.isis_instances.address_families.table_map, null)
+            table_map_filter                        = try(af.table_map_filter, local.defaults.nxos.devices.configuration.routing.isis_instances.address_families.table_map_filter, null) != null ? (try(af.table_map_filter, local.defaults.nxos.devices.configuration.routing.isis_instances.address_families.table_map_filter) ? "enabled" : "disabled") : null
+          } }
+        }
+      },
+      # Explicit non-default VRFs
+      { for vrf in try(inst.vrfs, []) : vrf.vrf => {
+        admin_state              = try(vrf.shutdown, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.shutdown, false) ? "disabled" : "enabled"
+        authentication_check_l1  = try(vrf.authentication_check_level_1, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.authentication_check_level_1, null)
+        authentication_check_l2  = try(vrf.authentication_check_level_2, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.authentication_check_level_2, null)
+        authentication_key_l1    = try(vrf.authentication_key_chain_level_1, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.authentication_key_chain_level_1, null)
+        authentication_key_l2    = try(vrf.authentication_key_chain_level_2, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.authentication_key_chain_level_2, null)
+        authentication_type_l1   = try(vrf.authentication_type_level_1, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.authentication_type_level_1, null)
+        authentication_type_l2   = try(vrf.authentication_type_level_2, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.authentication_type_level_2, null)
+        bandwidth_reference      = try(vrf.bandwidth_reference, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.bandwidth_reference, null)
+        bandwidth_reference_unit = try(vrf.bandwidth_reference_unit, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.bandwidth_reference_unit, null)
+        is_type                  = try(vrf.is_type, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.is_type, null)
+        metric_type              = try(vrf.metric_style, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.metric_style, null)
+        mtu                      = try(vrf.lsp_mtu, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.lsp_mtu, null)
+        net                      = try(vrf.net, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.net, null)
+        passive_default          = try(vrf.passive_default, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.passive_default, null)
+        control                  = try(vrf.log_adjacency_changes, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.log_adjacency_changes, null) != null ? (try(vrf.log_adjacency_changes, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.log_adjacency_changes) ? "log-adj-changes" : "unspecified") : null
+        lsp_lifetime             = try(vrf.max_lsp_lifetime, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.max_lsp_lifetime, null)
+        queue_limit              = try(vrf.queue_limit, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.queue_limit, null)
+        overload_admin_state     = try(vrf.set_overload_bit, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.set_overload_bit, null)
+        overload_startup_time    = try(vrf.overload_startup_time, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.overload_startup_time, null)
+        overload_bgp_as_number   = try(vrf.overload_bgp_as_number, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.overload_bgp_as_number, null)
+        overload_suppress        = try(vrf.overload_suppress, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.overload_suppress, null)
+
+        address_families = { for af in try(vrf.address_families, []) : replace(replace(af.address_family, "ipv4-unicast", "v4"), "ipv6-unicast", "v6") => {
+          segment_routing_mpls                    = try(af.segment_routing_mpls, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.address_families.segment_routing_mpls, null)
+          enable_bfd                              = try(af.bfd, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.address_families.bfd, null)
+          prefix_advertise_passive_l1             = try(af.advertise_passive_only_l1, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.address_families.advertise_passive_only_l1, null)
+          prefix_advertise_passive_l2             = try(af.advertise_passive_only_l2, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.address_families.advertise_passive_only_l2, null)
+          control                                 = try(af.adjacency_check, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.address_families.adjacency_check, null) != null ? (try(af.adjacency_check, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.address_families.adjacency_check) ? "adj-check" : null) : null
+          default_information_originate           = try(af.default_information_originate, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.address_families.default_information_originate, null)
+          default_information_originate_route_map = try(af.default_information_originate_route_map, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.address_families.default_information_originate_route_map, null)
+          distance                                = try(af.distance, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.address_families.distance, null)
+          max_ecmp                                = try(af.maximum_paths, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.address_families.maximum_paths, null)
+          multi_topology                          = try(replace(replace(replace(af.multi_topology, "standard", "st"), "multi-topology-transition", "mtt"), "multi-topology", "mt"), replace(replace(replace(local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.address_families.multi_topology, "standard", "st"), "multi-topology-transition", "mtt"), "multi-topology", "mt"), null)
+          router_id_interface                     = try(af.router_id_interface_type, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.address_families.router_id_interface_type, null) != null ? "${local.intf_prefix_map[try(af.router_id_interface_type, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.address_families.router_id_interface_type)]}${try(af.router_id_interface_id, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.address_families.router_id_interface_id, "")}" : null
+          router_id_ip_address                    = try(af.router_id_ip_address, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.address_families.router_id_ip_address, null)
+          table_map                               = try(af.table_map, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.address_families.table_map, null)
+          table_map_filter                        = try(af.table_map_filter, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.address_families.table_map_filter, null) != null ? (try(af.table_map_filter, local.defaults.nxos.devices.configuration.routing.isis_instances.vrfs.address_families.table_map_filter) ? "enabled" : "disabled") : null
+        } }
       } }
-    } }
+    )
 
     interfaces = { for int in local.isis_interfaces : "${int.type}${int.id}" => {
       authentication_check         = int.isis_authentication_check

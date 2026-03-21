@@ -11,37 +11,69 @@ resource "nxos_ospfv3" "ospfv3" {
   admin_state = "enabled"
 
   instances = { for proc in try(local.device_config[each.key].routing.ospfv3_processes, []) : proc.name => {
-    admin_state  = try(proc.shutdown, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.shutdown, false) ? "disabled" : "enabled"
     flush_routes = try(proc.flush_routes, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.flush_routes, null)
     isolate      = try(proc.isolate, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.isolate, null)
 
-    vrfs = { for vrf in try(proc.vrfs, []) : vrf.vrf => {
-      admin_state               = try(vrf.shutdown, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.vrfs.shutdown, false) ? "disabled" : "enabled"
-      bandwidth_reference       = try(vrf.auto_cost_reference_bandwidth, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.vrfs.auto_cost_reference_bandwidth, null)
-      bandwidth_reference_unit  = try(vrf.auto_cost_reference_bandwidth_unit, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.vrfs.auto_cost_reference_bandwidth_unit, null)
-      router_id                 = try(vrf.router_id, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.vrfs.router_id, null)
-      bfd_control               = try(vrf.bfd, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.vrfs.bfd, null)
-      log_adjacency_changes     = try(vrf.log_adjacency_changes, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.vrfs.log_adjacency_changes, null)
-      discard_route_external    = try(vrf.discard_route_external, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.vrfs.discard_route_external, null)
-      discard_route_internal    = try(vrf.discard_route_internal, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.vrfs.discard_route_internal, null)
-      name_lookup               = try(vrf.name_lookup, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.vrfs.name_lookup, null)
-      passive_interface_default = try(vrf.passive_interface_default, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.vrfs.passive_interface_default, null)
+    vrfs = merge(
+      # Synthetic "default" VRF from process-level attributes
+      {
+        "default" = {
+          admin_state               = try(proc.shutdown, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.shutdown, false) ? "disabled" : "enabled"
+          bandwidth_reference       = try(proc.auto_cost_reference_bandwidth, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.auto_cost_reference_bandwidth, null)
+          bandwidth_reference_unit  = try(proc.auto_cost_reference_bandwidth_unit, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.auto_cost_reference_bandwidth_unit, null)
+          router_id                 = try(proc.router_id, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.router_id, null)
+          bfd_control               = try(proc.bfd, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.bfd, null)
+          log_adjacency_changes     = try(proc.log_adjacency_changes, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.log_adjacency_changes, null)
+          discard_route_external    = try(proc.discard_route_external, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.discard_route_external, null)
+          discard_route_internal    = try(proc.discard_route_internal, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.discard_route_internal, null)
+          name_lookup               = try(proc.name_lookup, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.name_lookup, null)
+          passive_interface_default = try(proc.passive_interface_default, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.passive_interface_default, null)
 
-      areas = { for area in try(vrf.areas, []) : area.id => {
-        type                     = try(area.type, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.vrfs.areas.type, null)
-        redistribute             = try(area.redistribute, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.vrfs.areas.redistribute, null)
-        nssa_translator_role     = try(area.nssa_translate_type7, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.vrfs.areas.nssa_translate_type7, null)
-        summary                  = try(area.summary, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.vrfs.areas.summary, null)
-        suppress_forward_address = try(area.nssa_translate_type7_suppress_fa, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.vrfs.areas.nssa_translate_type7_suppress_fa, null)
-      } }
+          areas = { for area in try(proc.areas, []) : area.id => {
+            type                     = try(area.type, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.areas.type, null)
+            redistribute             = try(area.redistribute, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.areas.redistribute, null)
+            nssa_translator_role     = try(area.nssa_translate_type7, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.areas.nssa_translate_type7, null)
+            summary                  = try(area.summary, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.areas.summary, null)
+            suppress_forward_address = try(area.nssa_translate_type7_suppress_fa, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.areas.nssa_translate_type7_suppress_fa, null)
+          } }
 
-      address_families = { for af in try(vrf.address_families, []) : local.ospfv3_address_family_map[af.address_family] => {
-        administrative_distance       = try(af.distance, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.vrfs.address_families.distance, null)
-        default_metric                = try(af.default_metric, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.vrfs.address_families.default_metric, null)
-        default_route_nssa_pbit_clear = try(af.default_route_nssa_abr_pbit_clear, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.vrfs.address_families.default_route_nssa_abr_pbit_clear, null)
-        max_ecmp_cost                 = try(af.maximum_paths, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.vrfs.address_families.maximum_paths, null)
+          address_families = { for af in try(proc.address_families, []) : local.ospfv3_address_family_map[af.address_family] => {
+            administrative_distance       = try(af.distance, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.address_families.distance, null)
+            default_metric                = try(af.default_metric, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.address_families.default_metric, null)
+            default_route_nssa_pbit_clear = try(af.default_route_nssa_abr_pbit_clear, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.address_families.default_route_nssa_abr_pbit_clear, null)
+            max_ecmp_cost                 = try(af.maximum_paths, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.address_families.maximum_paths, null)
+          } }
+        }
+      },
+      # Explicit non-default VRFs
+      { for vrf in try(proc.vrfs, []) : vrf.vrf => {
+        admin_state               = try(vrf.shutdown, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.vrfs.shutdown, false) ? "disabled" : "enabled"
+        bandwidth_reference       = try(vrf.auto_cost_reference_bandwidth, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.vrfs.auto_cost_reference_bandwidth, null)
+        bandwidth_reference_unit  = try(vrf.auto_cost_reference_bandwidth_unit, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.vrfs.auto_cost_reference_bandwidth_unit, null)
+        router_id                 = try(vrf.router_id, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.vrfs.router_id, null)
+        bfd_control               = try(vrf.bfd, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.vrfs.bfd, null)
+        log_adjacency_changes     = try(vrf.log_adjacency_changes, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.vrfs.log_adjacency_changes, null)
+        discard_route_external    = try(vrf.discard_route_external, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.vrfs.discard_route_external, null)
+        discard_route_internal    = try(vrf.discard_route_internal, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.vrfs.discard_route_internal, null)
+        name_lookup               = try(vrf.name_lookup, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.vrfs.name_lookup, null)
+        passive_interface_default = try(vrf.passive_interface_default, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.vrfs.passive_interface_default, null)
+
+        areas = { for area in try(vrf.areas, []) : area.id => {
+          type                     = try(area.type, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.vrfs.areas.type, null)
+          redistribute             = try(area.redistribute, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.vrfs.areas.redistribute, null)
+          nssa_translator_role     = try(area.nssa_translate_type7, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.vrfs.areas.nssa_translate_type7, null)
+          summary                  = try(area.summary, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.vrfs.areas.summary, null)
+          suppress_forward_address = try(area.nssa_translate_type7_suppress_fa, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.vrfs.areas.nssa_translate_type7_suppress_fa, null)
+        } }
+
+        address_families = { for af in try(vrf.address_families, []) : local.ospfv3_address_family_map[af.address_family] => {
+          administrative_distance       = try(af.distance, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.vrfs.address_families.distance, null)
+          default_metric                = try(af.default_metric, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.vrfs.address_families.default_metric, null)
+          default_route_nssa_pbit_clear = try(af.default_route_nssa_abr_pbit_clear, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.vrfs.address_families.default_route_nssa_abr_pbit_clear, null)
+          max_ecmp_cost                 = try(af.maximum_paths, local.defaults.nxos.devices.configuration.routing.ospfv3_processes.vrfs.address_families.maximum_paths, null)
+        } }
       } }
-    } }
+    )
   } }
 
   interfaces = { for int in local.ospfv3_interfaces : "${int.type}${int.id}" => {
