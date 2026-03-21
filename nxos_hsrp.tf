@@ -59,16 +59,16 @@ resource "nxos_hsrp" "hsrp" {
   interfaces = { for int in local.hsrp_interfaces : int.id => {
     admin_state                        = "enabled"
     bfd                                = try(int.hsrp.bfd, try(int.defaults_path.hsrp.bfd, null), null) == null ? null : (try(int.hsrp.bfd, try(int.defaults_path.hsrp.bfd, null)) ? "enabled" : "disabled")
-    bia_scope                          = try(int.hsrp.bia_scope, try(int.defaults_path.hsrp.bia_scope, null), null)
+    bia_scope                          = try(int.hsrp.use_bia_scope, try(int.defaults_path.hsrp.use_bia_scope, null), null)
     control                            = try(int.hsrp.use_bia, try(int.defaults_path.hsrp.use_bia, null), null) == null ? null : (try(int.hsrp.use_bia, try(int.defaults_path.hsrp.use_bia, null)) ? "bia" : "")
     delay_minimum                      = try(int.hsrp.delay_minimum, try(int.defaults_path.hsrp.delay_minimum, null), null)
-    mac_refresh_interval               = try(int.hsrp.mac_refresh_interval, try(int.defaults_path.hsrp.mac_refresh_interval, null), null)
-    mac_refresh_interval_configuration = try(int.hsrp.mac_refresh_interval, try(int.defaults_path.hsrp.mac_refresh_interval, null), null) != null ? "enabled" : null
-    reload_delay                       = try(int.hsrp.reload_delay, try(int.defaults_path.hsrp.reload_delay, null), null)
+    mac_refresh_interval               = try(int.hsrp.mac_refresh, try(int.defaults_path.hsrp.mac_refresh, null), null)
+    mac_refresh_interval_configuration = try(int.hsrp.mac_refresh, try(int.defaults_path.hsrp.mac_refresh, null), null) != null ? "enabled" : null
+    reload_delay                       = try(int.hsrp.delay_reload, try(int.defaults_path.hsrp.delay_reload, null), null)
     version                            = try(int.hsrp.version, try(int.defaults_path.hsrp.version, null), null) == null ? null : "v${try(int.hsrp.version, try(int.defaults_path.hsrp.version, null))}"
 
     groups = { for group in try(int.hsrp.groups, []) : "${group.id};${group.address_family}" => {
-      authentication_md5_compatibility_mode = try(group.authentication_md5_compatibility_mode, try(int.defaults_path.hsrp.groups.authentication_md5_compatibility_mode, null), null) == null ? null : (try(group.authentication_md5_compatibility_mode, try(int.defaults_path.hsrp.groups.authentication_md5_compatibility_mode, null)) ? "enabled" : "disabled")
+      authentication_md5_compatibility_mode = try(group.authentication_md5_compatibility, try(int.defaults_path.hsrp.groups.authentication_md5_compatibility, null), null) == null ? null : (try(group.authentication_md5_compatibility, try(int.defaults_path.hsrp.groups.authentication_md5_compatibility, null)) ? "enabled" : "disabled")
       authentication_md5_key_chain_name     = try(group.authentication_md5_key_chain, try(int.defaults_path.hsrp.groups.authentication_md5_key_chain, null), null)
       authentication_md5_key_name           = try(group.authentication_md5_key_string, try(int.defaults_path.hsrp.groups.authentication_md5_key_string, null), null)
       authentication_md5_key_string_type    = try(group.authentication_md5_key_string_type, try(int.defaults_path.hsrp.groups.authentication_md5_key_string_type, null), null)
@@ -78,11 +78,11 @@ resource "nxos_hsrp" "hsrp" {
       authentication_type                   = try(group.authentication_type, try(int.defaults_path.hsrp.groups.authentication_type, null), null)
       control                               = try(group.preempt, try(int.defaults_path.hsrp.groups.preempt, null), null) == null ? null : (try(group.preempt, try(int.defaults_path.hsrp.groups.preempt, null)) ? "preempt" : "")
       follow                                = try(group.follow, try(int.defaults_path.hsrp.groups.follow, null), null)
-      forwarding_lower_threshold            = try(group.forwarding_lower_threshold, try(int.defaults_path.hsrp.groups.forwarding_lower_threshold, null), null)
-      hello_interval                        = try(group.hello_interval, try(int.defaults_path.hsrp.groups.hello_interval, null), null)
-      hold_interval                         = try(group.hold_interval, try(int.defaults_path.hsrp.groups.hold_interval, null), null)
-      ip_address                            = try(group.ip_address, try(int.defaults_path.hsrp.groups.ip_address, null), null)
-      ip_obtain_mode                        = try(group.ip_obtain_mode, try(int.defaults_path.hsrp.groups.ip_obtain_mode, null), null)
+      forwarding_lower_threshold            = try(group.forwarding_threshold_lower, try(int.defaults_path.hsrp.groups.forwarding_threshold_lower, null), null)
+      hello_interval                        = try(group.timers_hello_interval, try(int.defaults_path.hsrp.groups.timers_hello_interval, null), null)
+      hold_interval                         = try(group.timers_hold_interval, try(int.defaults_path.hsrp.groups.timers_hold_interval, null), null)
+      ip_address                            = try(group.ip, try(int.defaults_path.hsrp.groups.ip, null), null)
+      ip_obtain_mode                        = try(group.ip, try(int.defaults_path.hsrp.groups.ip, null), null) != null ? "admin" : null
       mac_address                           = try(group.mac_address, try(int.defaults_path.hsrp.groups.mac_address, null), null)
       name                                  = try(group.name, try(int.defaults_path.hsrp.groups.name, null), null)
       preempt_delay_minimum                 = try(group.preempt_delay_minimum, try(int.defaults_path.hsrp.groups.preempt_delay_minimum, null), null)
