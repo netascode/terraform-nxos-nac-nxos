@@ -35,5 +35,6 @@ defaults:
             set_community_criteria: none
         routing:
           ospf_processes:
+            shutdown: false
             vrfs:
               shutdown: false
