@@ -10,10 +10,9 @@ locals {
         passive              = try(int.pim.passive, local.defaults.nxos.devices.configuration.interfaces.ethernets.pim.passive, null)
         sparse_mode          = try(int.pim.sparse_mode, local.defaults.nxos.devices.configuration.interfaces.ethernets.pim.sparse_mode, null)
         border               = try(int.pim.border, local.defaults.nxos.devices.configuration.interfaces.ethernets.pim.border, null)
-        border_router        = try(int.pim.border_router, local.defaults.nxos.devices.configuration.interfaces.ethernets.pim.border_router, null)
         dr_delay             = try(int.pim.dr_delay, local.defaults.nxos.devices.configuration.interfaces.ethernets.pim.dr_delay, null)
         join_prune_route_map = try(int.pim.jp_policy, local.defaults.nxos.devices.configuration.interfaces.ethernets.pim.jp_policy, null)
-        neighbor_route_map   = try(int.pim.neighbor_policy, local.defaults.nxos.devices.configuration.interfaces.ethernets.pim.neighbor_policy, null)
+        neighbor_route_map   = try(int.pim.neighbor_policy_route_map, local.defaults.nxos.devices.configuration.interfaces.ethernets.pim.neighbor_policy_route_map, null)
         neighbor_prefix_list = try(int.pim.neighbor_policy_prefix_list, local.defaults.nxos.devices.configuration.interfaces.ethernets.pim.neighbor_policy_prefix_list, null)
         rfc_strict           = try(int.pim.strict_rfc_compliant, local.defaults.nxos.devices.configuration.interfaces.ethernets.pim.strict_rfc_compliant, null)
       } if try(int.pim, null) != null],
@@ -26,10 +25,9 @@ locals {
         passive              = try(int.pim.passive, local.defaults.nxos.devices.configuration.interfaces.port_channels.pim.passive, null)
         sparse_mode          = try(int.pim.sparse_mode, local.defaults.nxos.devices.configuration.interfaces.port_channels.pim.sparse_mode, null)
         border               = try(int.pim.border, local.defaults.nxos.devices.configuration.interfaces.port_channels.pim.border, null)
-        border_router        = try(int.pim.border_router, local.defaults.nxos.devices.configuration.interfaces.port_channels.pim.border_router, null)
         dr_delay             = try(int.pim.dr_delay, local.defaults.nxos.devices.configuration.interfaces.port_channels.pim.dr_delay, null)
         join_prune_route_map = try(int.pim.jp_policy, local.defaults.nxos.devices.configuration.interfaces.port_channels.pim.jp_policy, null)
-        neighbor_route_map   = try(int.pim.neighbor_policy, local.defaults.nxos.devices.configuration.interfaces.port_channels.pim.neighbor_policy, null)
+        neighbor_route_map   = try(int.pim.neighbor_policy_route_map, local.defaults.nxos.devices.configuration.interfaces.port_channels.pim.neighbor_policy_route_map, null)
         neighbor_prefix_list = try(int.pim.neighbor_policy_prefix_list, local.defaults.nxos.devices.configuration.interfaces.port_channels.pim.neighbor_policy_prefix_list, null)
         rfc_strict           = try(int.pim.strict_rfc_compliant, local.defaults.nxos.devices.configuration.interfaces.port_channels.pim.strict_rfc_compliant, null)
       } if try(int.pim, null) != null],
@@ -42,10 +40,9 @@ locals {
         passive              = try(int.pim.passive, local.defaults.nxos.devices.configuration.interfaces.loopbacks.pim.passive, null)
         sparse_mode          = try(int.pim.sparse_mode, local.defaults.nxos.devices.configuration.interfaces.loopbacks.pim.sparse_mode, null)
         border               = try(int.pim.border, local.defaults.nxos.devices.configuration.interfaces.loopbacks.pim.border, null)
-        border_router        = try(int.pim.border_router, local.defaults.nxos.devices.configuration.interfaces.loopbacks.pim.border_router, null)
         dr_delay             = try(int.pim.dr_delay, local.defaults.nxos.devices.configuration.interfaces.loopbacks.pim.dr_delay, null)
         join_prune_route_map = try(int.pim.jp_policy, local.defaults.nxos.devices.configuration.interfaces.loopbacks.pim.jp_policy, null)
-        neighbor_route_map   = try(int.pim.neighbor_policy, local.defaults.nxos.devices.configuration.interfaces.loopbacks.pim.neighbor_policy, null)
+        neighbor_route_map   = try(int.pim.neighbor_policy_route_map, local.defaults.nxos.devices.configuration.interfaces.loopbacks.pim.neighbor_policy_route_map, null)
         neighbor_prefix_list = try(int.pim.neighbor_policy_prefix_list, local.defaults.nxos.devices.configuration.interfaces.loopbacks.pim.neighbor_policy_prefix_list, null)
         rfc_strict           = try(int.pim.strict_rfc_compliant, local.defaults.nxos.devices.configuration.interfaces.loopbacks.pim.strict_rfc_compliant, null)
       } if try(int.pim, null) != null],
@@ -58,10 +55,9 @@ locals {
         passive              = try(int.pim.passive, local.defaults.nxos.devices.configuration.interfaces.vlans.pim.passive, null)
         sparse_mode          = try(int.pim.sparse_mode, local.defaults.nxos.devices.configuration.interfaces.vlans.pim.sparse_mode, null)
         border               = try(int.pim.border, local.defaults.nxos.devices.configuration.interfaces.vlans.pim.border, null)
-        border_router        = try(int.pim.border_router, local.defaults.nxos.devices.configuration.interfaces.vlans.pim.border_router, null)
         dr_delay             = try(int.pim.dr_delay, local.defaults.nxos.devices.configuration.interfaces.vlans.pim.dr_delay, null)
         join_prune_route_map = try(int.pim.jp_policy, local.defaults.nxos.devices.configuration.interfaces.vlans.pim.jp_policy, null)
-        neighbor_route_map   = try(int.pim.neighbor_policy, local.defaults.nxos.devices.configuration.interfaces.vlans.pim.neighbor_policy, null)
+        neighbor_route_map   = try(int.pim.neighbor_policy_route_map, local.defaults.nxos.devices.configuration.interfaces.vlans.pim.neighbor_policy_route_map, null)
         neighbor_prefix_list = try(int.pim.neighbor_policy_prefix_list, local.defaults.nxos.devices.configuration.interfaces.vlans.pim.neighbor_policy_prefix_list, null)
         rfc_strict           = try(int.pim.strict_rfc_compliant, local.defaults.nxos.devices.configuration.interfaces.vlans.pim.strict_rfc_compliant, null)
       } if try(int.pim, null) != null],
@@ -127,7 +123,6 @@ resource "nxos_pim" "pim" {
           passive              = int.passive
           sparse_mode          = int.sparse_mode
           border               = int.border
-          border_router        = int.border_router
           dr_delay             = int.dr_delay
           join_prune_route_map = int.join_prune_route_map
           neighbor_route_map   = int.neighbor_route_map
@@ -178,7 +173,6 @@ resource "nxos_pim" "pim" {
         passive              = int.passive
         sparse_mode          = int.sparse_mode
         border               = int.border
-        border_router        = int.border_router
         dr_delay             = int.dr_delay
         join_prune_route_map = int.join_prune_route_map
         neighbor_route_map   = int.neighbor_route_map
@@ -220,7 +214,6 @@ resource "nxos_pim" "pim" {
           passive              = int.passive
           sparse_mode          = int.sparse_mode
           border               = int.border
-          border_router        = int.border_router
           dr_delay             = int.dr_delay
           join_prune_route_map = int.join_prune_route_map
           neighbor_route_map   = int.neighbor_route_map
