@@ -28,7 +28,7 @@ locals {
         ipv6_verify_unicast_source_reachable_via = try(int.ipv6_verify_unicast_source_reachable_via, local.defaults.nxos.devices.configuration.interfaces.ethernets.ipv6_verify_unicast_source_reachable_via, null)
         ipv6_address_link_local                  = try(int.ipv6_address_link_local, local.defaults.nxos.devices.configuration.interfaces.ethernets.ipv6_address_link_local, null)
         ipv6_addresses                           = try(int.ipv6_addresses, [])
-        } if !try(int.switchport, local.defaults.nxos.devices.configuration.interfaces.ethernets.switchport, true)
+        } if !try(int.switchport, local.defaults.nxos.devices.configuration.interfaces.ethernets.switchport, true) && try(int.channel_group, null) == null
       ],
       # Loopbacks
       [for int in try(local.device_config[device.name].interfaces.loopbacks, []) : {

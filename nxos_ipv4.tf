@@ -28,7 +28,7 @@ locals {
         ip_directed_broadcast_acl              = try(int.ip_directed_broadcast_acl, local.defaults.nxos.devices.configuration.interfaces.ethernets.ip_directed_broadcast_acl, null)
         ip_address                             = try(int.ip_address, local.defaults.nxos.devices.configuration.interfaces.ethernets.ip_address, null)
         ip_secondary_addresses                 = try(int.ip_secondary_addresses, [])
-        } if !try(int.switchport, local.defaults.nxos.devices.configuration.interfaces.ethernets.switchport, true)
+        } if !try(int.switchport, local.defaults.nxos.devices.configuration.interfaces.ethernets.switchport, true) && try(int.channel_group, null) == null
       ],
       # Loopbacks
       [for int in try(local.device_config[device.name].interfaces.loopbacks, []) : {
