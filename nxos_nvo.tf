@@ -36,7 +36,7 @@ resource "nxos_nvo" "nvo" {
       multisite_ingress_replication = try(vni.multisite_ingress_replication, local.defaults.nxos.devices.configuration.interfaces.nve.vnis.multisite_ingress_replication, null)
       multisite_multicast_group     = try(vni.multisite_mcast_group, local.defaults.nxos.devices.configuration.interfaces.nve.vnis.multisite_mcast_group, null)
       spine_anycast_gateway         = try(vni.spine_anycast_gateway, local.defaults.nxos.devices.configuration.interfaces.nve.vnis.spine_anycast_gateway, null)
-      suppress_arp                  = try(vni.suppress_arp, local.defaults.nxos.devices.configuration.interfaces.nve.vnis.suppress_arp, null)
+      suppress_arp                  = try(vni.suppress_arp, local.defaults.nxos.devices.configuration.interfaces.nve.vnis.suppress_arp, null) == null ? null : (try(vni.suppress_arp, local.defaults.nxos.devices.configuration.interfaces.nve.vnis.suppress_arp) ? "enabled" : "disabled")
 
       ingress_replication_protocol = try(vni.ingress_replication_protocol, local.defaults.nxos.devices.configuration.interfaces.nve.vnis.ingress_replication_protocol, null)
     } }

@@ -36,7 +36,7 @@ resource "nxos_user_management" "user_management" {
 
   # Users (aaaUser) — data model path: users.accounts
   users = { for user in try(local.device_config[each.key].aaa.users.accounts, []) : user.username => {
-    account_status           = try(user.account_status, local.defaults.nxos.devices.configuration.aaa.users.accounts.account_status, null)
+    account_status           = try(user.account_status, local.defaults.nxos.devices.configuration.aaa.users.accounts.account_status, null) == null ? null : (try(user.account_status, local.defaults.nxos.devices.configuration.aaa.users.accounts.account_status) ? "active" : "inactive")
     allow_expired            = try(user.allow_expired, local.defaults.nxos.devices.configuration.aaa.users.accounts.allow_expired, null) == null ? null : (try(user.allow_expired, local.defaults.nxos.devices.configuration.aaa.users.accounts.allow_expired) ? "yes" : "no")
     clear_password_history   = try(user.clear_password_history, local.defaults.nxos.devices.configuration.aaa.users.accounts.clear_password_history, null) == null ? null : (try(user.clear_password_history, local.defaults.nxos.devices.configuration.aaa.users.accounts.clear_password_history) ? "yes" : "no")
     description              = try(user.description, local.defaults.nxos.devices.configuration.aaa.users.accounts.description, null)

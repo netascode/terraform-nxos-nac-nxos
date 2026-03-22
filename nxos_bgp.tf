@@ -137,7 +137,7 @@ resource "nxos_bgp" "bgp" {
           peer_control                   = join(",", sort(compact([try(pt.bfd, local.defaults.nxos.devices.configuration.routing.bgp.peer_templates.bfd, false) ? "bfd" : "", try(pt.dont_capability_negotiate, local.defaults.nxos.devices.configuration.routing.bgp.peer_templates.dont_capability_negotiate, false) ? "cap-neg-off" : "", try(pt.disable_connected_check, local.defaults.nxos.devices.configuration.routing.bgp.peer_templates.disable_connected_check, false) ? "dis-conn-check" : "", !try(pt.dynamic_capability, local.defaults.nxos.devices.configuration.routing.bgp.peer_templates.dynamic_capability, true) ? "no-dyn-cap" : ""])))
           hold_time                      = try(pt.hold_time, local.defaults.nxos.devices.configuration.routing.bgp.peer_templates.hold_time, null)
           keepalive_interval             = try(pt.keepalive_interval, local.defaults.nxos.devices.configuration.routing.bgp.peer_templates.keepalive_interval, null)
-          log_neighbor_changes           = try(pt.log_neighbor_changes, local.defaults.nxos.devices.configuration.routing.bgp.peer_templates.log_neighbor_changes, null)
+          log_neighbor_changes           = try(pt.log_neighbor_changes, local.defaults.nxos.devices.configuration.routing.bgp.peer_templates.log_neighbor_changes, null) == null ? "none" : (try(pt.log_neighbor_changes, local.defaults.nxos.devices.configuration.routing.bgp.peer_templates.log_neighbor_changes) ? "enable" : "disable")
           low_memory_exempt              = try(pt.low_memory_exempt, local.defaults.nxos.devices.configuration.routing.bgp.peer_templates.low_memory_exempt, false) ? "enabled" : "disabled"
           max_peer_count                 = try(pt.maximum_peers, local.defaults.nxos.devices.configuration.routing.bgp.peer_templates.maximum_peers, null)
           password_type                  = try(pt.password_type, local.defaults.nxos.devices.configuration.routing.bgp.peer_templates.password_type, null)
@@ -196,7 +196,7 @@ resource "nxos_bgp" "bgp" {
           bmp_server_2                   = try(nei.bmp_activate_server_2, local.defaults.nxos.devices.configuration.routing.bgp.neighbors.bmp_activate_server_2, false) ? "enabled" : "disabled"
           capability_suppress_4_byte_asn = try(nei.capability_suppress_4_byte_asn, local.defaults.nxos.devices.configuration.routing.bgp.neighbors.capability_suppress_4_byte_asn, false) ? "enabled" : "disabled"
           connection_mode                = try(nei.connection_mode, local.defaults.nxos.devices.configuration.routing.bgp.neighbors.connection_mode, null)
-          log_neighbor_changes           = try(nei.log_neighbor_changes, local.defaults.nxos.devices.configuration.routing.bgp.neighbors.log_neighbor_changes, null)
+          log_neighbor_changes           = try(nei.log_neighbor_changes, local.defaults.nxos.devices.configuration.routing.bgp.neighbors.log_neighbor_changes, null) == null ? "none" : (try(nei.log_neighbor_changes, local.defaults.nxos.devices.configuration.routing.bgp.neighbors.log_neighbor_changes) ? "enable" : "disable")
           low_memory_exempt              = try(nei.low_memory_exempt, local.defaults.nxos.devices.configuration.routing.bgp.neighbors.low_memory_exempt, false) ? "enabled" : "disabled"
           max_peer_count                 = try(nei.maximum_peers, local.defaults.nxos.devices.configuration.routing.bgp.neighbors.maximum_peers, null)
           private_as_control             = try(nei.remove_private_as, local.defaults.nxos.devices.configuration.routing.bgp.neighbors.remove_private_as, null)
@@ -346,7 +346,7 @@ resource "nxos_bgp" "bgp" {
         bmp_server_2                   = try(nei.bmp_activate_server_2, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.neighbors.bmp_activate_server_2, false) ? "enabled" : "disabled"
         capability_suppress_4_byte_asn = try(nei.capability_suppress_4_byte_asn, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.neighbors.capability_suppress_4_byte_asn, false) ? "enabled" : "disabled"
         connection_mode                = try(nei.connection_mode, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.neighbors.connection_mode, null)
-        log_neighbor_changes           = try(nei.log_neighbor_changes, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.neighbors.log_neighbor_changes, null)
+        log_neighbor_changes           = try(nei.log_neighbor_changes, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.neighbors.log_neighbor_changes, null) == null ? "none" : (try(nei.log_neighbor_changes, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.neighbors.log_neighbor_changes) ? "enable" : "disable")
         low_memory_exempt              = try(nei.low_memory_exempt, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.neighbors.low_memory_exempt, false) ? "enabled" : "disabled"
         max_peer_count                 = try(nei.maximum_peers, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.neighbors.maximum_peers, null)
         private_as_control             = try(nei.remove_private_as, local.defaults.nxos.devices.configuration.routing.bgp.vrfs.neighbors.remove_private_as, null)

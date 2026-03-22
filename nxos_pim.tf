@@ -5,7 +5,7 @@ locals {
         device               = device.name
         vrf                  = try(int.vrf, local.defaults.nxos.devices.configuration.interfaces.ethernets.vrf, "default")
         interface_id         = "eth${int.id}"
-        bfd                  = try(int.pim.bfd_instance, local.defaults.nxos.devices.configuration.interfaces.ethernets.pim.bfd_instance, null)
+        bfd                  = try(int.pim.bfd_instance, local.defaults.nxos.devices.configuration.interfaces.ethernets.pim.bfd_instance, null) == null ? null : (try(int.pim.bfd_instance, local.defaults.nxos.devices.configuration.interfaces.ethernets.pim.bfd_instance) ? "enabled" : "disabled")
         dr_priority          = try(int.pim.dr_priority, local.defaults.nxos.devices.configuration.interfaces.ethernets.pim.dr_priority, null)
         passive              = try(int.pim.passive, local.defaults.nxos.devices.configuration.interfaces.ethernets.pim.passive, null)
         sparse_mode          = try(int.pim.sparse_mode, local.defaults.nxos.devices.configuration.interfaces.ethernets.pim.sparse_mode, null)
@@ -20,7 +20,7 @@ locals {
         device               = device.name
         vrf                  = try(int.vrf, local.defaults.nxos.devices.configuration.interfaces.port_channels.vrf, "default")
         interface_id         = "po${int.id}"
-        bfd                  = try(int.pim.bfd_instance, local.defaults.nxos.devices.configuration.interfaces.port_channels.pim.bfd_instance, null)
+        bfd                  = try(int.pim.bfd_instance, local.defaults.nxos.devices.configuration.interfaces.port_channels.pim.bfd_instance, null) == null ? null : (try(int.pim.bfd_instance, local.defaults.nxos.devices.configuration.interfaces.port_channels.pim.bfd_instance) ? "enabled" : "disabled")
         dr_priority          = try(int.pim.dr_priority, local.defaults.nxos.devices.configuration.interfaces.port_channels.pim.dr_priority, null)
         passive              = try(int.pim.passive, local.defaults.nxos.devices.configuration.interfaces.port_channels.pim.passive, null)
         sparse_mode          = try(int.pim.sparse_mode, local.defaults.nxos.devices.configuration.interfaces.port_channels.pim.sparse_mode, null)
@@ -35,7 +35,7 @@ locals {
         device               = device.name
         vrf                  = try(int.vrf, local.defaults.nxos.devices.configuration.interfaces.loopbacks.vrf, "default")
         interface_id         = "lo${int.id}"
-        bfd                  = try(int.pim.bfd_instance, local.defaults.nxos.devices.configuration.interfaces.loopbacks.pim.bfd_instance, null)
+        bfd                  = try(int.pim.bfd_instance, local.defaults.nxos.devices.configuration.interfaces.loopbacks.pim.bfd_instance, null) == null ? null : (try(int.pim.bfd_instance, local.defaults.nxos.devices.configuration.interfaces.loopbacks.pim.bfd_instance) ? "enabled" : "disabled")
         dr_priority          = try(int.pim.dr_priority, local.defaults.nxos.devices.configuration.interfaces.loopbacks.pim.dr_priority, null)
         passive              = try(int.pim.passive, local.defaults.nxos.devices.configuration.interfaces.loopbacks.pim.passive, null)
         sparse_mode          = try(int.pim.sparse_mode, local.defaults.nxos.devices.configuration.interfaces.loopbacks.pim.sparse_mode, null)
@@ -50,7 +50,7 @@ locals {
         device               = device.name
         vrf                  = try(int.vrf, local.defaults.nxos.devices.configuration.interfaces.vlans.vrf, "default")
         interface_id         = "vlan${int.id}"
-        bfd                  = try(int.pim.bfd_instance, local.defaults.nxos.devices.configuration.interfaces.vlans.pim.bfd_instance, null)
+        bfd                  = try(int.pim.bfd_instance, local.defaults.nxos.devices.configuration.interfaces.vlans.pim.bfd_instance, null) == null ? null : (try(int.pim.bfd_instance, local.defaults.nxos.devices.configuration.interfaces.vlans.pim.bfd_instance) ? "enabled" : "disabled")
         dr_priority          = try(int.pim.dr_priority, local.defaults.nxos.devices.configuration.interfaces.vlans.pim.dr_priority, null)
         passive              = try(int.pim.passive, local.defaults.nxos.devices.configuration.interfaces.vlans.pim.passive, null)
         sparse_mode          = try(int.pim.sparse_mode, local.defaults.nxos.devices.configuration.interfaces.vlans.pim.sparse_mode, null)
