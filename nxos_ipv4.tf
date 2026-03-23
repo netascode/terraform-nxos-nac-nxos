@@ -22,13 +22,13 @@ locals {
         id                                     = "eth${int.id}"
         drop_glean                             = null
         forward                                = null
-        unnumbered                             = try(int.ip_unnumbered, local.defaults.nxos.devices.configuration.interfaces.ethernets.ip_unnumbered, null)
-        ip_verify_unicast_source_reachable_via = try(int.ip_verify_unicast_source_reachable_via, local.defaults.nxos.devices.configuration.interfaces.ethernets.ip_verify_unicast_source_reachable_via, null)
-        ip_directed_broadcast                  = try(int.ip_directed_broadcast, local.defaults.nxos.devices.configuration.interfaces.ethernets.ip_directed_broadcast, null)
-        ip_directed_broadcast_acl              = try(int.ip_directed_broadcast_acl, local.defaults.nxos.devices.configuration.interfaces.ethernets.ip_directed_broadcast_acl, null)
-        ip_address                             = try(int.ip_address, local.defaults.nxos.devices.configuration.interfaces.ethernets.ip_address, null)
-        ip_secondary_addresses                 = try(int.ip_secondary_addresses, [])
-        } if !try(int.switchport, local.defaults.nxos.devices.configuration.interfaces.ethernets.switchport, true) && try(int.channel_group, null) == null
+        unnumbered                             = try(int.ip.unnumbered, local.defaults.nxos.devices.configuration.interfaces.ethernets.ip.unnumbered, null)
+        ip_verify_unicast_source_reachable_via = try(int.ip.verify_unicast_source_reachable_via, local.defaults.nxos.devices.configuration.interfaces.ethernets.ip.verify_unicast_source_reachable_via, null)
+        ip_directed_broadcast                  = try(int.ip.directed_broadcast, local.defaults.nxos.devices.configuration.interfaces.ethernets.ip.directed_broadcast, null)
+        ip_directed_broadcast_acl              = try(int.ip.directed_broadcast_acl, local.defaults.nxos.devices.configuration.interfaces.ethernets.ip.directed_broadcast_acl, null)
+        ip_address                             = try(int.ip.address, local.defaults.nxos.devices.configuration.interfaces.ethernets.ip.address, null)
+        ip_secondary_addresses                 = try(int.ip.secondary_addresses, [])
+        } if !try(int.switchport.enabled, local.defaults.nxos.devices.configuration.interfaces.ethernets.switchport.enabled, true) && try(int.channel_group, null) == null
       ],
       # Loopbacks
       [for int in try(local.device_config[device.name].interfaces.loopbacks, []) : {
@@ -41,22 +41,22 @@ locals {
         ip_verify_unicast_source_reachable_via = null
         ip_directed_broadcast                  = null
         ip_directed_broadcast_acl              = null
-        ip_address                             = try(int.ip_address, local.defaults.nxos.devices.configuration.interfaces.loopbacks.ip_address, null)
-        ip_secondary_addresses                 = try(int.ip_secondary_addresses, [])
+        ip_address                             = try(int.ip.address, local.defaults.nxos.devices.configuration.interfaces.loopbacks.ip.address, null)
+        ip_secondary_addresses                 = try(int.ip.secondary_addresses, [])
       }],
       # SVIs
       [for int in try(local.device_config[device.name].interfaces.vlans, []) : {
         device                                 = device.name
         vrf                                    = try(int.vrf, local.defaults.nxos.devices.configuration.interfaces.vlans.vrf, "default")
         id                                     = "vlan${int.id}"
-        drop_glean                             = try(int.ip_drop_glean, local.defaults.nxos.devices.configuration.interfaces.vlans.ip_drop_glean, null) != null ? (try(int.ip_drop_glean, local.defaults.nxos.devices.configuration.interfaces.vlans.ip_drop_glean) ? "enabled" : "disabled") : null
-        forward                                = try(int.ip_forward, local.defaults.nxos.devices.configuration.interfaces.vlans.ip_forward, null) != null ? (try(int.ip_forward, local.defaults.nxos.devices.configuration.interfaces.vlans.ip_forward) ? "enabled" : "disabled") : null
+        drop_glean                             = try(int.ip.drop_glean, local.defaults.nxos.devices.configuration.interfaces.vlans.ip.drop_glean, null) != null ? (try(int.ip.drop_glean, local.defaults.nxos.devices.configuration.interfaces.vlans.ip.drop_glean) ? "enabled" : "disabled") : null
+        forward                                = try(int.ip.forward, local.defaults.nxos.devices.configuration.interfaces.vlans.ip.forward, null) != null ? (try(int.ip.forward, local.defaults.nxos.devices.configuration.interfaces.vlans.ip.forward) ? "enabled" : "disabled") : null
         unnumbered                             = null
         ip_verify_unicast_source_reachable_via = null
-        ip_directed_broadcast                  = try(int.ip_directed_broadcast, local.defaults.nxos.devices.configuration.interfaces.vlans.ip_directed_broadcast, null)
-        ip_directed_broadcast_acl              = try(int.ip_directed_broadcast_acl, local.defaults.nxos.devices.configuration.interfaces.vlans.ip_directed_broadcast_acl, null)
-        ip_address                             = try(int.ip_address, local.defaults.nxos.devices.configuration.interfaces.vlans.ip_address, null)
-        ip_secondary_addresses                 = try(int.ip_secondary_addresses, [])
+        ip_directed_broadcast                  = try(int.ip.directed_broadcast, local.defaults.nxos.devices.configuration.interfaces.vlans.ip.directed_broadcast, null)
+        ip_directed_broadcast_acl              = try(int.ip.directed_broadcast_acl, local.defaults.nxos.devices.configuration.interfaces.vlans.ip.directed_broadcast_acl, null)
+        ip_address                             = try(int.ip.address, local.defaults.nxos.devices.configuration.interfaces.vlans.ip.address, null)
+        ip_secondary_addresses                 = try(int.ip.secondary_addresses, [])
       }],
       # Port channels (L3 only)
       [for int in try(local.device_config[device.name].interfaces.port_channels, []) : {
@@ -65,13 +65,13 @@ locals {
         id                                     = "po${int.id}"
         drop_glean                             = null
         forward                                = null
-        unnumbered                             = try(int.ip_unnumbered, local.defaults.nxos.devices.configuration.interfaces.port_channels.ip_unnumbered, null)
-        ip_verify_unicast_source_reachable_via = try(int.ip_verify_unicast_source_reachable_via, local.defaults.nxos.devices.configuration.interfaces.port_channels.ip_verify_unicast_source_reachable_via, null)
-        ip_directed_broadcast                  = try(int.ip_directed_broadcast, local.defaults.nxos.devices.configuration.interfaces.port_channels.ip_directed_broadcast, null)
-        ip_directed_broadcast_acl              = try(int.ip_directed_broadcast_acl, local.defaults.nxos.devices.configuration.interfaces.port_channels.ip_directed_broadcast_acl, null)
-        ip_address                             = try(int.ip_address, local.defaults.nxos.devices.configuration.interfaces.port_channels.ip_address, null)
-        ip_secondary_addresses                 = try(int.ip_secondary_addresses, [])
-        } if !try(int.switchport, local.defaults.nxos.devices.configuration.interfaces.port_channels.switchport, true)
+        unnumbered                             = try(int.ip.unnumbered, local.defaults.nxos.devices.configuration.interfaces.port_channels.ip.unnumbered, null)
+        ip_verify_unicast_source_reachable_via = try(int.ip.verify_unicast_source_reachable_via, local.defaults.nxos.devices.configuration.interfaces.port_channels.ip.verify_unicast_source_reachable_via, null)
+        ip_directed_broadcast                  = try(int.ip.directed_broadcast, local.defaults.nxos.devices.configuration.interfaces.port_channels.ip.directed_broadcast, null)
+        ip_directed_broadcast_acl              = try(int.ip.directed_broadcast_acl, local.defaults.nxos.devices.configuration.interfaces.port_channels.ip.directed_broadcast_acl, null)
+        ip_address                             = try(int.ip.address, local.defaults.nxos.devices.configuration.interfaces.port_channels.ip.address, null)
+        ip_secondary_addresses                 = try(int.ip.secondary_addresses, [])
+        } if !try(int.switchport.enabled, local.defaults.nxos.devices.configuration.interfaces.port_channels.switchport.enabled, true)
       ],
     )
   ])
