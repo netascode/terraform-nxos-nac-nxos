@@ -1,9 +1,9 @@
 locals {
-  # Group static routes by device/vrf for the nxos_ipv4 vrfs nested map
-  ip_static_routes_by_device_vrf = {
+  # Group routes by device/vrf for the nxos_ipv4 vrfs nested map
+  ip_routes_by_device_vrf = {
     for entry in flatten([
       for device in local.devices : [
-        for route in try(local.device_config[device.name].routing.ip_static_routes, []) : {
+        for route in try(local.device_config[device.name].routing.ip_routes, []) : {
           device = device.name
           vrf    = try(route.vrf, "default")
           route  = route
@@ -89,7 +89,7 @@ resource "nxos_ipv4" "ipv4" {
     try(local.device_config[device.name].system.ip_redirect_syslog_interval, local.defaults.nxos.devices.configuration.system.ip_redirect_syslog_interval, null) != null ||
     try(local.device_config[device.name].system.ip_source_route, local.defaults.nxos.devices.configuration.system.ip_source_route, null) != null ||
     length(try(local.device_config[device.name].vrfs, [])) > 0 ||
-    length(try(local.device_config[device.name].routing.ip_static_routes, [])) > 0 ||
+    length(try(local.device_config[device.name].routing.ip_routes, [])) > 0 ||
   length([for int in local.ip_interfaces : int if int.device == device.name]) > 0 }
   device = each.key
 
@@ -110,16 +110,16 @@ resource "nxos_ipv4" "ipv4" {
         auto_discard                 = null
         icmp_errors_source_interface = null
 
-        static_routes = { for route in try(local.ip_static_routes_by_device_vrf["${each.key}/default"], []) : route.route.prefix => {
-          control    = try(route.route.bfd, local.defaults.nxos.devices.configuration.routing.ip_static_routes.bfd, false) ? "bfd" : (try(route.route.pervasive, local.defaults.nxos.devices.configuration.routing.ip_static_routes.pervasive, false) ? "pervasive" : null)
-          preference = try(route.route.preference, local.defaults.nxos.devices.configuration.routing.ip_static_routes.preference, null)
-          tag        = try(route.route.tag, local.defaults.nxos.devices.configuration.routing.ip_static_routes.tag, null)
+        static_routes = { for route in try(local.ip_routes_by_device_vrf["${each.key}/default"], []) : route.route.prefix => {
+          control    = try(route.route.bfd, local.defaults.nxos.devices.configuration.routing.ip_routes.bfd, false) ? "bfd" : (try(route.route.pervasive, local.defaults.nxos.devices.configuration.routing.ip_routes.pervasive, false) ? "pervasive" : null)
+          preference = try(route.route.preference, local.defaults.nxos.devices.configuration.routing.ip_routes.preference, null)
+          tag        = try(route.route.tag, local.defaults.nxos.devices.configuration.routing.ip_routes.tag, null)
 
-          next_hops = { for nh in try(route.route.next_hops, []) : "${try(nh.interface_type, local.defaults.nxos.devices.configuration.routing.ip_static_routes.next_hops.interface_type, null) != null ? "${local.intf_prefix_map[try(nh.interface_type, local.defaults.nxos.devices.configuration.routing.ip_static_routes.next_hops.interface_type)]}${try(nh.interface_id, local.defaults.nxos.devices.configuration.routing.ip_static_routes.next_hops.interface_id, "")}" : "unspecified"};${try(nh.address, local.defaults.nxos.devices.configuration.routing.ip_static_routes.next_hops.address, "0.0.0.0")};${try(nh.vrf, local.defaults.nxos.devices.configuration.routing.ip_static_routes.next_hops.vrf, "default")}" => {
-            object     = try(nh.track, local.defaults.nxos.devices.configuration.routing.ip_static_routes.next_hops.track, null)
-            preference = try(nh.preference, local.defaults.nxos.devices.configuration.routing.ip_static_routes.next_hops.preference, null)
-            tag        = try(nh.tag, local.defaults.nxos.devices.configuration.routing.ip_static_routes.next_hops.tag, null)
-            name       = try(nh.name, local.defaults.nxos.devices.configuration.routing.ip_static_routes.next_hops.name, null)
+          next_hops = { for nh in try(route.route.next_hops, []) : "${try(nh.interface_type, local.defaults.nxos.devices.configuration.routing.ip_routes.next_hops.interface_type, null) != null ? "${local.intf_prefix_map[try(nh.interface_type, local.defaults.nxos.devices.configuration.routing.ip_routes.next_hops.interface_type)]}${try(nh.interface_id, local.defaults.nxos.devices.configuration.routing.ip_routes.next_hops.interface_id, "")}" : "unspecified"};${try(nh.address, local.defaults.nxos.devices.configuration.routing.ip_routes.next_hops.address, "0.0.0.0")};${try(nh.vrf, local.defaults.nxos.devices.configuration.routing.ip_routes.next_hops.vrf, "default")}" => {
+            object     = try(nh.track, local.defaults.nxos.devices.configuration.routing.ip_routes.next_hops.track, null)
+            preference = try(nh.preference, local.defaults.nxos.devices.configuration.routing.ip_routes.next_hops.preference, null)
+            tag        = try(nh.tag, local.defaults.nxos.devices.configuration.routing.ip_routes.next_hops.tag, null)
+            name       = try(nh.name, local.defaults.nxos.devices.configuration.routing.ip_routes.next_hops.name, null)
           } }
         } }
 
@@ -143,16 +143,16 @@ resource "nxos_ipv4" "ipv4" {
       auto_discard                 = try(vrf.auto_discard, local.defaults.nxos.devices.configuration.vrfs.auto_discard, null) != null ? (try(vrf.auto_discard, local.defaults.nxos.devices.configuration.vrfs.auto_discard) ? "enabled" : "disabled") : null
       icmp_errors_source_interface = try(vrf.icmp_errors_source_interface_type, local.defaults.nxos.devices.configuration.vrfs.icmp_errors_source_interface_type, null) != null ? "${local.intf_prefix_map[try(vrf.icmp_errors_source_interface_type, local.defaults.nxos.devices.configuration.vrfs.icmp_errors_source_interface_type)]}${try(vrf.icmp_errors_source_interface_id, local.defaults.nxos.devices.configuration.vrfs.icmp_errors_source_interface_id, "")}" : null
 
-      static_routes = { for route in try(local.ip_static_routes_by_device_vrf["${each.key}/${vrf.name}"], []) : route.route.prefix => {
-        control    = try(route.route.bfd, local.defaults.nxos.devices.configuration.routing.ip_static_routes.bfd, false) ? "bfd" : (try(route.route.pervasive, local.defaults.nxos.devices.configuration.routing.ip_static_routes.pervasive, false) ? "pervasive" : null)
-        preference = try(route.route.preference, local.defaults.nxos.devices.configuration.routing.ip_static_routes.preference, null)
-        tag        = try(route.route.tag, local.defaults.nxos.devices.configuration.routing.ip_static_routes.tag, null)
+      static_routes = { for route in try(local.ip_routes_by_device_vrf["${each.key}/${vrf.name}"], []) : route.route.prefix => {
+        control    = try(route.route.bfd, local.defaults.nxos.devices.configuration.routing.ip_routes.bfd, false) ? "bfd" : (try(route.route.pervasive, local.defaults.nxos.devices.configuration.routing.ip_routes.pervasive, false) ? "pervasive" : null)
+        preference = try(route.route.preference, local.defaults.nxos.devices.configuration.routing.ip_routes.preference, null)
+        tag        = try(route.route.tag, local.defaults.nxos.devices.configuration.routing.ip_routes.tag, null)
 
-        next_hops = { for nh in try(route.route.next_hops, []) : "${try(nh.interface_type, local.defaults.nxos.devices.configuration.routing.ip_static_routes.next_hops.interface_type, null) != null ? "${local.intf_prefix_map[try(nh.interface_type, local.defaults.nxos.devices.configuration.routing.ip_static_routes.next_hops.interface_type)]}${try(nh.interface_id, local.defaults.nxos.devices.configuration.routing.ip_static_routes.next_hops.interface_id, "")}" : "unspecified"};${try(nh.address, local.defaults.nxos.devices.configuration.routing.ip_static_routes.next_hops.address, "0.0.0.0")};${try(nh.vrf, local.defaults.nxos.devices.configuration.routing.ip_static_routes.next_hops.vrf, "default")}" => {
-          object     = try(nh.track, local.defaults.nxos.devices.configuration.routing.ip_static_routes.next_hops.track, null)
-          preference = try(nh.preference, local.defaults.nxos.devices.configuration.routing.ip_static_routes.next_hops.preference, null)
-          tag        = try(nh.tag, local.defaults.nxos.devices.configuration.routing.ip_static_routes.next_hops.tag, null)
-          name       = try(nh.name, local.defaults.nxos.devices.configuration.routing.ip_static_routes.next_hops.name, null)
+        next_hops = { for nh in try(route.route.next_hops, []) : "${try(nh.interface_type, local.defaults.nxos.devices.configuration.routing.ip_routes.next_hops.interface_type, null) != null ? "${local.intf_prefix_map[try(nh.interface_type, local.defaults.nxos.devices.configuration.routing.ip_routes.next_hops.interface_type)]}${try(nh.interface_id, local.defaults.nxos.devices.configuration.routing.ip_routes.next_hops.interface_id, "")}" : "unspecified"};${try(nh.address, local.defaults.nxos.devices.configuration.routing.ip_routes.next_hops.address, "0.0.0.0")};${try(nh.vrf, local.defaults.nxos.devices.configuration.routing.ip_routes.next_hops.vrf, "default")}" => {
+          object     = try(nh.track, local.defaults.nxos.devices.configuration.routing.ip_routes.next_hops.track, null)
+          preference = try(nh.preference, local.defaults.nxos.devices.configuration.routing.ip_routes.next_hops.preference, null)
+          tag        = try(nh.tag, local.defaults.nxos.devices.configuration.routing.ip_routes.next_hops.tag, null)
+          name       = try(nh.name, local.defaults.nxos.devices.configuration.routing.ip_routes.next_hops.name, null)
         } }
       } }
 
