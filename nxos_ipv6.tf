@@ -20,58 +20,58 @@ locals {
         device                                   = device.name
         vrf                                      = try(int.vrf, local.defaults.nxos.devices.configuration.interfaces.ethernets.vrf, "default")
         id                                       = "eth${int.id}"
-        ipv6_address_autoconfig                  = try(int.ipv6_address_autoconfig, local.defaults.nxos.devices.configuration.interfaces.ethernets.ipv6_address_autoconfig, null)
-        ipv6_nd_default_route                    = try(int.ipv6_nd_default_route, local.defaults.nxos.devices.configuration.interfaces.ethernets.ipv6_nd_default_route, null)
-        ipv6_forward                             = try(int.ipv6_forward, local.defaults.nxos.devices.configuration.interfaces.ethernets.ipv6_forward, null)
-        ipv6_link_local_use_bia                  = try(int.ipv6_link_local_use_bia, local.defaults.nxos.devices.configuration.interfaces.ethernets.ipv6_link_local_use_bia, null)
-        ipv6_address_use_link_local_only         = try(int.ipv6_address_use_link_local_only, local.defaults.nxos.devices.configuration.interfaces.ethernets.ipv6_address_use_link_local_only, null)
-        ipv6_verify_unicast_source_reachable_via = try(int.ipv6_verify_unicast_source_reachable_via, local.defaults.nxos.devices.configuration.interfaces.ethernets.ipv6_verify_unicast_source_reachable_via, null)
-        ipv6_address_link_local                  = try(int.ipv6_address_link_local, local.defaults.nxos.devices.configuration.interfaces.ethernets.ipv6_address_link_local, null)
-        ipv6_addresses                           = try(int.ipv6_addresses, [])
-        } if !try(int.switchport, local.defaults.nxos.devices.configuration.interfaces.ethernets.switchport, true) && try(int.channel_group, null) == null
+        ipv6_address_autoconfig                  = try(int.ipv6.address_autoconfig, local.defaults.nxos.devices.configuration.interfaces.ethernets.ipv6.address_autoconfig, null)
+        ipv6_nd_default_route                    = try(int.ipv6.nd_default_route, local.defaults.nxos.devices.configuration.interfaces.ethernets.ipv6.nd_default_route, null)
+        ipv6_forward                             = try(int.ipv6.forward, local.defaults.nxos.devices.configuration.interfaces.ethernets.ipv6.forward, null)
+        ipv6_link_local_use_bia                  = try(int.ipv6.link_local_use_bia, local.defaults.nxos.devices.configuration.interfaces.ethernets.ipv6.link_local_use_bia, null)
+        ipv6_address_use_link_local_only         = try(int.ipv6.address_use_link_local_only, local.defaults.nxos.devices.configuration.interfaces.ethernets.ipv6.address_use_link_local_only, null)
+        ipv6_verify_unicast_source_reachable_via = try(int.ipv6.verify_unicast_source_reachable_via, local.defaults.nxos.devices.configuration.interfaces.ethernets.ipv6.verify_unicast_source_reachable_via, null)
+        ipv6_address_link_local                  = try(int.ipv6.address_link_local, local.defaults.nxos.devices.configuration.interfaces.ethernets.ipv6.address_link_local, null)
+        ipv6_addresses                           = try(int.ipv6.addresses, [])
+        } if !try(int.switchport.enabled, local.defaults.nxos.devices.configuration.interfaces.ethernets.switchport.enabled, true) && try(int.channel_group, null) == null
       ],
       # Loopbacks
       [for int in try(local.device_config[device.name].interfaces.loopbacks, []) : {
         device                                   = device.name
         vrf                                      = try(int.vrf, local.defaults.nxos.devices.configuration.interfaces.loopbacks.vrf, "default")
         id                                       = "lo${int.id}"
-        ipv6_address_autoconfig                  = try(int.ipv6_address_autoconfig, local.defaults.nxos.devices.configuration.interfaces.loopbacks.ipv6_address_autoconfig, null)
-        ipv6_nd_default_route                    = try(int.ipv6_nd_default_route, local.defaults.nxos.devices.configuration.interfaces.loopbacks.ipv6_nd_default_route, null)
-        ipv6_forward                             = try(int.ipv6_forward, local.defaults.nxos.devices.configuration.interfaces.loopbacks.ipv6_forward, null)
-        ipv6_link_local_use_bia                  = try(int.ipv6_link_local_use_bia, local.defaults.nxos.devices.configuration.interfaces.loopbacks.ipv6_link_local_use_bia, null)
-        ipv6_address_use_link_local_only         = try(int.ipv6_address_use_link_local_only, local.defaults.nxos.devices.configuration.interfaces.loopbacks.ipv6_address_use_link_local_only, null)
-        ipv6_verify_unicast_source_reachable_via = try(int.ipv6_verify_unicast_source_reachable_via, local.defaults.nxos.devices.configuration.interfaces.loopbacks.ipv6_verify_unicast_source_reachable_via, null)
-        ipv6_address_link_local                  = try(int.ipv6_address_link_local, local.defaults.nxos.devices.configuration.interfaces.loopbacks.ipv6_address_link_local, null)
-        ipv6_addresses                           = try(int.ipv6_addresses, [])
+        ipv6_address_autoconfig                  = try(int.ipv6.address_autoconfig, local.defaults.nxos.devices.configuration.interfaces.loopbacks.ipv6.address_autoconfig, null)
+        ipv6_nd_default_route                    = try(int.ipv6.nd_default_route, local.defaults.nxos.devices.configuration.interfaces.loopbacks.ipv6.nd_default_route, null)
+        ipv6_forward                             = try(int.ipv6.forward, local.defaults.nxos.devices.configuration.interfaces.loopbacks.ipv6.forward, null)
+        ipv6_link_local_use_bia                  = try(int.ipv6.link_local_use_bia, local.defaults.nxos.devices.configuration.interfaces.loopbacks.ipv6.link_local_use_bia, null)
+        ipv6_address_use_link_local_only         = try(int.ipv6.address_use_link_local_only, local.defaults.nxos.devices.configuration.interfaces.loopbacks.ipv6.address_use_link_local_only, null)
+        ipv6_verify_unicast_source_reachable_via = try(int.ipv6.verify_unicast_source_reachable_via, local.defaults.nxos.devices.configuration.interfaces.loopbacks.ipv6.verify_unicast_source_reachable_via, null)
+        ipv6_address_link_local                  = try(int.ipv6.address_link_local, local.defaults.nxos.devices.configuration.interfaces.loopbacks.ipv6.address_link_local, null)
+        ipv6_addresses                           = try(int.ipv6.addresses, [])
       }],
       # SVIs
       [for int in try(local.device_config[device.name].interfaces.vlans, []) : {
         device                                   = device.name
         vrf                                      = try(int.vrf, local.defaults.nxos.devices.configuration.interfaces.vlans.vrf, "default")
         id                                       = "vlan${int.id}"
-        ipv6_address_autoconfig                  = try(int.ipv6_address_autoconfig, local.defaults.nxos.devices.configuration.interfaces.vlans.ipv6_address_autoconfig, null)
-        ipv6_nd_default_route                    = try(int.ipv6_nd_default_route, local.defaults.nxos.devices.configuration.interfaces.vlans.ipv6_nd_default_route, null)
-        ipv6_forward                             = try(int.ipv6_forward, local.defaults.nxos.devices.configuration.interfaces.vlans.ipv6_forward, null)
-        ipv6_link_local_use_bia                  = try(int.ipv6_link_local_use_bia, local.defaults.nxos.devices.configuration.interfaces.vlans.ipv6_link_local_use_bia, null)
-        ipv6_address_use_link_local_only         = try(int.ipv6_address_use_link_local_only, local.defaults.nxos.devices.configuration.interfaces.vlans.ipv6_address_use_link_local_only, null)
-        ipv6_verify_unicast_source_reachable_via = try(int.ipv6_verify_unicast_source_reachable_via, local.defaults.nxos.devices.configuration.interfaces.vlans.ipv6_verify_unicast_source_reachable_via, null)
-        ipv6_address_link_local                  = try(int.ipv6_address_link_local, local.defaults.nxos.devices.configuration.interfaces.vlans.ipv6_address_link_local, null)
-        ipv6_addresses                           = try(int.ipv6_addresses, [])
+        ipv6_address_autoconfig                  = try(int.ipv6.address_autoconfig, local.defaults.nxos.devices.configuration.interfaces.vlans.ipv6.address_autoconfig, null)
+        ipv6_nd_default_route                    = try(int.ipv6.nd_default_route, local.defaults.nxos.devices.configuration.interfaces.vlans.ipv6.nd_default_route, null)
+        ipv6_forward                             = try(int.ipv6.forward, local.defaults.nxos.devices.configuration.interfaces.vlans.ipv6.forward, null)
+        ipv6_link_local_use_bia                  = try(int.ipv6.link_local_use_bia, local.defaults.nxos.devices.configuration.interfaces.vlans.ipv6.link_local_use_bia, null)
+        ipv6_address_use_link_local_only         = try(int.ipv6.address_use_link_local_only, local.defaults.nxos.devices.configuration.interfaces.vlans.ipv6.address_use_link_local_only, null)
+        ipv6_verify_unicast_source_reachable_via = try(int.ipv6.verify_unicast_source_reachable_via, local.defaults.nxos.devices.configuration.interfaces.vlans.ipv6.verify_unicast_source_reachable_via, null)
+        ipv6_address_link_local                  = try(int.ipv6.address_link_local, local.defaults.nxos.devices.configuration.interfaces.vlans.ipv6.address_link_local, null)
+        ipv6_addresses                           = try(int.ipv6.addresses, [])
       }],
       # Port channels (L3 only)
       [for int in try(local.device_config[device.name].interfaces.port_channels, []) : {
         device                                   = device.name
         vrf                                      = try(int.vrf, local.defaults.nxos.devices.configuration.interfaces.port_channels.vrf, "default")
         id                                       = "po${int.id}"
-        ipv6_address_autoconfig                  = try(int.ipv6_address_autoconfig, local.defaults.nxos.devices.configuration.interfaces.port_channels.ipv6_address_autoconfig, null)
-        ipv6_nd_default_route                    = try(int.ipv6_nd_default_route, local.defaults.nxos.devices.configuration.interfaces.port_channels.ipv6_nd_default_route, null)
-        ipv6_forward                             = try(int.ipv6_forward, local.defaults.nxos.devices.configuration.interfaces.port_channels.ipv6_forward, null)
-        ipv6_link_local_use_bia                  = try(int.ipv6_link_local_use_bia, local.defaults.nxos.devices.configuration.interfaces.port_channels.ipv6_link_local_use_bia, null)
-        ipv6_address_use_link_local_only         = try(int.ipv6_address_use_link_local_only, local.defaults.nxos.devices.configuration.interfaces.port_channels.ipv6_address_use_link_local_only, null)
-        ipv6_verify_unicast_source_reachable_via = try(int.ipv6_verify_unicast_source_reachable_via, local.defaults.nxos.devices.configuration.interfaces.port_channels.ipv6_verify_unicast_source_reachable_via, null)
-        ipv6_address_link_local                  = try(int.ipv6_address_link_local, local.defaults.nxos.devices.configuration.interfaces.port_channels.ipv6_address_link_local, null)
-        ipv6_addresses                           = try(int.ipv6_addresses, [])
-        } if !try(int.switchport, local.defaults.nxos.devices.configuration.interfaces.port_channels.switchport, true)
+        ipv6_address_autoconfig                  = try(int.ipv6.address_autoconfig, local.defaults.nxos.devices.configuration.interfaces.port_channels.ipv6.address_autoconfig, null)
+        ipv6_nd_default_route                    = try(int.ipv6.nd_default_route, local.defaults.nxos.devices.configuration.interfaces.port_channels.ipv6.nd_default_route, null)
+        ipv6_forward                             = try(int.ipv6.forward, local.defaults.nxos.devices.configuration.interfaces.port_channels.ipv6.forward, null)
+        ipv6_link_local_use_bia                  = try(int.ipv6.link_local_use_bia, local.defaults.nxos.devices.configuration.interfaces.port_channels.ipv6.link_local_use_bia, null)
+        ipv6_address_use_link_local_only         = try(int.ipv6.address_use_link_local_only, local.defaults.nxos.devices.configuration.interfaces.port_channels.ipv6.address_use_link_local_only, null)
+        ipv6_verify_unicast_source_reachable_via = try(int.ipv6.verify_unicast_source_reachable_via, local.defaults.nxos.devices.configuration.interfaces.port_channels.ipv6.verify_unicast_source_reachable_via, null)
+        ipv6_address_link_local                  = try(int.ipv6.address_link_local, local.defaults.nxos.devices.configuration.interfaces.port_channels.ipv6.address_link_local, null)
+        ipv6_addresses                           = try(int.ipv6.addresses, [])
+        } if !try(int.switchport.enabled, local.defaults.nxos.devices.configuration.interfaces.port_channels.switchport.enabled, true)
       ],
     )
   ])
