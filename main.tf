@@ -11,8 +11,8 @@ module "model" {
 }
 
 locals {
-  model    = module.model.model
-  defaults = module.model.default_values
+  model    = provider::utils::resolve_yaml_tags(module.model.model)
+  defaults = provider::utils::resolve_yaml_tags(module.model.default_values)
   nxos     = try(local.model.nxos, {})
   devices  = try(local.nxos.devices, [])
   device_config = { for device in try(local.nxos.devices, []) :

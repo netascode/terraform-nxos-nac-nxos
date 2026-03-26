@@ -7,17 +7,17 @@ locals {
   yaml_strings_files = [
     for file in var.yaml_files : file(file)
   ]
-  model_strings   = length(keys(var.model)) != 0 ? [yamlencode(var.model)] : []
+  model_strings   = length(keys(var.model)) != 0 ? [provider::utils::yaml_encode(var.model)] : []
   model_string    = provider::utils::yaml_merge(concat(local.yaml_strings_directories, local.yaml_strings_files, local.model_strings))
-  model           = yamldecode(local.model_string)
+  model           = provider::utils::yaml_decode(local.model_string)
   user_defaults   = { "defaults" : try(local.model["defaults"], {}) }
-  defaults_string = provider::utils::yaml_merge([file("${path.module}/../../defaults/defaults.yaml"), yamlencode(local.user_defaults)])
-  defaults        = yamldecode(local.defaults_string)["defaults"]
+  defaults_string = provider::utils::yaml_merge([file("${path.module}/../../defaults/defaults.yaml"), provider::utils::yaml_encode(local.user_defaults)])
+  defaults        = provider::utils::yaml_decode(local.defaults_string)["defaults"]
 }
 
 resource "local_sensitive_file" "model" {
   count    = var.write_model_file != "" ? 1 : 0
-  content  = yamlencode(local.nxos_devices)
+  content  = provider::utils::yaml_encode(local.nxos_devices)
   filename = var.write_model_file
 }
 

@@ -26,101 +26,124 @@ locals {
 
   templates = { for template in try(local.nxos.templates, []) : template.name => template }
 
+  # File templates — decoded to native values
   global_file_templates = { for device in local.managed_devices :
-    device.name => compact([
-      for t in try(local.global.templates, []) : templatefile(local.templates[t].file, local.device_variables[device.name]) if try(local.templates[t].type, null) == "file"
-    ])
+    device.name => [
+      for t in try(local.global.templates, []) :
+      provider::utils::yaml_decode(templatefile(local.templates[t].file, local.device_variables[device.name]))
+      if try(local.templates[t].type, null) == "file"
+    ]
   }
 
   group_file_templates = { for device in local.managed_devices :
     device.name => flatten([
-      for dg in local.device_groups : compact([
-        for t in try(dg.templates, []) : templatefile(local.templates[t].file, merge(local.device_variables[device.name], try(dg.variables, {}))) if try(local.templates[t].type, null) == "file"
-      ])
+      for dg in local.device_groups : [
+        for t in try(dg.templates, []) :
+        provider::utils::yaml_decode(templatefile(local.templates[t].file, merge(local.device_variables[device.name], try(dg.variables, {}))))
+        if try(local.templates[t].type, null) == "file"
+      ]
       if contains(try(device.device_groups, []), dg.name) || contains(try(dg.devices, []), device.name)
     ])
   }
 
   device_file_templates = { for device in local.managed_devices :
-    device.name => compact([
-      for t in try(device.templates, []) : templatefile(local.templates[t].file, local.device_variables[device.name]) if try(local.templates[t].type, null) == "file"
-    ])
-  }
-
-  global_model_templates_raw = { for device in local.managed_devices :
     device.name => [
-      for t in try(local.global.templates, []) : yamlencode(try(local.templates[t].configuration, {})) if try(local.templates[t].type, null) == "model"
+      for t in try(device.templates, []) :
+      provider::utils::yaml_decode(templatefile(local.templates[t].file, local.device_variables[device.name]))
+      if try(local.templates[t].type, null) == "file"
     ]
   }
 
-  global_model_templates = { for device, configs in local.global_model_templates_raw :
-    device => provider::utils::yaml_merge(
-      [for config in configs : templatestring(config, local.device_variables[device])]
-    )
+  # Model templates — encode, render vars, decode, then deep merge natively
+  global_model_templates_encoded = { for device in local.managed_devices :
+    device.name => [
+      for t in try(local.global.templates, []) :
+      provider::utils::yaml_encode(try(local.templates[t].configuration, {}))
+      if try(local.templates[t].type, null) == "model"
+    ]
   }
 
-  group_model_templates_raw = { for device in local.managed_devices :
-    device.name => {
-      for dg in local.device_groups : dg.name => [
-        for t in try(dg.templates, []) : yamlencode(try(local.templates[t].configuration, {})) if try(local.templates[t].type, null) == "model"
+  global_model_templates = { for device in local.managed_devices :
+    device.name => provider::utils::merge([
+      for encoded in local.global_model_templates_encoded[device.name] :
+      provider::utils::yaml_decode(templatestring(encoded, local.device_variables[device.name]))
+    ])
+  }
+
+  group_model_templates_encoded = { for device in local.managed_devices :
+    device.name => flatten([
+      for dg in local.device_groups : [
+        for t in try(dg.templates, []) :
+        { encoded = provider::utils::yaml_encode(try(local.templates[t].configuration, {})), vars = merge(local.device_variables[device.name], try(dg.variables, {})) }
+        if try(local.templates[t].type, null) == "model"
       ]
       if contains(try(device.device_groups, []), dg.name) || contains(try(dg.devices, []), device.name)
-    }
-  }
-
-  group_model_templates = { for device, groups in local.group_model_templates_raw :
-    device => provider::utils::yaml_merge([
-      for group_name, group_configs in groups : provider::utils::yaml_merge(
-        [for config in group_configs : templatestring(config, merge(local.device_variables[device], [for dg in local.device_groups : try(dg.variables, {}) if group_name == dg.name][0]))]
-      )
     ])
   }
 
-  device_model_templates_raw = { for device in local.managed_devices :
+  group_model_templates = { for device in local.managed_devices :
+    device.name => provider::utils::merge([
+      for item in local.group_model_templates_encoded[device.name] :
+      provider::utils::yaml_decode(templatestring(item.encoded, item.vars))
+    ])
+  }
+
+  device_model_templates_encoded = { for device in local.managed_devices :
     device.name => [
-      for t in try(device.templates, []) : yamlencode(try(local.templates[t].configuration, {})) if try(local.templates[t].type, null) == "model"
+      for t in try(device.templates, []) :
+      provider::utils::yaml_encode(try(local.templates[t].configuration, {}))
+      if try(local.templates[t].type, null) == "model"
     ]
   }
 
-  device_model_templates = { for device, configs in local.device_model_templates_raw :
-    device => provider::utils::yaml_merge(
-      [for config in configs : templatestring(config, local.device_variables[device])]
+  device_model_templates = { for device in local.managed_devices :
+    device.name => provider::utils::merge([
+      for encoded in local.device_model_templates_encoded[device.name] :
+      provider::utils::yaml_decode(templatestring(encoded, local.device_variables[device.name]))
+    ])
+  }
+
+  # 9-level precedence cascade — native deep merge, then templatestring for final variable substitution
+  devices_config_encoded = { for device in local.managed_devices :
+    device.name => provider::utils::yaml_encode(
+      provider::utils::merge(concat(
+        local.global_file_templates[device.name],
+        [local.global_model_templates[device.name]],
+        [try(local.global.configuration, {})],
+        local.group_file_templates[device.name],
+        [local.group_model_templates[device.name]],
+        [for dg in local.device_groups : try(dg.configuration, {}) if contains(try(device.device_groups, []), dg.name) || contains(try(dg.devices, []), device.name)],
+        local.device_file_templates[device.name],
+        [local.device_model_templates[device.name]],
+        [try(device.configuration, {})]
+      ))
     )
   }
 
-  devices_raw_config = { for device in local.managed_devices :
-    device.name => try(provider::utils::yaml_merge(concat(
-      local.global_file_templates[device.name],
-      [local.global_model_templates[device.name]],
-      [yamlencode(try(local.global.configuration, {}))],
-      local.group_file_templates[device.name],
-      [local.group_model_templates[device.name]],
-      [for dg in local.device_groups : yamlencode(try(dg.configuration, {})) if contains(try(device.device_groups, []), dg.name) || contains(try(dg.devices, []), device.name)],
-      local.device_file_templates[device.name],
-      [local.device_model_templates[device.name]],
-      [yamlencode(try(device.configuration, {}))]
-    )), "")
+  devices_config = { for device in local.managed_devices :
+    device.name => provider::utils::yaml_decode(templatestring(local.devices_config_encoded[device.name], local.device_variables[device.name]))
   }
 
-  devices_config = { for device, config in local.devices_raw_config :
-    device => yamldecode(templatestring(config, local.device_variables[device]))
-  }
-
-  interface_groups_raw_config = {
-    for device in local.managed_devices : device.name => {
-      for ig in local.interface_groups : ig.name => yamlencode(try(ig.configuration, {}))
-    }
-  }
-
-  interface_groups_config = {
+  # Interface groups — encode, render vars, decode
+  interface_groups_encoded = {
     for device in local.managed_devices : device.name => [
       for ig in local.interface_groups : {
-        name          = ig.name
-        configuration = yamldecode(templatestring(local.interface_groups_raw_config[device.name][ig.name], local.device_variables[device.name]))
+        name    = ig.name
+        encoded = provider::utils::yaml_encode(try(ig.configuration, {}))
       }
     ]
   }
 
+  interface_groups_config = {
+    for device in local.managed_devices : device.name => [
+      for ig in local.interface_groups_encoded[device.name] : {
+        name          = ig.name
+        configuration = provider::utils::yaml_decode(templatestring(ig.encoded, local.device_variables[device.name]))
+      }
+    ]
+  }
+
+  # CLI templates
   global_cli_templates_raw = { for device in local.managed_devices :
     device.name => {
       for t in try(local.global.templates, []) : local.templates[t].name => {
@@ -185,6 +208,7 @@ locals {
     )
   }
 
+  # Final output — interface groups merged into device interfaces using native deep merge
   nxos_devices = {
     nxos = {
       devices = [
@@ -200,22 +224,20 @@ locals {
                 {
                   "ethernets" = [
                     for ethernet in [
-                      for eth in try(local.devices_config[device.name].interfaces.ethernets, []) : merge(
-                        yamldecode(provider::utils::yaml_merge(concat(
-                          [for g in try(eth.interface_groups, []) : try([for ig in local.interface_groups_config[device.name] : yamlencode(ig.configuration) if ig.name == g][0], "")],
-                          [yamlencode(eth)]
-                        )))
-                      )
+                      for eth in try(local.devices_config[device.name].interfaces.ethernets, []) :
+                      provider::utils::merge(concat(
+                        [for g in try(eth.interface_groups, []) : try([for ig in local.interface_groups_config[device.name] : ig.configuration if ig.name == g][0], {})],
+                        [eth]
+                      ))
                       ] : merge(
                       { for k, v in ethernet : k => v if k != "subinterfaces" },
                       {
                         subinterfaces = [
-                          for sub in try(ethernet.subinterfaces, []) : merge(
-                            yamldecode(provider::utils::yaml_merge(concat(
-                              [for g in try(sub.interface_groups, []) : try([for ig in local.interface_groups_config[device.name] : yamlencode(ig.configuration) if ig.name == g][0], "")],
-                              [yamlencode(sub)]
-                            )))
-                          )
+                          for sub in try(ethernet.subinterfaces, []) :
+                          provider::utils::merge(concat(
+                            [for g in try(sub.interface_groups, []) : try([for ig in local.interface_groups_config[device.name] : ig.configuration if ig.name == g][0], {})],
+                            [sub]
+                          ))
                         ]
                       }
                     )
@@ -224,22 +246,20 @@ locals {
                 {
                   "port_channels" = [
                     for port_channel in [
-                      for pc in try(local.devices_config[device.name].interfaces.port_channels, []) : merge(
-                        yamldecode(provider::utils::yaml_merge(concat(
-                          [for g in try(pc.interface_groups, []) : try([for ig in local.interface_groups_config[device.name] : yamlencode(ig.configuration) if ig.name == g][0], "")],
-                          [yamlencode(pc)]
-                        )))
-                      )
+                      for pc in try(local.devices_config[device.name].interfaces.port_channels, []) :
+                      provider::utils::merge(concat(
+                        [for g in try(pc.interface_groups, []) : try([for ig in local.interface_groups_config[device.name] : ig.configuration if ig.name == g][0], {})],
+                        [pc]
+                      ))
                       ] : merge(
                       { for k, v in port_channel : k => v if k != "subinterfaces" },
                       {
                         subinterfaces = [
-                          for sub in try(port_channel.subinterfaces, []) : merge(
-                            yamldecode(provider::utils::yaml_merge(concat(
-                              [for g in try(sub.interface_groups, []) : try([for ig in local.interface_groups_config[device.name] : yamlencode(ig.configuration) if ig.name == g][0], "")],
-                              [yamlencode(sub)]
-                            )))
-                          )
+                          for sub in try(port_channel.subinterfaces, []) :
+                          provider::utils::merge(concat(
+                            [for g in try(sub.interface_groups, []) : try([for ig in local.interface_groups_config[device.name] : ig.configuration if ig.name == g][0], {})],
+                            [sub]
+                          ))
                         ]
                       }
                     )
@@ -247,22 +267,20 @@ locals {
                 },
                 {
                   "loopbacks" = [
-                    for loopback in try(local.devices_config[device.name].interfaces.loopbacks, []) : merge(
-                      yamldecode(provider::utils::yaml_merge(concat(
-                        [for g in try(loopback.interface_groups, []) : try([for ig in local.interface_groups_config[device.name] : yamlencode(ig.configuration) if ig.name == g][0], "")],
-                        [yamlencode(loopback)]
-                      )))
-                    )
+                    for loopback in try(local.devices_config[device.name].interfaces.loopbacks, []) :
+                    provider::utils::merge(concat(
+                      [for g in try(loopback.interface_groups, []) : try([for ig in local.interface_groups_config[device.name] : ig.configuration if ig.name == g][0], {})],
+                      [loopback]
+                    ))
                   ]
                 },
                 {
                   "vlans" = [
-                    for vlan in try(local.devices_config[device.name].interfaces.vlans, []) : merge(
-                      yamldecode(provider::utils::yaml_merge(concat(
-                        [for g in try(vlan.interface_groups, []) : try([for ig in local.interface_groups_config[device.name] : yamlencode(ig.configuration) if ig.name == g][0], "")],
-                        [yamlencode(vlan)]
-                      )))
-                    )
+                    for vlan in try(local.devices_config[device.name].interfaces.vlans, []) :
+                    provider::utils::merge(concat(
+                      [for g in try(vlan.interface_groups, []) : try([for ig in local.interface_groups_config[device.name] : ig.configuration if ig.name == g][0], {})],
+                      [vlan]
+                    ))
                   ]
                 }
               )
