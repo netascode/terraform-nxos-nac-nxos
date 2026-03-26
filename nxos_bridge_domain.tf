@@ -34,5 +34,6 @@ resource "nxos_bridge_domain" "bridge_domain" {
   depends_on = [
     nxos_feature.feature,
     nxos_vrf.vrf,
+    nxos_spanning_tree.spanning_tree,
   ]
 }
