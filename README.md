@@ -42,7 +42,7 @@ module "nxos" {
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.9.0 |
 | <a name="requirement_local"></a> [local](#requirement\_local) | >= 2.7.0 |
 | <a name="requirement_nxos"></a> [nxos](#requirement\_nxos) | = 0.8.0-beta10 |
-| <a name="requirement_utils"></a> [utils](#requirement\_utils) | = 2.0.0-beta0 |
+| <a name="requirement_utils"></a> [utils](#requirement\_utils) | = 2.0.0-beta1 |
 ## Inputs
 
 | Name | Description | Type | Default | Required |

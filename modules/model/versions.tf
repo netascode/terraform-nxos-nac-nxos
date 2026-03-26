@@ -4,7 +4,7 @@ terraform {
   required_providers {
     utils = {
       source  = "netascode/utils"
-      version = "= 2.0.0-beta0"
+      version = "= 2.0.0-beta1"
     }
     local = {
       source  = "hashicorp/local"
