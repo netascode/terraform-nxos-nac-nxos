@@ -6,21 +6,21 @@ locals {
         device        = device.name
         id            = "vlan${int.id}"
         hsrp          = try(int.hsrp, null)
-        defaults_path = local.defaults.nxos.devices.configuration.interfaces.vlans
+        defaults_path = try(local.defaults.nxos.devices.configuration.interfaces.vlans, {})
       } if try(int.hsrp, null) != null],
       [for int in try(local.device_config[device.name].interfaces.ethernets, []) : {
         key           = format("%s/eth%s", device.name, int.id)
         device        = device.name
         id            = "eth${int.id}"
         hsrp          = try(int.hsrp, null)
-        defaults_path = local.defaults.nxos.devices.configuration.interfaces.ethernets
+        defaults_path = try(local.defaults.nxos.devices.configuration.interfaces.ethernets, {})
       } if try(int.hsrp, null) != null],
       [for int in try(local.device_config[device.name].interfaces.port_channels, []) : {
         key           = format("%s/po%s", device.name, int.id)
         device        = device.name
         id            = "po${int.id}"
         hsrp          = try(int.hsrp, null)
-        defaults_path = local.defaults.nxos.devices.configuration.interfaces.port_channels
+        defaults_path = try(local.defaults.nxos.devices.configuration.interfaces.port_channels, {})
       } if try(int.hsrp, null) != null],
       flatten([for eth in try(local.device_config[device.name].interfaces.ethernets, []) :
         [for sub in try(eth.subinterfaces, []) : {
@@ -28,7 +28,7 @@ locals {
           device        = device.name
           id            = sub.id
           hsrp          = try(sub.hsrp, null)
-          defaults_path = local.defaults.nxos.devices.configuration.interfaces.ethernets.subinterfaces
+          defaults_path = try(local.defaults.nxos.devices.configuration.interfaces.ethernets.subinterfaces, {})
         } if try(sub.hsrp, null) != null]
       ]),
       flatten([for pc in try(local.device_config[device.name].interfaces.port_channels, []) :
@@ -37,7 +37,7 @@ locals {
           device        = device.name
           id            = sub.id
           hsrp          = try(sub.hsrp, null)
-          defaults_path = local.defaults.nxos.devices.configuration.interfaces.port_channels.subinterfaces
+          defaults_path = try(local.defaults.nxos.devices.configuration.interfaces.port_channels.subinterfaces, {})
         } if try(sub.hsrp, null) != null]
       ]),
     )
