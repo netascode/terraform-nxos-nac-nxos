@@ -4,37 +4,3 @@ defaults:
       order: 0
     devices:
       managed: true
-      configuration:
-        interfaces:
-          loopbacks:
-            shutdown: false
-            ospf:
-              advertise_secondaries: true
-          vlans:
-            shutdown: false
-            ospf:
-              advertise_secondaries: true
-          ethernets:
-            shutdown: false
-            ospf:
-              advertise_secondaries: true
-          port_channels:
-            shutdown: false
-            ospf:
-              advertise_secondaries: true
-        ip_prefix_lists:
-          entries:
-            action: permit
-            criteria: exact
-            ge: 0
-            le: 0
-        route_maps:
-          entries:
-            set_community_additive: false
-            set_community_none: false
-            set_community_criteria: none
-        routing:
-          ospf_processes:
-            shutdown: false
-            vrfs:
-              shutdown: false
