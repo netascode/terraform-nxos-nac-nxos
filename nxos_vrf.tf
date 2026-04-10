@@ -5,12 +5,12 @@ locals {
         key                 = format("%s/%s", device.name, vrf.name)
         device              = device.name
         name                = vrf.name
-        description         = try(vrf.description, local.defaults.nxos.devices.configuration.vrfs.description, null)
-        vni                 = try(vrf.vni, local.defaults.nxos.devices.configuration.vrfs.vni, null)
-        l3vni               = try(vrf.l3vni, local.defaults.nxos.devices.configuration.vrfs.l3vni, null)
-        route_distinguisher = try(vrf.route_distinguisher, local.defaults.nxos.devices.configuration.vrfs.route_distinguisher, null)
-        oui                 = try(vrf.oui, local.defaults.nxos.devices.configuration.vrfs.oui, null)
-        vpn_id              = try(vrf.vpn_id, local.defaults.nxos.devices.configuration.vrfs.vpn_id, null)
+        description         = try(vrf.description, null)
+        vni                 = try(vrf.vni, null)
+        l3vni               = try(vrf.l3vni, null)
+        route_distinguisher = try(vrf.route_distinguisher, null)
+        oui                 = try(vrf.oui, null)
+        vpn_id              = try(vrf.vpn_id, null)
         address_families    = try(vrf.address_families, [])
       }
     ]

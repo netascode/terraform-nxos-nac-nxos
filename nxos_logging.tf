@@ -1,11 +1,11 @@
 resource "nxos_logging" "logging" {
   for_each = { for device in local.devices : device.name => device
-    if try(local.device_config[device.name].logging.level, local.defaults.nxos.devices.configuration.logging.level, null) != null ||
+    if try(local.device_config[device.name].logging.level, null) != null ||
   length(try(local.device_config[device.name].logging.facilities, [])) > 0 }
   device = each.key
-  all    = try(local.device_config[each.key].logging.level, local.defaults.nxos.devices.configuration.logging.level, null) != null ? "enableall" : null
-  level  = try(local.device_config[each.key].logging.level, local.defaults.nxos.devices.configuration.logging.level, null)
+  all    = try(local.device_config[each.key].logging.level, null) != null ? "enableall" : null
+  level  = try(local.device_config[each.key].logging.level, null)
   facilities = { for facility in try(local.device_config[each.key].logging.facilities, []) : facility.name => {
-    level = try(facility.level, local.defaults.nxos.devices.configuration.logging.facilities.level, null)
+    level = try(facility.level, null)
   } }
 }

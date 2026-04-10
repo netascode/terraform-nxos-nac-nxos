@@ -1,24 +1,42 @@
-module "model" {
-  source = "./modules/model"
-
-  yaml_directories          = var.yaml_directories
-  yaml_files                = var.yaml_files
-  model                     = var.model
-  managed_device_groups     = var.managed_device_groups
-  managed_devices           = var.managed_devices
-  write_default_values_file = var.write_default_values_file
-  write_model_file          = var.write_model_file
-}
-
 locals {
-  model    = provider::utils::resolve_yaml_tags(module.model.model)
-  defaults = provider::utils::resolve_yaml_tags(module.model.default_values)
-  nxos     = try(local.model.nxos, {})
-  devices  = try(local.nxos.devices, [])
-  device_config = { for device in try(local.nxos.devices, []) :
-    device.name => try(device.configuration, {})
-  }
-  provider_devices = module.model.devices
+  # YAML strings
+  yaml_strings = concat(
+    flatten([
+      for dir in var.yaml_directories : [
+        for file in fileset(".", "${dir}/**/*.{yml,yaml}") : file(file)
+      ]
+    ]),
+    [for file in var.yaml_files : file(file)]
+  )
+
+  # Defaults YAML (module defaults — user overrides merged inside function)
+  defaults_yaml = file("${path.module}/defaults/defaults.yaml")
+
+  # File templates (path -> content)
+  file_templates = merge(
+    merge([
+      for dir in var.template_directories : {
+        for f in fileset(".", "${dir}/**/*") : f => file(f)
+      }
+    ]...),
+    { for f in var.template_files : f => file(f) }
+  )
+
+  # Render device configs
+  rendered = provider::utils::render_device_configs(
+    local.yaml_strings,
+    var.model,
+    local.defaults_yaml,
+    local.file_templates,
+    var.managed_devices,
+    var.managed_device_groups
+  )
+
+  # Derived locals
+  nxos          = try(local.rendered.resolved.nxos, {})
+  devices       = try(local.nxos.devices, [])
+  device_config = { for device in local.devices : device.name => try(device.configuration, {}) }
+
   intf_prefix_map = {
     "ethernet"     = "eth"
     "loopback"     = "lo"
@@ -30,104 +48,29 @@ locals {
 }
 
 provider "nxos" {
-  devices = local.provider_devices
+  devices = local.rendered.provider_devices
+}
+
+resource "local_sensitive_file" "model" {
+  count    = var.write_model_file != "" ? 1 : 0
+  content  = provider::utils::yaml_encode(local.rendered.raw)
+  filename = var.write_model_file
 }
 
 locals {
-  cli_templates_0 = flatten([
+  cli_templates = { for order in range(10) : order => flatten([
     for device in local.devices : [
       for template in try(device.cli_templates, []) : {
         key     = format("%s/%s", device.name, template.name)
         device  = device.name
         content = template.content
-      } if try(template.order, local.defaults.nxos.templates.order) == 0
+      } if try(template.order, 0) == order
     ]
-  ])
-  cli_templates_1 = flatten([
-    for device in local.devices : [
-      for template in try(device.cli_templates, []) : {
-        key     = format("%s/%s", device.name, template.name)
-        device  = device.name
-        content = template.content
-      } if try(template.order, local.defaults.nxos.templates.order) == 1
-    ]
-  ])
-  cli_templates_2 = flatten([
-    for device in local.devices : [
-      for template in try(device.cli_templates, []) : {
-        key     = format("%s/%s", device.name, template.name)
-        device  = device.name
-        content = template.content
-      } if try(template.order, local.defaults.nxos.templates.order) == 2
-    ]
-  ])
-  cli_templates_3 = flatten([
-    for device in local.devices : [
-      for template in try(device.cli_templates, []) : {
-        key     = format("%s/%s", device.name, template.name)
-        device  = device.name
-        content = template.content
-      } if try(template.order, local.defaults.nxos.templates.order) == 3
-    ]
-  ])
-  cli_templates_4 = flatten([
-    for device in local.devices : [
-      for template in try(device.cli_templates, []) : {
-        key     = format("%s/%s", device.name, template.name)
-        device  = device.name
-        content = template.content
-      } if try(template.order, local.defaults.nxos.templates.order) == 4
-    ]
-  ])
-  cli_templates_5 = flatten([
-    for device in local.devices : [
-      for template in try(device.cli_templates, []) : {
-        key     = format("%s/%s", device.name, template.name)
-        device  = device.name
-        content = template.content
-      } if try(template.order, local.defaults.nxos.templates.order) == 5
-    ]
-  ])
-  cli_templates_6 = flatten([
-    for device in local.devices : [
-      for template in try(device.cli_templates, []) : {
-        key     = format("%s/%s", device.name, template.name)
-        device  = device.name
-        content = template.content
-      } if try(template.order, local.defaults.nxos.templates.order) == 6
-    ]
-  ])
-  cli_templates_7 = flatten([
-    for device in local.devices : [
-      for template in try(device.cli_templates, []) : {
-        key     = format("%s/%s", device.name, template.name)
-        device  = device.name
-        content = template.content
-      } if try(template.order, local.defaults.nxos.templates.order) == 7
-    ]
-  ])
-  cli_templates_8 = flatten([
-    for device in local.devices : [
-      for template in try(device.cli_templates, []) : {
-        key     = format("%s/%s", device.name, template.name)
-        device  = device.name
-        content = template.content
-      } if try(template.order, local.defaults.nxos.templates.order) == 8
-    ]
-  ])
-  cli_templates_9 = flatten([
-    for device in local.devices : [
-      for template in try(device.cli_templates, []) : {
-        key     = format("%s/%s", device.name, template.name)
-        device  = device.name
-        content = template.content
-      } if try(template.order, local.defaults.nxos.templates.order) == 9
-    ]
-  ])
+  ]) }
 }
 
 resource "nxos_cli" "cli_0" {
-  for_each = { for e in local.cli_templates_0 : e.key => e }
+  for_each = { for e in local.cli_templates[0] : e.key => e }
   device   = each.value.device
 
   cli = each.value.content
@@ -169,7 +112,7 @@ resource "nxos_cli" "cli_0" {
 }
 
 resource "nxos_cli" "cli_1" {
-  for_each = { for e in local.cli_templates_1 : e.key => e }
+  for_each = { for e in local.cli_templates[1] : e.key => e }
   device   = each.value.device
 
   cli = each.value.content
@@ -180,7 +123,7 @@ resource "nxos_cli" "cli_1" {
 }
 
 resource "nxos_cli" "cli_2" {
-  for_each = { for e in local.cli_templates_2 : e.key => e }
+  for_each = { for e in local.cli_templates[2] : e.key => e }
   device   = each.value.device
 
   cli = each.value.content
@@ -191,7 +134,7 @@ resource "nxos_cli" "cli_2" {
 }
 
 resource "nxos_cli" "cli_3" {
-  for_each = { for e in local.cli_templates_3 : e.key => e }
+  for_each = { for e in local.cli_templates[3] : e.key => e }
   device   = each.value.device
 
   cli = each.value.content
@@ -202,7 +145,7 @@ resource "nxos_cli" "cli_3" {
 }
 
 resource "nxos_cli" "cli_4" {
-  for_each = { for e in local.cli_templates_4 : e.key => e }
+  for_each = { for e in local.cli_templates[4] : e.key => e }
   device   = each.value.device
 
   cli = each.value.content
@@ -213,7 +156,7 @@ resource "nxos_cli" "cli_4" {
 }
 
 resource "nxos_cli" "cli_5" {
-  for_each = { for e in local.cli_templates_5 : e.key => e }
+  for_each = { for e in local.cli_templates[5] : e.key => e }
   device   = each.value.device
 
   cli = each.value.content
@@ -224,7 +167,7 @@ resource "nxos_cli" "cli_5" {
 }
 
 resource "nxos_cli" "cli_6" {
-  for_each = { for e in local.cli_templates_6 : e.key => e }
+  for_each = { for e in local.cli_templates[6] : e.key => e }
   device   = each.value.device
 
   cli = each.value.content
@@ -235,7 +178,7 @@ resource "nxos_cli" "cli_6" {
 }
 
 resource "nxos_cli" "cli_7" {
-  for_each = { for e in local.cli_templates_7 : e.key => e }
+  for_each = { for e in local.cli_templates[7] : e.key => e }
   device   = each.value.device
 
   cli = each.value.content
@@ -246,7 +189,7 @@ resource "nxos_cli" "cli_7" {
 }
 
 resource "nxos_cli" "cli_8" {
-  for_each = { for e in local.cli_templates_8 : e.key => e }
+  for_each = { for e in local.cli_templates[8] : e.key => e }
   device   = each.value.device
 
   cli = each.value.content
@@ -257,7 +200,7 @@ resource "nxos_cli" "cli_8" {
 }
 
 resource "nxos_cli" "cli_9" {
-  for_each = { for e in local.cli_templates_9 : e.key => e }
+  for_each = { for e in local.cli_templates[9] : e.key => e }
   device   = each.value.device
 
   cli = each.value.content

@@ -1,44 +1,44 @@
 resource "nxos_nvo" "nvo" {
   for_each = { for device in local.devices : device.name => device
-    if try(local.device_config[device.name].system.nv_overlay_vxlan_udp_port, local.defaults.nxos.devices.configuration.system.nv_overlay_vxlan_udp_port, null) != null ||
-    try(local.device_config[device.name].system.nv_overlay_vxlan_udp_source_port_mode, local.defaults.nxos.devices.configuration.system.nv_overlay_vxlan_udp_source_port_mode, null) != null ||
+    if try(local.device_config[device.name].system.nv_overlay_vxlan_udp_port, null) != null ||
+    try(local.device_config[device.name].system.nv_overlay_vxlan_udp_source_port_mode, null) != null ||
   try(local.device_config[device.name].interfaces.nve, null) != null }
   device                     = each.key
-  vxlan_udp_port             = try(local.device_config[each.key].system.nv_overlay_vxlan_udp_port, local.defaults.nxos.devices.configuration.system.nv_overlay_vxlan_udp_port, null)
-  vxlan_udp_source_port_mode = try(local.device_config[each.key].system.nv_overlay_vxlan_udp_source_port_mode, local.defaults.nxos.devices.configuration.system.nv_overlay_vxlan_udp_source_port_mode, null)
+  vxlan_udp_port             = try(local.device_config[each.key].system.nv_overlay_vxlan_udp_port, null)
+  vxlan_udp_source_port_mode = try(local.device_config[each.key].system.nv_overlay_vxlan_udp_source_port_mode, null)
 
   nve_interfaces = { for nve_id in try(local.device_config[each.key].interfaces.nve, null) != null ? ["1"] : [] : nve_id => {
-    admin_state                        = try(local.device_config[each.key].interfaces.nve.shutdown, local.defaults.nxos.devices.configuration.interfaces.nve.shutdown, false) ? "disabled" : "enabled"
-    advertise_virtual_mac              = try(local.device_config[each.key].interfaces.nve.advertise_virtual_rmac, local.defaults.nxos.devices.configuration.interfaces.nve.advertise_virtual_rmac, null)
-    anycast_source_interface           = try(local.device_config[each.key].interfaces.nve.anycast_bundled_interface_type, local.defaults.nxos.devices.configuration.interfaces.nve.anycast_bundled_interface_type, null) != null ? "${local.intf_prefix_map[try(local.device_config[each.key].interfaces.nve.anycast_bundled_interface_type, local.defaults.nxos.devices.configuration.interfaces.nve.anycast_bundled_interface_type)]}${try(local.device_config[each.key].interfaces.nve.anycast_bundled_interface_id, local.defaults.nxos.devices.configuration.interfaces.nve.anycast_bundled_interface_id, "")}" : null
-    configuration_source               = try(local.device_config[each.key].interfaces.nve.configuration_source, local.defaults.nxos.devices.configuration.interfaces.nve.configuration_source, null)
-    controller_id                      = try(local.device_config[each.key].interfaces.nve.controller_id, local.defaults.nxos.devices.configuration.interfaces.nve.controller_id, null)
-    description                        = try(local.device_config[each.key].interfaces.nve.description, local.defaults.nxos.devices.configuration.interfaces.nve.description, null)
-    encapsulation_type                 = try(local.device_config[each.key].interfaces.nve.encapsulation_type, local.defaults.nxos.devices.configuration.interfaces.nve.encapsulation_type, null)
-    fabric_ready_time                  = try(local.device_config[each.key].interfaces.nve.fabric_convergence_delay, local.defaults.nxos.devices.configuration.interfaces.nve.fabric_convergence_delay, null)
-    hold_down_time                     = try(local.device_config[each.key].interfaces.nve.source_interface_hold_down_time, local.defaults.nxos.devices.configuration.interfaces.nve.source_interface_hold_down_time, null)
-    host_reachability_protocol         = try(local.device_config[each.key].interfaces.nve.host_reachability_protocol, local.defaults.nxos.devices.configuration.interfaces.nve.host_reachability_protocol, null)
-    ingress_replication_protocol_bgp   = try(local.device_config[each.key].interfaces.nve.global_ingress_replication_protocol_bgp, local.defaults.nxos.devices.configuration.interfaces.nve.global_ingress_replication_protocol_bgp, null)
-    multicast_group_l2                 = try(local.device_config[each.key].interfaces.nve.global_mcast_group_l2, local.defaults.nxos.devices.configuration.interfaces.nve.global_mcast_group_l2, null)
-    multicast_group_l3                 = try(local.device_config[each.key].interfaces.nve.global_mcast_group_l3, local.defaults.nxos.devices.configuration.interfaces.nve.global_mcast_group_l3, null)
-    multicast_routing_source_interface = try(local.device_config[each.key].interfaces.nve.multicast_routing_source_interface_type, local.defaults.nxos.devices.configuration.interfaces.nve.multicast_routing_source_interface_type, null) != null ? "${local.intf_prefix_map[try(local.device_config[each.key].interfaces.nve.multicast_routing_source_interface_type, local.defaults.nxos.devices.configuration.interfaces.nve.multicast_routing_source_interface_type)]}${try(local.device_config[each.key].interfaces.nve.multicast_routing_source_interface_id, local.defaults.nxos.devices.configuration.interfaces.nve.multicast_routing_source_interface_id, "")}" : null
-    multisite_source_interface         = try(local.device_config[each.key].interfaces.nve.multisite_border_gateway_interface_type, local.defaults.nxos.devices.configuration.interfaces.nve.multisite_border_gateway_interface_type, null) != null ? "${local.intf_prefix_map[try(local.device_config[each.key].interfaces.nve.multisite_border_gateway_interface_type, local.defaults.nxos.devices.configuration.interfaces.nve.multisite_border_gateway_interface_type)]}${try(local.device_config[each.key].interfaces.nve.multisite_border_gateway_interface_id, local.defaults.nxos.devices.configuration.interfaces.nve.multisite_border_gateway_interface_id, "")}" : null
-    multisite_virtual_mac              = try(local.device_config[each.key].interfaces.nve.multisite_virtual_rmac, local.defaults.nxos.devices.configuration.interfaces.nve.multisite_virtual_rmac, null)
-    source_interface                   = try(local.device_config[each.key].interfaces.nve.source_interface_type, local.defaults.nxos.devices.configuration.interfaces.nve.source_interface_type, null) != null ? "${local.intf_prefix_map[try(local.device_config[each.key].interfaces.nve.source_interface_type, local.defaults.nxos.devices.configuration.interfaces.nve.source_interface_type)]}${try(local.device_config[each.key].interfaces.nve.source_interface_id, local.defaults.nxos.devices.configuration.interfaces.nve.source_interface_id, "")}" : null
-    suppress_arp                       = try(local.device_config[each.key].interfaces.nve.global_suppress_arp, local.defaults.nxos.devices.configuration.interfaces.nve.global_suppress_arp, null)
-    suppress_mac_route                 = try(local.device_config[each.key].interfaces.nve.suppress_mac_route, local.defaults.nxos.devices.configuration.interfaces.nve.suppress_mac_route, null)
-    suppress_nd                        = try(local.device_config[each.key].interfaces.nve.suppress_nd, local.defaults.nxos.devices.configuration.interfaces.nve.suppress_nd, null)
-    virtual_mac                        = try(local.device_config[each.key].interfaces.nve.virtual_rmac, local.defaults.nxos.devices.configuration.interfaces.nve.virtual_rmac, null)
+    admin_state                        = try(local.device_config[each.key].interfaces.nve.shutdown, false) ? "disabled" : "enabled"
+    advertise_virtual_mac              = try(local.device_config[each.key].interfaces.nve.advertise_virtual_rmac, null)
+    anycast_source_interface           = try(local.device_config[each.key].interfaces.nve.anycast_bundled_interface_type, null) != null ? "${local.intf_prefix_map[try(local.device_config[each.key].interfaces.nve.anycast_bundled_interface_type)]}${try(local.device_config[each.key].interfaces.nve.anycast_bundled_interface_id, "")}" : null
+    configuration_source               = try(local.device_config[each.key].interfaces.nve.configuration_source, null)
+    controller_id                      = try(local.device_config[each.key].interfaces.nve.controller_id, null)
+    description                        = try(local.device_config[each.key].interfaces.nve.description, null)
+    encapsulation_type                 = try(local.device_config[each.key].interfaces.nve.encapsulation_type, null)
+    fabric_ready_time                  = try(local.device_config[each.key].interfaces.nve.fabric_convergence_delay, null)
+    hold_down_time                     = try(local.device_config[each.key].interfaces.nve.source_interface_hold_down_time, null)
+    host_reachability_protocol         = try(local.device_config[each.key].interfaces.nve.host_reachability_protocol, null)
+    ingress_replication_protocol_bgp   = try(local.device_config[each.key].interfaces.nve.global_ingress_replication_protocol_bgp, null)
+    multicast_group_l2                 = try(local.device_config[each.key].interfaces.nve.global_mcast_group_l2, null)
+    multicast_group_l3                 = try(local.device_config[each.key].interfaces.nve.global_mcast_group_l3, null)
+    multicast_routing_source_interface = try(local.device_config[each.key].interfaces.nve.multicast_routing_source_interface_type, null) != null ? "${local.intf_prefix_map[try(local.device_config[each.key].interfaces.nve.multicast_routing_source_interface_type)]}${try(local.device_config[each.key].interfaces.nve.multicast_routing_source_interface_id, "")}" : null
+    multisite_source_interface         = try(local.device_config[each.key].interfaces.nve.multisite_border_gateway_interface_type, null) != null ? "${local.intf_prefix_map[try(local.device_config[each.key].interfaces.nve.multisite_border_gateway_interface_type)]}${try(local.device_config[each.key].interfaces.nve.multisite_border_gateway_interface_id, "")}" : null
+    multisite_virtual_mac              = try(local.device_config[each.key].interfaces.nve.multisite_virtual_rmac, null)
+    source_interface                   = try(local.device_config[each.key].interfaces.nve.source_interface_type, null) != null ? "${local.intf_prefix_map[try(local.device_config[each.key].interfaces.nve.source_interface_type)]}${try(local.device_config[each.key].interfaces.nve.source_interface_id, "")}" : null
+    suppress_arp                       = try(local.device_config[each.key].interfaces.nve.global_suppress_arp, null)
+    suppress_mac_route                 = try(local.device_config[each.key].interfaces.nve.suppress_mac_route, null)
+    suppress_nd                        = try(local.device_config[each.key].interfaces.nve.suppress_nd, null)
+    virtual_mac                        = try(local.device_config[each.key].interfaces.nve.virtual_rmac, null)
 
     vnis = { for vni in try(local.device_config[each.key].interfaces.nve.vnis, []) : vni.vni => {
-      associate_vrf                 = try(vni.associate_vrf, local.defaults.nxos.devices.configuration.interfaces.nve.vnis.associate_vrf, null)
-      multicast_group               = try(vni.mcast_group, local.defaults.nxos.devices.configuration.interfaces.nve.vnis.mcast_group, null)
-      multisite_ingress_replication = try(vni.multisite_ingress_replication, local.defaults.nxos.devices.configuration.interfaces.nve.vnis.multisite_ingress_replication, null)
-      multisite_multicast_group     = try(vni.multisite_mcast_group, local.defaults.nxos.devices.configuration.interfaces.nve.vnis.multisite_mcast_group, null)
-      spine_anycast_gateway         = try(vni.spine_anycast_gateway, local.defaults.nxos.devices.configuration.interfaces.nve.vnis.spine_anycast_gateway, null)
-      suppress_arp                  = try(vni.suppress_arp, local.defaults.nxos.devices.configuration.interfaces.nve.vnis.suppress_arp, null) == null ? null : (try(vni.suppress_arp, local.defaults.nxos.devices.configuration.interfaces.nve.vnis.suppress_arp) ? "enabled" : "disabled")
+      associate_vrf                 = try(vni.associate_vrf, null)
+      multicast_group               = try(vni.mcast_group, null)
+      multisite_ingress_replication = try(vni.multisite_ingress_replication, null)
+      multisite_multicast_group     = try(vni.multisite_mcast_group, null)
+      spine_anycast_gateway         = try(vni.spine_anycast_gateway, null)
+      suppress_arp                  = try(vni.suppress_arp, null) == null ? null : (try(vni.suppress_arp) ? "enabled" : "disabled")
 
-      ingress_replication_protocol = try(vni.ingress_replication_protocol, local.defaults.nxos.devices.configuration.interfaces.nve.vnis.ingress_replication_protocol, null)
+      ingress_replication_protocol = try(vni.ingress_replication_protocol, null)
     } }
   } }
 

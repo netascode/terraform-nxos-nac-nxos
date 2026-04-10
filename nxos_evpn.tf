@@ -5,12 +5,12 @@ locals {
         key                    = format("%s/%s", device.name, vni.vni)
         device                 = device.name
         vni                    = vni.vni
-        rd                     = try(vni.rd, local.defaults.nxos.devices.configuration.evpn.vnis.rd, null)
-        route_target_both_auto = try(vni.route_target_both_auto, local.defaults.nxos.devices.configuration.evpn.vnis.route_target_both_auto, false)
-        route_target_imports   = try(vni.route_target_both_auto, local.defaults.nxos.devices.configuration.evpn.vnis.route_target_both_auto, false) ? concat(["auto"], try(vni.route_target_imports, local.defaults.nxos.devices.configuration.evpn.vnis.route_target_imports, [])) : try(vni.route_target_imports, local.defaults.nxos.devices.configuration.evpn.vnis.route_target_imports, [])
-        route_target_exports   = try(vni.route_target_both_auto, local.defaults.nxos.devices.configuration.evpn.vnis.route_target_both_auto, false) ? concat(["auto"], try(vni.route_target_exports, local.defaults.nxos.devices.configuration.evpn.vnis.route_target_exports, [])) : try(vni.route_target_exports, local.defaults.nxos.devices.configuration.evpn.vnis.route_target_exports, [])
-        table_map              = try(vni.table_map, local.defaults.nxos.devices.configuration.evpn.vnis.table_map, null)
-        table_map_filter       = try(vni.table_map_filter, local.defaults.nxos.devices.configuration.evpn.vnis.table_map_filter, null)
+        rd                     = try(vni.rd, null)
+        route_target_both_auto = try(vni.route_target_both_auto, false)
+        route_target_imports   = try(vni.route_target_both_auto, false) ? concat(["auto"], try(vni.route_target_imports, [])) : try(vni.route_target_imports, [])
+        route_target_exports   = try(vni.route_target_both_auto, false) ? concat(["auto"], try(vni.route_target_exports, [])) : try(vni.route_target_exports, [])
+        table_map              = try(vni.table_map, null)
+        table_map_filter       = try(vni.table_map_filter, null)
       }
     ]
   ])

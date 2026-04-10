@@ -42,7 +42,7 @@ module "nxos" {
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.9.0 |
 | <a name="requirement_local"></a> [local](#requirement\_local) | >= 2.7.0 |
 | <a name="requirement_nxos"></a> [nxos](#requirement\_nxos) | = 0.8.0 |
-| <a name="requirement_utils"></a> [utils](#requirement\_utils) | = 2.0.0-beta1 |
+| <a name="requirement_utils"></a> [utils](#requirement\_utils) | = 2.0.0-beta2 |
 ## Inputs
 
 | Name | Description | Type | Default | Required |
@@ -51,20 +51,19 @@ module "nxos" {
 | <a name="input_managed_devices"></a> [managed\_devices](#input\_managed\_devices) | List of device names to be managed. By default all devices will be managed. | `list(string)` | `[]` | no |
 | <a name="input_model"></a> [model](#input\_model) | As an alternative to YAML files, a native Terraform data structure can be provided as well. | `map(any)` | `{}` | no |
 | <a name="input_save_config"></a> [save\_config](#input\_save\_config) | Write changes to startup-config on all devices. | `bool` | `false` | no |
-| <a name="input_write_default_values_file"></a> [write\_default\_values\_file](#input\_write\_default\_values\_file) | Write all default values to a YAML file. Value is a path pointing to the file to be created. | `string` | `""` | no |
+| <a name="input_template_directories"></a> [template\_directories](#input\_template\_directories) | List of paths to directories containing template files. | `list(string)` | `[]` | no |
+| <a name="input_template_files"></a> [template\_files](#input\_template\_files) | List of paths to template files. | `list(string)` | `[]` | no |
 | <a name="input_write_model_file"></a> [write\_model\_file](#input\_write\_model\_file) | Write the rendered device model to a single YAML file. Value is a path pointing to the file to be created. | `string` | `""` | no |
 | <a name="input_yaml_directories"></a> [yaml\_directories](#input\_yaml\_directories) | List of paths to YAML directories. | `list(string)` | `[]` | no |
 | <a name="input_yaml_files"></a> [yaml\_files](#input\_yaml\_files) | List of paths to YAML files. | `list(string)` | `[]` | no |
 ## Outputs
 
-| Name | Description |
-|------|-------------|
-| <a name="output_default_values"></a> [default\_values](#output\_default\_values) | All default values. |
-| <a name="output_model"></a> [model](#output\_model) | Full model. |
+No outputs.
 ## Resources
 
 | Name | Type |
 |------|------|
+| [local_sensitive_file.model](https://registry.terraform.io/providers/hashicorp/local/latest/docs/resources/sensitive_file) | resource |
 | [nxos_access_list.access_list](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0/docs/resources/access_list) | resource |
 | [nxos_bgp.bgp](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0/docs/resources/bgp) | resource |
 | [nxos_bridge_domain.bridge_domain](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0/docs/resources/bridge_domain) | resource |
@@ -110,7 +109,5 @@ module "nxos" {
 | [nxos_vrf.vrf](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.8.0/docs/resources/vrf) | resource |
 ## Modules
 
-| Name | Source | Version |
-|------|--------|---------|
-| <a name="module_model"></a> [model](#module\_model) | ./modules/model | n/a |
+No modules.
 <!-- END_TF_DOCS -->

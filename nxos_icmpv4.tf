@@ -3,51 +3,51 @@ locals {
     for device in local.devices : concat(
       [for int in try(local.device_config[device.name].interfaces.ethernets, []) : {
         device              = device.name
-        vrf                 = try(int.vrf, local.defaults.nxos.devices.configuration.interfaces.ethernets.vrf, "default")
+        vrf                 = try(int.vrf, "default")
         id                  = "eth${int.id}"
-        ip_redirects        = try(int.ip.redirects, local.defaults.nxos.devices.configuration.interfaces.ethernets.ip.redirects, null)
-        ip_unreachables     = try(int.ip.unreachables, local.defaults.nxos.devices.configuration.interfaces.ethernets.ip.unreachables, null)
-        ip_port_unreachable = try(int.ip.port_unreachable, local.defaults.nxos.devices.configuration.interfaces.ethernets.ip.port_unreachable, null)
+        ip_redirects        = try(int.ip.redirects, null)
+        ip_unreachables     = try(int.ip.unreachables, null)
+        ip_port_unreachable = try(int.ip.port_unreachable, null)
         is_svi_with_vpc     = false
-        } if try(int.ip.redirects, local.defaults.nxos.devices.configuration.interfaces.ethernets.ip.redirects, null) != null ||
-        try(int.ip.unreachables, local.defaults.nxos.devices.configuration.interfaces.ethernets.ip.unreachables, null) != null ||
-        try(int.ip.port_unreachable, local.defaults.nxos.devices.configuration.interfaces.ethernets.ip.port_unreachable, null) != null
+        } if try(int.ip.redirects, null) != null ||
+        try(int.ip.unreachables, null) != null ||
+        try(int.ip.port_unreachable, null) != null
       ],
       [for int in try(local.device_config[device.name].interfaces.loopbacks, []) : {
         device              = device.name
-        vrf                 = try(int.vrf, local.defaults.nxos.devices.configuration.interfaces.loopbacks.vrf, "default")
+        vrf                 = try(int.vrf, "default")
         id                  = "lo${int.id}"
-        ip_redirects        = try(int.ip.redirects, local.defaults.nxos.devices.configuration.interfaces.loopbacks.ip.redirects, null)
-        ip_unreachables     = try(int.ip.unreachables, local.defaults.nxos.devices.configuration.interfaces.loopbacks.ip.unreachables, null)
-        ip_port_unreachable = try(int.ip.port_unreachable, local.defaults.nxos.devices.configuration.interfaces.loopbacks.ip.port_unreachable, null)
+        ip_redirects        = try(int.ip.redirects, null)
+        ip_unreachables     = try(int.ip.unreachables, null)
+        ip_port_unreachable = try(int.ip.port_unreachable, null)
         is_svi_with_vpc     = false
-        } if try(int.ip.redirects, local.defaults.nxos.devices.configuration.interfaces.loopbacks.ip.redirects, null) != null ||
-        try(int.ip.unreachables, local.defaults.nxos.devices.configuration.interfaces.loopbacks.ip.unreachables, null) != null ||
-        try(int.ip.port_unreachable, local.defaults.nxos.devices.configuration.interfaces.loopbacks.ip.port_unreachable, null) != null
+        } if try(int.ip.redirects, null) != null ||
+        try(int.ip.unreachables, null) != null ||
+        try(int.ip.port_unreachable, null) != null
       ],
       [for int in try(local.device_config[device.name].interfaces.vlans, []) : {
         device              = device.name
-        vrf                 = try(int.vrf, local.defaults.nxos.devices.configuration.interfaces.vlans.vrf, "default")
+        vrf                 = try(int.vrf, "default")
         id                  = "vlan${int.id}"
-        ip_redirects        = try(int.ip.redirects, local.defaults.nxos.devices.configuration.interfaces.vlans.ip.redirects, null)
-        ip_unreachables     = try(int.ip.unreachables, local.defaults.nxos.devices.configuration.interfaces.vlans.ip.unreachables, null)
-        ip_port_unreachable = try(int.ip.port_unreachable, local.defaults.nxos.devices.configuration.interfaces.vlans.ip.port_unreachable, null)
+        ip_redirects        = try(int.ip.redirects, null)
+        ip_unreachables     = try(int.ip.unreachables, null)
+        ip_port_unreachable = try(int.ip.port_unreachable, null)
         is_svi_with_vpc     = try(local.device_config[device.name].vpc.domain_id, null) != null
-        } if try(int.ip.redirects, local.defaults.nxos.devices.configuration.interfaces.vlans.ip.redirects, null) != null ||
-        try(int.ip.unreachables, local.defaults.nxos.devices.configuration.interfaces.vlans.ip.unreachables, null) != null ||
-        try(int.ip.port_unreachable, local.defaults.nxos.devices.configuration.interfaces.vlans.ip.port_unreachable, null) != null
+        } if try(int.ip.redirects, null) != null ||
+        try(int.ip.unreachables, null) != null ||
+        try(int.ip.port_unreachable, null) != null
       ],
       [for int in try(local.device_config[device.name].interfaces.port_channels, []) : {
         device              = device.name
-        vrf                 = try(int.vrf, local.defaults.nxos.devices.configuration.interfaces.port_channels.vrf, "default")
+        vrf                 = try(int.vrf, "default")
         id                  = "po${int.id}"
-        ip_redirects        = try(int.ip.redirects, local.defaults.nxos.devices.configuration.interfaces.port_channels.ip.redirects, null)
-        ip_unreachables     = try(int.ip.unreachables, local.defaults.nxos.devices.configuration.interfaces.port_channels.ip.unreachables, null)
-        ip_port_unreachable = try(int.ip.port_unreachable, local.defaults.nxos.devices.configuration.interfaces.port_channels.ip.port_unreachable, null)
+        ip_redirects        = try(int.ip.redirects, null)
+        ip_unreachables     = try(int.ip.unreachables, null)
+        ip_port_unreachable = try(int.ip.port_unreachable, null)
         is_svi_with_vpc     = false
-        } if try(int.ip.redirects, local.defaults.nxos.devices.configuration.interfaces.port_channels.ip.redirects, null) != null ||
-        try(int.ip.unreachables, local.defaults.nxos.devices.configuration.interfaces.port_channels.ip.unreachables, null) != null ||
-        try(int.ip.port_unreachable, local.defaults.nxos.devices.configuration.interfaces.port_channels.ip.port_unreachable, null) != null
+        } if try(int.ip.redirects, null) != null ||
+        try(int.ip.unreachables, null) != null ||
+        try(int.ip.port_unreachable, null) != null
       ],
     )
   ])
