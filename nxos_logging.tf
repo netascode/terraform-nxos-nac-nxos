@@ -13,6 +13,7 @@ resource "nxos_logging" "logging" {
   # syslogFile
   file_admin_state          = try(local.device_config[each.key].logging.logfile_name, null) != null ? "enabled" : null
   file_name                 = try(local.device_config[each.key].logging.logfile_name, null)
+  file_severity             = try(local.device_config[each.key].logging.logfile_severity, null)
   file_size                 = try(local.device_config[each.key].logging.logfile_size, null)
   file_persistent_threshold = try(local.device_config[each.key].logging.logfile_persistent_threshold, null)
 
