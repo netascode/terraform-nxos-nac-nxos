@@ -1,0 +1,1 @@
+- Add `ntp.source_interface_type`, `ntp.source_interface_id`, `ntp.access_group_match_all`, `ntp.access_group_peer`, `ntp.access_group_query_only`, `ntp.access_group_serve`, and `ntp.access_group_serve_only` support

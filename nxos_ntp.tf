@@ -8,17 +8,23 @@ locals {
 resource "nxos_ntp" "ntp" {
   for_each = { for device in local.devices : device.name => device
   if try(local.device_config[device.name].ntp, null) != null }
-  device               = each.key
-  admin_state          = "enabled"
-  allow_control        = try(local.device_config[each.key].ntp.allow_control, false) ? "enabled" : "disabled"
-  allow_private        = try(local.device_config[each.key].ntp.allow_private, false) ? "enabled" : "disabled"
-  authentication_state = try(local.device_config[each.key].ntp.authenticate, false) ? "enabled" : "disabled"
-  logging              = try(local.device_config[each.key].ntp.logging, false) ? "enabled" : "disabled"
-  logging_level        = try(local.device_config[each.key].ntp.logging_level, null)
-  master               = try(local.device_config[each.key].ntp.master, false) ? "enabled" : "disabled"
-  master_stratum       = try(local.device_config[each.key].ntp.master_stratum, null)
-  passive              = try(local.device_config[each.key].ntp.passive, false) ? "enabled" : "disabled"
-  rate_limit           = try(local.device_config[each.key].ntp.allow_control_rate_limit, null)
+  device                  = each.key
+  admin_state             = "enabled"
+  allow_control           = try(local.device_config[each.key].ntp.allow_control, false) ? "enabled" : "disabled"
+  allow_private           = try(local.device_config[each.key].ntp.allow_private, false) ? "enabled" : "disabled"
+  authentication_state    = try(local.device_config[each.key].ntp.authenticate, false) ? "enabled" : "disabled"
+  logging                 = try(local.device_config[each.key].ntp.logging, false) ? "enabled" : "disabled"
+  logging_level           = try(local.device_config[each.key].ntp.logging_level, null)
+  master                  = try(local.device_config[each.key].ntp.master, false) ? "enabled" : "disabled"
+  master_stratum          = try(local.device_config[each.key].ntp.master_stratum, null)
+  passive                 = try(local.device_config[each.key].ntp.passive, false) ? "enabled" : "disabled"
+  rate_limit              = try(local.device_config[each.key].ntp.allow_control_rate_limit, null)
+  source_interface        = try(local.device_config[each.key].ntp.source_interface_type, null) != null ? "${local.intf_prefix_map[try(local.device_config[each.key].ntp.source_interface_type)]}${try(local.device_config[each.key].ntp.source_interface_id, "")}" : null
+  access_group_match_all  = try(local.device_config[each.key].ntp.access_group_match_all, null) == null ? null : try(local.device_config[each.key].ntp.access_group_match_all) ? "enabled" : "disabled"
+  access_group_peer       = try(local.device_config[each.key].ntp.access_group_peer, null)
+  access_group_query_only = try(local.device_config[each.key].ntp.access_group_query_only, null)
+  access_group_serve      = try(local.device_config[each.key].ntp.access_group_serve, null)
+  access_group_serve_only = try(local.device_config[each.key].ntp.access_group_serve_only, null)
   servers = { for name, server in try(local.ntp_servers[each.key], {}) : name => {
     vrf       = try(server.vrf, null)
     type      = server.type
