@@ -1,14 +1,6 @@
 resource "nxos_logging" "logging" {
   for_each = { for device in local.devices : device.name => device
-    if try(local.device_config[device.name].logging.level, null) != null ||
-    length(try(local.device_config[device.name].logging.facilities, [])) > 0 ||
-    try(local.device_config[device.name].logging.logfile_name, null) != null ||
-    length(try(local.device_config[device.name].logging.servers, [])) > 0 ||
-    try(local.device_config[device.name].logging.source_interface_type, null) != null ||
-    try(local.device_config[device.name].logging.timestamp, null) != null ||
-    try(local.device_config[device.name].logging.monitor_severity, null) != null ||
-    try(local.device_config[device.name].logging.console_severity, null) != null ||
-  try(local.device_config[device.name].logging.origin_id_type, null) != null }
+  if try(local.device_config[device.name].logging, null) != null }
   device = each.key
 
   # loggingLogLevel
