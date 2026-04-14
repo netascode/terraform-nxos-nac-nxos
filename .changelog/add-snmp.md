@@ -1,0 +1,1 @@
+- Add `snmp` support including `snmp.contact`, `snmp.location`, `snmp.engine_id`, `snmp.packetsize`, `snmp.tcp_session_auth`, `snmp.source_interface_type`, `snmp.source_interface_id`, `snmp.enable_traps`, `snmp.users`, `snmp.hosts`, and `snmp.rmon_events`
