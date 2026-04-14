@@ -55,10 +55,13 @@ resource "nxos_icmpv6" "icmpv6" {
   redirect_syslog_interval   = try(local.device_config[each.key].system.ipv6_redirect_syslog_interval, null)
 
   interfaces = { for int in local.icmpv6_interfaces : int.id => {
-    control = join(",", sort(compact([
+    control = length(compact([
       try(int.redirects, false) == true ? "redirect" : "",
       try(int.unreachables, false) == true ? "unreachables" : "",
-    ])))
+      ])) > 0 ? join(",", sort(compact([
+        try(int.redirects, false) == true ? "redirect" : "",
+        try(int.unreachables, false) == true ? "unreachables" : "",
+    ]))) : null
   } if int.device == each.key }
 
   depends_on = [

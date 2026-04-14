@@ -42,10 +42,13 @@ resource "nxos_bfd" "bfd" {
   startup_interval     = try(local.device_config[each.key].bfd.startup_timer, null)
 
   interfaces = { for int in local.bfd_interfaces : int.id => {
-    control = join(",", sort(compact([
+    control = length(compact([
       try(int.bfd.optimize_subinterface, false) ? "opt-subif" : "",
       try(int.bfd.per_link, false) ? "pc-per-link" : "",
-    ])))
+      ])) > 0 ? join(",", sort(compact([
+        try(int.bfd.optimize_subinterface, false) ? "opt-subif" : "",
+        try(int.bfd.per_link, false) ? "pc-per-link" : "",
+    ]))) : null
     echo_admin_state       = try(int.bfd.echo, null) == null ? null : (try(int.bfd.echo) ? "enabled" : "disabled")
     source_ip              = try(int.bfd.source_ip, null)
     track_member_link      = try(int.bfd.track_member_link, null) == null ? null : try(int.bfd.track_member_link) ? "enable" : "disable"

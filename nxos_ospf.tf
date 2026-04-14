@@ -18,17 +18,24 @@ resource "nxos_ospf" "ospf" {
           bandwidth_reference      = try(proc.auto_cost_reference_bandwidth, null)
           bandwidth_reference_unit = try(proc.auto_cost_reference_bandwidth_unit, null)
           capability_vrf_lite      = try(proc.capability_vrf_lite, null)
-          control = join(",", sort(compact([
+          control = length(compact([
             try(proc.bfd, false) ? "bfd" : "",
             try(proc.passive_interface_default, false) ? "default-passive" : "",
             try(proc.name_lookup, false) ? "name-lookup" : "",
-          ])))
+            ])) > 0 ? join(",", sort(compact([
+              try(proc.bfd, false) ? "bfd" : "",
+              try(proc.passive_interface_default, false) ? "default-passive" : "",
+              try(proc.name_lookup, false) ? "name-lookup" : "",
+          ]))) : null
           default_metric                = try(proc.default_metric, null)
           default_route_nssa_pbit_clear = try(proc.default_route_nssa_abr_pbit_clear, null)
-          discard_route = join(",", sort(compact([
+          discard_route = length(compact([
             try(proc.discard_route_external, false) ? "ext" : "",
             try(proc.discard_route_internal, false) ? "int" : "",
-          ])))
+            ])) > 0 ? join(",", sort(compact([
+              try(proc.discard_route_external, false) ? "ext" : "",
+              try(proc.discard_route_internal, false) ? "int" : "",
+          ]))) : null
           distance              = try(proc.distance, null)
           down_bit_ignore       = try(proc.down_bit_ignore, null)
           log_adjacency_changes = try(proc.log_adjacency_changes, null)
@@ -38,12 +45,17 @@ resource "nxos_ospf" "ospf" {
           router_id             = try(proc.router_id, null)
 
           max_metric_await_convergence_bgp_asn = try(proc.max_metric_router_lsa.on_startup_wait_for_bgp, null)
-          max_metric_control = join(",", sort(compact([
+          max_metric_control = length(compact([
             try(proc.max_metric_router_lsa.external_lsa, false) ? "external-lsa" : "",
             try(proc.max_metric_router_lsa.on_startup, false) ? "startup" : "",
             try(proc.max_metric_router_lsa.include_stub, false) ? "stub" : "",
             try(proc.max_metric_router_lsa.summary_lsa, false) ? "summary-lsa" : "",
-          ])))
+            ])) > 0 ? join(",", sort(compact([
+              try(proc.max_metric_router_lsa.external_lsa, false) ? "external-lsa" : "",
+              try(proc.max_metric_router_lsa.on_startup, false) ? "startup" : "",
+              try(proc.max_metric_router_lsa.include_stub, false) ? "stub" : "",
+              try(proc.max_metric_router_lsa.summary_lsa, false) ? "summary-lsa" : "",
+          ]))) : null
           max_metric_external_lsa     = try(proc.max_metric_router_lsa.external_lsa, false) ? try(proc.max_metric_router_lsa.external_lsa_max_metric, null) : null
           max_metric_summary_lsa      = try(proc.max_metric_router_lsa.summary_lsa, false) ? try(proc.max_metric_router_lsa.summary_lsa_max_metric, null) : null
           max_metric_startup_interval = try(proc.max_metric_router_lsa.on_startup, false) ? try(proc.max_metric_router_lsa.on_startup_timeout, null) : null
@@ -51,11 +63,15 @@ resource "nxos_ospf" "ospf" {
           areas = { for area in try(proc.areas, []) : area.id => {
             authentication_type = try(area.authentication, null)
             cost                = try(area.default_cost, null)
-            control = join(",", sort(compact([
+            control = length(compact([
               try(area.nssa_no_redistribution, null) != null ? (try(area.nssa_no_redistribution, false) ? "" : "redistribute") : "",
               try(area.no_summary, null) != null ? (try(area.no_summary, false) ? "" : "summary") : "",
               try(area.nssa_translate_type7_suppress_fa, false) ? "suppress-fa" : "",
-            ])))
+              ])) > 0 ? join(",", sort(compact([
+                try(area.nssa_no_redistribution, null) != null ? (try(area.nssa_no_redistribution, false) ? "" : "redistribute") : "",
+                try(area.no_summary, null) != null ? (try(area.no_summary, false) ? "" : "summary") : "",
+                try(area.nssa_translate_type7_suppress_fa, false) ? "suppress-fa" : "",
+            ]))) : null
             nssa_translator_role = try(area.nssa_translate_type7, null)
             segment_routing_mpls = try(area.segment_routing_mpls, false) ? "mpls" : "unspecified"
             type                 = try(area.type, null)
@@ -75,10 +91,13 @@ resource "nxos_ospf" "ospf" {
             network_type          = int.ospf_network_type
             passive               = int.ospf_passive
             priority              = int.ospf_priority
-            control = join(",", sort(compact([
+            control = length(compact([
               int.ospf_advertise_subnet ? "advert-subnet" : "",
               int.ospf_mtu_ignore ? "mtu-ignore" : "",
-            ])))
+              ])) > 0 ? join(",", sort(compact([
+                int.ospf_advertise_subnet ? "advert-subnet" : "",
+                int.ospf_mtu_ignore ? "mtu-ignore" : "",
+            ]))) : null
             node_flag                          = int.ospf_node_flag
             retransmit_interval                = int.ospf_retransmit_interval
             transmit_delay                     = int.ospf_transmit_delay
@@ -98,17 +117,24 @@ resource "nxos_ospf" "ospf" {
         bandwidth_reference      = try(vrf.auto_cost_reference_bandwidth, null)
         bandwidth_reference_unit = try(vrf.auto_cost_reference_bandwidth_unit, null)
         capability_vrf_lite      = try(vrf.capability_vrf_lite, null)
-        control = join(",", sort(compact([
+        control = length(compact([
           try(vrf.bfd, false) ? "bfd" : "",
           try(vrf.passive_interface_default, false) ? "default-passive" : "",
           try(vrf.name_lookup, false) ? "name-lookup" : "",
-        ])))
+          ])) > 0 ? join(",", sort(compact([
+            try(vrf.bfd, false) ? "bfd" : "",
+            try(vrf.passive_interface_default, false) ? "default-passive" : "",
+            try(vrf.name_lookup, false) ? "name-lookup" : "",
+        ]))) : null
         default_metric                = try(vrf.default_metric, null)
         default_route_nssa_pbit_clear = try(vrf.default_route_nssa_abr_pbit_clear, null)
-        discard_route = join(",", sort(compact([
+        discard_route = length(compact([
           try(vrf.discard_route_external, false) ? "ext" : "",
           try(vrf.discard_route_internal, false) ? "int" : "",
-        ])))
+          ])) > 0 ? join(",", sort(compact([
+            try(vrf.discard_route_external, false) ? "ext" : "",
+            try(vrf.discard_route_internal, false) ? "int" : "",
+        ]))) : null
         distance              = try(vrf.distance, null)
         down_bit_ignore       = try(vrf.down_bit_ignore, null)
         log_adjacency_changes = try(vrf.log_adjacency_changes, null)
@@ -118,12 +144,17 @@ resource "nxos_ospf" "ospf" {
         router_id             = try(vrf.router_id, null)
 
         max_metric_await_convergence_bgp_asn = try(vrf.max_metric_router_lsa.on_startup_wait_for_bgp, null)
-        max_metric_control = join(",", sort(compact([
+        max_metric_control = length(compact([
           try(vrf.max_metric_router_lsa.external_lsa, false) ? "external-lsa" : "",
           try(vrf.max_metric_router_lsa.on_startup, false) ? "startup" : "",
           try(vrf.max_metric_router_lsa.include_stub, false) ? "stub" : "",
           try(vrf.max_metric_router_lsa.summary_lsa, false) ? "summary-lsa" : "",
-        ])))
+          ])) > 0 ? join(",", sort(compact([
+            try(vrf.max_metric_router_lsa.external_lsa, false) ? "external-lsa" : "",
+            try(vrf.max_metric_router_lsa.on_startup, false) ? "startup" : "",
+            try(vrf.max_metric_router_lsa.include_stub, false) ? "stub" : "",
+            try(vrf.max_metric_router_lsa.summary_lsa, false) ? "summary-lsa" : "",
+        ]))) : null
         max_metric_external_lsa     = try(vrf.max_metric_router_lsa.external_lsa, false) ? try(vrf.max_metric_router_lsa.external_lsa_max_metric, null) : null
         max_metric_summary_lsa      = try(vrf.max_metric_router_lsa.summary_lsa, false) ? try(vrf.max_metric_router_lsa.summary_lsa_max_metric, null) : null
         max_metric_startup_interval = try(vrf.max_metric_router_lsa.on_startup, false) ? try(vrf.max_metric_router_lsa.on_startup_timeout, null) : null
@@ -131,11 +162,15 @@ resource "nxos_ospf" "ospf" {
         areas = { for area in try(vrf.areas, []) : area.id => {
           authentication_type = try(area.authentication, null)
           cost                = try(area.default_cost, null)
-          control = join(",", sort(compact([
+          control = length(compact([
             try(area.nssa_no_redistribution, null) != null ? (try(area.nssa_no_redistribution, false) ? "" : "redistribute") : "",
             try(area.no_summary, null) != null ? (try(area.no_summary, false) ? "" : "summary") : "",
             try(area.nssa_translate_type7_suppress_fa, false) ? "suppress-fa" : "",
-          ])))
+            ])) > 0 ? join(",", sort(compact([
+              try(area.nssa_no_redistribution, null) != null ? (try(area.nssa_no_redistribution, false) ? "" : "redistribute") : "",
+              try(area.no_summary, null) != null ? (try(area.no_summary, false) ? "" : "summary") : "",
+              try(area.nssa_translate_type7_suppress_fa, false) ? "suppress-fa" : "",
+          ]))) : null
           nssa_translator_role = try(area.nssa_translate_type7, null)
           segment_routing_mpls = try(area.segment_routing_mpls, false) ? "mpls" : "unspecified"
           type                 = try(area.type, null)
@@ -155,10 +190,13 @@ resource "nxos_ospf" "ospf" {
           network_type          = int.ospf_network_type
           passive               = int.ospf_passive
           priority              = int.ospf_priority
-          control = join(",", sort(compact([
+          control = length(compact([
             int.ospf_advertise_subnet ? "advert-subnet" : "",
             int.ospf_mtu_ignore ? "mtu-ignore" : "",
-          ])))
+            ])) > 0 ? join(",", sort(compact([
+              int.ospf_advertise_subnet ? "advert-subnet" : "",
+              int.ospf_mtu_ignore ? "mtu-ignore" : "",
+          ]))) : null
           node_flag                          = int.ospf_node_flag
           retransmit_interval                = int.ospf_retransmit_interval
           transmit_delay                     = int.ospf_transmit_delay

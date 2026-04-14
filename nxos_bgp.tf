@@ -134,21 +134,48 @@ resource "nxos_bgp" "bgp" {
           bmp_server_2                   = try(pt.bmp_activate_server_2, false) ? "enabled" : "disabled"
           capability_suppress_4_byte_asn = try(pt.capability_suppress_4_byte_asn, false) ? "enabled" : "disabled"
           connection_mode                = try(pt.connection_mode, null)
-          peer_control                   = join(",", sort(compact([try(pt.bfd, false) ? "bfd" : "", try(pt.dont_capability_negotiate, false) ? "cap-neg-off" : "", try(pt.disable_connected_check, false) ? "dis-conn-check" : "", !try(pt.dynamic_capability, true) ? "no-dyn-cap" : ""])))
-          hold_time                      = try(pt.hold_time, null)
-          keepalive_interval             = try(pt.keepalive_interval, null)
-          log_neighbor_changes           = try(pt.log_neighbor_changes, null) == null ? "none" : (try(pt.log_neighbor_changes) ? "enable" : "disable")
-          low_memory_exempt              = try(pt.low_memory_exempt, false) ? "enabled" : "disabled"
-          max_peer_count                 = try(pt.maximum_peers, null)
-          password_type                  = try(pt.password_type, null)
-          password                       = try(pt.password, null)
-          private_as_control             = try(pt.remove_private_as, null)
-          session_template               = try(pt.inherit_peer_session, null)
-          ebgp_multihop_ttl              = try(pt.ebgp_multihop_ttl, null)
-          ttl_security_hops              = try(pt.ttl_security_hops, null)
+          peer_control = length(compact([
+            try(pt.bfd, false) ? "bfd" : "",
+            try(pt.dont_capability_negotiate, false) ? "cap-neg-off" : "",
+            try(pt.disable_connected_check, false) ? "dis-conn-check" : "",
+            !try(pt.dynamic_capability, true) ? "no-dyn-cap" : "",
+            ])) > 0 ? join(",", sort(compact([
+              try(pt.bfd, false) ? "bfd" : "",
+              try(pt.dont_capability_negotiate, false) ? "cap-neg-off" : "",
+              try(pt.disable_connected_check, false) ? "dis-conn-check" : "",
+              !try(pt.dynamic_capability, true) ? "no-dyn-cap" : "",
+          ]))) : null
+          keepalive_interval   = try(pt.keepalive_interval, null)
+          log_neighbor_changes = try(pt.log_neighbor_changes, null) == null ? "none" : (try(pt.log_neighbor_changes) ? "enable" : "disable")
+          low_memory_exempt    = try(pt.low_memory_exempt, false) ? "enabled" : "disabled"
+          max_peer_count       = try(pt.maximum_peers, null)
+          password_type        = try(pt.password_type, null)
+          password             = try(pt.password, null)
+          private_as_control   = try(pt.remove_private_as, null)
+          session_template     = try(pt.inherit_peer_session, null)
+          ebgp_multihop_ttl    = try(pt.ebgp_multihop_ttl, null)
+          ttl_security_hops    = try(pt.ttl_security_hops, null)
 
           peer_template_address_families = { for af in try(pt.address_families, []) : local.address_family_names_map[af.address_family] => {
-            control                       = join(",", sort(compact([try(af.advertisement_interval, null) != null ? "advertisement-interval" : "", try(af.allowas_in, false) ? "allow-self-as" : "", try(af.default_originate, false) ? "default-originate" : "", try(af.disable_peer_as_check, false) ? "dis-peer-as-check" : "", try(af.next_hop_self, false) ? "nh-self" : "", try(af.next_hop_self_all, false) ? "nh-self-all" : "", try(af.route_reflector_client, false) ? "rr-client" : "", try(af.suppress_inactive, false) ? "suppress-inactive" : ""])))
+            control = length(compact([
+              try(af.advertisement_interval, null) != null ? "advertisement-interval" : "",
+              try(af.allowas_in, false) ? "allow-self-as" : "",
+              try(af.default_originate, false) ? "default-originate" : "",
+              try(af.disable_peer_as_check, false) ? "dis-peer-as-check" : "",
+              try(af.next_hop_self, false) ? "nh-self" : "",
+              try(af.next_hop_self_all, false) ? "nh-self-all" : "",
+              try(af.route_reflector_client, false) ? "rr-client" : "",
+              try(af.suppress_inactive, false) ? "suppress-inactive" : "",
+              ])) > 0 ? join(",", sort(compact([
+                try(af.advertisement_interval, null) != null ? "advertisement-interval" : "",
+                try(af.allowas_in, false) ? "allow-self-as" : "",
+                try(af.default_originate, false) ? "default-originate" : "",
+                try(af.disable_peer_as_check, false) ? "dis-peer-as-check" : "",
+                try(af.next_hop_self, false) ? "nh-self" : "",
+                try(af.next_hop_self_all, false) ? "nh-self-all" : "",
+                try(af.route_reflector_client, false) ? "rr-client" : "",
+                try(af.suppress_inactive, false) ? "suppress-inactive" : "",
+            ]))) : null
             send_community_extended       = try(af.send_community_extended, false) ? "enabled" : "disabled"
             send_community_standard       = try(af.send_community_standard, false) ? "enabled" : "disabled"
             advertise_gateway_ip          = try(af.advertise_gateway_ip, false) ? "enabled" : "disabled"
@@ -177,15 +204,25 @@ resource "nxos_bgp" "bgp" {
         } }
 
         peers = { for nei in try(local.device_config[each.key].routing.bgp.neighbors, []) : nei.ip => {
-          remote_asn                     = try(nei.remote_as, null)
-          description                    = try(nei.description, null)
-          peer_template                  = try(nei.inherit_peer, null)
-          peer_type                      = try(nei.peer_type, null)
-          source_interface               = try(nei.update_source_interface_type, null) != null ? "${local.intf_prefix_map[try(nei.update_source_interface_type)]}${try(nei.update_source_interface_id, "")}" : null
-          hold_time                      = try(nei.hold_time, null)
-          keepalive_interval             = try(nei.keepalive_interval, null)
-          ebgp_multihop_ttl              = try(nei.ebgp_multihop_ttl, null)
-          peer_control                   = join(",", sort(compact([try(nei.bfd, false) ? "bfd" : "", try(nei.dont_capability_negotiate, false) ? "cap-neg-off" : "", try(nei.disable_connected_check, false) ? "dis-conn-check" : "", !try(nei.dynamic_capability, true) ? "no-dyn-cap" : ""])))
+          remote_asn         = try(nei.remote_as, null)
+          description        = try(nei.description, null)
+          peer_template      = try(nei.inherit_peer, null)
+          peer_type          = try(nei.peer_type, null)
+          source_interface   = try(nei.update_source_interface_type, null) != null ? "${local.intf_prefix_map[try(nei.update_source_interface_type)]}${try(nei.update_source_interface_id, "")}" : null
+          hold_time          = try(nei.hold_time, null)
+          keepalive_interval = try(nei.keepalive_interval, null)
+          ebgp_multihop_ttl  = try(nei.ebgp_multihop_ttl, null)
+          peer_control = length(compact([
+            try(nei.bfd, false) ? "bfd" : "",
+            try(nei.dont_capability_negotiate, false) ? "cap-neg-off" : "",
+            try(nei.disable_connected_check, false) ? "dis-conn-check" : "",
+            !try(nei.dynamic_capability, true) ? "no-dyn-cap" : "",
+            ])) > 0 ? join(",", sort(compact([
+              try(nei.bfd, false) ? "bfd" : "",
+              try(nei.dont_capability_negotiate, false) ? "cap-neg-off" : "",
+              try(nei.disable_connected_check, false) ? "dis-conn-check" : "",
+              !try(nei.dynamic_capability, true) ? "no-dyn-cap" : "",
+          ]))) : null
           password_type                  = try(nei.password_type, null)
           password                       = try(nei.password, null)
           admin_state                    = try(nei.shutdown, false) ? "disabled" : "enabled"
@@ -207,7 +244,25 @@ resource "nxos_bgp" "bgp" {
           local_asn             = try(nei.local_as, null)
 
           peer_address_families = { for af in try(nei.address_families, []) : local.address_family_names_map[af.address_family] => {
-            control                       = join(",", sort(compact([try(af.advertisement_interval, null) != null ? "advertisement-interval" : "", try(af.allowas_in, false) ? "allow-self-as" : "", try(af.default_originate, false) ? "default-originate" : "", try(af.disable_peer_as_check, false) ? "dis-peer-as-check" : "", try(af.next_hop_self, false) ? "nh-self" : "", try(af.next_hop_self_all, false) ? "nh-self-all" : "", try(af.route_reflector_client, false) ? "rr-client" : "", try(af.suppress_inactive, false) ? "suppress-inactive" : ""])))
+            control = length(compact([
+              try(af.advertisement_interval, null) != null ? "advertisement-interval" : "",
+              try(af.allowas_in, false) ? "allow-self-as" : "",
+              try(af.default_originate, false) ? "default-originate" : "",
+              try(af.disable_peer_as_check, false) ? "dis-peer-as-check" : "",
+              try(af.next_hop_self, false) ? "nh-self" : "",
+              try(af.next_hop_self_all, false) ? "nh-self-all" : "",
+              try(af.route_reflector_client, false) ? "rr-client" : "",
+              try(af.suppress_inactive, false) ? "suppress-inactive" : "",
+              ])) > 0 ? join(",", sort(compact([
+                try(af.advertisement_interval, null) != null ? "advertisement-interval" : "",
+                try(af.allowas_in, false) ? "allow-self-as" : "",
+                try(af.default_originate, false) ? "default-originate" : "",
+                try(af.disable_peer_as_check, false) ? "dis-peer-as-check" : "",
+                try(af.next_hop_self, false) ? "nh-self" : "",
+                try(af.next_hop_self_all, false) ? "nh-self-all" : "",
+                try(af.route_reflector_client, false) ? "rr-client" : "",
+                try(af.suppress_inactive, false) ? "suppress-inactive" : "",
+            ]))) : null
             send_community_extended       = try(af.send_community_extended, false) ? "enabled" : "disabled"
             send_community_standard       = try(af.send_community_standard, false) ? "enabled" : "disabled"
             advertise_gateway_ip          = try(af.advertise_gateway_ip, false) ? "enabled" : "disabled"
@@ -327,15 +382,25 @@ resource "nxos_bgp" "bgp" {
       peer_templates = {}
 
       peers = { for nei in try(vrf.neighbors, []) : nei.ip => {
-        remote_asn                     = try(nei.remote_as, null)
-        description                    = try(nei.description, null)
-        peer_template                  = try(nei.inherit_peer, null)
-        peer_type                      = try(nei.peer_type, null)
-        source_interface               = try(nei.update_source_interface_type, null) != null ? "${local.intf_prefix_map[try(nei.update_source_interface_type)]}${try(nei.update_source_interface_id, "")}" : null
-        hold_time                      = try(nei.hold_time, null)
-        keepalive_interval             = try(nei.keepalive_interval, null)
-        ebgp_multihop_ttl              = try(nei.ebgp_multihop_ttl, null)
-        peer_control                   = join(",", sort(compact([try(nei.bfd, false) ? "bfd" : "", try(nei.dont_capability_negotiate, false) ? "cap-neg-off" : "", try(nei.disable_connected_check, false) ? "dis-conn-check" : "", !try(nei.dynamic_capability, true) ? "no-dyn-cap" : ""])))
+        remote_asn         = try(nei.remote_as, null)
+        description        = try(nei.description, null)
+        peer_template      = try(nei.inherit_peer, null)
+        peer_type          = try(nei.peer_type, null)
+        source_interface   = try(nei.update_source_interface_type, null) != null ? "${local.intf_prefix_map[try(nei.update_source_interface_type)]}${try(nei.update_source_interface_id, "")}" : null
+        hold_time          = try(nei.hold_time, null)
+        keepalive_interval = try(nei.keepalive_interval, null)
+        ebgp_multihop_ttl  = try(nei.ebgp_multihop_ttl, null)
+        peer_control = length(compact([
+          try(nei.bfd, false) ? "bfd" : "",
+          try(nei.dont_capability_negotiate, false) ? "cap-neg-off" : "",
+          try(nei.disable_connected_check, false) ? "dis-conn-check" : "",
+          !try(nei.dynamic_capability, true) ? "no-dyn-cap" : "",
+          ])) > 0 ? join(",", sort(compact([
+            try(nei.bfd, false) ? "bfd" : "",
+            try(nei.dont_capability_negotiate, false) ? "cap-neg-off" : "",
+            try(nei.disable_connected_check, false) ? "dis-conn-check" : "",
+            !try(nei.dynamic_capability, true) ? "no-dyn-cap" : "",
+        ]))) : null
         password_type                  = try(nei.password_type, null)
         password                       = try(nei.password, null)
         admin_state                    = try(nei.shutdown, false) ? "disabled" : "enabled"
@@ -357,7 +422,25 @@ resource "nxos_bgp" "bgp" {
         local_asn             = try(nei.local_as, null)
 
         peer_address_families = { for af in try(nei.address_families, []) : local.address_family_names_map[af.address_family] => {
-          control                       = join(",", sort(compact([try(af.advertisement_interval, null) != null ? "advertisement-interval" : "", try(af.allowas_in, false) ? "allow-self-as" : "", try(af.default_originate, false) ? "default-originate" : "", try(af.disable_peer_as_check, false) ? "dis-peer-as-check" : "", try(af.next_hop_self, false) ? "nh-self" : "", try(af.next_hop_self_all, false) ? "nh-self-all" : "", try(af.route_reflector_client, false) ? "rr-client" : "", try(af.suppress_inactive, false) ? "suppress-inactive" : ""])))
+          control = length(compact([
+            try(af.advertisement_interval, null) != null ? "advertisement-interval" : "",
+            try(af.allowas_in, false) ? "allow-self-as" : "",
+            try(af.default_originate, false) ? "default-originate" : "",
+            try(af.disable_peer_as_check, false) ? "dis-peer-as-check" : "",
+            try(af.next_hop_self, false) ? "nh-self" : "",
+            try(af.next_hop_self_all, false) ? "nh-self-all" : "",
+            try(af.route_reflector_client, false) ? "rr-client" : "",
+            try(af.suppress_inactive, false) ? "suppress-inactive" : "",
+            ])) > 0 ? join(",", sort(compact([
+              try(af.advertisement_interval, null) != null ? "advertisement-interval" : "",
+              try(af.allowas_in, false) ? "allow-self-as" : "",
+              try(af.default_originate, false) ? "default-originate" : "",
+              try(af.disable_peer_as_check, false) ? "dis-peer-as-check" : "",
+              try(af.next_hop_self, false) ? "nh-self" : "",
+              try(af.next_hop_self_all, false) ? "nh-self-all" : "",
+              try(af.route_reflector_client, false) ? "rr-client" : "",
+              try(af.suppress_inactive, false) ? "suppress-inactive" : "",
+          ]))) : null
           send_community_extended       = try(af.send_community_extended, false) ? "enabled" : "disabled"
           send_community_standard       = try(af.send_community_standard, false) ? "enabled" : "disabled"
           advertise_gateway_ip          = try(af.advertise_gateway_ip, false) ? "enabled" : "disabled"

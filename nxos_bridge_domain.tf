@@ -16,14 +16,20 @@ resource "nxos_bridge_domain" "bridge_domain" {
     name         = try(vlan.name, null)
     admin_state  = try(vlan.state_active, null) == null ? null : try(vlan.state_active) ? "active" : "suspend"
     bridge_mode  = try(vlan.bridge_mode, null)
-    control = join(",", sort(compact([
+    control = length(compact([
       try(vlan.policy_enforced, false) ? "policy-enforced" : "",
       try(vlan.untagged, false) ? "untagged" : "",
-    ])))
-    forwarding_mode = join(",", sort(compact([
+      ])) > 0 ? join(",", sort(compact([
+        try(vlan.policy_enforced, false) ? "policy-enforced" : "",
+        try(vlan.untagged, false) ? "untagged" : "",
+    ]))) : null
+    forwarding_mode = length(compact([
       try(vlan.forwarding_mode_bridge, false) ? "bridge" : "",
       try(vlan.forwarding_mode_route, false) ? "route" : "",
-    ])))
+      ])) > 0 ? join(",", sort(compact([
+        try(vlan.forwarding_mode_bridge, false) ? "bridge" : "",
+        try(vlan.forwarding_mode_route, false) ? "route" : "",
+    ]))) : null
     long_name           = try(vlan.long_name, null)
     mac_packet_classify = try(vlan.mac_packet_classify, null) == null ? null : try(vlan.mac_packet_classify) ? "enable" : "disable"
     mode                = try(local.bridge_domain_mode_map[try(vlan.mode)], null)

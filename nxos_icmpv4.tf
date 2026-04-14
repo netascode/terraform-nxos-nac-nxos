@@ -65,11 +65,15 @@ resource "nxos_icmpv4" "icmpv4" {
   control              = ""
   vrfs = { for key, entry in local.icmpv4_vrfs : entry.vrf => {
     interfaces = { for int in local.icmpv4_interfaces : int.id => {
-      control = join(",", sort(compact([
+      control = length(compact([
         try(int.ip_port_unreachable, false) == true ? "port-unreachable" : "",
         try(int.ip_redirects, false) == true && !int.is_svi_with_vpc ? "redirect" : "",
         try(int.ip_unreachables, false) == true ? "unreachable" : "",
-      ])))
+        ])) > 0 ? join(",", sort(compact([
+          try(int.ip_port_unreachable, false) == true ? "port-unreachable" : "",
+          try(int.ip_redirects, false) == true && !int.is_svi_with_vpc ? "redirect" : "",
+          try(int.ip_unreachables, false) == true ? "unreachable" : "",
+      ]))) : null
     } if int.device == each.key && int.vrf == entry.vrf }
   } if entry.device == each.key }
 
