@@ -4,7 +4,7 @@ resource "nxos_logging" "logging" {
   device = each.key
 
   # loggingLogLevel
-  all   = try(local.device_config[each.key].logging.level, null) != null ? "enableall" : null
+  all   = try(local.device_config[each.key].logging.logging, null) == null ? null : (try(local.device_config[each.key].logging.logging) ? "enableall" : "disableall")
   level = try(local.device_config[each.key].logging.level, null)
   facilities = { for facility in try(local.device_config[each.key].logging.facilities, []) : facility.name => {
     level = try(facility.level, null)
