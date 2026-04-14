@@ -1,0 +1,1 @@
+- Add logfile, remote destinations, source interface, timestamp, monitor, console, and origin ID to `nxos_logging`
