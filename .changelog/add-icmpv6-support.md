@@ -1,0 +1,1 @@
+- Add `system.ipv6_adjacency_stale_timer`, `system.ipv6_adjacency_stale_timer_icmp`, `system.ipv6_redirect_syslog`, `system.ipv6_redirect_syslog_interval`, `interfaces.*.ipv6.redirects`, and `interfaces.*.ipv6.unreachables` ICMPv6 support
