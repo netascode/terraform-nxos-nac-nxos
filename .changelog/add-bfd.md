@@ -1,1 +1,1 @@
-- Add `bfd.echo_interface_type`, `bfd.echo_interface_id`, `bfd.hardware_offload`, `bfd.slow_timer`, and `bfd.startup_timer` support
+- Add `bfd.echo_interface_type`, `bfd.echo_interface_id`, `bfd.hardware_offload`, `bfd.slow_timer`, `bfd.startup_timer`, and interface-level BFD support
