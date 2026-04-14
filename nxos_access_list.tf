@@ -4,6 +4,7 @@ resource "nxos_access_list" "access_list" {
   device = each.key
   access_lists = { for acl in try(local.device_config[each.key].ip_access_lists, []) : acl.name => {
     fragments          = try(acl.fragments, null)
+    ignore_routable    = try(acl.ignore_routable, null)
     per_ace_statistics = try(acl.statistics_per_entry, false) ? "on" : "off"
     entries = { for entry in try(acl.entries, []) : entry.sequence_number => {
       remark                    = try(entry.remark, null)
@@ -47,6 +48,20 @@ resource "nxos_access_list" "access_list" {
       precedence                = try(tostring(entry.precedence), null)
       vlan                      = try(entry.vlan, null)
       vni                       = try(entry.vni, null)
+      capture_session           = try(entry.capture_session, null)
+      dscp_mask                 = try(entry.dscp_mask, null)
+      igmp_type                 = try(entry.igmp_type, null)
+      load_share                = try(entry.load_share, null)
+      priority_all              = try(entry.priority_all, null)
+      protocol_mask             = try(entry.protocol_mask, null)
+      redirect_all              = try(entry.redirect_all, null)
+      rev                       = try(entry.rev, null)
+      tcp_flags_mask            = try(entry.tcp_flags_mask, null)
+      tcp_option_length         = try(entry.tcp_option_length, null)
+      telemetry_path            = try(entry.telemetry_path, null)
+      telemetry_queue           = try(entry.telemetry_queue, null)
+      ttl                       = try(entry.ttl, null)
+      type_of_service           = try(entry.tos, null)
     } }
   } }
 }
