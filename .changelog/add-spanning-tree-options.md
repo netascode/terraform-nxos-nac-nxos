@@ -1,0 +1,1 @@
+- Add `spanning_tree.port_type_edge_default`, `spanning_tree.port_type_edge_bpdufilter_default`, `spanning_tree.port_type_edge_bpduguard_default`, `spanning_tree.vlans`, and interface-level `spanning_tree.mst_pre_standard` and `spanning_tree.mst_simulate_pvst` support
