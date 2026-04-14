@@ -1,0 +1,17 @@
+- Add `system.boot` support
+- Add `system.cfs_distribute`, `system.cfs_eth_distribute`, `system.cfs_ipv4_distribute`, `system.cfs_ipv4_mcast_address`, `system.cfs_ipv6_distribute`, and `system.cfs_ipv6_mcast_address` support
+- Add `system.cli_aliases` support
+- Add `system.copp_profile` and `system.copp_rate_limit` support
+- Add `system.clock.format`, `system.clock.format_show_timezone_debug`, `system.clock.format_show_timezone_syslog`, and `system.clock.protocol` support
+- Add `system.clock` timezone and summer time support
+- Add `system.icam_monitor_interval`, `system.icam_monitor_intervals`, `system.icam_monitor_scale`, and ICAM threshold support
+- Add `system.platform` support
+- Add `system.smart_licensing_transport` and `system.smart_licensing_url_cslu` support
+- Add `system.terminal_console_exec_timeout`, `system.terminal_vty_exec_timeout`, and `system.terminal_vty_session_limit` support
+- Add `system.vdcs` support
+- Add `nd.vpc_domains` support
+- Add `cdp` support
+- Add `dns` support
+- Add `lldp` support
+- Add `udld` support
+- Add `interfaces.management` support
