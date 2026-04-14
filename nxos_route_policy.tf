@@ -49,6 +49,13 @@ resource "nxos_route_policy" "route_policy" {
       } : {}
 
       match_tags = { for tag in try(entry.match_tags, []) : tag => {} }
+
+      set_metric             = try(entry.set_metric, null)
+      set_metric_is_bgp      = try(entry.set_metric_is_bgp, null)
+      set_metric_delay       = try(entry.set_metric_delay, null)
+      set_metric_load        = try(entry.set_metric_load, null)
+      set_metric_mtu         = try(entry.set_metric_mtu, null)
+      set_metric_reliability = try(entry.set_metric_reliability, null)
     } }
   } }
 }
