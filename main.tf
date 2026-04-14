@@ -77,6 +77,7 @@ resource "nxos_cli" "cli_0" {
 
   depends_on = [
     nxos_access_list.access_list,
+    nxos_bfd.bfd,
     nxos_bgp.bgp,
     nxos_bridge_domain.bridge_domain,
     nxos_default_qos.default_qos,

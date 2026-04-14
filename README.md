@@ -65,6 +65,7 @@ No outputs.
 |------|------|
 | [local_sensitive_file.model](https://registry.terraform.io/providers/hashicorp/local/latest/docs/resources/sensitive_file) | resource |
 | [nxos_access_list.access_list](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.9.2/docs/resources/access_list) | resource |
+| [nxos_bfd.bfd](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.9.2/docs/resources/bfd) | resource |
 | [nxos_bgp.bgp](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.9.2/docs/resources/bgp) | resource |
 | [nxos_bridge_domain.bridge_domain](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.9.2/docs/resources/bridge_domain) | resource |
 | [nxos_cli.cli_0](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.9.2/docs/resources/cli) | resource |
