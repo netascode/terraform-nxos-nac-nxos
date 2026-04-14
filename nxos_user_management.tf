@@ -10,7 +10,10 @@ resource "nxos_user_management" "user_management" {
   for_each = { for device in local.devices : device.name => device
     if try(local.device_config[device.name].aaa.users, null) != null ||
     try(local.device_config[device.name].banner, null) != null ||
-  try(local.device_config[device.name].aaa.tacacs, null) != null }
+    try(local.device_config[device.name].aaa.tacacs, null) != null ||
+    try(local.device_config[device.name].aaa.authentication, null) != null ||
+    length(try(local.device_config[device.name].aaa.authorization, [])) > 0 ||
+  try(local.device_config[device.name].aaa.accounting, null) != null }
   device = each.key
 
   # Top-level attributes (aaaUserEp) — data model path: users
@@ -91,7 +94,77 @@ resource "nxos_user_management" "user_management" {
     description      = try(group.description, null)
     source_interface = try(group.source_interface_type, null) != null ? "${local.intf_prefix_map[try(group.source_interface_type)]}${try(group.source_interface_id, "")}" : null
     vrf              = try(group.vrf, null)
+
+    # TACACS+ provider group server members (aaaProviderRef) — data model path: tacacs.server_groups.servers
+    servers = { for server in try(group.servers, []) : server.host => {
+      description = try(server.description, null)
+      order       = try(server.order, null)
+    } }
   } }
+
+  # Authentication realm (aaaAuthRealm) — data model path: aaa.authentication
+  authentication_realm_default_role_policy     = try(local.device_config[each.key].aaa.authentication.default_role, null)
+  authentication_realm_radius_directed_request = try(local.device_config[each.key].aaa.authentication.radius_directed_request, null) == null ? null : (try(local.device_config[each.key].aaa.authentication.radius_directed_request) ? "yes" : "no")
+  authentication_realm_tacacs_directed_request = try(local.device_config[each.key].aaa.authentication.tacacs_directed_request, null) == null ? null : (try(local.device_config[each.key].aaa.authentication.tacacs_directed_request) ? "yes" : "no")
+
+  # Default authentication (aaaDefaultAuth) — data model path: aaa.authentication.login_default_*
+  default_authentication_error_enable     = try(local.device_config[each.key].aaa.authentication.login_default_error_enable, null)
+  default_authentication_fallback         = try(local.device_config[each.key].aaa.authentication.login_default_fallback, null) == null ? null : (try(local.device_config[each.key].aaa.authentication.login_default_fallback) ? "yes" : "no")
+  default_authentication_invalid_user_log = try(local.device_config[each.key].aaa.authentication.login_default_invalid_username_log, null)
+  default_authentication_local            = try(local.device_config[each.key].aaa.authentication.login_default_local, null) == null ? null : (try(local.device_config[each.key].aaa.authentication.login_default_local) ? "yes" : "no")
+  default_authentication_none             = try(local.device_config[each.key].aaa.authentication.login_default_none, null) == null ? null : (try(local.device_config[each.key].aaa.authentication.login_default_none) ? "yes" : "no")
+  default_authentication_provider_group   = try(local.device_config[each.key].aaa.authentication.login_default_groups[0], null)
+  default_authentication_provider_group_2 = try(local.device_config[each.key].aaa.authentication.login_default_groups[1], null)
+  default_authentication_provider_group_3 = try(local.device_config[each.key].aaa.authentication.login_default_groups[2], null)
+  default_authentication_provider_group_4 = try(local.device_config[each.key].aaa.authentication.login_default_groups[3], null)
+  default_authentication_provider_group_5 = try(local.device_config[each.key].aaa.authentication.login_default_groups[4], null)
+  default_authentication_provider_group_6 = try(local.device_config[each.key].aaa.authentication.login_default_groups[5], null)
+  default_authentication_provider_group_7 = try(local.device_config[each.key].aaa.authentication.login_default_groups[6], null)
+  default_authentication_provider_group_8 = try(local.device_config[each.key].aaa.authentication.login_default_groups[7], null)
+  default_authentication_realm            = try(local.device_config[each.key].aaa.authentication.login_default_realm, null)
+
+  # Console authentication (aaaConsoleAuth) — data model path: aaa.authentication.login_console_*
+  console_authentication_error_enable     = try(local.device_config[each.key].aaa.authentication.login_console_error_enable, null)
+  console_authentication_fallback         = try(local.device_config[each.key].aaa.authentication.login_console_fallback, null) == null ? null : (try(local.device_config[each.key].aaa.authentication.login_console_fallback) ? "yes" : "no")
+  console_authentication_invalid_user_log = try(local.device_config[each.key].aaa.authentication.login_console_invalid_username_log, null)
+  console_authentication_local            = try(local.device_config[each.key].aaa.authentication.login_console_local, null) == null ? null : (try(local.device_config[each.key].aaa.authentication.login_console_local) ? "yes" : "no")
+  console_authentication_none             = try(local.device_config[each.key].aaa.authentication.login_console_none, null) == null ? null : (try(local.device_config[each.key].aaa.authentication.login_console_none) ? "yes" : "no")
+  console_authentication_provider_group   = try(local.device_config[each.key].aaa.authentication.login_console_groups[0], null)
+  console_authentication_provider_group_2 = try(local.device_config[each.key].aaa.authentication.login_console_groups[1], null)
+  console_authentication_provider_group_3 = try(local.device_config[each.key].aaa.authentication.login_console_groups[2], null)
+  console_authentication_provider_group_4 = try(local.device_config[each.key].aaa.authentication.login_console_groups[3], null)
+  console_authentication_provider_group_5 = try(local.device_config[each.key].aaa.authentication.login_console_groups[4], null)
+  console_authentication_provider_group_6 = try(local.device_config[each.key].aaa.authentication.login_console_groups[5], null)
+  console_authentication_provider_group_7 = try(local.device_config[each.key].aaa.authentication.login_console_groups[6], null)
+  console_authentication_provider_group_8 = try(local.device_config[each.key].aaa.authentication.login_console_groups[7], null)
+  console_authentication_realm            = try(local.device_config[each.key].aaa.authentication.login_console_realm, null)
+
+  # Default authorizations (aaaDefaultAuthor) — data model path: aaa.authorization
+  default_authorizations = { for authz in try(local.device_config[each.key].aaa.authorization, []) : authz.command_type => {
+    authorization_method_none = try(authz.none, null)
+    local_rbac                = try(authz.local, null)
+    provider_group            = try(authz.groups[0], null)
+    provider_group_2          = try(authz.groups[1], null)
+    provider_group_3          = try(authz.groups[2], null)
+    provider_group_4          = try(authz.groups[3], null)
+    provider_group_5          = try(authz.groups[4], null)
+    provider_group_6          = try(authz.groups[5], null)
+    provider_group_7          = try(authz.groups[6], null)
+    provider_group_8          = try(authz.groups[7], null)
+  } }
+
+  # Default accounting (aaaDefaultAcc) — data model path: aaa.accounting
+  default_accounting_method_none      = try(local.device_config[each.key].aaa.accounting.none, null)
+  default_accounting_local_rbac       = try(local.device_config[each.key].aaa.accounting.local, null)
+  default_accounting_provider_group   = try(local.device_config[each.key].aaa.accounting.groups[0], null)
+  default_accounting_provider_group_2 = try(local.device_config[each.key].aaa.accounting.groups[1], null)
+  default_accounting_provider_group_3 = try(local.device_config[each.key].aaa.accounting.groups[2], null)
+  default_accounting_provider_group_4 = try(local.device_config[each.key].aaa.accounting.groups[3], null)
+  default_accounting_provider_group_5 = try(local.device_config[each.key].aaa.accounting.groups[4], null)
+  default_accounting_provider_group_6 = try(local.device_config[each.key].aaa.accounting.groups[5], null)
+  default_accounting_provider_group_7 = try(local.device_config[each.key].aaa.accounting.groups[6], null)
+  default_accounting_provider_group_8 = try(local.device_config[each.key].aaa.accounting.groups[7], null)
+  default_accounting_realm            = try(local.device_config[each.key].aaa.accounting.realm, null)
 
   depends_on = [
     nxos_feature.feature,
