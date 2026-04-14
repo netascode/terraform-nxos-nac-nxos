@@ -1,0 +1,1 @@
+- Add route map `set_metric`, `set_metric_is_bgp`, `set_metric_delay`, `set_metric_load`, `set_metric_mtu`, and `set_metric_reliability` support
