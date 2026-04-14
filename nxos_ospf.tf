@@ -61,6 +61,10 @@ resource "nxos_ospf" "ospf" {
             type                 = try(area.type, null)
           } }
 
+          redistributions = { for redist in try(proc.redistributions, []) : "${redist.protocol};${try(redist.protocol_instance, "none")};${try(redist.asn, "none")}" => {
+            route_map = try(redist.route_map, null)
+          } }
+
           interfaces = { for int in local.ospf_interfaces : "${int.type}${int.id}" => {
             advertise_secondaries = int.ospf_advertise_secondaries
             area                  = int.ospf_area
@@ -135,6 +139,10 @@ resource "nxos_ospf" "ospf" {
           nssa_translator_role = try(area.nssa_translate_type7, null)
           segment_routing_mpls = try(area.segment_routing_mpls, false) ? "mpls" : "unspecified"
           type                 = try(area.type, null)
+        } }
+
+        redistributions = { for redist in try(vrf.redistributions, []) : "${redist.protocol};${try(redist.protocol_instance, "none")};${try(redist.asn, "none")}" => {
+          route_map = try(redist.route_map, null)
         } }
 
         interfaces = { for int in local.ospf_interfaces : "${int.type}${int.id}" => {
