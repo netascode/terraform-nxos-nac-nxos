@@ -1,0 +1,1 @@
+- Add `ip_access_lists.ignore_routable` and ACL entry attributes `rev`, `tcp_flags_mask`, `tcp_option_length`, `igmp_type`, `capture_session`, `dscp_mask`, `load_share`, `priority_all`, `protocol_mask`, `redirect_all`, `telemetry_path`, `telemetry_queue`, `tos`, and `ttl`
