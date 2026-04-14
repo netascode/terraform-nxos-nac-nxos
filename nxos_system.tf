@@ -104,7 +104,7 @@ resource "nxos_system" "system" {
 
   # arpVpcDom nested map
   arp_vpc_domains = { for vpc in try(local.device_config[each.key].arp.vpc_domains, []) : vpc.domain_id => {
-    arp_sync = try(vpc.arp_synchronize, null) != null ? (try(vpc.arp_synchronize) ? "enabled" : "disabled") : null
+    arp_sync = try(vpc.synchronize, null) != null ? (try(vpc.synchronize) ? "enabled" : "disabled") : null
   } }
 
   # ndEntity / ndInst attributes
