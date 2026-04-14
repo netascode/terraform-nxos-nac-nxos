@@ -1,0 +1,3 @@
+- Add physical interface `shutdown_lan`, `buffer_boost`, `flowcontrol_receive`, `flowcontrol_send`, and `mac_address` support
+- Add physical interface switchport `autostate_exclude_vlans`, `block`, `isolated`, and `mac_learning` support
+- Add physical interface `storm_control` support
