@@ -14,6 +14,7 @@ resource "nxos_spanning_tree" "spanning_tree" {
       try(local.device_config[each.key].spanning_tree.port_type_edge_bpdufilter_default, false) ? "extchp-bpdu-filter" : "",
       try(local.device_config[each.key].spanning_tree.port_type_edge_bpduguard_default, false) ? "extchp-bpdu-guard" : "",
       try(local.device_config[each.key].spanning_tree.port_type_edge_default, false) ? "extchp-edge" : "",
+      "normal",
   ]))) : null
   fcoe                     = try(local.device_config[each.key].spanning_tree.fcoe, null) != null ? (try(local.device_config[each.key].spanning_tree.fcoe) ? "enabled" : "disabled") : null
   l2_gateway_stp_domain_id = try(local.device_config[each.key].spanning_tree.l2_gateway_stp_domain_id, null)
