@@ -1,1 +1,1 @@
-- Add logfile, remote destinations, source interface, timestamp, monitor, console, and origin ID to `nxos_logging`
+- Add `logging.logfile_name`, `logging.logfile_size`, `logging.logfile_persistent_threshold`, `logging.source_interface_type`, `logging.source_interface_id`, `logging.timestamp`, `logging.monitor_severity`, `logging.console_severity`, `logging.origin_id_type`, `logging.origin_id_value`, and `logging.servers` support
