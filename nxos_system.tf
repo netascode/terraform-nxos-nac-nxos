@@ -368,9 +368,7 @@ resource "nxos_system" "system" {
   dns_admin_state = try(local.device_config[each.key].dns.domain_lookup, null) == null ? null : (try(local.device_config[each.key].dns.domain_lookup) ? "enabled" : "disabled")
   dns_profiles = try(local.device_config[each.key].dns.domain_name, null) != null ? {
     "default" = {
-      domain = {
-        domain_name = try(local.device_config[each.key].dns.domain_name, null)
-      }
+      domain_name = try(local.device_config[each.key].dns.domain_name, null)
     }
   } : {}
 
