@@ -103,8 +103,8 @@ resource "nxos_system" "system" {
     try(local.device_config[device.name].system.smart_licensing_transport, null) != null ||
     try(local.device_config[device.name].system.smart_licensing_url_cslu, null) != null ||
     try(local.device_config[device.name].system.terminal_console_exec_timeout, null) != null ||
-    try(local.device_config[device.name].system.terminal_vty_exec_timeout, null) != null ||
-    try(local.device_config[device.name].system.terminal_vty_session_limit, null) != null ||
+    try(local.device_config[device.name].system.line_vty_exec_timeout, null) != null ||
+    try(local.device_config[device.name].system.line_vty_session_limit, null) != null ||
     length(try(local.device_config[device.name].system.vdcs, [])) > 0 ||
     try(local.device_config[device.name].arp, null) != null ||
     try(local.device_config[device.name].nd, null) != null ||
@@ -256,8 +256,8 @@ resource "nxos_system" "system" {
 
   # terminalTerminal attributes
   console_exec_timeout = try(local.device_config[each.key].system.terminal_console_exec_timeout, null)
-  vty_exec_timeout     = try(local.device_config[each.key].system.terminal_vty_exec_timeout, null)
-  vty_session_limit    = try(local.device_config[each.key].system.terminal_vty_session_limit, null)
+  vty_exec_timeout     = try(local.device_config[each.key].system.line_vty_exec_timeout, null)
+  vty_session_limit    = try(local.device_config[each.key].system.line_vty_session_limit, null)
 
   # icamEntity / icamInst / icamScale attributes
   icam_monitor_interval         = try(local.device_config[each.key].system.icam_monitor_interval, null)
