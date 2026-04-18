@@ -36,11 +36,11 @@ resource "nxos_logging" "logging" {
   timestamp_format = try(local.device_config[each.key].logging.timestamp, null)
 
   # syslogTermMonitor
-  monitor_admin_state = try(local.device_config[each.key].logging.monitor_severity, null) != null ? "enabled" : null
+  monitor_admin_state = try(local.device_config[each.key].logging.monitor, null) != null ? (try(local.device_config[each.key].logging.monitor) ? "enabled" : "disabled") : (try(local.device_config[each.key].logging.monitor_severity, null) != null ? "enabled" : null)
   monitor_severity    = try(local.device_config[each.key].logging.monitor_severity, null)
 
   # syslogConsole
-  console_admin_state = try(local.device_config[each.key].logging.console_severity, null) != null ? "enabled" : null
+  console_admin_state = try(local.device_config[each.key].logging.console, null) != null ? (try(local.device_config[each.key].logging.console) ? "enabled" : "disabled") : (try(local.device_config[each.key].logging.console_severity, null) != null ? "enabled" : null)
   console_severity    = try(local.device_config[each.key].logging.console_severity, null)
 
   # syslogOriginid
