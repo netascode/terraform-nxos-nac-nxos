@@ -1,0 +1,1 @@
+- Add route map `set_metric_type` support
