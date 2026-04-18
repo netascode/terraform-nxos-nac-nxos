@@ -112,6 +112,8 @@ resource "nxos_system" "system" {
     try(local.device_config[device.name].dns, null) != null ||
     try(local.device_config[device.name].lldp, null) != null ||
     try(local.device_config[device.name].udld, null) != null ||
+    try(local.device_config[device.name].vpc.ip_arp_synchronize, null) != null ||
+    try(local.device_config[device.name].vpc.ipv6_nd_synchronize, null) != null ||
     length(try(local.nd_interfaces_by_device[device.name], [])) > 0 ||
   length(try(local.device_config[device.name].interfaces.management, [])) > 0 }
   device = each.key
@@ -152,9 +154,9 @@ resource "nxos_system" "system" {
   arp_timeout                             = try(local.device_config[each.key].arp.timeout, null)
 
   # arpVpcDom nested map
-  arp_vpc_domains = { for vpc in try(local.device_config[each.key].arp.vpc_domains, []) : vpc.domain_id => {
-    arp_sync = try(vpc.synchronize, null) != null ? (try(vpc.synchronize) ? "enabled" : "disabled") : null
-  } }
+  arp_vpc_domains = try(local.device_config[each.key].vpc.ip_arp_synchronize, null) != null ? { tostring(try(local.device_config[each.key].vpc.domain_id)) = {
+    arp_sync = try(local.device_config[each.key].vpc.ip_arp_synchronize) ? "enabled" : "disabled"
+  } } : {}
 
   # ndEntity / ndInst attributes
   nd_admin_state                         = "enabled"
@@ -169,9 +171,9 @@ resource "nxos_system" "system" {
   nd_solicit_neighbor_advertisement      = try(local.device_config[each.key].nd.solicit_neighbor_advertisement, null) != null ? (try(local.device_config[each.key].nd.solicit_neighbor_advertisement) ? "enabled" : "disabled") : null
 
   # ndVpcDom nested map
-  nd_vpc_domains = { for vpc in try(local.device_config[each.key].nd.vpc_domains, []) : vpc.domain_id => {
-    nd_sync = try(vpc.synchronize, null) != null ? (try(vpc.synchronize) ? "enabled" : "disabled") : null
-  } }
+  nd_vpc_domains = try(local.device_config[each.key].vpc.ipv6_nd_synchronize, null) != null ? { tostring(try(local.device_config[each.key].vpc.domain_id)) = {
+    nd_sync = try(local.device_config[each.key].vpc.ipv6_nd_synchronize) ? "enabled" : "disabled"
+  } } : {}
 
   # ndDom -> ndIf nested maps (VRF -> interfaces)
   nd_vrfs = { for vrf_name, vrf_data in try(local.nd_vrfs_by_device[each.key], {}) : vrf_name => {
