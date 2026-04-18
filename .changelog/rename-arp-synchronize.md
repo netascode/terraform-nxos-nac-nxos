@@ -1,1 +1,0 @@
-- BREAKING: Rename `arp.vpc_domains.arp_synchronize` to `arp.vpc_domains.synchronize`
