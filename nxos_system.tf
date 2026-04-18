@@ -63,6 +63,94 @@ locals {
     )
   ])
 
+  cdp_interfaces = flatten([
+    for device in local.devices : concat(
+      [for int in try(local.device_config[device.name].interfaces.ethernets, []) : {
+        device       = device.name
+        interface_id = "eth${int.id}"
+        cdp          = try(int.cdp, null)
+      } if try(int.cdp, null) != null],
+      [for int in try(local.device_config[device.name].interfaces.port_channels, []) : {
+        device       = device.name
+        interface_id = "po${int.id}"
+        cdp          = try(int.cdp, null)
+      } if try(int.cdp, null) != null],
+      [for int in try(local.device_config[device.name].interfaces.management, []) : {
+        device       = device.name
+        interface_id = int.id
+        cdp          = try(int.cdp, null)
+      } if try(int.cdp, null) != null],
+    )
+  ])
+
+  cdp_interfaces_by_device = { for entry in local.cdp_interfaces : entry.device => entry... }
+
+  lldp_interfaces = flatten([
+    for device in local.devices : concat(
+      [for int in try(local.device_config[device.name].interfaces.ethernets, []) : {
+        device                             = device.name
+        interface_id                       = "eth${int.id}"
+        lldp_receive                       = try(int.lldp_receive, null)
+        lldp_transmit                      = try(int.lldp_transmit, null)
+        lldp_tlv_set_management_address_v4 = try(int.lldp_tlv_set_management_address_v4, null)
+        lldp_tlv_set_management_address_v6 = try(int.lldp_tlv_set_management_address_v6, null)
+        lldp_tlv_set_vlan                  = try(int.lldp_tlv_set_vlan, null)
+        lldp_dcbx_version                  = try(int.lldp_dcbx_version, null)
+        } if try(int.lldp_receive, null) != null ||
+        try(int.lldp_transmit, null) != null ||
+        try(int.lldp_tlv_set_management_address_v4, null) != null ||
+        try(int.lldp_tlv_set_management_address_v6, null) != null ||
+        try(int.lldp_tlv_set_vlan, null) != null ||
+      try(int.lldp_dcbx_version, null) != null],
+      [for int in try(local.device_config[device.name].interfaces.port_channels, []) : {
+        device                             = device.name
+        interface_id                       = "po${int.id}"
+        lldp_receive                       = try(int.lldp_receive, null)
+        lldp_transmit                      = try(int.lldp_transmit, null)
+        lldp_tlv_set_management_address_v4 = try(int.lldp_tlv_set_management_address_v4, null)
+        lldp_tlv_set_management_address_v6 = try(int.lldp_tlv_set_management_address_v6, null)
+        lldp_tlv_set_vlan                  = try(int.lldp_tlv_set_vlan, null)
+        lldp_dcbx_version                  = try(int.lldp_dcbx_version, null)
+        } if try(int.lldp_receive, null) != null ||
+        try(int.lldp_transmit, null) != null ||
+        try(int.lldp_tlv_set_management_address_v4, null) != null ||
+        try(int.lldp_tlv_set_management_address_v6, null) != null ||
+        try(int.lldp_tlv_set_vlan, null) != null ||
+      try(int.lldp_dcbx_version, null) != null],
+      [for int in try(local.device_config[device.name].interfaces.management, []) : {
+        device                             = device.name
+        interface_id                       = int.id
+        lldp_receive                       = try(int.lldp_receive, null)
+        lldp_transmit                      = try(int.lldp_transmit, null)
+        lldp_tlv_set_management_address_v4 = try(int.lldp_tlv_set_management_address_v4, null)
+        lldp_tlv_set_management_address_v6 = try(int.lldp_tlv_set_management_address_v6, null)
+        lldp_tlv_set_vlan                  = try(int.lldp_tlv_set_vlan, null)
+        lldp_dcbx_version                  = try(int.lldp_dcbx_version, null)
+        } if try(int.lldp_receive, null) != null ||
+        try(int.lldp_transmit, null) != null ||
+        try(int.lldp_tlv_set_management_address_v4, null) != null ||
+        try(int.lldp_tlv_set_management_address_v6, null) != null ||
+        try(int.lldp_tlv_set_vlan, null) != null ||
+      try(int.lldp_dcbx_version, null) != null],
+    )
+  ])
+
+  lldp_interfaces_by_device = { for entry in local.lldp_interfaces : entry.device => entry... }
+
+  udld_interfaces = flatten([
+    for device in local.devices : [
+      for int in try(local.device_config[device.name].interfaces.ethernets, []) : {
+        device          = device.name
+        interface_id    = "eth${int.id}"
+        udld            = try(int.udld, null)
+        udld_aggressive = try(int.udld_aggressive, null)
+      } if try(int.udld, null) != null ||
+      try(int.udld_aggressive, null) != null
+    ]
+  ])
+
+  udld_interfaces_by_device = { for entry in local.udld_interfaces : entry.device => entry... }
+
   nd_interfaces_by_device = { for entry in local.nd_interfaces : entry.device => entry... }
 
   nd_vrfs_by_device = { for device_name, entries in local.nd_interfaces_by_device : device_name => {
@@ -116,6 +204,9 @@ resource "nxos_system" "system" {
     try(local.device_config[device.name].vpc.ipv6_nd_synchronize, null) != null ||
     try(local.device_config[device.name].system.nxapi, null) != null ||
     length(try(local.nd_interfaces_by_device[device.name], [])) > 0 ||
+    length(try(local.cdp_interfaces_by_device[device.name], [])) > 0 ||
+    length(try(local.lldp_interfaces_by_device[device.name], [])) > 0 ||
+    length(try(local.udld_interfaces_by_device[device.name], [])) > 0 ||
   length(try(local.device_config[device.name].interfaces.management, [])) > 0 }
   device = each.key
 
@@ -367,6 +458,11 @@ resource "nxos_system" "system" {
   cdp_device_id_type     = try(local.cdp_format_device_id_map[try(local.device_config[each.key].cdp.format_device_id)], null)
   cdp_pnp_startup_vlan   = try(local.device_config[each.key].cdp.pnp_startup_vlan, null)
 
+  # cdpIf nested map
+  cdp_interfaces = { for entry in try(local.cdp_interfaces_by_device[each.key], []) : entry.interface_id => {
+    admin_state = entry.cdp ? "enabled" : "disabled"
+  } }
+
   # dnsEntity attributes
   dns_admin_state = try(local.device_config[each.key].dns.domain_lookup, null) == null ? null : (try(local.device_config[each.key].dns.domain_lookup) ? "enabled" : "disabled")
   dns_profiles = try(local.device_config[each.key].dns.domain_name, null) != null ? {
@@ -384,9 +480,25 @@ resource "nxos_system" "system" {
   lldp_advertise_system_chassis_id = try(local.device_config[each.key].lldp.chassis_id, null) == null ? null : (try(local.device_config[each.key].lldp.chassis_id) ? "enabled" : "disabled")
   lldp_port_channel                = try(local.device_config[each.key].lldp.portchannel, null) == null ? null : (try(local.device_config[each.key].lldp.portchannel) ? "enabled" : "disabled")
 
+  # lldpIf nested map
+  lldp_interfaces = { for entry in try(local.lldp_interfaces_by_device[each.key], []) : entry.interface_id => {
+    admin_receive_state  = try(entry.lldp_receive, null) == null ? null : (entry.lldp_receive ? "enabled" : "disabled")
+    admin_transmit_state = try(entry.lldp_transmit, null) == null ? null : (entry.lldp_transmit ? "enabled" : "disabled")
+    port_dcbxp_version   = try(entry.lldp_dcbx_version, null)
+    tlv_management_ipv4  = try(entry.lldp_tlv_set_management_address_v4, null)
+    tlv_management_ipv6  = try(entry.lldp_tlv_set_management_address_v6, null)
+    tlv_vlan             = try(entry.lldp_tlv_set_vlan, null)
+  } }
+
   # udldInst attributes
   udld_aggressive       = try(local.device_config[each.key].udld.aggressive, null) == null ? null : (try(local.device_config[each.key].udld.aggressive) ? "enabled" : "disabled")
   udld_message_interval = try(local.device_config[each.key].udld.message_time, null)
+
+  # udldPhysIf nested map
+  udld_interfaces = { for entry in try(local.udld_interfaces_by_device[each.key], []) : entry.interface_id => {
+    admin_state = try(entry.udld, null) == null ? null : (entry.udld ? "port-enabled" : "port-default")
+    aggressive  = try(entry.udld_aggressive, null) == null ? null : (entry.udld_aggressive ? "enabled" : "disabled")
+  } }
 
   # nxapiInst attributes
   nxapi_vrf                               = try(local.device_config[each.key].system.nxapi.vrf, null)

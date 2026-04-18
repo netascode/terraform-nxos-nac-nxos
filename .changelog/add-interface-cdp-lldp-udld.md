@@ -1,0 +1,3 @@
+- Add per-interface CDP support for ethernets, port-channels, and management interfaces
+- Add per-interface LLDP support for ethernets, port-channels, and management interfaces
+- Add per-interface UDLD support for ethernets
