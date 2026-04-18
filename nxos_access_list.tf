@@ -1,6 +1,8 @@
 resource "nxos_access_list" "access_list" {
   for_each = { for device in local.devices : device.name => device
-  if length(try(local.device_config[device.name].ip_access_lists, [])) > 0 }
+    if length(try(local.device_config[device.name].ip_access_lists, [])) > 0 ||
+    try(local.device_config[device.name].system.line_vty_access_class_in, null) != null ||
+  try(local.device_config[device.name].system.line_vty_access_class_out, null) != null }
   device = each.key
   access_lists = { for acl in try(local.device_config[each.key].ip_access_lists, []) : acl.name => {
     fragments          = try(acl.fragments, null)
@@ -64,4 +66,6 @@ resource "nxos_access_list" "access_list" {
       type_of_service           = try(entry.tos, null)
     } }
   } }
+  ingress_vty_access_list_name = try(local.device_config[each.key].system.line_vty_access_class_in, null)
+  egress_vty_access_list_name  = try(local.device_config[each.key].system.line_vty_access_class_out, null)
 }
