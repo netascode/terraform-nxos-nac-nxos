@@ -61,6 +61,42 @@ locals {
         neighbor_prefix_list = try(int.pim.neighbor_policy_prefix_list, null)
         rfc_strict           = try(int.pim.strict_rfc_compliant, null)
       } if try(int.pim, null) != null],
+      # Subinterfaces (ethernets)
+      flatten([for eth in try(local.device_config[device.name].interfaces.ethernets, []) :
+        [for sub in try(eth.subinterfaces, []) : {
+          device               = device.name
+          vrf                  = try(sub.vrf, "default")
+          interface_id         = "eth${eth.id}.${sub.id}"
+          bfd                  = try(sub.pim.bfd_instance, null) == null ? null : (try(sub.pim.bfd_instance) ? "enabled" : "disabled")
+          dr_priority          = try(sub.pim.dr_priority, null)
+          passive              = try(sub.pim.passive, null)
+          sparse_mode          = try(sub.pim.sparse_mode, null)
+          border               = try(sub.pim.border, null)
+          dr_delay             = try(sub.pim.dr_delay, null)
+          join_prune_route_map = try(sub.pim.jp_policy, null)
+          neighbor_route_map   = try(sub.pim.neighbor_policy_route_map, null)
+          neighbor_prefix_list = try(sub.pim.neighbor_policy_prefix_list, null)
+          rfc_strict           = try(sub.pim.strict_rfc_compliant, null)
+        } if try(sub.pim, null) != null]
+      ]),
+      # Subinterfaces (port channels)
+      flatten([for pc in try(local.device_config[device.name].interfaces.port_channels, []) :
+        [for sub in try(pc.subinterfaces, []) : {
+          device               = device.name
+          vrf                  = try(sub.vrf, "default")
+          interface_id         = "po${pc.id}.${sub.id}"
+          bfd                  = try(sub.pim.bfd_instance, null) == null ? null : (try(sub.pim.bfd_instance) ? "enabled" : "disabled")
+          dr_priority          = try(sub.pim.dr_priority, null)
+          passive              = try(sub.pim.passive, null)
+          sparse_mode          = try(sub.pim.sparse_mode, null)
+          border               = try(sub.pim.border, null)
+          dr_delay             = try(sub.pim.dr_delay, null)
+          join_prune_route_map = try(sub.pim.jp_policy, null)
+          neighbor_route_map   = try(sub.pim.neighbor_policy_route_map, null)
+          neighbor_prefix_list = try(sub.pim.neighbor_policy_prefix_list, null)
+          rfc_strict           = try(sub.pim.strict_rfc_compliant, null)
+        } if try(sub.pim, null) != null]
+      ]),
     )
   ])
   pim_interfaces_by_device_vrf = { for item in local.pim_interfaces :
@@ -233,6 +269,7 @@ resource "nxos_pim" "pim" {
     nxos_physical_interface.physical_interface,
     nxos_port_channel_interface.port_channel_interface,
     nxos_route_policy.route_policy,
+    nxos_subinterface.subinterface,
     nxos_svi_interface.svi_interface,
     nxos_vrf.vrf,
   ]

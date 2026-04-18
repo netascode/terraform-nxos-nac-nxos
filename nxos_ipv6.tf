@@ -73,6 +73,52 @@ locals {
         ipv6_addresses                           = try(int.ipv6.addresses, [])
         } if !try(int.switchport.enabled, true)
       ],
+      # Subinterfaces (ethernets)
+      flatten([for int in try(local.device_config[device.name].interfaces.ethernets, []) :
+        [for sub in try(int.subinterfaces, []) : {
+          device                                   = device.name
+          vrf                                      = try(sub.vrf, "default")
+          id                                       = "eth${int.id}.${sub.id}"
+          ipv6_address_autoconfig                  = try(sub.ipv6.address_autoconfig, null)
+          ipv6_nd_default_route                    = try(sub.ipv6.nd_default_route, null)
+          ipv6_forward                             = try(sub.ipv6.forward, null)
+          ipv6_link_local_use_bia                  = try(sub.ipv6.link_local_use_bia, null)
+          ipv6_address_use_link_local_only         = try(sub.ipv6.address_use_link_local_only, null)
+          ipv6_verify_unicast_source_reachable_via = try(sub.ipv6.verify_unicast_source_reachable_via, null)
+          ipv6_address_link_local                  = try(sub.ipv6.address_link_local, null)
+          ipv6_addresses                           = try(sub.ipv6.addresses, [])
+        } if try(sub.ipv6, null) != null]
+      ]),
+      # Subinterfaces (port channels)
+      flatten([for int in try(local.device_config[device.name].interfaces.port_channels, []) :
+        [for sub in try(int.subinterfaces, []) : {
+          device                                   = device.name
+          vrf                                      = try(sub.vrf, "default")
+          id                                       = "po${int.id}.${sub.id}"
+          ipv6_address_autoconfig                  = try(sub.ipv6.address_autoconfig, null)
+          ipv6_nd_default_route                    = try(sub.ipv6.nd_default_route, null)
+          ipv6_forward                             = try(sub.ipv6.forward, null)
+          ipv6_link_local_use_bia                  = try(sub.ipv6.link_local_use_bia, null)
+          ipv6_address_use_link_local_only         = try(sub.ipv6.address_use_link_local_only, null)
+          ipv6_verify_unicast_source_reachable_via = try(sub.ipv6.verify_unicast_source_reachable_via, null)
+          ipv6_address_link_local                  = try(sub.ipv6.address_link_local, null)
+          ipv6_addresses                           = try(sub.ipv6.addresses, [])
+        } if try(sub.ipv6, null) != null]
+      ]),
+      # Management interfaces
+      [for int in try(local.device_config[device.name].interfaces.management, []) : {
+        device                                   = device.name
+        vrf                                      = "management"
+        id                                       = "mgmt${int.id}"
+        ipv6_address_autoconfig                  = try(int.ipv6.address_autoconfig, null)
+        ipv6_nd_default_route                    = try(int.ipv6.nd_default_route, null)
+        ipv6_forward                             = try(int.ipv6.forward, null)
+        ipv6_link_local_use_bia                  = try(int.ipv6.link_local_use_bia, null)
+        ipv6_address_use_link_local_only         = try(int.ipv6.address_use_link_local_only, null)
+        ipv6_verify_unicast_source_reachable_via = try(int.ipv6.verify_unicast_source_reachable_via, null)
+        ipv6_address_link_local                  = try(int.ipv6.address_link_local, null)
+        ipv6_addresses                           = try(int.ipv6.addresses, [])
+      } if try(int.ipv6, null) != null],
     )
   ])
 }

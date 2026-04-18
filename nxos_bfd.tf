@@ -25,6 +25,24 @@ locals {
         id     = "po${int.id}"
         bfd    = try(int.bfd, null)
       } if try(int.bfd, null) != null],
+      # Subinterfaces (ethernets)
+      flatten([for eth in try(local.device_config[device.name].interfaces.ethernets, []) :
+        [for sub in try(eth.subinterfaces, []) : {
+          key    = format("%s/eth%s.%s", device.name, eth.id, sub.id)
+          device = device.name
+          id     = "eth${eth.id}.${sub.id}"
+          bfd    = try(sub.bfd, null)
+        } if try(sub.bfd, null) != null]
+      ]),
+      # Subinterfaces (port channels)
+      flatten([for pc in try(local.device_config[device.name].interfaces.port_channels, []) :
+        [for sub in try(pc.subinterfaces, []) : {
+          key    = format("%s/po%s.%s", device.name, pc.id, sub.id)
+          device = device.name
+          id     = "po${pc.id}.${sub.id}"
+          bfd    = try(sub.bfd, null)
+        } if try(sub.bfd, null) != null]
+      ]),
     )
   ])
 }
@@ -69,5 +87,6 @@ resource "nxos_bfd" "bfd" {
     nxos_svi_interface.svi_interface,
     nxos_loopback_interface.loopback_interface,
     nxos_port_channel_interface.port_channel_interface,
+    nxos_subinterface.subinterface,
   ]
 }

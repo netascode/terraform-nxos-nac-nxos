@@ -73,6 +73,52 @@ locals {
         ip_secondary_addresses                 = try(int.ip.secondary_addresses, [])
         } if !try(int.switchport.enabled, true)
       ],
+      # Subinterfaces (ethernets)
+      flatten([for int in try(local.device_config[device.name].interfaces.ethernets, []) :
+        [for sub in try(int.subinterfaces, []) : {
+          device                                 = device.name
+          vrf                                    = try(sub.vrf, "default")
+          id                                     = "eth${int.id}.${sub.id}"
+          drop_glean                             = null
+          forward                                = null
+          unnumbered                             = try(sub.ip.unnumbered, null)
+          ip_verify_unicast_source_reachable_via = try(sub.ip.verify_unicast_source_reachable_via, null)
+          ip_directed_broadcast                  = try(sub.ip.directed_broadcast, null)
+          ip_directed_broadcast_acl              = try(sub.ip.directed_broadcast_acl, null)
+          ip_address                             = try(sub.ip.address, null)
+          ip_secondary_addresses                 = try(sub.ip.secondary_addresses, [])
+        }]
+      ]),
+      # Subinterfaces (port channels)
+      flatten([for int in try(local.device_config[device.name].interfaces.port_channels, []) :
+        [for sub in try(int.subinterfaces, []) : {
+          device                                 = device.name
+          vrf                                    = try(sub.vrf, "default")
+          id                                     = "po${int.id}.${sub.id}"
+          drop_glean                             = null
+          forward                                = null
+          unnumbered                             = try(sub.ip.unnumbered, null)
+          ip_verify_unicast_source_reachable_via = try(sub.ip.verify_unicast_source_reachable_via, null)
+          ip_directed_broadcast                  = try(sub.ip.directed_broadcast, null)
+          ip_directed_broadcast_acl              = try(sub.ip.directed_broadcast_acl, null)
+          ip_address                             = try(sub.ip.address, null)
+          ip_secondary_addresses                 = try(sub.ip.secondary_addresses, [])
+        }]
+      ]),
+      # Management interfaces
+      [for int in try(local.device_config[device.name].interfaces.management, []) : {
+        device                                 = device.name
+        vrf                                    = "management"
+        id                                     = "mgmt${int.id}"
+        drop_glean                             = null
+        forward                                = null
+        unnumbered                             = null
+        ip_verify_unicast_source_reachable_via = null
+        ip_directed_broadcast                  = null
+        ip_directed_broadcast_acl              = null
+        ip_address                             = try(int.ip.address, null)
+        ip_secondary_addresses                 = try(int.ip.secondary_addresses, [])
+      } if try(int.ip, null) != null],
     )
   ])
 }

@@ -60,6 +60,24 @@ locals {
         interface_id = "po${int.id}"
         nd           = try(int.nd, {})
       } if try(int.nd, null) != null],
+      # Subinterfaces (ethernets)
+      flatten([for eth in try(local.device_config[device.name].interfaces.ethernets, []) :
+        [for sub in try(eth.subinterfaces, []) : {
+          device       = device.name
+          vrf          = try(sub.vrf, "default")
+          interface_id = "eth${eth.id}.${sub.id}"
+          nd           = try(sub.nd, {})
+        } if try(sub.nd, null) != null]
+      ]),
+      # Subinterfaces (port channels)
+      flatten([for pc in try(local.device_config[device.name].interfaces.port_channels, []) :
+        [for sub in try(pc.subinterfaces, []) : {
+          device       = device.name
+          vrf          = try(sub.vrf, "default")
+          interface_id = "po${pc.id}.${sub.id}"
+          nd           = try(sub.nd, {})
+        } if try(sub.nd, null) != null]
+      ]),
     )
   ])
 
@@ -520,6 +538,7 @@ resource "nxos_system" "system" {
     nxos_loopback_interface.loopback_interface,
     nxos_physical_interface.physical_interface,
     nxos_port_channel_interface.port_channel_interface,
+    nxos_subinterface.subinterface,
     nxos_svi_interface.svi_interface,
     nxos_vrf.vrf,
   ]
