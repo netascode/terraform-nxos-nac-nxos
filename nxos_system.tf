@@ -114,6 +114,7 @@ resource "nxos_system" "system" {
     try(local.device_config[device.name].udld, null) != null ||
     try(local.device_config[device.name].vpc.ip_arp_synchronize, null) != null ||
     try(local.device_config[device.name].vpc.ipv6_nd_synchronize, null) != null ||
+    try(local.device_config[device.name].system.nxapi, null) != null ||
     length(try(local.nd_interfaces_by_device[device.name], [])) > 0 ||
   length(try(local.device_config[device.name].interfaces.management, [])) > 0 }
   device = each.key
@@ -386,6 +387,21 @@ resource "nxos_system" "system" {
   # udldInst attributes
   udld_aggressive       = try(local.device_config[each.key].udld.aggressive, null) == null ? null : (try(local.device_config[each.key].udld.aggressive) ? "enabled" : "disabled")
   udld_message_interval = try(local.device_config[each.key].udld.message_time, null)
+
+  # nxapiInst attributes
+  nxapi_vrf                               = try(local.device_config[each.key].system.nxapi.vrf, null)
+  nxapi_http_port                         = try(local.device_config[each.key].system.nxapi.http_port, null)
+  nxapi_https_port                        = try(local.device_config[each.key].system.nxapi.https_port, null)
+  nxapi_idle_timeout                      = try(local.device_config[each.key].system.nxapi.idle_timeout, null)
+  nxapi_certificate_enable                = try(local.device_config[each.key].system.nxapi.certificate_enable, null) == null ? null : try(local.device_config[each.key].system.nxapi.certificate_enable)
+  nxapi_certificate_file                  = try(local.device_config[each.key].system.nxapi.certificate_httpscrt, null)
+  nxapi_key_file                          = try(local.device_config[each.key].system.nxapi.certificate_httpskey, null)
+  nxapi_encrypted_key_passphrase          = try(local.device_config[each.key].system.nxapi.certificate_httpskey_passphrase, null)
+  nxapi_trustpoint                        = try(local.device_config[each.key].system.nxapi.certificate_trustpoint, null)
+  nxapi_ssl_protocols                     = try(local.device_config[each.key].system.nxapi.ssl_protocols, null)
+  nxapi_ssl_ciphers_weak                  = try(local.device_config[each.key].system.nxapi.ssl_ciphers_weak, null) == null ? null : try(local.device_config[each.key].system.nxapi.ssl_ciphers_weak)
+  nxapi_client_certificate_authentication = try(local.device_config[each.key].system.nxapi.client_cert_auth, null)
+  nxapi_sudi                              = try(local.device_config[each.key].system.nxapi.sudi, null) == null ? null : try(local.device_config[each.key].system.nxapi.sudi)
 
   depends_on = [
     nxos_feature.feature,
