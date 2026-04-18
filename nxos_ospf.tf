@@ -1,5 +1,5 @@
 locals {
-  ospf_interfaces = concat(local.interfaces_ethernets, local.interfaces_loopbacks, local.interfaces_vlans, local.interfaces_port_channels)
+  ospf_interfaces = concat(local.interfaces_ethernets, local.interfaces_loopbacks, local.interfaces_vlans, local.interfaces_port_channels, local.interfaces_subinterfaces)
 }
 
 resource "nxos_ospf" "ospf" {
@@ -217,6 +217,7 @@ resource "nxos_ospf" "ospf" {
     nxos_loopback_interface.loopback_interface,
     nxos_physical_interface.physical_interface,
     nxos_port_channel_interface.port_channel_interface,
+    nxos_subinterface.subinterface,
     nxos_svi_interface.svi_interface,
     nxos_vrf.vrf,
   ]
