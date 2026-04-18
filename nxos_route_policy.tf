@@ -56,6 +56,7 @@ resource "nxos_route_policy" "route_policy" {
       set_metric_load        = try(entry.set_metric_load, null)
       set_metric_mtu         = try(entry.set_metric_mtu, null)
       set_metric_reliability = try(entry.set_metric_reliability, null)
+      set_metric_type        = try(entry.set_metric_type, null)
     } }
   } }
 }
