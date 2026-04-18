@@ -1,0 +1,1 @@
+- Add `snmp.global_enforce_priv`, `snmp.logging_level`, `snmp.traps` granular per-category trap control, and `snmp.hosts.vrf` support
