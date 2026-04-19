@@ -1,0 +1,2 @@
+- Add `tag` support for IPv4 interface addresses (primary and secondary)
+- BREAKING CHANGE: `secondary_addresses` under `ip` changed from a list of strings to a list of objects with `address` and optional `tag` attributes
