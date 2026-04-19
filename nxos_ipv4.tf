@@ -27,6 +27,7 @@ locals {
         ip_directed_broadcast                  = try(int.ip.directed_broadcast, null)
         ip_directed_broadcast_acl              = try(int.ip.directed_broadcast_acl, null)
         ip_address                             = try(int.ip.address, null)
+        ip_tag                                 = try(int.ip.tag, null)
         ip_secondary_addresses                 = try(int.ip.secondary_addresses, [])
         } if !try(int.switchport.enabled, true) && try(int.channel_group, null) == null
       ],
@@ -42,6 +43,7 @@ locals {
         ip_directed_broadcast                  = null
         ip_directed_broadcast_acl              = null
         ip_address                             = try(int.ip.address, null)
+        ip_tag                                 = try(int.ip.tag, null)
         ip_secondary_addresses                 = try(int.ip.secondary_addresses, [])
       }],
       # SVIs
@@ -56,6 +58,7 @@ locals {
         ip_directed_broadcast                  = try(int.ip.directed_broadcast, null)
         ip_directed_broadcast_acl              = try(int.ip.directed_broadcast_acl, null)
         ip_address                             = try(int.ip.address, null)
+        ip_tag                                 = try(int.ip.tag, null)
         ip_secondary_addresses                 = try(int.ip.secondary_addresses, [])
       }],
       # Port channels (L3 only)
@@ -70,6 +73,7 @@ locals {
         ip_directed_broadcast                  = try(int.ip.directed_broadcast, null)
         ip_directed_broadcast_acl              = try(int.ip.directed_broadcast_acl, null)
         ip_address                             = try(int.ip.address, null)
+        ip_tag                                 = try(int.ip.tag, null)
         ip_secondary_addresses                 = try(int.ip.secondary_addresses, [])
         } if !try(int.switchport.enabled, true)
       ],
@@ -86,6 +90,7 @@ locals {
           ip_directed_broadcast                  = try(sub.ip.directed_broadcast, null)
           ip_directed_broadcast_acl              = try(sub.ip.directed_broadcast_acl, null)
           ip_address                             = try(sub.ip.address, null)
+          ip_tag                                 = try(sub.ip.tag, null)
           ip_secondary_addresses                 = try(sub.ip.secondary_addresses, [])
         }]
       ]),
@@ -102,6 +107,7 @@ locals {
           ip_directed_broadcast                  = try(sub.ip.directed_broadcast, null)
           ip_directed_broadcast_acl              = try(sub.ip.directed_broadcast_acl, null)
           ip_address                             = try(sub.ip.address, null)
+          ip_tag                                 = try(sub.ip.tag, null)
           ip_secondary_addresses                 = try(sub.ip.secondary_addresses, [])
         }]
       ]),
@@ -117,6 +123,7 @@ locals {
         ip_directed_broadcast                  = null
         ip_directed_broadcast_acl              = null
         ip_address                             = try(int.ip.address, null)
+        ip_tag                                 = try(int.ip.tag, null)
         ip_secondary_addresses                 = try(int.ip.secondary_addresses, [])
       } if try(int.ip, null) != null],
     )
@@ -178,8 +185,8 @@ resource "nxos_ipv4" "ipv4" {
           directed_broadcast_acl = int.ip_directed_broadcast_acl
 
           addresses = merge(
-            int.ip_address != null ? { (int.ip_address) = { type = "primary" } } : {},
-            { for ip in int.ip_secondary_addresses : ip => { type = "secondary" } }
+            int.ip_address != null ? { (int.ip_address) = { type = "primary", tag = int.ip_tag } } : {},
+            { for sec in int.ip_secondary_addresses : sec.address => { type = "secondary", tag = try(sec.tag, null) } }
           )
         } if int.device == each.key && int.vrf == "default" }
       }
@@ -211,8 +218,8 @@ resource "nxos_ipv4" "ipv4" {
         directed_broadcast_acl = int.ip_directed_broadcast_acl
 
         addresses = merge(
-          int.ip_address != null ? { (int.ip_address) = { type = "primary" } } : {},
-          { for ip in int.ip_secondary_addresses : ip => { type = "secondary" } }
+          int.ip_address != null ? { (int.ip_address) = { type = "primary", tag = int.ip_tag } } : {},
+          { for sec in int.ip_secondary_addresses : sec.address => { type = "secondary", tag = try(sec.tag, null) } }
         )
       } if int.device == each.key && int.vrf == vrf.name }
     } }
