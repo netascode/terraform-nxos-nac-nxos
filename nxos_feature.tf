@@ -18,6 +18,7 @@ resource "nxos_feature" "feature" {
   ngmvpn         = try(local.device_config[each.key].feature.ngmvpn, null) == null ? null : (try(local.device_config[each.key].feature.ngmvpn) ? "enabled" : "disabled")
   ngoam          = try(local.device_config[each.key].feature.ngoam, null) == null ? null : (try(local.device_config[each.key].feature.ngoam) ? "enabled" : "disabled")
   nv_overlay     = try(local.device_config[each.key].feature.nv_overlay, null) == null ? null : (try(local.device_config[each.key].feature.nv_overlay) ? "enabled" : "disabled")
+  nxapi          = try(local.device_config[each.key].feature.nxapi, null) == null ? null : (try(local.device_config[each.key].feature.nxapi) ? "enabled" : "disabled")
   ospf           = try(local.device_config[each.key].feature.ospf, null) == null ? null : (try(local.device_config[each.key].feature.ospf) ? "enabled" : "disabled")
   ospfv3         = try(local.device_config[each.key].feature.ospfv3, null) == null ? null : (try(local.device_config[each.key].feature.ospfv3) ? "enabled" : "disabled")
   pim            = try(local.device_config[each.key].feature.pim, null) == null ? null : (try(local.device_config[each.key].feature.pim) ? "enabled" : "disabled")
