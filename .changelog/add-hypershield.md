@@ -1,0 +1,1 @@
+- Add Hypershield (Service Acceleration) support

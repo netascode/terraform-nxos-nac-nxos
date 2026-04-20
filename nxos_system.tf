@@ -177,6 +177,15 @@ locals {
     }
   } }
 
+  hypershield_source_interface_type_map = {
+    "ethernet"     = "eth"
+    "loopback"     = "lo"
+    "mgmt"         = "mgmt"
+    "port-channel" = "po"
+    "vlan"         = "vlan"
+    "vni"          = "vni"
+  }
+
   nd_control_values = {
     "redirects"       = "redirects"
     "managed_cfg"     = "managed-cfg"
@@ -222,6 +231,7 @@ resource "nxos_system" "system" {
     try(local.device_config[device.name].vpc.ip_arp_synchronize, null) != null ||
     try(local.device_config[device.name].vpc.ipv6_nd_synchronize, null) != null ||
     try(local.device_config[device.name].system.nxapi, null) != null ||
+    try(local.device_config[device.name].system.hypershield, null) != null ||
     length(try(local.nd_interfaces_by_device[device.name], [])) > 0 ||
     length(try(local.cdp_interfaces_by_device[device.name], [])) > 0 ||
     length(try(local.lldp_interfaces_by_device[device.name], [])) > 0 ||
@@ -541,6 +551,17 @@ resource "nxos_system" "system" {
   nxapi_ssl_ciphers_weak                  = try(local.device_config[each.key].system.nxapi.ssl_ciphers_weak, null) == null ? null : try(local.device_config[each.key].system.nxapi.ssl_ciphers_weak)
   nxapi_client_certificate_authentication = try(local.device_config[each.key].system.nxapi.client_cert_auth, null)
   nxapi_sudi                              = try(local.device_config[each.key].system.nxapi.sudi, null) == null ? null : try(local.device_config[each.key].system.nxapi.sudi)
+
+  # sasSas / sasSvcInstance / sasSController / sasFwSvcPolicy / sasDom (hypershield)
+  hypershield = try(local.device_config[each.key].system.hypershield, null) != null ? { "hypershield" = {
+    source_interface              = try(local.device_config[each.key].system.hypershield.source_interface_type, null) != null ? "${local.hypershield_source_interface_type_map[local.device_config[each.key].system.hypershield.source_interface_type]}${try(local.device_config[each.key].system.hypershield.source_interface_id, "")}" : null
+    controller_https_proxy_server = try(local.device_config[each.key].system.hypershield.https_proxy, null)
+    controller_https_proxy_port   = try(local.device_config[each.key].system.hypershield.https_proxy_port, null)
+    firewall_policy_admin_state   = try(local.device_config[each.key].system.hypershield.firewall_in_service, null) == null ? null : (try(local.device_config[each.key].system.hypershield.firewall_in_service) ? "in-service" : "out-of-service")
+    vrfs = { for vrf in try(local.device_config[each.key].system.hypershield.firewall_vrfs, []) : vrf.name => {
+      affinity = try(vrf.module_affinity, null)
+    } }
+  } } : {}
 
   depends_on = [
     nxos_feature.feature,
