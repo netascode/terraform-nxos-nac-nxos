@@ -553,7 +553,7 @@ resource "nxos_system" "system" {
   nxapi_sudi                              = try(local.device_config[each.key].system.nxapi.sudi, null) == null ? null : try(local.device_config[each.key].system.nxapi.sudi)
 
   # sasSas / sasSvcInstance / sasSController / sasFwSvcPolicy / sasDom (hypershield)
-  hypershield = try(local.device_config[each.key].system.hypershield, null) != null ? { "hypershield" = {
+  service_instances = try(local.device_config[each.key].system.hypershield, null) != null ? { "hypershield" = {
     source_interface              = try(local.device_config[each.key].system.hypershield.source_interface_type, null) != null ? "${local.hypershield_source_interface_type_map[local.device_config[each.key].system.hypershield.source_interface_type]}${try(local.device_config[each.key].system.hypershield.source_interface_id, "")}" : null
     controller_https_proxy_server = try(local.device_config[each.key].system.hypershield.https_proxy, null)
     controller_https_proxy_port   = try(local.device_config[each.key].system.hypershield.https_proxy_port, null)
