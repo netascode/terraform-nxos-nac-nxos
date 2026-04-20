@@ -198,6 +198,7 @@ resource "nxos_system" "system" {
     try(local.device_config[device.name].system.cfs_ipv4_mcast_address, null) != null ||
     try(local.device_config[device.name].system.cfs_ipv6_distribute, null) != null ||
     try(local.device_config[device.name].system.cfs_ipv6_mcast_address, null) != null ||
+    length(try(local.device_config[device.name].system.interface_breakout_modules, [])) > 0 ||
     length(try(local.device_config[device.name].system.cli_aliases, [])) > 0 ||
     try(local.device_config[device.name].system.copp_profile, null) != null ||
     try(local.device_config[device.name].system.copp_rate_limit, null) != null ||
@@ -344,6 +345,13 @@ resource "nxos_system" "system" {
   boot_image_verification    = try(local.device_config[each.key].system.boot.image_verify, null) == null ? null : (try(local.device_config[each.key].system.boot.image_verify) ? "enable" : "disable")
   boot_image_supervisor_1    = try(local.device_config[each.key].system.boot.nxos_image_sup_1, null)
   boot_image_supervisor_2    = try(local.device_config[each.key].system.boot.nxos_image_sup_2, null)
+
+  # imBreakout / imMod / imFpP nested maps
+  breakout_modules = { for mod in try(local.device_config[each.key].system.interface_breakout_modules, []) : mod.id => {
+    front_panel_ports = { for port in try(mod.ports, []) : port.id => {
+      breakout_map = try(port.map, null)
+    } }
+  } }
 
   # cfsEntity / cfsInst attributes
   cfs_distribute             = try(local.device_config[each.key].system.cfs_distribute, null) == null ? null : (try(local.device_config[each.key].system.cfs_distribute) ? "enabled" : "disabled")
