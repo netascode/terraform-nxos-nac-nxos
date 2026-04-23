@@ -1,0 +1,2 @@
+- Add port-channel `shutdown_lan`, `buffer_boost`, `flowcontrol_receive`, and `flowcontrol_send` support
+- Add port-channel `storm_control` support
