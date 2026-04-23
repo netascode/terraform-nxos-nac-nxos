@@ -1,7 +1,15 @@
+locals {
+  community_list_mode_map = {
+    "standard" = "standard"
+    "expanded" = "regex"
+  }
+}
+
 resource "nxos_route_policy" "route_policy" {
   for_each = { for device in local.devices : device.name => device
     if length(try(local.device_config[device.name].ip_prefix_lists, [])) > 0 ||
-  length(try(local.device_config[device.name].route_maps, [])) > 0 }
+    length(try(local.device_config[device.name].route_maps, [])) > 0 ||
+  length(try(local.device_config[device.name].community_lists, [])) > 0 }
   device = each.key
 
   ipv4_prefix_lists = { for pl in try(local.device_config[each.key].ip_prefix_lists, []) : pl.name => {
@@ -63,6 +71,18 @@ resource "nxos_route_policy" "route_policy" {
       set_next_hop_v6_peer_address     = try(entry.set_ipv6_next_hop_peer_address, null) != null ? (try(entry.set_ipv6_next_hop_peer_address) ? "enabled" : "disabled") : null
       set_next_hop_v6_unchanged        = try(entry.set_ipv6_next_hop_unchanged, null) != null ? (try(entry.set_ipv6_next_hop_unchanged) ? "enabled" : "disabled") : null
       set_next_hop_v6_redist_unchanged = try(entry.set_ipv6_next_hop_redist_unchanged, null) != null ? (try(entry.set_ipv6_next_hop_redist_unchanged) ? "enabled" : "disabled") : null
+    } }
+  } }
+
+  community_lists = { for cl in try(local.device_config[each.key].community_lists, []) : cl.name => {
+    mode = try(local.community_list_mode_map[try(cl.mode)], null)
+    type = try(cl.type, null)
+
+    entries = { for entry in try(cl.entries, []) : entry.seq => {
+      action = try(entry.action, null)
+      regex  = try(entry.regex, null)
+
+      items = { for community in try(entry.communities, []) : community => {} }
     } }
   } }
 }
