@@ -1,0 +1,1 @@
+- Add `sflow` support including `sflow.agent_address`, `sflow.sampling_rate`, `sflow.max_header_size`, `sflow.max_datagram_size`, `sflow.counter_poll_interval`, `sflow.extended_bgp`, `sflow.extended_switch`, `sflow.collector_address`, `sflow.collector_port`, `sflow.collector_source`, and `sflow.collector_vrf`
