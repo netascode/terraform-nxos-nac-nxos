@@ -76,7 +76,6 @@ resource "nxos_route_policy" "route_policy" {
 
   community_lists = { for cl in try(local.device_config[each.key].community_lists, []) : cl.name => {
     mode = try(local.community_list_mode_map[try(cl.mode)], null)
-    type = try(cl.type, null)
 
     entries = { for entry in try(cl.entries, []) : entry.seq => {
       action = try(entry.action, null)
