@@ -84,6 +84,7 @@ resource "nxos_cli" "cli_0" {
     nxos_dhcp.dhcp,
     nxos_evpn.evpn,
     nxos_feature.feature,
+    nxos_hardware_telemetry.hardware_telemetry,
     nxos_hmm.hmm,
     nxos_hsrp.hsrp,
     nxos_icmpv4.icmpv4,
