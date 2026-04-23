@@ -1,6 +1,7 @@
 resource "nxos_feature" "feature" {
   for_each = { for device in local.devices : device.name => device
-  if try(local.device_config[device.name].feature, null) != null }
+    if try(local.device_config[device.name].feature, null) != null ||
+  try(local.device_config[device.name].feature_set, null) != null }
   device               = each.key
   bash_shell           = try(local.device_config[each.key].feature.bash_shell, null) == null ? null : (try(local.device_config[each.key].feature.bash_shell) ? "enabled" : "disabled")
   bfd                  = try(local.device_config[each.key].feature.bfd, null) == null ? null : (try(local.device_config[each.key].feature.bfd) ? "enabled" : "disabled")
@@ -32,4 +33,9 @@ resource "nxos_feature" "feature" {
   udld                 = try(local.device_config[each.key].feature.udld, null) == null ? null : (try(local.device_config[each.key].feature.udld) ? "enabled" : "disabled")
   vn_segment           = try(local.device_config[each.key].feature.vn_segment_vlan_based, null) == null ? null : (try(local.device_config[each.key].feature.vn_segment_vlan_based) ? "enabled" : "disabled")
   vpc                  = try(local.device_config[each.key].feature.vpc, null) == null ? null : (try(local.device_config[each.key].feature.vpc) ? "enabled" : "disabled")
+  feature_sets = merge(
+    try(local.device_config[each.key].feature_set.fex, null) == null ? {} : { "fex" = { admin_state = try(local.device_config[each.key].feature_set.fex) ? "enabled" : "disabled" } },
+    try(local.device_config[each.key].feature_set.mpls, null) == null ? {} : { "mpls" = { admin_state = try(local.device_config[each.key].feature_set.mpls) ? "enabled" : "disabled" } },
+    try(local.device_config[each.key].feature_set.virtualization, null) == null ? {} : { "virtualization" = { admin_state = try(local.device_config[each.key].feature_set.virtualization) ? "enabled" : "disabled" } },
+  )
 }
