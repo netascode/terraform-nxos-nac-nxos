@@ -99,7 +99,7 @@ resource "nxos_port_channel_interface" "port_channel_interface" {
   if length(try(local.device_config[device.name].interfaces.port_channels, [])) > 0 }
   device = each.key
   port_channel_interfaces = { for int in try(local.device_config[each.key].interfaces.port_channels, []) : "po${int.id}" => {
-    channel_group_mode                         = try([for eth in try(local.device_config[each.key].interfaces.ethernets, []) : try(eth.channel_group_mode, null) if try(eth.channel_group, null) == int.id][0], null)
+    port_channel_mode                          = try([for eth in try(local.device_config[each.key].interfaces.ethernets, []) : try(eth.channel_group_mode, null) if try(eth.channel_group, null) == int.id][0], null)
     minimum_links                              = try(int.lacp_min_links, null)
     maximum_links                              = try(int.lacp_max_bundle, null)
     suspend_individual                         = try(int.lacp_suspend_individual, null) != null ? (try(int.lacp_suspend_individual) ? "enable" : "disable") : null
