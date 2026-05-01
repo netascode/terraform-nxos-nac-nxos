@@ -1,5 +1,0 @@
-- Add `template_directories` variable for specifying directories containing template files
-- Add `template_files` variable for specifying individual template files
-- Remove `write_default_values_file` variable
-- Remove `default_values` and `model` outputs
-- Remove `modules/model` submodule, model rendering is now performed by the `utils` provider

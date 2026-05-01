@@ -1,2 +1,0 @@
-- Fix spanning tree control flag idempotency issue
-- Fix empty flag mapping pattern causing unnecessary diffs across multiple resources

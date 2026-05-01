@@ -1,1 +1,0 @@
-- BREAKING CHANGE: Move `arp.vpc_domains` and `nd.vpc_domains` to `vpc.ip_arp_synchronize` and `vpc.ipv6_nd_synchronize`

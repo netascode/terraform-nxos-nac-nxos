@@ -1,1 +1,0 @@
-- Add route map `set_ip_next_hop_peer_address`, `set_ip_next_hop_unchanged`, `set_ip_next_hop_redist_unchanged`, `set_ipv6_next_hop_peer_address`, `set_ipv6_next_hop_unchanged`, and `set_ipv6_next_hop_redist_unchanged` support

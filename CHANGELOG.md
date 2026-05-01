@@ -1,3 +1,71 @@
+## 0.2.0
+
+- Add AAA authentication, authorization, and accounting support
+- Add TACACS+ server group server members support
+- Add `ip_access_lists.ignore_routable` and ACL entry attributes `rev`, `tcp_flags_mask`, `tcp_option_length`, `igmp_type`, `capture_session`, `dscp_mask`, `load_share`, `priority_all`, `protocol_mask`, `redirect_all`, `telemetry_path`, `telemetry_queue`, `tos`, and `ttl`
+- Add `bfd.echo_interface_type`, `bfd.echo_interface_id`, `bfd.hardware_offload`, `bfd.slow_timer`, `bfd.startup_timer`, and interface-level BFD support
+- Add community list support
+- Remove unsupported `type` attribute from community lists
+- Add `feature_set` support for FEX, MPLS, and virtualization feature-sets
+- Add Hypershield (Service Acceleration) support
+- Add `system.ipv6_adjacency_stale_timer`, `system.ipv6_adjacency_stale_timer_icmp`, `system.ipv6_redirect_syslog`, `system.ipv6_redirect_syslog_interval`, `interfaces.*.ipv6.redirects`, and `interfaces.*.ipv6.unreachables` ICMPv6 support
+- Add interface breakout module and port configuration support
+- Add per-interface CDP support for ethernets, port-channels, and management interfaces
+- Add per-interface LLDP support for ethernets, port-channels, and management interfaces
+- Add per-interface UDLD support for ethernets
+- Add `tag` support for IPv4 interface addresses (primary and secondary)
+- BREAKING CHANGE: `secondary_addresses` under `ip` changed from a list of strings to a list of objects with `address` and optional `tag` attributes
+- Add `logging.logging`, `logging.logfile_name`, `logging.logfile_severity`, `logging.logfile_size`, `logging.logfile_persistent_threshold`, `logging.source_interface_type`, `logging.source_interface_id`, `logging.timestamp`, `logging.monitor_severity`, `logging.console_severity`, `logging.origin_id_type`, `logging.origin_id_value`, and `logging.servers` support
+- Add logging `console` and `monitor` attributes
+- Add `interfaces.management.vrf` support
+- Add subinterface module mappings
+- Add interface-level BFD, IPv4, IPv6, PIM, and system module mappings for previously unsupported interface types
+- Add `ntp.source_interface_type`, `ntp.source_interface_id`, `ntp.access_group_match_all`, `ntp.access_group_peer`, `ntp.access_group_query_only`, `ntp.access_group_serve`, and `ntp.access_group_serve_only` support
+- Add `nxapi` feature flag support
+- Add OSPF route redistribution support
+- Add physical interface `shutdown_lan`, `buffer_boost`, `flowcontrol_receive`, `flowcontrol_send`, and `mac_address` support
+- Add physical interface switchport `autostate_exclude_vlans`, `block`, `isolated`, and `mac_learning` support
+- Add physical interface `storm_control` support
+- Add port-channel `shutdown_lan`, `buffer_boost`, `flowcontrol_receive`, and `flowcontrol_send` support
+- Add port-channel `storm_control` support
+- Fix port-channel `port_channel_mode` attribute mapping
+- Add route map `set_metric_type` support
+- Add route map `set_metric`, `set_metric_is_bgp`, `set_metric_delay`, `set_metric_load`, `set_metric_mtu`, and `set_metric_reliability` support
+- Add route map `set_ip_next_hop_peer_address`, `set_ip_next_hop_unchanged`, `set_ip_next_hop_redist_unchanged`, `set_ipv6_next_hop_peer_address`, `set_ipv6_next_hop_unchanged`, and `set_ipv6_next_hop_redist_unchanged` support
+- Add `sflow` support including `sflow.agent_address`, `sflow.sampling_rate`, `sflow.max_header_size`, `sflow.max_datagram_size`, `sflow.counter_poll_interval`, `sflow.extended_bgp`, `sflow.extended_switch`, `sflow.collector_address`, `sflow.collector_port`, `sflow.collector_source`, and `sflow.collector_vrf`
+- Add `snmp.global_enforce_priv`, `snmp.logging_level`, `snmp.traps` granular per-category trap control, and `snmp.hosts.vrf` support
+- Add `snmp` support including `snmp.contact`, `snmp.location`, `snmp.engine_id`, `snmp.packetsize`, `snmp.tcp_session_auth`, `snmp.source_interface_type`, `snmp.source_interface_id`, `snmp.enable_traps`, `snmp.users`, `snmp.hosts`, and `snmp.rmon_events`
+- Add `spanning_tree.port_type_edge_default`, `spanning_tree.port_type_edge_bpdufilter_default`, `spanning_tree.port_type_edge_bpduguard_default`, `spanning_tree.vlans`, and interface-level `spanning_tree.mst_pre_standard` and `spanning_tree.mst_simulate_pvst` support
+- Add `system.boot` support
+- Add `system.cfs_distribute`, `system.cfs_eth_distribute`, `system.cfs_ipv4_distribute`, `system.cfs_ipv4_mcast_address`, `system.cfs_ipv6_distribute`, and `system.cfs_ipv6_mcast_address` support
+- Add `system.cli_aliases` support
+- Add `system.copp_profile` and `system.copp_rate_limit` support
+- Add `system.clock.format`, `system.clock.format_show_timezone_debug`, `system.clock.format_show_timezone_syslog`, and `system.clock.protocol` support
+- Add `system.clock` timezone and summer time support
+- Add `system.icam_monitor_interval`, `system.icam_monitor_intervals`, `system.icam_monitor_scale`, and ICAM threshold support
+- Add `system.platform` support
+- Add `system.smart_licensing_transport` and `system.smart_licensing_url_cslu` support
+- Add `system.terminal_console_exec_timeout`, `system.line_vty_exec_timeout`, and `system.line_vty_session_limit` support
+- Add `system.vdcs` support
+- Add `nd.vpc_domains` support
+- Add `cdp` support
+- Add `dns` support
+- Add `lldp` support
+- Add `udld` support
+- Add `interfaces.management` support
+- Add `system.nxapi` support
+- BREAKING CHANGE: Move `arp.vpc_domains` and `nd.vpc_domains` to `vpc.ip_arp_synchronize` and `vpc.ipv6_nd_synchronize`
+- Add `system.line_vty_access_class_in` and `system.line_vty_access_class_out` support
+- BREAKING CHANGE: Bump required `nxos` provider version from `0.8.0` to `0.10.2`. Existing `nxos_feature` state entries must be removed and re-imported after upgrading (`terraform state rm 'module.<name>.nxos_feature.feature[\"<device>\"]'` followed by `terraform plan` to let the module recreate them)
+- Fix `dns.domain_name` mapping to use correct `dns_profiles` attribute structure
+- Fix spanning tree control flag idempotency issue
+- Fix empty flag mapping pattern causing unnecessary diffs across multiple resources
+- Add `template_directories` variable for specifying directories containing template files
+- Add `template_files` variable for specifying individual template files
+- Remove `write_default_values_file` variable
+- Remove `default_values` and `model` outputs
+- Remove `modules/model` submodule, model rendering is now performed by the `utils` provider
+
 ## 0.1.0
 
 - Initial release

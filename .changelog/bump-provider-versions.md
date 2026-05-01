@@ -1,1 +1,0 @@
-- BREAKING CHANGE: Bump required `nxos` provider version from `0.8.0` to `0.10.2`. Existing `nxos_feature` state entries must be removed and re-imported after upgrading (`terraform state rm 'module.<name>.nxos_feature.feature[\"<device>\"]'` followed by `terraform plan` to let the module recreate them)

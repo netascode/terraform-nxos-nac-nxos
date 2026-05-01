@@ -1,1 +1,0 @@
-- Fix `dns.domain_name` mapping to use correct `dns_profiles` attribute structure
