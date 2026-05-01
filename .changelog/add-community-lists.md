@@ -1,1 +1,2 @@
 - Add community list support
+- Remove unsupported `type` attribute from community lists
