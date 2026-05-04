@@ -103,6 +103,7 @@ No outputs.
 | [nxos_physical_interface.physical_interface](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.11.1/docs/resources/physical_interface) | resource |
 | [nxos_pim.pim](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.11.1/docs/resources/pim) | resource |
 | [nxos_port_channel_interface.port_channel_interface](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.11.1/docs/resources/port_channel_interface) | resource |
+| [nxos_ptp.ptp](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.11.1/docs/resources/ptp) | resource |
 | [nxos_queuing_qos.queuing_qos](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.11.1/docs/resources/queuing_qos) | resource |
 | [nxos_route_policy.route_policy](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.11.1/docs/resources/route_policy) | resource |
 | [nxos_save_config.save_config](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.11.1/docs/resources/save_config) | resource |
