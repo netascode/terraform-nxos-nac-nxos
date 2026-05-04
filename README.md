@@ -81,6 +81,7 @@ No outputs.
 | [nxos_cli.cli_9](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.11.1/docs/resources/cli) | resource |
 | [nxos_default_qos.default_qos](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.11.1/docs/resources/default_qos) | resource |
 | [nxos_dhcp.dhcp](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.11.1/docs/resources/dhcp) | resource |
+| [nxos_esg.esg](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.11.1/docs/resources/esg) | resource |
 | [nxos_evpn.evpn](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.11.1/docs/resources/evpn) | resource |
 | [nxos_feature.feature](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.11.1/docs/resources/feature) | resource |
 | [nxos_hardware_telemetry.hardware_telemetry](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.11.1/docs/resources/hardware_telemetry) | resource |

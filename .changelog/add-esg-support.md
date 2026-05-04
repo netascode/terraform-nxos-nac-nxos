@@ -1,0 +1,1 @@
+- Add ESG (Endpoint Security Group) support including security groups, selectors, class maps, policy maps, and VRF domain security enforcement
