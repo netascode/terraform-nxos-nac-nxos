@@ -1,0 +1,1 @@
+- Add NVE platform configuration support including `system.nve_ipmc_index_size`, `system.nve_overlay_vlan_id`, and `system.nve_infra_vlans`

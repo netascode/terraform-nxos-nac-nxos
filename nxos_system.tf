@@ -244,6 +244,9 @@ resource "nxos_system" "system" {
     try(local.device_config[device.name].system.icam_monitor_interval, null) != null ||
     try(local.device_config[device.name].system.icam_monitor_intervals, null) != null ||
     try(local.device_config[device.name].system.icam_monitor_scale, null) != null ||
+    try(local.device_config[device.name].system.nve_ipmc_index_size, null) != null ||
+    try(local.device_config[device.name].system.nve_overlay_vlan_id, null) != null ||
+    length(try(local.device_config[device.name].system.nve_infra_vlans, [])) > 0 ||
     try(local.device_config[device.name].system.platform, null) != null ||
     try(local.device_config[device.name].system.smart_licensing_transport, null) != null ||
     try(local.device_config[device.name].system.smart_licensing_url_cslu, null) != null ||
@@ -487,6 +490,19 @@ resource "nxos_system" "system" {
   platform_unknown_unicast_flood                     = try(local.device_config[each.key].system.platform.unknown_unicast_flood, null) == null ? null : (try(local.device_config[each.key].system.platform.unknown_unicast_flood) ? "enabled" : "disabled")
   platform_urpf_status                               = try(local.device_config[each.key].system.platform.urpf, null) == null ? null : (try(local.device_config[each.key].system.platform.urpf) ? "enabled" : "disabled")
   platform_wrr_unicast_bandwidth                     = try(local.device_config[each.key].system.platform.wrr_unicast_bandwidth, null)
+
+  # platformNVE / platformInfraVlan nested maps
+  platform_nve_interfaces = (try(local.device_config[each.key].system.nve_ipmc_index_size, null) != null ||
+    try(local.device_config[each.key].system.nve_overlay_vlan_id, null) != null ||
+    length(try(local.device_config[each.key].system.nve_infra_vlans, [])) > 0) ? {
+    "1" = {
+      ipmc_index_size = try(local.device_config[each.key].system.nve_ipmc_index_size, null)
+      overlay_vlan_id = try(local.device_config[each.key].system.nve_overlay_vlan_id, null)
+      infra_vlans = { for vlan in try(local.device_config[each.key].system.nve_infra_vlans, []) : vlan.id => {
+        force = try(vlan.force, null) == null ? null : (try(vlan.force) ? "Enable" : "Disable")
+      } }
+    }
+  } : {}
 
   # nwVdc nested map
   vdcs = { for vdc in try(local.device_config[each.key].system.vdcs, []) : vdc.id => {
