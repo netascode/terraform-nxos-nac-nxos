@@ -121,4 +121,6 @@ resource "nxos_route_policy" "route_policy" {
       items = { for community in try(entry.communities, []) : community => {} }
     } }
   } }
+
+  depends_on = [nxos_access_list.access_list]
 }
