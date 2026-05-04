@@ -9,18 +9,14 @@ resource "nxos_esg" "esg" {
   mac_segmentation = try(local.device_config[each.key].security_group.mac_segmentation, null)
 
   security_groups = { for sg in try(local.device_config[each.key].security_group.security_groups, []) : sg.id => {
-    name = try(sg.name, null)
-
+    name                              = try(sg.name, null)
     selector_connected_endpoints_ipv4 = { for ep in try(sg.match_connected_endpoints_ipv4, []) : "${ep.vrf};${ep.address}" => {} }
-
     selector_connected_endpoints_ipv6 = { for ep in try(sg.match_connected_endpoints_ipv6, []) : "${ep.vrf};${ep.address}" => {} }
-
-    selector_match_vlans = { for vlan in try(sg.match_vlans, []) : "vlan-${vlan.vlan_id}" => {} }
+    selector_match_vlans              = { for vlan in try(sg.match_vlans, []) : "vlan-${vlan.vlan_id}" => {} }
   } }
 
   class_maps = { for cm in try(local.device_config[each.key].security_group.class_maps, []) : cm.name => {
     description = try(cm.description, null)
-
     filter_entries = { for fe in try(cm.filter_entries, []) : fe.name => {
       apply_to_fragment           = try(fe.apply_to_fragment, null)
       arp_opcode                  = try(fe.arp_opcode, null)
@@ -36,7 +32,6 @@ resource "nxos_esg" "esg" {
 
   policy_maps = { for pm in try(local.device_config[each.key].security_group.policy_maps, []) : pm.name => {
     description = try(pm.description, null)
-
     match_class_maps = { for mc in try(pm.classes, []) : mc.class => {
       count_action      = try(mc.count, null)
       forwarding_action = try(mc.action, null)
