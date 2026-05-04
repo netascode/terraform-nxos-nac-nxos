@@ -105,6 +105,7 @@ resource "nxos_cli" "cli_0" {
     nxos_queuing_qos.queuing_qos,
     nxos_route_policy.route_policy,
     nxos_snmp.snmp,
+    nxos_span.span,
     nxos_spanning_tree.spanning_tree,
     nxos_subinterface.subinterface,
     nxos_svi_interface.svi_interface,
