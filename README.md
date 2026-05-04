@@ -108,6 +108,7 @@ No outputs.
 | [nxos_subinterface.subinterface](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.11.1/docs/resources/subinterface) | resource |
 | [nxos_svi_interface.svi_interface](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.11.1/docs/resources/svi_interface) | resource |
 | [nxos_system.system](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.11.1/docs/resources/system) | resource |
+| [nxos_telemetry.telemetry](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.11.1/docs/resources/telemetry) | resource |
 | [nxos_user_management.user_management](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.11.1/docs/resources/user_management) | resource |
 | [nxos_vpc.vpc](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.11.1/docs/resources/vpc) | resource |
 | [nxos_vrf.vrf](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.11.1/docs/resources/vrf) | resource |
