@@ -107,6 +107,7 @@ No outputs.
 | [nxos_route_policy.route_policy](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.11.1/docs/resources/route_policy) | resource |
 | [nxos_save_config.save_config](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.11.1/docs/resources/save_config) | resource |
 | [nxos_snmp.snmp](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.11.1/docs/resources/snmp) | resource |
+| [nxos_span.span](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.11.1/docs/resources/span) | resource |
 | [nxos_spanning_tree.spanning_tree](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.11.1/docs/resources/spanning_tree) | resource |
 | [nxos_subinterface.subinterface](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.11.1/docs/resources/subinterface) | resource |
 | [nxos_svi_interface.svi_interface](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.11.1/docs/resources/svi_interface) | resource |
