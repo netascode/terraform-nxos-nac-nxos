@@ -82,6 +82,7 @@ resource "nxos_cli" "cli_0" {
     nxos_bridge_domain.bridge_domain,
     nxos_default_qos.default_qos,
     nxos_dhcp.dhcp,
+    nxos_esg.esg,
     nxos_evpn.evpn,
     nxos_feature.feature,
     nxos_hardware_telemetry.hardware_telemetry,
