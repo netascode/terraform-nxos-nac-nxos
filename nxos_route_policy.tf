@@ -11,8 +11,7 @@ resource "nxos_route_policy" "route_policy" {
     length(try(local.device_config[device.name].ipv6_prefix_lists, [])) > 0 ||
     length(try(local.device_config[device.name].route_maps, [])) > 0 ||
   length(try(local.device_config[device.name].community_lists, [])) > 0 }
-  device     = each.key
-  depends_on = [nxos_access_list.access_list]
+  device = each.key
 
   ipv4_prefix_lists = { for pl in try(local.device_config[each.key].ip_prefix_lists, []) : pl.name => {
     description = try(pl.description, null)
@@ -122,4 +121,6 @@ resource "nxos_route_policy" "route_policy" {
       items = { for community in try(entry.communities, []) : community => {} }
     } }
   } }
+
+  depends_on = [nxos_access_list.access_list]
 }
