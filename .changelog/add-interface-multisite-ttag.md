@@ -1,0 +1,2 @@
+- Add `evpn_multisite_dci_tracking` and `evpn_multisite_fabric_tracking` support for ethernet, port-channel, and SVI interfaces
+- Add `system.ttag_marker_interval` and per-interface `ttag`, `ttag_inner`, `ttag_marker`, `ttag_strip` support for ethernet and port-channel interfaces

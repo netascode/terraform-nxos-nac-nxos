@@ -109,13 +109,14 @@ resource "nxos_svi_interface" "svi_interface" {
   if length(try(local.device_config[device.name].interfaces.vlans, [])) > 0 }
   device = each.key
   svi_interfaces = { for int in try(local.device_config[each.key].interfaces.vlans, []) : "vlan${int.id}" => {
-    admin_state = try(int.shutdown, false) ? "down" : "up"
-    bandwidth   = try(int.bandwidth, null)
-    delay       = try(int.delay, null)
-    description = try(int.description, null)
-    medium      = try(int.medium, null) == "broadcast" ? "bcast" : try(int.medium, null)
-    mtu         = try(int.mtu, null)
-    vrf_dn      = "sys/inst-${try(int.vrf, "default")}"
+    admin_state                  = try(int.shutdown, false) ? "down" : "up"
+    bandwidth                    = try(int.bandwidth, null)
+    delay                        = try(int.delay, null)
+    description                  = try(int.description, null)
+    medium                       = try(int.medium, null) == "broadcast" ? "bcast" : try(int.medium, null)
+    mtu                          = try(int.mtu, null)
+    vrf_dn                       = "sys/inst-${try(int.vrf, "default")}"
+    multisite_interface_tracking = try(int.evpn_multisite_dci_tracking, false) ? "dci" : try(int.evpn_multisite_fabric_tracking, false) ? "fabric" : null
   } }
 
   depends_on = [

@@ -169,6 +169,35 @@ locals {
 
   udld_interfaces_by_device = { for entry in local.udld_interfaces : entry.device => entry... }
 
+  ttag_interfaces = flatten([
+    for device in local.devices : concat(
+      [for int in try(local.device_config[device.name].interfaces.ethernets, []) : {
+        device       = device.name
+        interface_id = "eth${int.id}"
+        ttag         = try(int.ttag, null)
+        ttag_inner   = try(int.ttag_inner, null)
+        ttag_marker  = try(int.ttag_marker, null)
+        ttag_strip   = try(int.ttag_strip, null)
+        } if try(int.ttag, null) != null ||
+        try(int.ttag_inner, null) != null ||
+        try(int.ttag_marker, null) != null ||
+      try(int.ttag_strip, null) != null],
+      [for int in try(local.device_config[device.name].interfaces.port_channels, []) : {
+        device       = device.name
+        interface_id = "po${int.id}"
+        ttag         = try(int.ttag, null)
+        ttag_inner   = try(int.ttag_inner, null)
+        ttag_marker  = try(int.ttag_marker, null)
+        ttag_strip   = try(int.ttag_strip, null)
+        } if try(int.ttag, null) != null ||
+        try(int.ttag_inner, null) != null ||
+        try(int.ttag_marker, null) != null ||
+      try(int.ttag_strip, null) != null],
+    )
+  ])
+
+  ttag_interfaces_by_device = { for entry in local.ttag_interfaces : entry.device => entry... }
+
   nd_interfaces_by_device = { for entry in local.nd_interfaces : entry.device => entry... }
 
   nd_vrfs_by_device = { for device_name, entries in local.nd_interfaces_by_device : device_name => {
@@ -236,6 +265,8 @@ resource "nxos_system" "system" {
     length(try(local.cdp_interfaces_by_device[device.name], [])) > 0 ||
     length(try(local.lldp_interfaces_by_device[device.name], [])) > 0 ||
     length(try(local.udld_interfaces_by_device[device.name], [])) > 0 ||
+    try(local.device_config[device.name].system.ttag_marker_interval, null) != null ||
+    length(try(local.ttag_interfaces_by_device[device.name], [])) > 0 ||
   length(try(local.device_config[device.name].interfaces.management, [])) > 0 }
   device = each.key
 
@@ -562,6 +593,16 @@ resource "nxos_system" "system" {
       affinity = try(vrf.module_affinity, null)
     } }
   } } : {}
+
+  # ttagTtagEntity / ttagTtagIf attributes
+  ttag_marker_interval = try(local.device_config[each.key].system.ttag_marker_interval, null)
+
+  ttag_interfaces = { for entry in try(local.ttag_interfaces_by_device[each.key], []) : entry.interface_id => {
+    ttag        = try(entry.ttag, null)
+    ttag_inner  = try(entry.ttag_inner, null)
+    ttag_marker = try(entry.ttag_marker, null)
+    ttag_strip  = try(entry.ttag_strip, null)
+  } }
 
   depends_on = [
     nxos_feature.feature,

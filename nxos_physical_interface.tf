@@ -199,6 +199,7 @@ resource "nxos_physical_interface" "physical_interface" {
     switchport_block                           = try(int.switchport.block, null) != null ? join(",", sort(try(int.switchport.block, []))) : null
     switchport_isolated                        = try(int.switchport.isolated, null) == null ? null : (try(int.switchport.isolated) ? "enable" : "disable")
     switchport_mac_learn                       = try(int.switchport.mac_learning, null) == null ? null : (try(int.switchport.mac_learning) ? "enable" : "disable")
+    multisite_interface_tracking               = try(int.evpn_multisite_dci_tracking, false) ? "dci" : try(int.evpn_multisite_fabric_tracking, false) ? "fabric" : null
   } }
 
   depends_on = [
