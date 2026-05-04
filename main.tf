@@ -98,6 +98,7 @@ resource "nxos_cli" "cli_0" {
     nxos_logging.logging,
     nxos_loopback_interface.loopback_interface,
     nxos_netflow.netflow,
+    nxos_network_qos.network_qos,
     nxos_ntp.ntp,
     nxos_nvo.nvo,
     nxos_ospf.ospf,
