@@ -1,0 +1,1 @@
+- Add BGP address family `default_information_originate_always_rd`, `default_information_originate_always_route_target`, `load_balance_egress_filter_policy_route_map`, and `load_balance_egress_multipath_auto_policy_route_map` support
