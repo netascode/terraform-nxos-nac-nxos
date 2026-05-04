@@ -96,6 +96,7 @@ No outputs.
 | [nxos_logging.logging](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.11.1/docs/resources/logging) | resource |
 | [nxos_loopback_interface.loopback_interface](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.11.1/docs/resources/loopback_interface) | resource |
 | [nxos_netflow.netflow](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.11.1/docs/resources/netflow) | resource |
+| [nxos_network_qos.network_qos](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.11.1/docs/resources/network_qos) | resource |
 | [nxos_ntp.ntp](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.11.1/docs/resources/ntp) | resource |
 | [nxos_nvo.nvo](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.11.1/docs/resources/nvo) | resource |
 | [nxos_ospf.ospf](https://registry.terraform.io/providers/CiscoDevNet/nxos/0.11.1/docs/resources/ospf) | resource |
