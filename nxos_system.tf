@@ -261,6 +261,7 @@ resource "nxos_system" "system" {
     try(local.device_config[device.name].vpc.ipv6_nd_synchronize, null) != null ||
     try(local.device_config[device.name].system.nxapi, null) != null ||
     try(local.device_config[device.name].system.hypershield, null) != null ||
+    try(local.device_config[device.name].system.ssh, null) != null ||
     length(try(local.nd_interfaces_by_device[device.name], [])) > 0 ||
     length(try(local.cdp_interfaces_by_device[device.name], [])) > 0 ||
     length(try(local.lldp_interfaces_by_device[device.name], [])) > 0 ||
@@ -602,6 +603,21 @@ resource "nxos_system" "system" {
     ttag_inner  = try(entry.ttag_inner, null)
     ttag_marker = try(entry.ttag_marker, null)
     ttag_strip  = try(entry.ttag_strip, null)
+  } }
+
+  # commSsh attributes
+  ssh_ciphers                      = try(local.device_config[each.key].system.ssh.ciphers_all, null) == null ? null : (try(local.device_config[each.key].system.ssh.ciphers_all) ? "yes" : "no")
+  ssh_enable_weak_ciphers          = try(local.device_config[each.key].system.ssh.ciphers_weak, null) == null ? null : (try(local.device_config[each.key].system.ssh.ciphers_weak) ? "yes" : "no")
+  ssh_key_exchange_algorithms      = try(local.device_config[each.key].system.ssh.kexalgos_all, null) == null ? null : (try(local.device_config[each.key].system.ssh.kexalgos_all) ? "yes" : "no")
+  ssh_key_types                    = try(local.device_config[each.key].system.ssh.keytypes_all, null) == null ? null : (try(local.device_config[each.key].system.ssh.keytypes_all) ? "yes" : "no")
+  ssh_login_attempts               = try(local.device_config[each.key].system.ssh.login_attempts, null)
+  ssh_login_grace_time             = try(local.device_config[each.key].system.ssh.login_gracetime, null)
+  ssh_message_authentication_codes = try(local.device_config[each.key].system.ssh.macs_all, null) == null ? null : (try(local.device_config[each.key].system.ssh.macs_all) ? "yes" : "no")
+  ssh_port                         = try(local.device_config[each.key].system.ssh.port, null)
+
+  # commSshKey nested map
+  ssh_keys = { for key in try(local.device_config[each.key].system.ssh.keys, []) : key.type => {
+    key_length = try(key.key_length, null)
   } }
 
   depends_on = [
