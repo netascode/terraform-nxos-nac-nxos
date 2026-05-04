@@ -113,11 +113,30 @@ resource "nxos_bgp" "bgp" {
             evpn      = try(prefix.evpn, false) ? "enabled" : "disabled"
           } }
 
+          additional_paths_capability = length(compact([
+            try(af.additional_paths_send, false) ? "send" : "",
+            try(af.additional_paths_receive, false) ? "receive" : "",
+            try(af.additional_paths_install_backup, false) ? "install-bkup" : "",
+            ])) > 0 ? join(",", sort(compact([
+              try(af.additional_paths_send, false) ? "send" : "",
+              try(af.additional_paths_receive, false) ? "receive" : "",
+              try(af.additional_paths_install_backup, false) ? "install-bkup" : "",
+          ]))) : null
+          additional_paths_route_map = try(af.additional_paths_selection_route_map, null)
+
           redistributions = { for redist in try(af.redistributions, []) : "${redist.protocol};${try(redist.protocol_instance, "none")}" => {
             route_map        = try(redist.route_map, null)
             scope            = try(redist.scope, null)
             srv6_prefix_type = try(redist.srv6_prefix_type, null)
             asn              = try(redist.asn, null)
+          } }
+
+          aggregate_addresses = { for agg in try(af.aggregate_addresses, []) : agg.prefix => {
+            advertise_map = try(agg.advertise_map, null)
+            as_set        = try(agg.as_set, false) ? "enabled" : "disabled"
+            attribute_map = try(agg.attribute_map, null)
+            summary_only  = try(agg.summary_only, false) ? "enabled" : "disabled"
+            suppress_map  = try(agg.suppress_map, null)
           } }
         } }
 
@@ -243,6 +262,12 @@ resource "nxos_bgp" "bgp" {
           local_asn_propagation = try(nei.local_as_propagation, null)
           local_asn             = try(nei.local_as, null)
 
+          dscp                             = try(nei.dscp, null)
+          dynamic_route_map                = try(nei.dynamic_route_map, null)
+          egress_peer_engineering          = try(nei.egress_peer_engineering, false) ? "enabled" : "disabled"
+          egress_peer_engineering_peer_set = try(nei.egress_peer_engineering_peer_set, null)
+          internal_vpn_client              = try(nei.internal_vpn_client, false) ? "enabled" : "disabled"
+
           peer_address_families = { for af in try(nei.address_families, []) : local.address_family_names_map[af.address_family] => {
             control = length(compact([
               try(af.advertisement_interval, null) != null ? "advertisement-interval" : "",
@@ -296,7 +321,49 @@ resource "nxos_bgp" "bgp" {
               list = direction == "in" ? af.prefix_list_in : af.prefix_list_out
             } }
           } }
-        } }
+        } if try(nei.interface_type, null) == null }
+
+        interface_peers = { for nei in try(local.device_config[each.key].routing.bgp.neighbors, []) : "${local.intf_prefix_map[try(nei.interface_type)]}${try(nei.interface_id, "")}" => {
+          remote_asn                     = try(nei.remote_as, null)
+          description                    = try(nei.description, null)
+          peer_template                  = try(nei.inherit_peer, null)
+          peer_type                      = try(nei.peer_type, null)
+          admin_state                    = try(nei.shutdown, false) ? "disabled" : "enabled"
+          affinity_group                 = try(nei.affinity_group, null)
+          asn_type                       = try(nei.remote_as_type, null)
+          bfd_type                       = try(nei.bfd_type, null)
+          bmp_server_1                   = try(nei.bmp_activate_server_1, false) ? "enabled" : "disabled"
+          bmp_server_2                   = try(nei.bmp_activate_server_2, false) ? "enabled" : "disabled"
+          capability_suppress_4_byte_asn = try(nei.capability_suppress_4_byte_asn, false) ? "enabled" : "disabled"
+          connection_mode                = try(nei.connection_mode, null)
+          peer_control = length(compact([
+            try(nei.bfd, false) ? "bfd" : "",
+            try(nei.dont_capability_negotiate, false) ? "cap-neg-off" : "",
+            try(nei.disable_connected_check, false) ? "dis-conn-check" : "",
+            !try(nei.dynamic_capability, true) ? "no-dyn-cap" : "",
+            ])) > 0 ? join(",", sort(compact([
+              try(nei.bfd, false) ? "bfd" : "",
+              try(nei.dont_capability_negotiate, false) ? "cap-neg-off" : "",
+              try(nei.disable_connected_check, false) ? "dis-conn-check" : "",
+              !try(nei.dynamic_capability, true) ? "no-dyn-cap" : "",
+          ]))) : null
+          dscp                             = try(nei.dscp, null)
+          dynamic_route_map                = try(nei.dynamic_route_map, null)
+          egress_peer_engineering          = try(nei.egress_peer_engineering, false) ? "enabled" : "disabled"
+          egress_peer_engineering_peer_set = try(nei.egress_peer_engineering_peer_set, null)
+          hold_time                        = try(nei.hold_time, null)
+          keepalive_interval               = try(nei.keepalive_interval, null)
+          log_neighbor_changes             = try(nei.log_neighbor_changes, null) == null ? "none" : (try(nei.log_neighbor_changes) ? "enable" : "disable")
+          low_memory_exempt                = try(nei.low_memory_exempt, false) ? "enabled" : "disabled"
+          max_peer_count                   = try(nei.maximum_peers, null)
+          password_type                    = try(nei.password_type, null)
+          password                         = try(nei.password, null)
+          private_as_control               = try(nei.remove_private_as, null)
+          session_template                 = try(nei.inherit_peer_session, null)
+          ebgp_multihop_ttl                = try(nei.ebgp_multihop_ttl, null)
+          ttl_security_hops                = try(nei.ttl_security_hops, null)
+          internal_vpn_client              = try(nei.internal_vpn_client, false) ? "enabled" : "disabled"
+        } if try(nei.interface_type, null) != null }
       }
     },
     # Explicit non-default VRFs
@@ -371,11 +438,30 @@ resource "nxos_bgp" "bgp" {
           evpn      = try(prefix.evpn, false) ? "enabled" : "disabled"
         } }
 
+        additional_paths_capability = length(compact([
+          try(af.additional_paths_send, false) ? "send" : "",
+          try(af.additional_paths_receive, false) ? "receive" : "",
+          try(af.additional_paths_install_backup, false) ? "install-bkup" : "",
+          ])) > 0 ? join(",", sort(compact([
+            try(af.additional_paths_send, false) ? "send" : "",
+            try(af.additional_paths_receive, false) ? "receive" : "",
+            try(af.additional_paths_install_backup, false) ? "install-bkup" : "",
+        ]))) : null
+        additional_paths_route_map = try(af.additional_paths_selection_route_map, null)
+
         redistributions = { for redist in try(af.redistributions, []) : "${redist.protocol};${try(redist.protocol_instance, "none")}" => {
           route_map        = try(redist.route_map, null)
           scope            = try(redist.scope, null)
           srv6_prefix_type = try(redist.srv6_prefix_type, null)
           asn              = try(redist.asn, null)
+        } }
+
+        aggregate_addresses = { for agg in try(af.aggregate_addresses, []) : agg.prefix => {
+          advertise_map = try(agg.advertise_map, null)
+          as_set        = try(agg.as_set, false) ? "enabled" : "disabled"
+          attribute_map = try(agg.attribute_map, null)
+          summary_only  = try(agg.summary_only, false) ? "enabled" : "disabled"
+          suppress_map  = try(agg.suppress_map, null)
         } }
       } }
 
@@ -420,6 +506,12 @@ resource "nxos_bgp" "bgp" {
 
         local_asn_propagation = try(nei.local_as_propagation, null)
         local_asn             = try(nei.local_as, null)
+
+        dscp                             = try(nei.dscp, null)
+        dynamic_route_map                = try(nei.dynamic_route_map, null)
+        egress_peer_engineering          = try(nei.egress_peer_engineering, false) ? "enabled" : "disabled"
+        egress_peer_engineering_peer_set = try(nei.egress_peer_engineering_peer_set, null)
+        internal_vpn_client              = try(nei.internal_vpn_client, false) ? "enabled" : "disabled"
 
         peer_address_families = { for af in try(nei.address_families, []) : local.address_family_names_map[af.address_family] => {
           control = length(compact([
@@ -474,7 +566,49 @@ resource "nxos_bgp" "bgp" {
             list = direction == "in" ? af.prefix_list_in : af.prefix_list_out
           } }
         } }
-      } }
+      } if try(nei.interface_type, null) == null }
+
+      interface_peers = { for nei in try(vrf.neighbors, []) : "${local.intf_prefix_map[try(nei.interface_type)]}${try(nei.interface_id, "")}" => {
+        remote_asn                     = try(nei.remote_as, null)
+        description                    = try(nei.description, null)
+        peer_template                  = try(nei.inherit_peer, null)
+        peer_type                      = try(nei.peer_type, null)
+        admin_state                    = try(nei.shutdown, false) ? "disabled" : "enabled"
+        affinity_group                 = try(nei.affinity_group, null)
+        asn_type                       = try(nei.remote_as_type, null)
+        bfd_type                       = try(nei.bfd_type, null)
+        bmp_server_1                   = try(nei.bmp_activate_server_1, false) ? "enabled" : "disabled"
+        bmp_server_2                   = try(nei.bmp_activate_server_2, false) ? "enabled" : "disabled"
+        capability_suppress_4_byte_asn = try(nei.capability_suppress_4_byte_asn, false) ? "enabled" : "disabled"
+        connection_mode                = try(nei.connection_mode, null)
+        peer_control = length(compact([
+          try(nei.bfd, false) ? "bfd" : "",
+          try(nei.dont_capability_negotiate, false) ? "cap-neg-off" : "",
+          try(nei.disable_connected_check, false) ? "dis-conn-check" : "",
+          !try(nei.dynamic_capability, true) ? "no-dyn-cap" : "",
+          ])) > 0 ? join(",", sort(compact([
+            try(nei.bfd, false) ? "bfd" : "",
+            try(nei.dont_capability_negotiate, false) ? "cap-neg-off" : "",
+            try(nei.disable_connected_check, false) ? "dis-conn-check" : "",
+            !try(nei.dynamic_capability, true) ? "no-dyn-cap" : "",
+        ]))) : null
+        dscp                             = try(nei.dscp, null)
+        dynamic_route_map                = try(nei.dynamic_route_map, null)
+        egress_peer_engineering          = try(nei.egress_peer_engineering, false) ? "enabled" : "disabled"
+        egress_peer_engineering_peer_set = try(nei.egress_peer_engineering_peer_set, null)
+        hold_time                        = try(nei.hold_time, null)
+        keepalive_interval               = try(nei.keepalive_interval, null)
+        log_neighbor_changes             = try(nei.log_neighbor_changes, null) == null ? "none" : (try(nei.log_neighbor_changes) ? "enable" : "disable")
+        low_memory_exempt                = try(nei.low_memory_exempt, false) ? "enabled" : "disabled"
+        max_peer_count                   = try(nei.maximum_peers, null)
+        password_type                    = try(nei.password_type, null)
+        password                         = try(nei.password, null)
+        private_as_control               = try(nei.remove_private_as, null)
+        session_template                 = try(nei.inherit_peer_session, null)
+        ebgp_multihop_ttl                = try(nei.ebgp_multihop_ttl, null)
+        ttl_security_hops                = try(nei.ttl_security_hops, null)
+        internal_vpn_client              = try(nei.internal_vpn_client, false) ? "enabled" : "disabled"
+      } if try(nei.interface_type, null) != null }
     } }
   )
 
