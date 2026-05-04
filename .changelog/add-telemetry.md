@@ -1,0 +1,1 @@
+- Add `telemetry` support including destination groups, sensor groups, subscriptions, and their relationships
