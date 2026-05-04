@@ -153,6 +153,7 @@ resource "nxos_port_channel_interface" "port_channel_interface" {
     storm_control_unicast_level_1              = try(format("%f", int.storm_control.unicast_level[1]), null)
     storm_control_unicast_level_2              = try(format("%f", int.storm_control.unicast_level[2]), null)
     storm_control_unicast_packets_per_second   = try(int.storm_control.unicast_pps, null)
+    multisite_interface_tracking               = try(int.evpn_multisite_dci_tracking, false) ? "dci" : try(int.evpn_multisite_fabric_tracking, false) ? "fabric" : null
     members = { for eth in try(local.device_config[each.key].interfaces.ethernets, []) : "sys/intf/phys-[eth${eth.id}]" => {
       force = try(eth.channel_group_force, false)
     } if try(eth.channel_group, null) == int.id }
