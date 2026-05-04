@@ -8,11 +8,25 @@ locals {
 resource "nxos_route_policy" "route_policy" {
   for_each = { for device in local.devices : device.name => device
     if length(try(local.device_config[device.name].ip_prefix_lists, [])) > 0 ||
+    length(try(local.device_config[device.name].ipv6_prefix_lists, [])) > 0 ||
     length(try(local.device_config[device.name].route_maps, [])) > 0 ||
   length(try(local.device_config[device.name].community_lists, [])) > 0 }
   device = each.key
 
   ipv4_prefix_lists = { for pl in try(local.device_config[each.key].ip_prefix_lists, []) : pl.name => {
+    description = try(pl.description, null)
+
+    entries = { for entry in try(pl.entries, []) : entry.seq => {
+      action     = try(entry.action, null)
+      criteria   = try(entry.criteria, null)
+      prefix     = try(entry.prefix, null)
+      from_range = try(entry.ge, null)
+      to_range   = try(entry.le, null)
+      mask       = try(entry.mask, null)
+    } }
+  } }
+
+  ipv6_prefix_lists = { for pl in try(local.device_config[each.key].ipv6_prefix_lists, []) : pl.name => {
     description = try(pl.description, null)
 
     entries = { for entry in try(pl.entries, []) : entry.seq => {
@@ -44,9 +58,14 @@ resource "nxos_route_policy" "route_policy" {
       verify_availability_v4  = try(entry.verify_availability_v4, null) != null ? (try(entry.verify_availability_v4) ? "enabled" : "disabled") : null
       verify_availability_v6  = try(entry.verify_availability_v6, null) != null ? (try(entry.verify_availability_v6) ? "enabled" : "disabled") : null
 
-      match_route_prefix_lists = try(entry.match_ip_prefix_list, null) != null ? {
-        "sys/rpm/pfxlistv4-[${try(entry.match_ip_prefix_list)}]" = {}
-      } : {}
+      match_route_prefix_lists = merge(
+        try(entry.match_ip_prefix_list, null) != null ? {
+          "sys/rpm/pfxlistv4-[${try(entry.match_ip_prefix_list)}]" = {}
+        } : {},
+        try(entry.match_ipv6_prefix_list, null) != null ? {
+          "sys/rpm/pfxlistv6-[${try(entry.match_ipv6_prefix_list)}]" = {}
+        } : {},
+      )
 
       set_regular_community_additive     = try(entry.set_community, null) != null ? (try(entry.set_community_additive, null) != null ? (try(entry.set_community_additive) ? "enabled" : "disabled") : "disabled") : null
       set_regular_community_no_community = try(entry.set_community, null) != null ? (try(entry.set_community_none, null) != null ? (try(entry.set_community_none) ? "enabled" : "disabled") : "disabled") : null
