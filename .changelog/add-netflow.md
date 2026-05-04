@@ -1,0 +1,1 @@
+- Add `netflow` support including `netflow.exporters`, `netflow.records`, `netflow.monitors`, `netflow.hardware_profiles`, and `netflow.class_maps`
