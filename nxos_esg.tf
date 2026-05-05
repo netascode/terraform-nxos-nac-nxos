@@ -12,7 +12,7 @@ resource "nxos_esg" "esg" {
     name                              = try(sg.name, null)
     selector_connected_endpoints_ipv4 = { for ep in try(sg.match_connected_endpoints_ipv4, []) : "${ep.vrf};${ep.address}" => {} }
     selector_connected_endpoints_ipv6 = { for ep in try(sg.match_connected_endpoints_ipv6, []) : "${ep.vrf};${ep.address}" => {} }
-    selector_match_vlans              = { for vlan in try(sg.match_vlans, []) : "vlan-${vlan.vlan_id}" => {} }
+    selector_match_vlans              = { for vlan_id in try(provider::utils::normalize_vlans(try(sg.match_vlans), "list"), []) : "vlan-${vlan_id}" => {} }
   } }
 
   class_maps = { for cm in try(local.device_config[each.key].security_group.class_maps, []) : cm.name => {

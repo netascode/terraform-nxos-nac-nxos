@@ -1,0 +1,3 @@
+- BREAKING CHANGE: `spanning_tree.vlans[].vlan_id` replaced by `spanning_tree.vlans[].vlans` with `ids`/`ranges` to allow configuring multiple VLANs with the same spanning tree parameters in a single entry
+- BREAKING CHANGE: `vpc.dual_active_exclude_interface_vlan` (string) renamed to `vpc.dual_active_exclude_interface_vlans` with `ids`/`ranges`
+- BREAKING CHANGE: `vpc.peer_gateway_exclude_vlan` (string) renamed to `vpc.peer_gateway_exclude_vlans` with `ids`/`ranges`

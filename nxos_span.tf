@@ -38,10 +38,11 @@ resource "nxos_span" "span" {
     source_interfaces = { for si in try(session.source_interfaces, []) : "${local.intf_prefix_map[try(si.interface_type)]}${try(si.interface_id)}" => {
       direction = try(si.direction, null)
     } }
-    source_vlans = { for sv in try(session.source_vlans, []) : "vlan-${sv.vlan}" => {
-      direction = try(sv.direction, null)
-    } }
-    filter_vlans = { for fv in try(session.filter_vlans, []) : "vlan-${fv.vlan}" => {} }
+    source_vlans = merge([for sv in try(session.source_vlans, []) : {
+      for vlan_id in try(provider::utils::normalize_vlans(sv.vlans, "list"), []) :
+      "vlan-${vlan_id}" => { direction = try(sv.direction, null) }
+    }]...)
+    filter_vlans = try(provider::utils::normalize_vlans(try(session.filter_vlans), "string-nxos"), null)
   } }
 
   depends_on = [

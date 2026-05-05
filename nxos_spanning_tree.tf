@@ -46,15 +46,18 @@ resource "nxos_spanning_tree" "spanning_tree" {
       simulate_pvst             = try(int.spanning_tree.mst_simulate_pvst, null) == null ? null : (try(int.spanning_tree.mst_simulate_pvst) ? "enabled" : "disabled")
     } if try(int.spanning_tree, null) != null && try(int.switchport.enabled, true) },
   )
-  vlans = { for vlan in try(local.device_config[each.key].spanning_tree.vlans, []) : tostring(vlan.vlan_id) => {
-    diameter     = try(vlan.diameter, null)
-    forward_time = try(vlan.forward_time, null)
-    hello_time   = try(vlan.hello_time, null)
-    max_age      = try(vlan.max_age, null)
-    priority     = try(vlan.priority, null) != null ? tostring(try(vlan.priority)) : null
-    root_mode    = try(vlan.root, null) != null ? "enabled" : null
-    root_type    = try(vlan.root, null)
-  } }
+  vlans = merge([for group in try(local.device_config[each.key].spanning_tree.vlans, []) : {
+    for vlan_id in try(provider::utils::normalize_vlans(group.vlans, "list"), []) :
+    tostring(vlan_id) => {
+      diameter     = try(group.diameter, null)
+      forward_time = try(group.forward_time, null)
+      hello_time   = try(group.hello_time, null)
+      max_age      = try(group.max_age, null)
+      priority     = try(group.priority, null) != null ? tostring(try(group.priority)) : null
+      root_mode    = try(group.root, null) != null ? "enabled" : null
+      root_type    = try(group.root, null)
+    }
+  }]...)
 
   depends_on = [
     nxos_physical_interface.physical_interface,

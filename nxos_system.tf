@@ -245,7 +245,7 @@ resource "nxos_system" "system" {
     try(local.device_config[device.name].system.icam_monitor_intervals, null) != null ||
     try(local.device_config[device.name].system.icam_monitor_scale, null) != null ||
     try(local.device_config[device.name].system.nve_ipmc_index_size, null) != null ||
-    try(local.device_config[device.name].system.nve_overlay_vlan_id, null) != null ||
+    try(local.device_config[device.name].system.nve_overlay_vlans, null) != null ||
     length(try(local.device_config[device.name].system.nve_infra_vlans, [])) > 0 ||
     try(local.device_config[device.name].system.platform, null) != null ||
     try(local.device_config[device.name].system.smart_licensing_transport, null) != null ||
@@ -494,14 +494,17 @@ resource "nxos_system" "system" {
 
   # platformNVE / platformInfraVlan nested maps
   platform_nve_interfaces = (try(local.device_config[each.key].system.nve_ipmc_index_size, null) != null ||
-    try(local.device_config[each.key].system.nve_overlay_vlan_id, null) != null ||
+    try(local.device_config[each.key].system.nve_overlay_vlans, null) != null ||
     length(try(local.device_config[each.key].system.nve_infra_vlans, [])) > 0) ? {
     "1" = {
       ipmc_index_size = try(local.device_config[each.key].system.nve_ipmc_index_size, null)
-      overlay_vlan_id = try(local.device_config[each.key].system.nve_overlay_vlan_id, null)
-      infra_vlans = { for vlan in try(local.device_config[each.key].system.nve_infra_vlans, []) : vlan.id => {
-        force = try(vlan.force, null) == null ? null : (try(vlan.force) ? "Enable" : "Disable")
-      } }
+      overlay_vlan_id = try(provider::utils::normalize_vlans(try(local.device_config[each.key].system.nve_overlay_vlans), "string-nxos"), null)
+      infra_vlans = merge([for group in try(local.device_config[each.key].system.nve_infra_vlans, []) : {
+        for vlan_id in try(provider::utils::normalize_vlans(group.vlans, "list"), []) :
+        tostring(vlan_id) => {
+          force = try(group.force, null) == null ? null : (try(group.force) ? "Enable" : "Disable")
+        }
+      }]...)
     }
   } : {}
 
