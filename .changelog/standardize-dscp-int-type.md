@@ -1,0 +1,1 @@
+- BREAKING CHANGE: Change DSCP fields from string to `int(0-63)`: `qos.class_maps.match_dscp_values`, `qos.policy_maps.classes.police.conform_set_dscp`, `qos.policy_maps.classes.police.exceed_set_dscp`, `qos.policy_maps.classes.police.violate_set_dscp`, and `routing.bgp.vrfs.neighbors.dscp`

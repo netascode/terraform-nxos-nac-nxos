@@ -5,7 +5,7 @@ resource "nxos_default_qos" "default_qos" {
   device = each.key
   class_maps = { for cm in try(local.device_config[each.key].qos.class_maps, []) : cm.name => {
     match_type = try(cm.match_type, null)
-    dscp_values = { for dscp in try(cm.match_dscp_values, []) : dscp => {
+    dscp_values = { for dscp in try(cm.match_dscp_values, []) : try(local.dscp_int_to_string_map[dscp], tostring(dscp)) => {
     } }
   } }
   policy_maps = { for pm in try(local.device_config[each.key].qos.policy_maps, []) : pm.name => {
@@ -22,17 +22,17 @@ resource "nxos_default_qos" "default_qos" {
       police_be_unit                = try(cls.police.be_unit, null)
       police_conform_action         = try(cls.police.conform_action, null)
       police_conform_set_cos        = try(cls.police.conform_set_cos, null)
-      police_conform_set_dscp       = try(cls.police.conform_set_dscp, null)
+      police_conform_set_dscp       = try(tostring(cls.police.conform_set_dscp), null) != null ? try(local.dscp_int_to_string_map[cls.police.conform_set_dscp], tostring(cls.police.conform_set_dscp)) : null
       police_conform_set_precedence = try(cls.police.conform_set_precedence, null)
       police_conform_set_qos_group  = try(cls.police.conform_set_qos_group, null)
       police_exceed_action          = try(cls.police.exceed_action, null)
       police_exceed_set_cos         = try(cls.police.exceed_set_cos, null)
-      police_exceed_set_dscp        = try(cls.police.exceed_set_dscp, null)
+      police_exceed_set_dscp        = try(tostring(cls.police.exceed_set_dscp), null) != null ? try(local.dscp_int_to_string_map[cls.police.exceed_set_dscp], tostring(cls.police.exceed_set_dscp)) : null
       police_exceed_set_precedence  = try(cls.police.exceed_set_precedence, null)
       police_exceed_set_qos_group   = try(cls.police.exceed_set_qos_group, null)
       police_violate_action         = try(cls.police.violate_action, null)
       police_violate_set_cos        = try(cls.police.violate_set_cos, null)
-      police_violate_set_dscp       = try(cls.police.violate_set_dscp, null)
+      police_violate_set_dscp       = try(tostring(cls.police.violate_set_dscp), null) != null ? try(local.dscp_int_to_string_map[cls.police.violate_set_dscp], tostring(cls.police.violate_set_dscp)) : null
       police_violate_set_precedence = try(cls.police.violate_set_precedence, null)
       police_violate_set_qos_group  = try(cls.police.violate_set_qos_group, null)
     } }

@@ -266,7 +266,7 @@ resource "nxos_bgp" "bgp" {
           local_asn_propagation = try(nei.local_as_propagation, null)
           local_asn             = try(nei.local_as, null)
 
-          dscp                             = try(nei.dscp, null)
+          dscp                             = try(tostring(nei.dscp), null) != null ? try(local.dscp_int_to_string_map[nei.dscp], tostring(nei.dscp)) : null
           dynamic_route_map                = try(nei.dynamic_route_map, null)
           egress_peer_engineering          = try(nei.egress_peer_engineering, false) ? "enabled" : "disabled"
           egress_peer_engineering_peer_set = try(nei.egress_peer_engineering_peer_set, null)
@@ -351,7 +351,7 @@ resource "nxos_bgp" "bgp" {
               try(nei.disable_connected_check, false) ? "dis-conn-check" : "",
               !try(nei.dynamic_capability, true) ? "no-dyn-cap" : "",
           ]))) : null
-          dscp                             = try(nei.dscp, null)
+          dscp                             = try(tostring(nei.dscp), null) != null ? try(local.dscp_int_to_string_map[nei.dscp], tostring(nei.dscp)) : null
           dynamic_route_map                = try(nei.dynamic_route_map, null)
           egress_peer_engineering          = try(nei.egress_peer_engineering, false) ? "enabled" : "disabled"
           egress_peer_engineering_peer_set = try(nei.egress_peer_engineering_peer_set, null)
@@ -515,7 +515,7 @@ resource "nxos_bgp" "bgp" {
         local_asn_propagation = try(nei.local_as_propagation, null)
         local_asn             = try(nei.local_as, null)
 
-        dscp                             = try(nei.dscp, null)
+        dscp                             = try(tostring(nei.dscp), null) != null ? try(local.dscp_int_to_string_map[nei.dscp], tostring(nei.dscp)) : null
         dynamic_route_map                = try(nei.dynamic_route_map, null)
         egress_peer_engineering          = try(nei.egress_peer_engineering, false) ? "enabled" : "disabled"
         egress_peer_engineering_peer_set = try(nei.egress_peer_engineering_peer_set, null)
@@ -600,7 +600,7 @@ resource "nxos_bgp" "bgp" {
             try(nei.disable_connected_check, false) ? "dis-conn-check" : "",
             !try(nei.dynamic_capability, true) ? "no-dyn-cap" : "",
         ]))) : null
-        dscp                             = try(nei.dscp, null)
+        dscp                             = try(tostring(nei.dscp), null) != null ? try(local.dscp_int_to_string_map[nei.dscp], tostring(nei.dscp)) : null
         dynamic_route_map                = try(nei.dynamic_route_map, null)
         egress_peer_engineering          = try(nei.egress_peer_engineering, false) ? "enabled" : "disabled"
         egress_peer_engineering_peer_set = try(nei.egress_peer_engineering_peer_set, null)
