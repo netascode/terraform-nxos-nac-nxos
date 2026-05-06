@@ -33,6 +33,32 @@ locals {
     "store-forward" = "STORE_FORWARD"
     "cut-through"   = "CUT_THROUGH"
   }
+  platform_routing_map = {
+    "non-hierarchical-routing"                    = "NON_HIER_DEFAULT"
+    "non-hierarchical-routing max-l3-mode"        = "NON_HIER_MAX_L3"
+    "max-mode host"                               = "MAX_HOST"
+    "max-mode-tor l3"                             = "TOR_MAX_L3"
+    "mode hierarchical 64b-alpm"                  = "DEFAULT_64B"
+    "non-hierarchical max-mode l3-nh 64b-alpm-nh" = "NON_HIER_MAX_L3_64B"
+    "hierarchical def-max-mode l3 64b-alpm"       = "TOR_MAX_L3_64B"
+    "max-mode-tor l2"                             = "TOR_MAX_L2"
+    "max-mode-tor l2-l3"                          = "TOR_MAX_L2L3"
+    "template-overlay-host-scale"                 = "TOR_TEMPLATE_OVL_HOST_SCALE"
+    "template-lpm-heavy"                          = "TEMPLATE_LPM_HEAVY"
+    "template-lpm-scale-v6-64"                    = "TOR_TEMPLATE_LPM_SCALE_V6_64"
+    "template-dual-stack-host-scale"              = "TOR_TEMPLATE_DUAL_STACK_HOST_SCALE"
+    "template-service-provider"                   = "TEMPLATE_SERVICE_PROVIDER"
+    "template-multicast-heavy"                    = "TEMPLATE_MULTICAST_HEAVY"
+    "template-vxlan-scale"                        = "TEMPLATE_VXLAN_SCALE"
+    "template-mpls-heavy"                         = "TEMPLATE_MPLS_SCALE"
+    "template-internet-peering"                   = "TEMPLATE_INTERNET_PEERING"
+    "template-multicast-ext-heavy"                = "TEMPLATE_MULTICAST_EXT_HEAVY"
+    "template-l3-heavy"                           = "TEMPLATE_L3_HEAVY"
+    "template-dual-stack-mcast"                   = "TEMPLATE_MULTICAST_DUAL_STACK"
+    "template-l2-heavy"                           = "TEMPLATE_L2_HEAVY"
+    "template-l2-scale"                           = "TEMPLATE_L2_SCALE"
+    "template-security-groups"                    = "TEMPLATE_SECURITY_GROUPS"
+  }
 
   nd_interfaces = flatten([
     for device in local.devices : concat(
@@ -477,7 +503,7 @@ resource "nxos_system" "system" {
   platform_profile_tuple                             = try(local.device_config[each.key].system.platform.profile_tuple, null) == null ? null : (try(local.device_config[each.key].system.platform.profile_tuple) ? "Enable" : "Disable")
   platform_pstat_configuration                       = try(local.device_config[each.key].system.platform.pstat, null) == null ? null : (try(local.device_config[each.key].system.platform.pstat) ? "PSTAT_ENABLE" : "PSTAT_DISABLE")
   platform_qos_min_buffer                            = try(local.device_config[each.key].system.platform.qos_min_buffer, null)
-  platform_routing_mode                              = try(local.device_config[each.key].system.platform.routing_mode, null)
+  platform_routing_mode                              = try(local.platform_routing_map[try(local.device_config[each.key].system.platform.routing)], null)
   platform_service_template_name                     = try(local.device_config[each.key].system.platform.service_template_name, null)
   platform_svi_and_si_flex_stats                     = try(local.device_config[each.key].system.platform.svi_and_si_flex_stats, null) == null ? null : (try(local.device_config[each.key].system.platform.svi_and_si_flex_stats) ? "enable" : "disable")
   platform_svi_flex_stats                            = try(local.device_config[each.key].system.platform.svi_flex_stats, null) == null ? null : (try(local.device_config[each.key].system.platform.svi_flex_stats) ? "enable" : "disable")
