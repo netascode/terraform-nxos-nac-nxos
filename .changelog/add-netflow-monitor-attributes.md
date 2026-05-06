@@ -1,0 +1,1 @@
+- Add `netflow.monitors.record`, `netflow.monitors.exporter_buckets.exporter_1`, and `netflow.monitors.exporter_buckets.exporter_2` support
