@@ -296,6 +296,8 @@ resource "nxos_system" "system" {
     length(try(local.cdp_interfaces_by_device[device.name], [])) > 0 ||
     length(try(local.lldp_interfaces_by_device[device.name], [])) > 0 ||
     length(try(local.udld_interfaces_by_device[device.name], [])) > 0 ||
+    try(local.device_config[device.name].system.erspan_origin_ip_address, null) != null ||
+    try(local.device_config[device.name].system.erspan_origin_ipv6_address, null) != null ||
     try(local.device_config[device.name].system.ttag_marker_interval, null) != null ||
     length(try(local.ttag_interfaces_by_device[device.name], [])) > 0 ||
     length(try(local.device_config[device.name].interfaces.management, [])) > 0 ||
@@ -688,6 +690,12 @@ resource "nxos_system" "system" {
       affinity = try(vrf.module_affinity, null)
     } }
   } } : {}
+
+  # spanErspanOriginIp attributes
+  erspan_origin_ip_is_global      = try(local.device_config[each.key].system.erspan_origin_ip_address, null) != null ? true : null
+  erspan_origin_ip_is_global_ipv6 = try(local.device_config[each.key].system.erspan_origin_ipv6_address, null) != null ? true : null
+  erspan_origin_ip_address        = try(local.device_config[each.key].system.erspan_origin_ip_address, null)
+  erspan_origin_ipv6_address      = try(local.device_config[each.key].system.erspan_origin_ipv6_address, null)
 
   # ttagTtagEntity / ttagTtagIf attributes
   ttag_marker_interval = try(local.device_config[each.key].system.ttag_marker_interval, null)
