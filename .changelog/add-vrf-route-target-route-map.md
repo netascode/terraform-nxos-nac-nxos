@@ -1,1 +1,1 @@
-- Add VRF address family route target import/export route-map support including `vrfs.address_families.route_target_import_route_map`, `vrfs.address_families.route_target_export_route_map`, `vrfs.address_families.route_target_import_route_map_evpn`, and `vrfs.address_families.route_target_export_route_map_evpn`
+- Add VRF address family import/export map support including `vrfs.address_families.import_map` and `vrfs.address_families.export_map`
