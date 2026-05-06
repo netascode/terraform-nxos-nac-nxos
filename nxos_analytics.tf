@@ -82,6 +82,19 @@ resource "nxos_analytics" "analytics" {
         } }
       } }
 
+      forward_instance_targets = try(local.device_config[each.key].analytics.flow_system_config, null) != null ? {
+        "0" = {
+          direction                    = try(local.device_config[each.key].analytics.flow_system_config.direction, null)
+          switch_latency               = try(local.device_config[each.key].analytics.flow_system_config.switch_latency, null)
+          system_exporter_id           = try(local.device_config[each.key].analytics.flow_system_config.exporter_id, null)
+          traffic_analytics_enabled    = try(local.device_config[each.key].analytics.flow_system_config.traffic_analytics, null)
+          monitor_attachment_target_dn = try(local.device_config[each.key].analytics.flow_system_config.monitor, null) != null ? "sys/analytics/inst-[analytics]/monitor-[${try(local.device_config[each.key].analytics.flow_system_config.monitor)}]" : null
+          profile_attachment_target_dn = try(local.device_config[each.key].analytics.flow_system_config.profile, null) != null ? "sys/analytics/inst-[analytics]/prof-[${try(local.device_config[each.key].analytics.flow_system_config.profile)}]" : null
+          events_attachment_target_dn  = try(local.device_config[each.key].analytics.flow_system_config.events, null) != null ? "sys/analytics/inst-[analytics]/events-[${try(local.device_config[each.key].analytics.flow_system_config.events)}]" : null
+          policy_attachment_target_dn  = try(local.device_config[each.key].analytics.flow_system_config.filter, null) != null ? "sys/analytics/inst-[analytics]/policy-[${try(local.device_config[each.key].analytics.flow_system_config.filter)}]" : null
+        }
+      } : {}
+
       traffic_analytics_interface_mode               = try(local.device_config[each.key].analytics.flow_traffic_analytics.mode_interface, null)
       traffic_analytics_name                         = try(local.device_config[each.key].analytics.flow_traffic_analytics.name, null)
       traffic_analytics_service_database_size        = try(local.device_config[each.key].analytics.flow_traffic_analytics.db_size, null)
