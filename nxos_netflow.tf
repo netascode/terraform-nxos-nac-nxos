@@ -24,10 +24,13 @@ resource "nxos_netflow" "netflow" {
   } }
 
   monitors = { for monitor in try(local.device_config[each.key].netflow.monitors, []) : monitor.name => {
-    description = try(monitor.description, null)
+    description      = try(monitor.description, null)
+    record_target_dn = try(monitor.record, null) != null ? "sys/flow/fr-[${monitor.record}]" : null
     exporter_buckets = { for bucket in try(monitor.exporter_buckets, []) : tostring(bucket.id) => {
-      hash_high = try(bucket.hash_high, null)
-      hash_low  = try(bucket.hash_low, null)
+      exporter1_target_dn = try(bucket.exporter_1, null) != null ? "sys/flow/fe-[${bucket.exporter_1}]" : null
+      exporter2_target_dn = try(bucket.exporter_2, null) != null ? "sys/flow/fe-[${bucket.exporter_2}]" : null
+      hash_high           = try(bucket.hash_high, null)
+      hash_low            = try(bucket.hash_low, null)
     } }
   } }
 
