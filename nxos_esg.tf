@@ -1,11 +1,10 @@
 resource "nxos_esg" "esg" {
   for_each = { for device in local.devices : device.name => device
     if try(local.device_config[device.name].security_group.mac_segmentation, null) != null ||
-    try(local.device_config[device.name].security_group.security_enforce_mode, null) != null ||
     length(try(local.device_config[device.name].security_group.security_groups, [])) > 0 ||
     length(try(local.device_config[device.name].security_group.class_maps, [])) > 0 ||
     length(try(local.device_config[device.name].security_group.policy_maps, [])) > 0 ||
-  length([for vrf in try(local.device_config[device.name].vrfs, []) : vrf if try(vrf.security_enforce_tag, null) != null || try(vrf.security_enforce_default, null) != null]) > 0 }
+  length([for vrf in try(local.device_config[device.name].vrfs, []) : vrf if try(vrf.security_enforce_tag, null) != null || try(vrf.security_enforce_default, null) != null || try(vrf.security_enforce_mode, null) != null]) > 0 }
   device           = each.key
   mac_segmentation = try(local.device_config[each.key].security_group.mac_segmentation, null)
 
@@ -44,8 +43,8 @@ resource "nxos_esg" "esg" {
   domains = { for vrf in try(local.device_config[each.key].vrfs, []) : vrf.name => {
     default_action        = try(vrf.security_enforce_default, null)
     policy_classifier_tag = try(vrf.security_enforce_tag, null)
-    security_mode         = try(local.device_config[each.key].security_group.security_enforce_mode, null)
-  } if try(vrf.security_enforce_tag, null) != null || try(vrf.security_enforce_default, null) != null }
+    security_mode         = try(vrf.security_enforce_mode, null)
+  } if try(vrf.security_enforce_tag, null) != null || try(vrf.security_enforce_default, null) != null || try(vrf.security_enforce_mode, null) != null }
 
   depends_on = [
     nxos_feature.feature,
