@@ -1,1 +1,1 @@
-- Add `analytics.flow_policies.description` and `analytics.flow_policies.flow_filters` support
+- Add `analytics.flow_filters.description` and `analytics.flow_filters.acls` support

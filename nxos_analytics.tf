@@ -40,10 +40,10 @@ resource "nxos_analytics" "analytics" {
         ttl_match_value        = try(event.capture_ttl, null)
       } }
 
-      policies = { for policy in try(local.device_config[each.key].analytics.flow_policies, []) : policy.name => {
-        description = try(policy.description, null)
+      policies = { for filter in try(local.device_config[each.key].analytics.flow_filters, []) : filter.name => {
+        description = try(filter.description, null)
 
-        match_acls = { for acl in try(policy.flow_filters, []) : acl.name => {
+        match_acls = { for acl in try(filter.acls, []) : acl.name => {
           acl_name    = try(acl.acl_name, null)
           description = try(acl.description, null)
           filter_type = try(acl.filter_type, null)
