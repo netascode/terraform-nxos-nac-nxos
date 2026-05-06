@@ -50,6 +50,38 @@ resource "nxos_analytics" "analytics" {
         )
       } }
 
+      records = { for record in try(local.device_config[each.key].analytics.flow_records, []) : record.name => {
+        collect = try(join(",", record.collect), null)
+        match   = try(join(",", record.match), null)
+      } }
+
+      collectors = { for collector in try(local.device_config[each.key].analytics.flow_collectors, []) : collector.name => {
+        description            = try(collector.description, null)
+        dscp                   = try(collector.dscp, null)
+        destination_address    = try(collector.destination, null)
+        destination_port       = try(collector.destination_port, null)
+        event_destination_port = try(collector.event_destination_port, null)
+        inband_interface       = try(collector.inband_interface, null)
+        source_address         = try(collector.source_address, null)
+        source_interface       = try(collector.source_interface_type, null) != null ? "${local.intf_prefix_map[try(collector.source_interface_type)]}${try(collector.source_interface_id, "")}" : null
+        v9                     = try(collector.v9, null)
+        version                = try(collector.version, null)
+        vrf_name               = try(collector.vrf, null)
+      } }
+
+      monitors = { for monitor in try(local.device_config[each.key].analytics.flow_monitors, []) : monitor.name => {
+        record_target_dn = try(monitor.record, null) != null ? "sys/analytics/inst-analytics/recordp-${monitor.record}" : null
+
+        collector_buckets = { for bucket in try(monitor.exporter_buckets, []) : tostring(bucket.id) => {
+          hash_high = try(bucket.hash_high, null)
+          hash_low  = try(bucket.hash_low, null)
+
+          collectors = { for exporter in try(bucket.exporters, []) :
+            "sys/analytics/inst-analytics/collector-${exporter}" => {}
+          }
+        } }
+      } }
+
       traffic_analytics_interface_mode               = try(local.device_config[each.key].analytics.flow_traffic_analytics.mode_interface, null)
       traffic_analytics_name                         = try(local.device_config[each.key].analytics.flow_traffic_analytics.name, null)
       traffic_analytics_service_database_size        = try(local.device_config[each.key].analytics.flow_traffic_analytics.db_size, null)
