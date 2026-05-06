@@ -1,1 +1,1 @@
-- Add `port_type_fabric` support for ethernet interfaces
+- Add `port_type_fabric` support for ethernet and port-channel interfaces
