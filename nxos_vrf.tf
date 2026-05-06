@@ -140,6 +140,9 @@ resource "nxos_vrf" "vrf" {
             for dir, dir_entries in {
               for entry in rt_af_entries : entry.direction => entry...
               } : dir => {
+              route_map = rt_af == local.vrf_address_family_names_map[af.address_family] ? (
+                dir == "import" ? try(af.import_map, null) : try(af.export_map, null)
+              ) : null
               route_targets = { for entry in dir_entries : entry.rt_dme => {} }
             }
           }
