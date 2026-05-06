@@ -1,1 +1,1 @@
-- Add VRF security enforce mode support for ESG domains
+- Add security enforce mode support for ESG domains
