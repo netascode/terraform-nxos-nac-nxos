@@ -1,0 +1,1 @@
+- Add `port_type_fabric` support for ethernet interfaces
