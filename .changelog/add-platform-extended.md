@@ -1,1 +1,1 @@
-- Add `system.platform` extended hardware profile attributes (TCAM atomic update, PBR tuning, counter management, multicast, storm control, etc.)
+- Add `system.hardware` extended hardware profile attributes (TCAM atomic update, PBR tuning, counter management, multicast, storm control, etc.)
