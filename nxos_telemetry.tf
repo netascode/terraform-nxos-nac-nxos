@@ -2,12 +2,14 @@ resource "nxos_telemetry" "telemetry" {
   for_each = { for device in local.devices : device.name => device
     if try(local.device_config[device.name].telemetry.batch_dme_events, null) != null ||
     try(local.device_config[device.name].telemetry.merge_subscriptions, null) != null ||
+    try(local.device_config[device.name].telemetry.destination_profile_vrf, null) != null ||
     length(try(local.device_config[device.name].telemetry.destination_groups, [])) > 0 ||
     length(try(local.device_config[device.name].telemetry.sensor_groups, [])) > 0 ||
   length(try(local.device_config[device.name].telemetry.subscriptions, [])) > 0 }
-  device              = each.key
-  batch_dme_events    = try(local.device_config[each.key].telemetry.batch_dme_events, null)
-  merge_subscriptions = try(local.device_config[each.key].telemetry.merge_subscriptions, null)
+  device                  = each.key
+  batch_dme_events        = try(local.device_config[each.key].telemetry.batch_dme_events, null)
+  merge_subscriptions     = try(local.device_config[each.key].telemetry.merge_subscriptions, null)
+  destination_profile_vrf = try(local.device_config[each.key].telemetry.destination_profile_vrf, null)
   destination_groups = { for dg in try(local.device_config[each.key].telemetry.destination_groups, []) : dg.id => {
     destinations = { for dest in try(dg.destinations, []) : "${dest.ip_address};${dest.port}" => {
       encoding = try(dest.encoding, null)
