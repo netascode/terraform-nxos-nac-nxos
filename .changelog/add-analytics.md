@@ -1,1 +1,1 @@
-- Add `analytics` support including instances, flow profiles, flow events, flow policies, and flow traffic analytics configuration
+- Add `analytics` support including instances, flow profiles, flow events, flow filters, and flow traffic analytics configuration
