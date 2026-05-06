@@ -67,9 +67,14 @@ resource "nxos_route_policy" "route_policy" {
         } : {},
       )
 
-      match_route_access_lists = try(entry.match_ip_access_list, null) != null ? {
-        "sys/acl/ipv4/name-[${try(entry.match_ip_access_list)}]" = {}
-      } : {}
+      match_route_access_lists = merge(
+        try(entry.match_ip_access_list, null) != null ? {
+          "sys/acl/ipv4/name-[${try(entry.match_ip_access_list)}]" = {}
+        } : {},
+        try(entry.match_ip_address, null) != null ? {
+          "sys/rpm/accesslist-[${try(entry.match_ip_address)}]" = {}
+        } : {},
+      )
 
       set_regular_community_additive     = try(entry.set_community, null) != null ? (try(entry.set_community_additive, null) != null ? (try(entry.set_community_additive) ? "enabled" : "disabled") : "disabled") : null
       set_regular_community_no_community = try(entry.set_community, null) != null ? (try(entry.set_community_none, null) != null ? (try(entry.set_community_none) ? "enabled" : "disabled") : "disabled") : null
@@ -95,6 +100,7 @@ resource "nxos_route_policy" "route_policy" {
       set_next_hop_v6_unchanged        = try(entry.set_ipv6_next_hop_unchanged, null) != null ? (try(entry.set_ipv6_next_hop_unchanged) ? "enabled" : "disabled") : null
       set_next_hop_v6_redist_unchanged = try(entry.set_ipv6_next_hop_redist_unchanged, null) != null ? (try(entry.set_ipv6_next_hop_redist_unchanged) ? "enabled" : "disabled") : null
       set_local_preference             = try(entry.set_local_preference, null)
+      set_policy_tag                   = try(entry.set_policy_tag, null)
       set_path_selection_advertise     = try(entry.set_path_selection_advertise, null)
       set_evpn_gateway_ip              = try(entry.set_evpn_gateway_ip, null)
       set_evpn_gateway_type            = try(entry.set_evpn_gateway_ip_type, null)
