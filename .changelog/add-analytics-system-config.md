@@ -1,1 +1,1 @@
-- Add `analytics.flow_records`, `analytics.flow_collectors`, `analytics.flow_monitors`, and `analytics.flow_system_config` support
+- Add `analytics.flow_system_config` support
