@@ -1,6 +1,7 @@
 resource "nxos_access_list" "access_list" {
   for_each = { for device in local.devices : device.name => device
     if length(try(local.device_config[device.name].ip_access_lists, [])) > 0 ||
+    length(try(local.device_config[device.name].ipv6_access_lists, [])) > 0 ||
     try(local.device_config[device.name].system.line_vty_access_class_in, null) != null ||
   try(local.device_config[device.name].system.line_vty_access_class_out, null) != null }
   device = each.key
@@ -64,6 +65,65 @@ resource "nxos_access_list" "access_list" {
       telemetry_queue           = try(entry.telemetry_queue, null)
       ttl                       = try(entry.ttl, null)
       type_of_service           = try(entry.tos, null)
+    } }
+  } }
+  ipv6_access_lists = { for acl in try(local.device_config[each.key].ipv6_access_lists, []) : acl.name => {
+    extension_header   = try(acl.extension_header, null)
+    fragments          = try(acl.fragments, null)
+    ignore_routable    = try(acl.ignore_routable, null)
+    per_ace_statistics = try(acl.statistics_per_entry, false) ? "on" : "off"
+    entries = { for entry in try(acl.entries, []) : entry.sequence_number => {
+      remark                    = try(entry.remark, null)
+      action                    = try(entry.action, null)
+      protocol                  = try(tostring(entry.protocol), null)
+      source_prefix             = try(entry.source.prefix, null)
+      source_prefix_length      = try(tostring(entry.source.prefix_length), null)
+      source_prefix_mask        = try(entry.source.prefix_mask, null)
+      source_address_group      = try(entry.source.address_group, null)
+      source_port_operator      = try(entry.source.port_operator, null)
+      source_port_1             = try(tostring(entry.source.port_1), null)
+      source_port_2             = try(tostring(entry.source.port_2), null)
+      source_port_group         = try(entry.source.port_group, null)
+      destination_prefix        = try(entry.destination.prefix, null)
+      destination_prefix_length = try(tostring(entry.destination.prefix_length), null)
+      destination_prefix_mask   = try(entry.destination.prefix_mask, null)
+      destination_address_group = try(entry.destination.address_group, null)
+      destination_port_operator = try(entry.destination.port_operator, null)
+      destination_port_1        = try(tostring(entry.destination.port_1), null)
+      destination_port_2        = try(tostring(entry.destination.port_2), null)
+      destination_port_group    = try(entry.destination.port_group, null)
+      dscp                      = try(entry.dscp, null)
+      flow_label                = try(entry.flow_label, null)
+      fragment                  = try(entry.fragment, null)
+      log                       = try(entry.log, null)
+      established               = try(entry.established, null)
+      ack                       = try(entry.ack, null)
+      fin                       = try(entry.fin, null)
+      psh                       = try(entry.psh, null)
+      rst                       = try(entry.rst, null)
+      syn                       = try(entry.syn, null)
+      urg                       = try(entry.urg, null)
+      icmp_type                 = try(entry.icmp_type, null)
+      icmp_code                 = try(entry.icmp_code, null)
+      icmp_string               = try(entry.icmp_message, null)
+      http_option_type          = try(entry.http_method, null)
+      time_range                = try(entry.time_range, null)
+      redirect                  = try(entry.redirect, null)
+      packet_length_operator    = try(entry.packet_length_operator, null)
+      packet_length_1           = try(tostring(entry.packet_length_1), null)
+      packet_length_2           = try(tostring(entry.packet_length_2), null)
+      vlan                      = try(entry.vlan, null)
+      vni                       = try(entry.vni, null)
+      capture_session           = try(entry.capture_session, null)
+      dscp_mask                 = try(entry.dscp_mask, null)
+      load_share                = try(entry.load_share, null)
+      priority_all              = try(entry.priority_all, null)
+      protocol_mask             = try(entry.protocol_mask, null)
+      rev                       = try(entry.rev, null)
+      tcp_flags_mask            = try(entry.tcp_flags_mask, null)
+      tcp_option_length         = try(entry.tcp_option_length, null)
+      telemetry_path            = try(entry.telemetry_path, null)
+      telemetry_queue           = try(entry.telemetry_queue, null)
     } }
   } }
   ingress_vty_access_list_name = try(local.device_config[each.key].system.line_vty_access_class_in, null)
