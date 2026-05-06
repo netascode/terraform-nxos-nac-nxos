@@ -154,6 +154,7 @@ resource "nxos_port_channel_interface" "port_channel_interface" {
     storm_control_unicast_level_2                       = try(format("%f", int.storm_control.unicast_level[2]), null)
     storm_control_unicast_packets_per_second            = try(int.storm_control.unicast_pps, null)
     multisite_interface_tracking                        = try(int.evpn_multisite_dci_tracking, false) ? "dci" : try(int.evpn_multisite_fabric_tracking, false) ? "fabric" : null
+    port_type_fabric                                    = try(int.port_type_fabric, null) == null ? null : (try(int.port_type_fabric) ? "yes" : "no")
     priority_flow_control_mode                          = try(int.priority_flow_control_mode, null)
     priority_flow_control_send_tlv                      = try(int.priority_flow_control_send_tlv, null)
     priority_flow_control_watchdog_interval             = try(int.priority_flow_control_watchdog_interval, null) == null ? null : (try(int.priority_flow_control_watchdog_interval) ? "on" : "off")
