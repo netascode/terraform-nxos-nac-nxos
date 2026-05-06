@@ -503,7 +503,7 @@ resource "nxos_system" "system" {
   platform_profile_tuple                             = try(local.device_config[each.key].system.platform.profile_tuple, null) == null ? null : (try(local.device_config[each.key].system.platform.profile_tuple) ? "Enable" : "Disable")
   platform_pstat_configuration                       = try(local.device_config[each.key].system.platform.pstat, null) == null ? null : (try(local.device_config[each.key].system.platform.pstat) ? "PSTAT_ENABLE" : "PSTAT_DISABLE")
   platform_qos_min_buffer                            = try(local.device_config[each.key].system.platform.qos_min_buffer, null)
-  platform_routing_mode                              = try(local.platform_routing_map[try(local.device_config[each.key].system.platform.routing)], null)
+  platform_routing_mode                              = try(local.platform_routing_map[try(local.device_config[each.key].system.routing)], null)
   platform_service_template_name                     = try(local.device_config[each.key].system.platform.service_template_name, null)
   platform_svi_and_si_flex_stats                     = try(local.device_config[each.key].system.platform.svi_and_si_flex_stats, null) == null ? null : (try(local.device_config[each.key].system.platform.svi_and_si_flex_stats) ? "enable" : "disable")
   platform_svi_flex_stats                            = try(local.device_config[each.key].system.platform.svi_flex_stats, null) == null ? null : (try(local.device_config[each.key].system.platform.svi_flex_stats) ? "enable" : "disable")

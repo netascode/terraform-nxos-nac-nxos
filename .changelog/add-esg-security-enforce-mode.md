@@ -1,2 +1,0 @@
-- Add VRF security enforce mode support for ESG domains
-- BREAKING: Rename `system.platform.routing_mode` to `system.platform.routing` with CLI-aligned enum values
