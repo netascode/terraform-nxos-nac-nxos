@@ -10,8 +10,8 @@ locals {
         device                                  = device.name
         id                                      = int.id
         type                                    = "eth"
-        switchport_access_vlan                  = try(int.switchport.access_vlan, 1)
-        admin_state                             = try(int.shutdown, false)
+        switchport_access_vlan                  = try(int.switchport.access_vlan, null)
+        admin_state                             = try(int.shutdown, null)
         negotiate_auto                          = try(int.negotiate_auto, null)
         bandwidth                               = try(int.bandwidth, null)
         delay                                   = try(int.delay, null)
@@ -25,7 +25,7 @@ locals {
         medium                                  = try(int.medium, null)
         mode                                    = try(local.switchport_mode_map[try(int.switchport.mode)], try(int.switchport.mode, null))
         mtu                                     = try(int.mtu, null)
-        switchport_trunk_native_vlan            = try(int.switchport.trunk_native_vlan, 1)
+        switchport_trunk_native_vlan            = try(int.switchport.trunk_native_vlan, null)
         speed                                   = try(int.speed, null)
         speed_group                             = try(int.speed_group, null)
         switchport_trunk_allowed_vlans          = try(provider::utils::normalize_vlans(try(int.switchport.trunk_allowed_vlans), "string-nxos"), null)
@@ -35,7 +35,7 @@ locals {
         ip_verify_unicast_source_reachable_via  = try(int.ip.verify_unicast_source_reachable_via, null)
         ip_address                              = try(int.ip.address, null)
         ospf_process_name                       = try(int.ospf.process, null)
-        ospf_advertise_secondaries              = try(int.ospf.advertise_secondaries, false)
+        ospf_advertise_secondaries              = try(int.ospf.advertise_secondaries, null)
         ospf_area                               = try(int.ospf.area, null)
         ospf_bfd                                = try(int.ospf.bfd, null) == null ? null : (try(int.ospf.bfd) ? "enabled" : "disabled")
         ospf_cost                               = try(int.ospf.cost, null)
@@ -46,10 +46,10 @@ locals {
         ospf_priority                           = try(int.ospf.priority, null)
         ospf_authentication_key                 = try(int.ospf.authentication_key, null)
         ospf_authentication_key_id              = try(int.ospf.message_digest_key_id, null)
-        ospf_authentication_key_secure_mode     = try(int.ospf.authentication_key_secure_mode, false)
+        ospf_authentication_key_secure_mode     = try(int.ospf.authentication_key_secure_mode, null)
         ospf_authentication_keychain            = try(int.ospf.authentication_key_chain, null)
         ospf_authentication_md5_key             = try(int.ospf.message_digest_key, null)
-        ospf_authentication_md5_key_secure_mode = try(int.ospf.message_digest_key_secure_mode, false)
+        ospf_authentication_md5_key_secure_mode = try(int.ospf.message_digest_key_secure_mode, null)
         ospf_authentication_type                = try(int.ospf.authentication, null)
         ospf_advertise_subnet                   = try(int.ospf.advertise_subnet, false)
         ospf_mtu_ignore                         = try(int.ospf.mtu_ignore, false)
@@ -128,8 +128,8 @@ resource "nxos_physical_interface" "physical_interface" {
   device = each.key
   physical_interfaces = { for int in try(local.device_config[each.key].interfaces.ethernets, []) : "eth${int.id}" => {
     fec_mode                                            = try(int.fec, null)
-    access_vlan                                         = try(int.channel_group, null) != null ? null : (!try(int.switchport.enabled, true) ? "unknown" : "vlan-${try(int.switchport.access_vlan, 1)}")
-    admin_state                                         = try(int.shutdown, false) ? "down" : "up"
+    access_vlan                                         = try(int.channel_group, null) != null ? null : (!try(int.switchport.enabled, true) ? "unknown" : try(int.switchport.access_vlan, null) != null ? "vlan-${int.switchport.access_vlan}" : null)
+    admin_state                                         = try(int.shutdown, null) == null ? null : (try(int.shutdown) ? "down" : "up")
     auto_negotiation                                    = try(int.negotiate_auto, null)
     bandwidth                                           = try(int.bandwidth, null)
     beacon                                              = try(int.beacon, null) != null ? (try(int.beacon) ? "on" : "off") : null
@@ -157,7 +157,7 @@ resource "nxos_physical_interface" "physical_interface" {
     medium                                              = try(int.medium, null)
     mode                                                = try(local.switchport_mode_map[try(int.switchport.mode)], try(int.switchport.mode, null))
     mtu                                                 = try(int.mtu, null)
-    native_vlan                                         = try(int.channel_group, null) != null ? null : (!try(int.switchport.enabled, true) ? "unknown" : "vlan-${try(int.switchport.trunk_native_vlan, 1)}")
+    native_vlan                                         = try(int.channel_group, null) != null ? null : (!try(int.switchport.enabled, true) ? "unknown" : try(int.switchport.trunk_native_vlan, null) != null ? "vlan-${int.switchport.trunk_native_vlan}" : null)
     packet_timestamp_egress_source_id                   = try(int.packet_timestamp_egress_source_id, null)
     packet_timestamp_ingress_source_id                  = try(int.packet_timestamp_ingress_source_id, null)
     packet_timestamp_state                              = try(int.packet_timestamp, null)
@@ -199,7 +199,7 @@ resource "nxos_physical_interface" "physical_interface" {
     switchport_block                                    = try(int.switchport.block, null) != null ? join(",", sort(try(int.switchport.block, []))) : null
     switchport_isolated                                 = try(int.switchport.isolated, null) == null ? null : (try(int.switchport.isolated) ? "enable" : "disable")
     switchport_mac_learn                                = try(int.switchport.mac_learning, null) == null ? null : (try(int.switchport.mac_learning) ? "enable" : "disable")
-    multisite_interface_tracking                        = try(int.evpn_multisite_dci_tracking, false) ? "dci" : try(int.evpn_multisite_fabric_tracking, false) ? "fabric" : null
+    multisite_interface_tracking                        = try(int.evpn_multisite_dci_tracking, null) == true ? "dci" : try(int.evpn_multisite_fabric_tracking, null) == true ? "fabric" : null
     port_type_fabric                                    = try(int.port_type_fabric, null) == null ? null : (try(int.port_type_fabric) ? "yes" : "no")
     priority_flow_control_mode                          = try(int.priority_flow_control_mode, null)
     priority_flow_control_send_tlv                      = try(int.priority_flow_control_send_tlv, null)

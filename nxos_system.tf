@@ -606,7 +606,7 @@ resource "nxos_system" "system" {
 
   # mgmtMgmtIf nested map
   management_interfaces = { for int in try(local.device_config[each.key].interfaces.management, []) : int.id => {
-    admin_state      = try(int.shutdown, false) ? "down" : "up"
+    admin_state      = try(int.shutdown, null) == null ? null : (try(int.shutdown) ? "down" : "up")
     description      = try(int.description, null)
     duplex           = try(int.duplex, null)
     mtu              = try(int.mtu, null)

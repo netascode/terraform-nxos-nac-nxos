@@ -18,7 +18,7 @@ resource "nxos_ospfv3" "ospfv3" {
       # Synthetic "default" VRF from process-level attributes
       {
         "default" = {
-          admin_state               = try(proc.shutdown, false) ? "disabled" : "enabled"
+          admin_state               = try(proc.shutdown, null) == null ? null : (try(proc.shutdown) ? "disabled" : "enabled")
           bandwidth_reference       = try(proc.auto_cost_reference_bandwidth, null)
           bandwidth_reference_unit  = try(proc.auto_cost_reference_bandwidth_unit, null)
           router_id                 = try(proc.router_id, null)
@@ -47,7 +47,7 @@ resource "nxos_ospfv3" "ospfv3" {
       },
       # Explicit non-default VRFs
       { for vrf in try(proc.vrfs, []) : vrf.vrf => {
-        admin_state               = try(vrf.shutdown, false) ? "disabled" : "enabled"
+        admin_state               = try(vrf.shutdown, null) == null ? null : (try(vrf.shutdown) ? "disabled" : "enabled")
         bandwidth_reference       = try(vrf.auto_cost_reference_bandwidth, null)
         bandwidth_reference_unit  = try(vrf.auto_cost_reference_bandwidth_unit, null)
         router_id                 = try(vrf.router_id, null)

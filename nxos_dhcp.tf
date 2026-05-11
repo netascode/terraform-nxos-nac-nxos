@@ -99,8 +99,8 @@ resource "nxos_dhcp" "dhcp" {
     subnet_selection    = try(item.ip_dhcp_relay_source_subnet, null)
     v6_smart_relay      = try(item.ipv6_dhcp_smart_relay, null)
     addresses = merge(
-      { for addr in try(item.ip_dhcp_relay_addresses, []) : "${try(addr.vrf, "!unspecified")};${addr.address}" => {} },
-      { for addr in try(item.ipv6_dhcp_relay_addresses, []) : "${try(addr.vrf, "!unspecified")};${addr.address}" => {} }
+      { for addr in try(item.ip_dhcp_relay_addresses, []) : "${try(addr.vrf, "none")};${addr.address}" => {} },
+      { for addr in try(item.ipv6_dhcp_relay_addresses, []) : "${try(addr.vrf, "none")};${addr.address}" => {} }
     )
   } if item.device == each.key }
 

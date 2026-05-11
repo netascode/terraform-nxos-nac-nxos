@@ -15,7 +15,7 @@ resource "nxos_isis" "isis" {
       # Synthetic "default" VRF from instance-level attributes
       {
         "default" = {
-          admin_state              = try(inst.shutdown, false) ? "disabled" : "enabled"
+          admin_state              = try(inst.shutdown, null) == null ? null : (try(inst.shutdown) ? "disabled" : "enabled")
           authentication_check_l1  = try(inst.authentication_check_level_1, null)
           authentication_check_l2  = try(inst.authentication_check_level_2, null)
           authentication_key_l1    = try(inst.authentication_key_chain_level_1, null)
@@ -57,7 +57,7 @@ resource "nxos_isis" "isis" {
       },
       # Explicit non-default VRFs
       { for vrf in try(inst.vrfs, []) : vrf.vrf => {
-        admin_state              = try(vrf.shutdown, false) ? "disabled" : "enabled"
+        admin_state              = try(vrf.shutdown, null) == null ? null : (try(vrf.shutdown) ? "disabled" : "enabled")
         authentication_check_l1  = try(vrf.authentication_check_level_1, null)
         authentication_check_l2  = try(vrf.authentication_check_level_2, null)
         authentication_key_l1    = try(vrf.authentication_key_chain_level_1, null)

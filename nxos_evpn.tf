@@ -2,15 +2,14 @@ locals {
   evpn_vnis = flatten([
     for device in local.devices : [
       for vni in try(local.device_config[device.name].evpn.vnis, []) : {
-        key                    = format("%s/%s", device.name, vni.vni)
-        device                 = device.name
-        vni                    = vni.vni
-        rd                     = try(vni.rd, null)
-        route_target_both_auto = try(vni.route_target_both_auto, false)
-        route_target_imports   = try(vni.route_target_both_auto, false) ? concat(["auto"], try(vni.route_target_imports, [])) : try(vni.route_target_imports, [])
-        route_target_exports   = try(vni.route_target_both_auto, false) ? concat(["auto"], try(vni.route_target_exports, [])) : try(vni.route_target_exports, [])
-        table_map              = try(vni.table_map, null)
-        table_map_filter       = try(vni.table_map_filter, null)
+        key                  = format("%s/%s", device.name, vni.vni)
+        device               = device.name
+        vni                  = vni.vni
+        rd                   = try(vni.rd, null)
+        route_target_imports = try(vni.route_target_both_auto, false) ? concat(["auto"], try(vni.route_target_imports, [])) : try(vni.route_target_imports, [])
+        route_target_exports = try(vni.route_target_both_auto, false) ? concat(["auto"], try(vni.route_target_exports, [])) : try(vni.route_target_exports, [])
+        table_map            = try(vni.table_map, null)
+        table_map_filter     = try(vni.table_map_filter, null)
       }
     ]
   ])

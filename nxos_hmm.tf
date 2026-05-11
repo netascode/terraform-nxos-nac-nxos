@@ -16,7 +16,7 @@ resource "nxos_hmm" "hmm" {
   anycast_mac             = try(local.device_config[each.key].fabric_forwarding.anycast_gateway_mac, null)
   administrative_distance = try(local.device_config[each.key].fabric_forwarding.distance, null)
   limit_vlan_mac          = try(local.device_config[each.key].fabric_forwarding.limit_vlan_mac, null)
-  selective_host_probe    = try(local.device_config[each.key].fabric_forwarding.selective_host_probe, false) ? "yes" : "no"
+  selective_host_probe    = try(local.device_config[each.key].fabric_forwarding.selective_host_probe, null) == null ? null : (try(local.device_config[each.key].fabric_forwarding.selective_host_probe) ? "yes" : "no")
   interfaces = { for int in try(local.device_config[each.key].interfaces.vlans, []) : "vlan${int.id}" => {
     admin_state = "enabled"
     mode        = try(local.hmm_mode_map[try(int.fabric_forwarding_mode)], null)

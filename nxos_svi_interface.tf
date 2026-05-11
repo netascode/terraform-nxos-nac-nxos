@@ -6,19 +6,19 @@ locals {
         device                                  = device.name
         id                                      = int.id
         type                                    = "vlan"
-        admin_state                             = try(int.shutdown, false)
+        admin_state                             = try(int.shutdown, null)
         description                             = try(int.description, null)
         vrf                                     = try(int.vrf, "default")
         ip_address                              = try(int.ip.address, null)
         delay                                   = try(int.delay, null)
         bandwidth                               = try(int.bandwidth, null)
-        ip_forward                              = try(int.ip.forward, false)
-        ip_drop_glean                           = try(int.ip.drop_glean, false)
+        ip_forward                              = try(int.ip.forward, null)
+        ip_drop_glean                           = try(int.ip.drop_glean, null)
         medium                                  = try(int.medium, null)
         mtu                                     = try(int.mtu, null)
         fabric_forwarding_mode                  = try(int.fabric_forwarding_mode, null)
         ospf_process_name                       = try(int.ospf.process, null)
-        ospf_advertise_secondaries              = try(int.ospf.advertise_secondaries, false)
+        ospf_advertise_secondaries              = try(int.ospf.advertise_secondaries, null)
         ospf_area                               = try(int.ospf.area, null)
         ospf_bfd                                = try(int.ospf.bfd, null) == null ? null : (try(int.ospf.bfd) ? "enabled" : "disabled")
         ospf_cost                               = try(int.ospf.cost, null)
@@ -29,10 +29,10 @@ locals {
         ospf_priority                           = try(int.ospf.priority, null)
         ospf_authentication_key                 = try(int.ospf.authentication_key, null)
         ospf_authentication_key_id              = try(int.ospf.message_digest_key_id, null)
-        ospf_authentication_key_secure_mode     = try(int.ospf.authentication_key_secure_mode, false)
+        ospf_authentication_key_secure_mode     = try(int.ospf.authentication_key_secure_mode, null)
         ospf_authentication_keychain            = try(int.ospf.authentication_key_chain, null)
         ospf_authentication_md5_key             = try(int.ospf.message_digest_key, null)
-        ospf_authentication_md5_key_secure_mode = try(int.ospf.message_digest_key_secure_mode, false)
+        ospf_authentication_md5_key_secure_mode = try(int.ospf.message_digest_key_secure_mode, null)
         ospf_authentication_type                = try(int.ospf.authentication, null)
         ospf_advertise_subnet                   = try(int.ospf.advertise_subnet, false)
         ospf_mtu_ignore                         = try(int.ospf.mtu_ignore, false)
@@ -109,14 +109,14 @@ resource "nxos_svi_interface" "svi_interface" {
   if length(try(local.device_config[device.name].interfaces.vlans, [])) > 0 }
   device = each.key
   svi_interfaces = { for int in try(local.device_config[each.key].interfaces.vlans, []) : "vlan${int.id}" => {
-    admin_state                  = try(int.shutdown, false) ? "down" : "up"
+    admin_state                  = try(int.shutdown, null) == null ? null : (try(int.shutdown) ? "down" : "up")
     bandwidth                    = try(int.bandwidth, null)
     delay                        = try(int.delay, null)
     description                  = try(int.description, null)
     medium                       = try(int.medium, null) == "broadcast" ? "bcast" : try(int.medium, null)
     mtu                          = try(int.mtu, null)
     vrf_dn                       = "sys/inst-${try(int.vrf, "default")}"
-    multisite_interface_tracking = try(int.evpn_multisite_dci_tracking, false) ? "dci" : try(int.evpn_multisite_fabric_tracking, false) ? "fabric" : null
+    multisite_interface_tracking = try(int.evpn_multisite_dci_tracking, null) == true ? "dci" : try(int.evpn_multisite_fabric_tracking, null) == true ? "fabric" : null
   } }
 
   depends_on = [

@@ -14,7 +14,7 @@ resource "nxos_ospf" "ospf" {
       # Synthetic "default" VRF from process-level attributes
       {
         "default" = {
-          admin_state              = try(proc.shutdown, false) ? "disabled" : "enabled"
+          admin_state              = try(proc.shutdown, null) == null ? null : (try(proc.shutdown) ? "disabled" : "enabled")
           bandwidth_reference      = try(proc.auto_cost_reference_bandwidth, null)
           bandwidth_reference_unit = try(proc.auto_cost_reference_bandwidth_unit, null)
           capability_vrf_lite      = try(proc.capability_vrf_lite, null)
@@ -73,7 +73,7 @@ resource "nxos_ospf" "ospf" {
                 try(area.nssa_translate_type7_suppress_fa, false) ? "suppress-fa" : "",
             ]))) : null
             nssa_translator_role = try(area.nssa_translate_type7, null)
-            segment_routing_mpls = try(area.segment_routing_mpls, false) ? "mpls" : "unspecified"
+            segment_routing_mpls = try(area.segment_routing_mpls, null) == null ? null : (try(area.segment_routing_mpls) ? "mpls" : "unspecified")
             type                 = try(area.type, null)
           } }
 
@@ -113,7 +113,7 @@ resource "nxos_ospf" "ospf" {
       },
       # Explicit non-default VRFs
       { for vrf in try(proc.vrfs, []) : vrf.vrf => {
-        admin_state              = try(vrf.shutdown, false) ? "disabled" : "enabled"
+        admin_state              = try(vrf.shutdown, null) == null ? null : (try(vrf.shutdown) ? "disabled" : "enabled")
         bandwidth_reference      = try(vrf.auto_cost_reference_bandwidth, null)
         bandwidth_reference_unit = try(vrf.auto_cost_reference_bandwidth_unit, null)
         capability_vrf_lite      = try(vrf.capability_vrf_lite, null)
@@ -172,7 +172,7 @@ resource "nxos_ospf" "ospf" {
               try(area.nssa_translate_type7_suppress_fa, false) ? "suppress-fa" : "",
           ]))) : null
           nssa_translator_role = try(area.nssa_translate_type7, null)
-          segment_routing_mpls = try(area.segment_routing_mpls, false) ? "mpls" : "unspecified"
+          segment_routing_mpls = try(area.segment_routing_mpls, null) == null ? null : (try(area.segment_routing_mpls) ? "mpls" : "unspecified")
           type                 = try(area.type, null)
         } }
 

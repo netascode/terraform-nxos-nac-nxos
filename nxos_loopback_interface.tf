@@ -6,12 +6,12 @@ locals {
         device                                  = device.name
         id                                      = int.id
         type                                    = "lo"
-        admin_state                             = try(int.shutdown, false)
+        admin_state                             = try(int.shutdown, null)
         description                             = try(int.description, null)
         vrf                                     = try(int.vrf, "default")
         ip_address                              = try(int.ip.address, null)
         ospf_process_name                       = try(int.ospf.process, null)
-        ospf_advertise_secondaries              = try(int.ospf.advertise_secondaries, false)
+        ospf_advertise_secondaries              = try(int.ospf.advertise_secondaries, null)
         ospf_area                               = try(int.ospf.area, null)
         ospf_bfd                                = try(int.ospf.bfd, null) == null ? null : (try(int.ospf.bfd) ? "enabled" : "disabled")
         ospf_cost                               = try(int.ospf.cost, null)
@@ -22,10 +22,10 @@ locals {
         ospf_priority                           = try(int.ospf.priority, null)
         ospf_authentication_key                 = try(int.ospf.authentication_key, null)
         ospf_authentication_key_id              = try(int.ospf.message_digest_key_id, null)
-        ospf_authentication_key_secure_mode     = try(int.ospf.authentication_key_secure_mode, false)
+        ospf_authentication_key_secure_mode     = try(int.ospf.authentication_key_secure_mode, null)
         ospf_authentication_keychain            = try(int.ospf.authentication_key_chain, null)
         ospf_authentication_md5_key             = try(int.ospf.message_digest_key, null)
-        ospf_authentication_md5_key_secure_mode = try(int.ospf.message_digest_key_secure_mode, false)
+        ospf_authentication_md5_key_secure_mode = try(int.ospf.message_digest_key_secure_mode, null)
         ospf_authentication_type                = try(int.ospf.authentication, null)
         ospf_advertise_subnet                   = try(int.ospf.advertise_subnet, false)
         ospf_mtu_ignore                         = try(int.ospf.mtu_ignore, false)
@@ -102,7 +102,7 @@ resource "nxos_loopback_interface" "loopback_interface" {
   if length(try(local.device_config[device.name].interfaces.loopbacks, [])) > 0 }
   device = each.key
   loopback_interfaces = { for int in try(local.device_config[each.key].interfaces.loopbacks, []) : "lo${int.id}" => {
-    admin_state  = try(int.shutdown, false) ? "down" : "up"
+    admin_state  = try(int.shutdown, null) == null ? null : (try(int.shutdown) ? "down" : "up")
     description  = try(int.description, null)
     link_logging = try(int.logging_event_port_link_status, null) == null ? null : try(int.logging_event_port_link_status, null) ? "enable" : "disable"
     vrf_dn       = "sys/inst-${try(int.vrf, "default")}"

@@ -8,7 +8,7 @@ resource "nxos_access_list" "access_list" {
   access_lists = { for acl in try(local.device_config[each.key].ip_access_lists, []) : acl.name => {
     fragments          = try(acl.fragments, null)
     ignore_routable    = try(acl.ignore_routable, null)
-    per_ace_statistics = try(acl.statistics_per_entry, false) ? "on" : "off"
+    per_ace_statistics = try(acl.statistics_per_entry, null) == null ? null : (try(acl.statistics_per_entry) ? "on" : "off")
     entries = { for entry in try(acl.entries, []) : entry.sequence_number => {
       remark                    = try(entry.remark, null)
       action                    = try(entry.action, null)
@@ -71,7 +71,7 @@ resource "nxos_access_list" "access_list" {
     extension_header   = try(acl.extension_header, null)
     fragments          = try(acl.fragments, null)
     ignore_routable    = try(acl.ignore_routable, null)
-    per_ace_statistics = try(acl.statistics_per_entry, false) ? "on" : "off"
+    per_ace_statistics = try(acl.statistics_per_entry, null) == null ? null : (try(acl.statistics_per_entry) ? "on" : "off")
     entries = { for entry in try(acl.entries, []) : entry.sequence_number => {
       remark                    = try(entry.remark, null)
       action                    = try(entry.action, null)

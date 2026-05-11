@@ -8,7 +8,7 @@ locals {
         type                                    = "po"
         vrf                                     = try(int.vrf, "default")
         ospf_process_name                       = try(int.ospf.process, null)
-        ospf_advertise_secondaries              = try(int.ospf.advertise_secondaries, false)
+        ospf_advertise_secondaries              = try(int.ospf.advertise_secondaries, null)
         ospf_area                               = try(int.ospf.area, null)
         ospf_bfd                                = try(int.ospf.bfd, null) == null ? null : (try(int.ospf.bfd) ? "enabled" : "disabled")
         ospf_cost                               = try(int.ospf.cost, null)
@@ -19,10 +19,10 @@ locals {
         ospf_priority                           = try(int.ospf.priority, null)
         ospf_authentication_key                 = try(int.ospf.authentication_key, null)
         ospf_authentication_key_id              = try(int.ospf.message_digest_key_id, null)
-        ospf_authentication_key_secure_mode     = try(int.ospf.authentication_key_secure_mode, false)
+        ospf_authentication_key_secure_mode     = try(int.ospf.authentication_key_secure_mode, null)
         ospf_authentication_keychain            = try(int.ospf.authentication_key_chain, null)
         ospf_authentication_md5_key             = try(int.ospf.message_digest_key, null)
-        ospf_authentication_md5_key_secure_mode = try(int.ospf.message_digest_key_secure_mode, false)
+        ospf_authentication_md5_key_secure_mode = try(int.ospf.message_digest_key_secure_mode, null)
         ospf_authentication_type                = try(int.ospf.authentication, null)
         ospf_advertise_subnet                   = try(int.ospf.advertise_subnet, false)
         ospf_mtu_ignore                         = try(int.ospf.mtu_ignore, false)
@@ -103,8 +103,8 @@ resource "nxos_port_channel_interface" "port_channel_interface" {
     minimum_links                                       = try(int.lacp_min_links, null)
     maximum_links                                       = try(int.lacp_max_bundle, null)
     suspend_individual                                  = try(int.lacp_suspend_individual, null) != null ? (try(int.lacp_suspend_individual) ? "enable" : "disable") : null
-    access_vlan                                         = !try(int.switchport.enabled, true) ? "unknown" : "vlan-${try(int.switchport.access_vlan, 1)}"
-    admin_state                                         = try(int.shutdown, false) ? "down" : "up"
+    access_vlan                                         = !try(int.switchport.enabled, true) ? "unknown" : try(int.switchport.access_vlan, null) != null ? "vlan-${int.switchport.access_vlan}" : null
+    admin_state                                         = try(int.shutdown, null) == null ? null : (try(int.shutdown) ? "down" : "up")
     auto_negotiation                                    = try(int.negotiate_auto, null)
     bandwidth                                           = try(int.bandwidth, null)
     delay                                               = try(int.delay, null)
@@ -115,7 +115,7 @@ resource "nxos_port_channel_interface" "port_channel_interface" {
     medium                                              = try(int.medium, null)
     mode                                                = try(local.switchport_mode_map[try(int.switchport.mode)], try(int.switchport.mode, null))
     mtu                                                 = try(int.mtu, null)
-    native_vlan                                         = !try(int.switchport.enabled, true) ? "unknown" : "vlan-${try(int.switchport.trunk_native_vlan, 1)}"
+    native_vlan                                         = !try(int.switchport.enabled, true) ? "unknown" : try(int.switchport.trunk_native_vlan, null) != null ? "vlan-${int.switchport.trunk_native_vlan}" : null
     speed                                               = try(int.speed, null)
     trunk_vlans                                         = !try(int.switchport.enabled, true) ? "1-4094" : try(provider::utils::normalize_vlans(try(int.switchport.trunk_allowed_vlans), "string-nxos"), null)
     dot1q_ethertype                                     = try(int.dot1q_ethertype, null)
@@ -153,7 +153,7 @@ resource "nxos_port_channel_interface" "port_channel_interface" {
     storm_control_unicast_level_1                       = try(format("%f", int.storm_control.unicast_level[1]), null)
     storm_control_unicast_level_2                       = try(format("%f", int.storm_control.unicast_level[2]), null)
     storm_control_unicast_packets_per_second            = try(int.storm_control.unicast_pps, null)
-    multisite_interface_tracking                        = try(int.evpn_multisite_dci_tracking, false) ? "dci" : try(int.evpn_multisite_fabric_tracking, false) ? "fabric" : null
+    multisite_interface_tracking                        = try(int.evpn_multisite_dci_tracking, null) == true ? "dci" : try(int.evpn_multisite_fabric_tracking, null) == true ? "fabric" : null
     port_type_fabric                                    = try(int.port_type_fabric, null) == null ? null : (try(int.port_type_fabric) ? "yes" : "no")
     priority_flow_control_mode                          = try(int.priority_flow_control_mode, null)
     priority_flow_control_send_tlv                      = try(int.priority_flow_control_send_tlv, null)
@@ -161,7 +161,7 @@ resource "nxos_port_channel_interface" "port_channel_interface" {
     priority_flow_control_watchdog_disable_action       = try(int.priority_flow_control_watchdog_disable_action, null)
     priority_flow_control_watchdog_interface_multiplier = try(int.priority_flow_control_watchdog_interface_multiplier, null)
     members = { for eth in try(local.device_config[each.key].interfaces.ethernets, []) : "sys/intf/phys-[eth${eth.id}]" => {
-      force = try(eth.channel_group_force, false)
+      force = try(eth.channel_group_force, null)
     } if try(eth.channel_group, null) == int.id }
   } }
 
