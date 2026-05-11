@@ -57,7 +57,7 @@ resource "nxos_access_list" "access_list" {
       load_share                = try(entry.load_share, null)
       priority_all              = try(entry.priority_all, null)
       protocol_mask             = try(entry.protocol_mask, null)
-      redirect_all              = try(entry.redirect_all, null)
+      redirect_all              = try(entry.redirect_all_interface_type, null) != null ? "${local.intf_prefix_map[try(entry.redirect_all_interface_type)]}${try(entry.redirect_all_interface_id, "")}" : null
       rev                       = try(entry.rev, null)
       tcp_flags_mask            = try(entry.tcp_flags_mask, null)
       tcp_option_length         = try(entry.tcp_option_length, null)
@@ -66,6 +66,20 @@ resource "nxos_access_list" "access_list" {
       ttl                       = try(entry.ttl, null)
       type_of_service           = try(entry.tos, null)
     } }
+    ingress_interfaces = merge([
+      for intf_type, intf_prefix in { "ethernets" = "eth", "port_channels" = "po", "vlans" = "vlan", "loopbacks" = "lo" } : {
+        for int in try(local.device_config[each.key].interfaces[intf_type], []) : "${intf_prefix}${int.id}" => {
+          access_list_name = acl.name
+        } if try(int.ip.access_group_in, null) == acl.name
+      }
+    ]...)
+    egress_interfaces = merge([
+      for intf_type, intf_prefix in { "ethernets" = "eth", "port_channels" = "po", "vlans" = "vlan", "loopbacks" = "lo" } : {
+        for int in try(local.device_config[each.key].interfaces[intf_type], []) : "${intf_prefix}${int.id}" => {
+          access_list_name = acl.name
+        } if try(int.ip.access_group_out, null) == acl.name
+      }
+    ]...)
   } }
   ipv6_access_lists = { for acl in try(local.device_config[each.key].ipv6_access_lists, []) : acl.name => {
     extension_header   = try(acl.extension_header, null)
@@ -119,6 +133,7 @@ resource "nxos_access_list" "access_list" {
       load_share                = try(entry.load_share, null)
       priority_all              = try(entry.priority_all, null)
       protocol_mask             = try(entry.protocol_mask, null)
+      redirect_all              = try(entry.redirect_all_interface_type, null) != null ? "${local.intf_prefix_map[try(entry.redirect_all_interface_type)]}${try(entry.redirect_all_interface_id, "")}" : null
       rev                       = try(entry.rev, null)
       tcp_flags_mask            = try(entry.tcp_flags_mask, null)
       tcp_option_length         = try(entry.tcp_option_length, null)

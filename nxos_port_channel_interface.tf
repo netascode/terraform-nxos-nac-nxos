@@ -132,6 +132,10 @@ resource "nxos_port_channel_interface" "port_channel_interface" {
     squelch                                             = try(int.squelch, null) != null ? (try(int.squelch) ? "enable" : "disable") : null
     transmission_mode                                   = try(int.switchport.transparent_mode, null) == null ? null : (try(int.switchport.transparent_mode) ? "trans-port" : "not-a-trans-port")
     trunk_logging                                       = try(int.logging_event_port_trunk_status, null) != null ? (try(int.logging_event_port_trunk_status) ? "enable" : "disable") : null
+    auto_exclude_vlans                                  = try(provider::utils::normalize_vlans(try(int.switchport.autostate_exclude_vlans), "string-nxos"), null)
+    switchport_block                                    = try(int.switchport.block, null) != null ? join(",", sort(try(int.switchport.block, []))) : null
+    switchport_isolated                                 = try(int.switchport.isolated, null) == null ? null : (try(int.switchport.isolated) ? "enable" : "disable")
+    switchport_mac_learn                                = try(int.switchport.mac_learning, null) == null ? null : (try(int.switchport.mac_learning) ? "enable" : "disable")
     user_configured_flags                               = "admin_layer,admin_mtu,admin_state"
     vrf_dn                                              = !try(int.switchport.enabled, true) ? "sys/inst-${try(int.vrf, "default")}" : null
     buffer_boost                                        = try(int.buffer_boost, null) == null ? null : (try(int.buffer_boost) ? "enable" : "disable")

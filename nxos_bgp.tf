@@ -169,6 +169,7 @@ resource "nxos_bgp" "bgp" {
               !try(pt.dynamic_capability, true) ? "no-dyn-cap" : "",
           ]))) : null
           keepalive_interval   = try(pt.keepalive_interval, null)
+          hold_time            = try(pt.hold_time, null)
           log_neighbor_changes = try(pt.log_neighbor_changes, null) == null ? "none" : (try(pt.log_neighbor_changes) ? "enable" : "disable")
           low_memory_exempt    = try(pt.low_memory_exempt, null) == null ? null : (try(pt.low_memory_exempt) ? "enabled" : "disabled")
           max_peer_count       = try(pt.maximum_peers, null)
@@ -367,6 +368,8 @@ resource "nxos_bgp" "bgp" {
           ebgp_multihop_ttl                = try(nei.ebgp_multihop_ttl, null)
           ttl_security_hops                = try(nei.ttl_security_hops, null)
           internal_vpn_client              = try(nei.internal_vpn_client, null) == null ? null : (try(nei.internal_vpn_client) ? "enabled" : "disabled")
+          local_asn                        = try(nei.local_as, null)
+          local_asn_propagation            = try(nei.local_as_propagation, null)
         } if try(nei.interface_type, null) != null }
       }
     },
@@ -616,6 +619,8 @@ resource "nxos_bgp" "bgp" {
         ebgp_multihop_ttl                = try(nei.ebgp_multihop_ttl, null)
         ttl_security_hops                = try(nei.ttl_security_hops, null)
         internal_vpn_client              = try(nei.internal_vpn_client, null) == null ? null : (try(nei.internal_vpn_client) ? "enabled" : "disabled")
+        local_asn                        = try(nei.local_as, null)
+        local_asn_propagation            = try(nei.local_as_propagation, null)
       } if try(nei.interface_type, null) != null }
     } }
   )

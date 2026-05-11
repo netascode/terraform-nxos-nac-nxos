@@ -117,6 +117,15 @@ resource "nxos_svi_interface" "svi_interface" {
     mtu                          = try(int.mtu, null)
     vrf_dn                       = "sys/inst-${try(int.vrf, "default")}"
     multisite_interface_tracking = try(int.evpn_multisite_dci_tracking, null) == true ? "dci" : try(int.evpn_multisite_fabric_tracking, null) == true ? "fabric" : null
+    autostate                    = try(int.autostate, null)
+    carrier_delay                = try(int.carrier_delay, null)
+    inband_management            = try(int.management, null)
+    load_interval_counter_1      = try(int.load_interval_counter_1, null)
+    load_interval_counter_2      = try(int.load_interval_counter_2, null)
+    load_interval_counter_3      = try(int.load_interval_counter_3, null)
+    mac_address                  = try(int.mac_address, null)
+    mtu_inherit                  = try(int.mtu_inherit, null)
+    snmp_trap_link_status        = try(int.snmp_trap_link_status, null)
   } }
 
   depends_on = [

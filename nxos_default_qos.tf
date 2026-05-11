@@ -1,7 +1,10 @@
 resource "nxos_default_qos" "default_qos" {
   for_each = { for device in local.devices : device.name => device
     if length(try(local.device_config[device.name].qos.class_maps, [])) > 0 ||
-  length(try(local.device_config[device.name].qos.policy_maps, [])) > 0 }
+    length(try(local.device_config[device.name].qos.policy_maps, [])) > 0 ||
+    length([for int in try(local.device_config[device.name].interfaces.ethernets, []) : int if try(int.service_policy_type_qos_input, null) != null]) > 0 ||
+    length([for int in try(local.device_config[device.name].interfaces.vlans, []) : int if try(int.service_policy_type_qos_input, null) != null]) > 0 ||
+  length([for int in try(local.device_config[device.name].interfaces.port_channels, []) : int if try(int.service_policy_type_qos_input, null) != null]) > 0 }
   device = each.key
   class_maps = { for cm in try(local.device_config[each.key].qos.class_maps, []) : cm.name => {
     match_type = try(cm.match_type, null)
@@ -37,4 +40,12 @@ resource "nxos_default_qos" "default_qos" {
       police_violate_set_qos_group  = try(cls.police.violate_set_qos_group, null)
     } }
   } }
+  policy_interface_in = merge([
+    for intf_type, intf_prefix in { "ethernets" = "eth", "port_channels" = "po", "vlans" = "vlan" } : {
+      for int in try(local.device_config[each.key].interfaces[intf_type], []) : "${intf_prefix}${int.id}" => {
+        policy_map_name       = try(int.service_policy_type_qos_input)
+        policy_map_statistics = try(int.service_policy_type_qos_input_statistics, null)
+      } if try(int.service_policy_type_qos_input, null) != null
+    }
+  ]...)
 }
