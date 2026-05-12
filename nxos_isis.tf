@@ -98,52 +98,53 @@ resource "nxos_isis" "isis" {
       } }
     )
 
-    interfaces = { for int in local.isis_interfaces : "${int.type}${int.id}" => {
-      authentication_check         = int.isis_authentication_check
-      authentication_check_l1      = int.isis_authentication_check_level_1
-      authentication_check_l2      = int.isis_authentication_check_level_2
-      authentication_key           = int.isis_authentication_key_chain
-      authentication_key_l1        = int.isis_authentication_key_chain_level_1
-      authentication_key_l2        = int.isis_authentication_key_chain_level_2
-      authentication_type          = int.isis_authentication_type
-      authentication_type_l1       = int.isis_authentication_type_level_1
-      authentication_type_l2       = int.isis_authentication_type_level_2
-      circuit_type                 = int.isis_circuit_type
-      vrf                          = int.vrf
-      hello_interval               = int.isis_hello_interval
-      hello_interval_l1            = int.isis_hello_interval_l1
-      hello_interval_l2            = int.isis_hello_interval_l2
-      hello_multiplier             = int.isis_hello_multiplier
-      hello_multiplier_l1          = int.isis_hello_multiplier_l1
-      hello_multiplier_l2          = int.isis_hello_multiplier_l2
-      hello_padding                = int.isis_hello_padding
-      instance_name                = int.isis_instance_name
-      metric_l1                    = int.isis_metric_l1
-      metric_l2                    = int.isis_metric_l2
-      mtu_check                    = int.isis_mtu_check
-      mtu_check_l1                 = int.isis_mtu_check_l1
-      mtu_check_l2                 = int.isis_mtu_check_l2
-      network_type_p2p             = int.isis_network_point_to_point
-      passive                      = int.isis_passive_interface
-      priority_l1                  = int.isis_priority_l1
-      priority_l2                  = int.isis_priority_l2
-      enable_ipv4                  = int.isis_ipv4
-      csnp_interval_l1             = int.isis_csnp_interval_l1
-      csnp_interval_l2             = int.isis_csnp_interval_l2
-      lsp_refresh_interval         = int.isis_lsp_interval
-      mesh_group_blocked           = int.isis_mesh_group_blocked
-      mesh_group_id                = int.isis_mesh_group
-      ipv6_metric_l1               = int.isis_ipv6_metric_l1
-      ipv6_metric_l2               = int.isis_ipv6_metric_l2
-      n_flag_clear                 = int.isis_n_flag_clear
-      retransmit_interval          = int.isis_retransmit_interval
-      retransmit_throttle_interval = int.isis_retransmit_throttle_interval
-      suppressed_state             = int.isis_suppress_prefix
-      ipv4_bfd                     = int.isis_bfd
-      ipv6_bfd                     = int.isis_ipv6_bfd
-      ipv6                         = int.isis_ipv6
-    } if int.device == each.key && int.isis_instance_name == inst.name }
   } }
+
+  interfaces = { for int in local.isis_interfaces : "${int.type}${int.id}" => {
+    authentication_check         = int.isis_authentication_check
+    authentication_check_l1      = int.isis_authentication_check_level_1
+    authentication_check_l2      = int.isis_authentication_check_level_2
+    authentication_key           = int.isis_authentication_key_chain
+    authentication_key_l1        = int.isis_authentication_key_chain_level_1
+    authentication_key_l2        = int.isis_authentication_key_chain_level_2
+    authentication_type          = int.isis_authentication_type
+    authentication_type_l1       = int.isis_authentication_type_level_1
+    authentication_type_l2       = int.isis_authentication_type_level_2
+    circuit_type                 = int.isis_circuit_type
+    vrf                          = int.vrf
+    hello_interval               = int.isis_hello_interval
+    hello_interval_l1            = int.isis_hello_interval_l1
+    hello_interval_l2            = int.isis_hello_interval_l2
+    hello_multiplier             = int.isis_hello_multiplier
+    hello_multiplier_l1          = int.isis_hello_multiplier_l1
+    hello_multiplier_l2          = int.isis_hello_multiplier_l2
+    hello_padding                = int.isis_hello_padding
+    instance_name                = int.isis_instance_name
+    metric_l1                    = int.isis_metric_l1
+    metric_l2                    = int.isis_metric_l2
+    mtu_check                    = int.isis_mtu_check
+    mtu_check_l1                 = int.isis_mtu_check_l1
+    mtu_check_l2                 = int.isis_mtu_check_l2
+    network_type_p2p             = int.isis_network_point_to_point
+    passive                      = int.isis_passive_interface
+    priority_l1                  = int.isis_priority_l1
+    priority_l2                  = int.isis_priority_l2
+    enable_ipv4                  = coalesce(int.isis_ipv4, true) # NX-OS CLI enables IPv4 by default when adding an interface to ISIS
+    csnp_interval_l1             = int.isis_csnp_interval_l1
+    csnp_interval_l2             = int.isis_csnp_interval_l2
+    lsp_refresh_interval         = int.isis_lsp_interval
+    mesh_group_blocked           = int.isis_mesh_group_blocked
+    mesh_group_id                = int.isis_mesh_group
+    ipv6_metric_l1               = int.isis_ipv6_metric_l1
+    ipv6_metric_l2               = int.isis_ipv6_metric_l2
+    n_flag_clear                 = int.isis_n_flag_clear
+    retransmit_interval          = int.isis_retransmit_interval
+    retransmit_throttle_interval = int.isis_retransmit_throttle_interval
+    suppressed_state             = int.isis_suppress_prefix
+    ipv4_bfd                     = int.isis_bfd
+    ipv6_bfd                     = int.isis_ipv6_bfd
+    ipv6                         = int.isis_ipv6
+  } if int.device == each.key && int.isis_instance_name != null }
 
   depends_on = [
     nxos_feature.feature,
