@@ -66,20 +66,6 @@ resource "nxos_access_list" "access_list" {
       ttl                       = try(entry.ttl, null)
       type_of_service           = try(entry.tos, null)
     } }
-    ingress_interfaces = merge([
-      for intf_type, intf_prefix in { "ethernets" = "eth", "port_channels" = "po", "vlans" = "vlan", "loopbacks" = "lo" } : {
-        for int in try(local.device_config[each.key].interfaces[intf_type], []) : "${intf_prefix}${int.id}" => {
-          access_list_name = acl.name
-        } if try(int.ip.access_group_in, null) == acl.name
-      }
-    ]...)
-    egress_interfaces = merge([
-      for intf_type, intf_prefix in { "ethernets" = "eth", "port_channels" = "po", "vlans" = "vlan", "loopbacks" = "lo" } : {
-        for int in try(local.device_config[each.key].interfaces[intf_type], []) : "${intf_prefix}${int.id}" => {
-          access_list_name = acl.name
-        } if try(int.ip.access_group_out, null) == acl.name
-      }
-    ]...)
   } }
   ipv6_access_lists = { for acl in try(local.device_config[each.key].ipv6_access_lists, []) : acl.name => {
     extension_header   = try(acl.extension_header, null)
@@ -141,6 +127,30 @@ resource "nxos_access_list" "access_list" {
       telemetry_queue           = try(entry.telemetry_queue, null)
     } }
   } }
+  ingress_interfaces = merge([
+    for acl in try(local.device_config[each.key].ip_access_lists, []) : merge([
+      for intf_type, intf_prefix in { "ethernets" = "eth", "port_channels" = "po", "vlans" = "vlan", "loopbacks" = "lo" } : {
+        for int in try(local.device_config[each.key].interfaces[intf_type], []) : "${intf_prefix}${int.id}" => {
+          access_list_name = acl.name
+        } if try(int.ip.access_group_in, null) == acl.name
+      }
+    ]...)
+  ]...)
+  egress_interfaces = merge([
+    for acl in try(local.device_config[each.key].ip_access_lists, []) : merge([
+      for intf_type, intf_prefix in { "ethernets" = "eth", "port_channels" = "po", "vlans" = "vlan", "loopbacks" = "lo" } : {
+        for int in try(local.device_config[each.key].interfaces[intf_type], []) : "${intf_prefix}${int.id}" => {
+          access_list_name = acl.name
+        } if try(int.ip.access_group_out, null) == acl.name
+      }
+    ]...)
+  ]...)
   ingress_vty_access_list_name = try(local.device_config[each.key].system.line_vty_access_class_in, null)
   egress_vty_access_list_name  = try(local.device_config[each.key].system.line_vty_access_class_out, null)
+  depends_on = [
+    nxos_physical_interface.physical_interface,
+    nxos_svi_interface.svi_interface,
+    nxos_loopback_interface.loopback_interface,
+    nxos_port_channel_interface.port_channel_interface,
+  ]
 }
