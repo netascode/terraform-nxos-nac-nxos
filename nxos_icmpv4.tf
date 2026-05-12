@@ -54,17 +54,14 @@ locals {
   icmpv4_vrfs = { for entry in distinct([for int in local.icmpv4_interfaces : { device = int.device, vrf = int.vrf }]) :
     "${entry.device}/${entry.vrf}" => entry
   }
-}
-
-resource "nxos_icmpv4" "icmpv4" {
-  for_each = { for device in local.devices : device.name => device
-  if length([for int in local.icmpv4_interfaces : int if int.device == device.name]) > 0 }
-  device               = each.key
-  admin_state          = "enabled"
-  instance_admin_state = "enabled"
-  control              = ""
-  vrfs = { for key, entry in local.icmpv4_vrfs : entry.vrf => {
-    interfaces = { for int in local.icmpv4_interfaces : int.id => {
+  icmpv4_vrfs_map = { for device in local.devices : device.name =>
+    { for key, entry in local.icmpv4_vrfs : entry.vrf => {
+      interfaces = length(try(local.icmpv4_interfaces_map[device.name][entry.vrf], {})) > 0 ? local.icmpv4_interfaces_map[device.name][entry.vrf] : null
+    } if entry.device == device.name }
+  }
+  icmpv4_interfaces_map = { for device in local.devices : device.name => {
+    for vrf in distinct([for int in local.icmpv4_interfaces : int.vrf if int.device == device.name]) : vrf =>
+    { for int in local.icmpv4_interfaces : int.id => {
       control = length(compact([
         try(int.ip_port_unreachable, false) == true ? "port-unreachable" : "",
         try(int.ip_redirects, false) == true && !int.is_svi_with_vpc ? "redirect" : "",
@@ -74,8 +71,18 @@ resource "nxos_icmpv4" "icmpv4" {
           try(int.ip_redirects, false) == true && !int.is_svi_with_vpc ? "redirect" : "",
           try(int.ip_unreachables, false) == true ? "unreachable" : "",
       ]))) : null
-    } if int.device == each.key && int.vrf == entry.vrf }
-  } if entry.device == each.key }
+    } if int.device == device.name && int.vrf == vrf }
+  } }
+}
+
+resource "nxos_icmpv4" "icmpv4" {
+  for_each = { for device in local.devices : device.name => device
+  if length([for int in local.icmpv4_interfaces : int if int.device == device.name]) > 0 }
+  device               = each.key
+  admin_state          = "enabled"
+  instance_admin_state = "enabled"
+  control              = ""
+  vrfs                 = length(local.icmpv4_vrfs_map[each.key]) > 0 ? local.icmpv4_vrfs_map[each.key] : null
 
   depends_on = [
     nxos_feature.feature,

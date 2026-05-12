@@ -1,4 +1,27 @@
 locals {
+  bfd_interfaces_map = { for device in local.devices : device.name =>
+    { for int in local.bfd_interfaces : int.id => {
+      control = length(compact([
+        try(int.bfd.optimize_subinterface, false) ? "opt-subif" : "",
+        try(int.bfd.per_link, false) ? "pc-per-link" : "",
+        ])) > 0 ? join(",", sort(compact([
+          try(int.bfd.optimize_subinterface, false) ? "opt-subif" : "",
+          try(int.bfd.per_link, false) ? "pc-per-link" : "",
+      ]))) : null
+      echo_admin_state       = try(int.bfd.echo, null) == null ? null : (try(int.bfd.echo) ? "enabled" : "disabled")
+      source_ip              = try(int.bfd.source_ip, null)
+      track_member_link      = try(int.bfd.track_member_link, null) == null ? null : try(int.bfd.track_member_link) ? "enable" : "disable"
+      vpc_watch              = try(int.bfd.vpc_watch, null) == null ? null : try(int.bfd.vpc_watch) ? "enable" : "disable"
+      detect_multiplier      = try(int.bfd.multiplier, null)
+      echo_receive_interval  = try(int.bfd.echo_rx_interval, null)
+      min_receive_interval   = try(int.bfd.min_rx, null)
+      min_transmit_interval  = try(int.bfd.interval, null)
+      authentication_interop = try(int.bfd.authentication_interop, null) == null ? null : try(int.bfd.authentication_interop) ? "enable" : "disable"
+      authentication_key     = try(int.bfd.authentication_key, null)
+      authentication_key_id  = try(int.bfd.authentication_key_id, null)
+      authentication_type    = try(int.bfd.authentication_type, null)
+    } if int.device == device.name }
+  }
   bfd_interfaces = flatten([
     for device in local.devices : concat(
       [for int in try(local.device_config[device.name].interfaces.ethernets, []) : {
@@ -59,27 +82,7 @@ resource "nxos_bfd" "bfd" {
   slow_interval        = try(local.device_config[each.key].bfd.slow_timer, null)
   startup_interval     = try(local.device_config[each.key].bfd.startup_timer, null)
 
-  interfaces = { for int in local.bfd_interfaces : int.id => {
-    control = length(compact([
-      try(int.bfd.optimize_subinterface, false) ? "opt-subif" : "",
-      try(int.bfd.per_link, false) ? "pc-per-link" : "",
-      ])) > 0 ? join(",", sort(compact([
-        try(int.bfd.optimize_subinterface, false) ? "opt-subif" : "",
-        try(int.bfd.per_link, false) ? "pc-per-link" : "",
-    ]))) : null
-    echo_admin_state       = try(int.bfd.echo, null) == null ? null : (try(int.bfd.echo) ? "enabled" : "disabled")
-    source_ip              = try(int.bfd.source_ip, null)
-    track_member_link      = try(int.bfd.track_member_link, null) == null ? null : try(int.bfd.track_member_link) ? "enable" : "disable"
-    vpc_watch              = try(int.bfd.vpc_watch, null) == null ? null : try(int.bfd.vpc_watch) ? "enable" : "disable"
-    detect_multiplier      = try(int.bfd.multiplier, null)
-    echo_receive_interval  = try(int.bfd.echo_rx_interval, null)
-    min_receive_interval   = try(int.bfd.min_rx, null)
-    min_transmit_interval  = try(int.bfd.interval, null)
-    authentication_interop = try(int.bfd.authentication_interop, null) == null ? null : try(int.bfd.authentication_interop) ? "enable" : "disable"
-    authentication_key     = try(int.bfd.authentication_key, null)
-    authentication_key_id  = try(int.bfd.authentication_key_id, null)
-    authentication_type    = try(int.bfd.authentication_type, null)
-  } if int.device == each.key }
+  interfaces = length(local.bfd_interfaces_map[each.key]) > 0 ? local.bfd_interfaces_map[each.key] : null
 
   depends_on = [
     nxos_feature.feature,

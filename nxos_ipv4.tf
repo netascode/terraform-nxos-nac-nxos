@@ -128,6 +128,10 @@ locals {
       } if try(int.ip, null) != null],
     )
   ])
+
+  ip_interfaces_by_device_vrf = {
+    for entry in local.ip_interfaces : "${entry.device}/${entry.vrf}" => entry...
+  }
 }
 
 resource "nxos_ipv4" "ipv4" {
@@ -163,20 +167,20 @@ resource "nxos_ipv4" "ipv4" {
         auto_discard                 = null
         icmp_errors_source_interface = null
 
-        static_routes = { for route in try(local.ip_routes_by_device_vrf["${each.key}/default"], []) : route.route.prefix => {
+        static_routes = length(try(local.ip_routes_by_device_vrf["${each.key}/default"], [])) > 0 ? { for route in try(local.ip_routes_by_device_vrf["${each.key}/default"], []) : route.route.prefix => {
           control    = try(route.route.bfd, false) ? "bfd" : (try(route.route.pervasive, false) ? "pervasive" : null)
           preference = try(route.route.preference, null)
           tag        = try(route.route.tag, null)
 
-          next_hops = { for nh in try(route.route.next_hops, []) : "${try(nh.interface_type, null) != null ? "${local.intf_prefix_map[try(nh.interface_type)]}${try(nh.interface_id, "")}" : "unspecified"};${try(nh.address, "0.0.0.0")};${try(nh.vrf, "default")}" => {
+          next_hops = length(try(route.route.next_hops, [])) > 0 ? { for nh in try(route.route.next_hops, []) : "${try(nh.interface_type, null) != null ? "${local.intf_prefix_map[try(nh.interface_type)]}${try(nh.interface_id, "")}" : "unspecified"};${try(nh.address, "0.0.0.0")};${try(nh.vrf, "default")}" => {
             object     = try(nh.track, null)
             preference = try(nh.preference, null)
             tag        = try(nh.tag, null)
             name       = try(nh.name, null)
-          } }
-        } }
+          } } : null
+        } } : null
 
-        interfaces = { for int in local.ip_interfaces : int.id => {
+        interfaces = length(try(local.ip_interfaces_by_device_vrf["${each.key}/default"], [])) > 0 ? { for int in local.ip_interfaces_by_device_vrf["${each.key}/default"] : int.id => {
           drop_glean             = int.drop_glean
           forward                = int.forward
           unnumbered             = int.unnumbered
@@ -184,11 +188,11 @@ resource "nxos_ipv4" "ipv4" {
           directed_broadcast     = int.ip_directed_broadcast != null ? (int.ip_directed_broadcast ? "enabled" : "disabled") : null
           directed_broadcast_acl = int.ip_directed_broadcast_acl
 
-          addresses = merge(
+          addresses = (int.ip_address != null || length(int.ip_secondary_addresses) > 0) ? merge(
             int.ip_address != null ? { (int.ip_address) = { type = "primary", tag = int.ip_tag } } : {},
             { for sec in int.ip_secondary_addresses : sec.address => { type = "secondary", tag = try(sec.tag, null) } }
-          )
-        } if int.device == each.key && int.vrf == "default" }
+          ) : null
+        } } : null
       }
     },
     # VRFs from configuration.vrfs[]
@@ -196,20 +200,20 @@ resource "nxos_ipv4" "ipv4" {
       auto_discard                 = try(vrf.auto_discard, null) != null ? (try(vrf.auto_discard) ? "enabled" : "disabled") : null
       icmp_errors_source_interface = try(vrf.icmp_errors_source_interface_type, null) != null ? "${local.intf_prefix_map[try(vrf.icmp_errors_source_interface_type)]}${try(vrf.icmp_errors_source_interface_id, "")}" : null
 
-      static_routes = { for route in try(local.ip_routes_by_device_vrf["${each.key}/${vrf.name}"], []) : route.route.prefix => {
+      static_routes = length(try(local.ip_routes_by_device_vrf["${each.key}/${vrf.name}"], [])) > 0 ? { for route in try(local.ip_routes_by_device_vrf["${each.key}/${vrf.name}"], []) : route.route.prefix => {
         control    = try(route.route.bfd, false) ? "bfd" : (try(route.route.pervasive, false) ? "pervasive" : null)
         preference = try(route.route.preference, null)
         tag        = try(route.route.tag, null)
 
-        next_hops = { for nh in try(route.route.next_hops, []) : "${try(nh.interface_type, null) != null ? "${local.intf_prefix_map[try(nh.interface_type)]}${try(nh.interface_id, "")}" : "unspecified"};${try(nh.address, "0.0.0.0")};${try(nh.vrf, "default")}" => {
+        next_hops = length(try(route.route.next_hops, [])) > 0 ? { for nh in try(route.route.next_hops, []) : "${try(nh.interface_type, null) != null ? "${local.intf_prefix_map[try(nh.interface_type)]}${try(nh.interface_id, "")}" : "unspecified"};${try(nh.address, "0.0.0.0")};${try(nh.vrf, "default")}" => {
           object     = try(nh.track, null)
           preference = try(nh.preference, null)
           tag        = try(nh.tag, null)
           name       = try(nh.name, null)
-        } }
-      } }
+        } } : null
+      } } : null
 
-      interfaces = { for int in local.ip_interfaces : int.id => {
+      interfaces = length(try(local.ip_interfaces_by_device_vrf["${each.key}/${vrf.name}"], [])) > 0 ? { for int in local.ip_interfaces_by_device_vrf["${each.key}/${vrf.name}"] : int.id => {
         drop_glean             = int.drop_glean
         forward                = int.forward
         unnumbered             = int.unnumbered
@@ -217,11 +221,11 @@ resource "nxos_ipv4" "ipv4" {
         directed_broadcast     = int.ip_directed_broadcast != null ? (int.ip_directed_broadcast ? "enabled" : "disabled") : null
         directed_broadcast_acl = int.ip_directed_broadcast_acl
 
-        addresses = merge(
+        addresses = (int.ip_address != null || length(int.ip_secondary_addresses) > 0) ? merge(
           int.ip_address != null ? { (int.ip_address) = { type = "primary", tag = int.ip_tag } } : {},
           { for sec in int.ip_secondary_addresses : sec.address => { type = "secondary", tag = try(sec.tag, null) } }
-        )
-      } if int.device == each.key && int.vrf == vrf.name }
+        ) : null
+      } } : null
     } }
   )
 

@@ -88,7 +88,7 @@ resource "nxos_snmp" "snmp" {
   vtp_notifs_trap_status                                = try(local.device_config[each.key].snmp.traps.vtp_notifs, null) == null ? null : (try(local.device_config[each.key].snmp.traps.vtp_notifs) ? "enable" : "disable")
   vtp_vlan_create_trap_status                           = try(local.device_config[each.key].snmp.traps.vtp_vlan_create, null) == null ? null : (try(local.device_config[each.key].snmp.traps.vtp_vlan_create) ? "enable" : "disable")
   vtp_vlan_delete_trap_status                           = try(local.device_config[each.key].snmp.traps.vtp_vlan_delete, null) == null ? null : (try(local.device_config[each.key].snmp.traps.vtp_vlan_delete) ? "enable" : "disable")
-  local_users = { for user in try(local.device_config[each.key].snmp.users, []) : user.name => {
+  local_users = length(try(local.device_config[each.key].snmp.users, [])) > 0 ? { for user in try(local.device_config[each.key].snmp.users, []) : user.name => {
     authentication_password = try(user.authentication_password, null)
     authentication_type     = try(user.authentication_type, null)
     ipv4_acl_name           = try(user.ipv4_acl, null)
@@ -99,21 +99,21 @@ resource "nxos_snmp" "snmp" {
     privacy_password        = try(user.privacy_password, null)
     privacy_type            = try(user.privacy_type, null)
     engine_id               = try(user.engine_id, null)
-    groups                  = { for group in try(user.groups, []) : group => {} }
-  } }
-  hosts = { for host in try(local.device_config[each.key].snmp.hosts, []) : "${host.host};${try(host.udp_port, 162)}" => {
+    groups                  = length(try(user.groups, [])) > 0 ? { for group in try(user.groups, []) : group => {} } : null
+  } } : null
+  hosts = length(try(local.device_config[each.key].snmp.hosts, [])) > 0 ? { for host in try(local.device_config[each.key].snmp.hosts, []) : "${host.host};${try(host.udp_port, 162)}" => {
     community_name    = try(host.community, null)
     notification_type = try(host.notification_type, null)
     security_level    = try(host.security_level, null)
     version           = try(host.version, null)
-    vrfs              = try(host.vrf, null) != null ? { (host.vrf) = {} } : {}
-  } }
-  rmon_events = { for event in try(local.device_config[each.key].snmp.rmon_events, []) : event.number => {
+    vrfs              = try(host.vrf, null) != null ? { (host.vrf) = {} } : null
+  } } : null
+  rmon_events = length(try(local.device_config[each.key].snmp.rmon_events, [])) > 0 ? { for event in try(local.device_config[each.key].snmp.rmon_events, []) : event.number => {
     description = try(event.description, null)
     log         = try(event.log, null) == null ? null : (try(event.log) ? "yes" : "no")
     owner       = try(event.owner, null)
     trap        = try(event.trap, null)
-  } }
+  } } : null
 
   depends_on = [
     nxos_feature.feature,

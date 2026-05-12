@@ -115,6 +115,36 @@ locals {
     for entry in local.vrfs_address_families_rt_entries :
     format("%s/%s/%s", entry.device, entry.vrf, entry.address_family) => entry...
   }
+  vrf_vrfs_map = { for device in local.devices : device.name =>
+    { for vrf in [for v in local.vrfs_rd_dme_format : v if v.device == device.name && v.name != "default"] : vrf.name => {
+      description         = vrf.description
+      encap               = vrf.vni != null ? "vxlan-${vrf.vni}" : null
+      l3vni               = vrf.l3vni
+      oui                 = vrf.oui
+      vpn_id              = vrf.vpn_id
+      route_distinguisher = vrf.rd_dme_format
+
+      address_families = length(vrf.address_families) > 0 ? { for af in vrf.address_families : local.vrf_address_family_names_map[af.address_family] => {
+        route_target_address_families = length(try(local.vrfs_rt_by_af[format("%s/%s/%s", device.name, vrf.name, local.vrf_address_family_names_map[af.address_family])], [])) > 0 ? {
+          for rt_af, rt_af_entries in {
+            for entry in try(local.vrfs_rt_by_af[format("%s/%s/%s", device.name, vrf.name, local.vrf_address_family_names_map[af.address_family])], []) :
+            entry.rt_af => entry...
+            } : rt_af => {
+            route_target_directions = {
+              for dir, dir_entries in {
+                for entry in rt_af_entries : entry.direction => entry...
+                } : dir => {
+                route_map = rt_af == local.vrf_address_family_names_map[af.address_family] ? (
+                  dir == "import" ? try(af.import_map, null) : try(af.export_map, null)
+                ) : null
+                route_targets = { for entry in dir_entries : entry.rt_dme => {} }
+              }
+            }
+          }
+        } : null
+      } } : null
+    } }
+  }
 }
 
 resource "nxos_vrf" "vrf" {
@@ -122,34 +152,7 @@ resource "nxos_vrf" "vrf" {
   if length(try(local.device_config[device.name].vrfs, [])) > 0 }
   device = each.key
 
-  vrfs = { for vrf in [for v in local.vrfs_rd_dme_format : v if v.device == each.key && v.name != "default"] : vrf.name => {
-    description         = vrf.description
-    encap               = vrf.vni != null ? "vxlan-${vrf.vni}" : null
-    l3vni               = vrf.l3vni
-    oui                 = vrf.oui
-    vpn_id              = vrf.vpn_id
-    route_distinguisher = vrf.rd_dme_format
-
-    address_families = { for af in vrf.address_families : local.vrf_address_family_names_map[af.address_family] => {
-      route_target_address_families = {
-        for rt_af, rt_af_entries in {
-          for entry in try(local.vrfs_rt_by_af[format("%s/%s/%s", each.key, vrf.name, local.vrf_address_family_names_map[af.address_family])], []) :
-          entry.rt_af => entry...
-          } : rt_af => {
-          route_target_directions = {
-            for dir, dir_entries in {
-              for entry in rt_af_entries : entry.direction => entry...
-              } : dir => {
-              route_map = rt_af == local.vrf_address_family_names_map[af.address_family] ? (
-                dir == "import" ? try(af.import_map, null) : try(af.export_map, null)
-              ) : null
-              route_targets = { for entry in dir_entries : entry.rt_dme => {} }
-            }
-          }
-        }
-      }
-    } }
-  } }
+  vrfs = length(local.vrf_vrfs_map[each.key]) > 0 ? local.vrf_vrfs_map[each.key] : null
 
   depends_on = [
     nxos_feature.feature,

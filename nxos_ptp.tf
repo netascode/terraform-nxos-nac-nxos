@@ -1,4 +1,39 @@
 locals {
+  ptp_interfaces_map = { for device in local.devices : device.name =>
+    { for int in local.ptp_interfaces : int.id => {
+      announce_interval_type               = try(int.ptp.announce_interval_type, null)
+      announce_interval_value              = try(int.ptp.announce_interval, null)
+      announce_timeout_type                = try(int.ptp.announce_timeout_type, null)
+      announce_timeout_value               = try(int.ptp.announce_timeout, null)
+      asymmetric_delay_value               = try(int.ptp.asymmetric_delay_value, null)
+      asymmetric_direction                 = try(int.ptp.asymmetric_delay_direction, null)
+      cost                                 = try(int.ptp.cost, null)
+      delay_request_min_interval_type      = try(int.ptp.delay_request_minimum_interval_type, null)
+      delay_request_min_interval_value     = try(int.ptp.delay_request_minimum_interval, null)
+      destination_mac                      = try(int.ptp.destination_mac, null)
+      domain                               = try(int.ptp.domain, null)
+      ipv6_multicast_receive_scope         = try(int.ptp.ipv6_multicast_receive_scope, null)
+      ipv6_multicast_transmit_scope        = try(int.ptp.ipv6_multicast_transmit_scope, null)
+      negotiation_schema                   = try(int.ptp.negotiation_schema, null)
+      neighbor_propagation_delay_threshold = try(int.ptp.neighbor_propagation_delay_threshold, null)
+      profile_override                     = try(int.ptp.profile_override, null)
+      ptp                                  = try(int.ptp.admin_state, null)
+      receive_no_match                     = try(int.ptp.receive_no_match, null)
+      role                                 = try(int.ptp.role, null)
+      sync_interval_type                   = try(int.ptp.sync_interval_type, null)
+      sync_interval_value                  = try(int.ptp.sync_interval, null)
+      transmission                         = try(int.ptp.transmission, null)
+      transport                            = try(int.ptp.transport, null)
+      unicast_source                       = try(int.ptp.unicast_source, null)
+      unicast_source_ipv6                  = try(int.ptp.unicast_source_ipv6, null)
+      unicast_vrf                          = try(int.ptp.unicast_vrf, null)
+      unicast_vrf_ipv6                     = try(int.ptp.unicast_vrf_ipv6, null)
+      vlan                                 = try(int.ptp.vlan, null) != null ? "vlan-${try(int.ptp.vlan)}" : null
+      peers = length(try(int.ptp.unicast_peers, [])) > 0 ? { for peer in try(int.ptp.unicast_peers, []) : peer.ip => {
+        negotiation_schema = try(peer.negotiation_schema, null)
+      } } : null
+    } if int.device == device.name }
+  }
   ptp_device_type_map = {
     "boundary-clock"             = "boundaryClock"
     "generalized-ptp"            = "generalizedPtp"
@@ -67,11 +102,11 @@ resource "nxos_ptp" "ptp" {
   vrf_name                             = try(local.device_config[each.key].ptp.vrf, null)
   vrf_name_ipv6                        = try(local.device_config[each.key].ptp.vrf_ipv6, null)
 
-  domains = { for domain in try(local.device_config[each.key].ptp.domains, []) : domain.domain => {
+  domains = length(try(local.device_config[each.key].ptp.domains, [])) > 0 ? { for domain in try(local.device_config[each.key].ptp.domains, []) : domain.domain => {
     clock_accuracy_threshold = try(domain.clock_accuracy_threshold, null)
     clock_class_threshold    = try(domain.clock_class_threshold, null)
     priority                 = try(domain.priority, null)
-  } }
+  } } : null
 
   notify_high_correction_interval = try(local.device_config[each.key].ptp.notification_high_correction_interval, null)
   notify_high_correction          = try(local.device_config[each.key].ptp.notification_high_correction, null) == null ? null : (try(local.device_config[each.key].ptp.notification_high_correction) ? "enabled" : "disabled")
@@ -82,39 +117,7 @@ resource "nxos_ptp" "ptp" {
   notify_port_state_change          = try(local.device_config[each.key].ptp.notification_port_state_change, null) == null ? null : (try(local.device_config[each.key].ptp.notification_port_state_change) ? "enabled" : "disabled")
   notify_port_state_change_periodic = try(local.device_config[each.key].ptp.notification_port_state_change_periodic, null) == null ? null : (try(local.device_config[each.key].ptp.notification_port_state_change_periodic) ? "enabled" : "disabled")
 
-  interfaces = { for int in local.ptp_interfaces : int.id => {
-    announce_interval_type               = try(int.ptp.announce_interval_type, null)
-    announce_interval_value              = try(int.ptp.announce_interval, null)
-    announce_timeout_type                = try(int.ptp.announce_timeout_type, null)
-    announce_timeout_value               = try(int.ptp.announce_timeout, null)
-    asymmetric_delay_value               = try(int.ptp.asymmetric_delay_value, null)
-    asymmetric_direction                 = try(int.ptp.asymmetric_delay_direction, null)
-    cost                                 = try(int.ptp.cost, null)
-    delay_request_min_interval_type      = try(int.ptp.delay_request_minimum_interval_type, null)
-    delay_request_min_interval_value     = try(int.ptp.delay_request_minimum_interval, null)
-    destination_mac                      = try(int.ptp.destination_mac, null)
-    domain                               = try(int.ptp.domain, null)
-    ipv6_multicast_receive_scope         = try(int.ptp.ipv6_multicast_receive_scope, null)
-    ipv6_multicast_transmit_scope        = try(int.ptp.ipv6_multicast_transmit_scope, null)
-    negotiation_schema                   = try(int.ptp.negotiation_schema, null)
-    neighbor_propagation_delay_threshold = try(int.ptp.neighbor_propagation_delay_threshold, null)
-    profile_override                     = try(int.ptp.profile_override, null)
-    ptp                                  = try(int.ptp.admin_state, null)
-    receive_no_match                     = try(int.ptp.receive_no_match, null)
-    role                                 = try(int.ptp.role, null)
-    sync_interval_type                   = try(int.ptp.sync_interval_type, null)
-    sync_interval_value                  = try(int.ptp.sync_interval, null)
-    transmission                         = try(int.ptp.transmission, null)
-    transport                            = try(int.ptp.transport, null)
-    unicast_source                       = try(int.ptp.unicast_source, null)
-    unicast_source_ipv6                  = try(int.ptp.unicast_source_ipv6, null)
-    unicast_vrf                          = try(int.ptp.unicast_vrf, null)
-    unicast_vrf_ipv6                     = try(int.ptp.unicast_vrf_ipv6, null)
-    vlan                                 = try(int.ptp.vlan, null) != null ? "vlan-${try(int.ptp.vlan)}" : null
-    peers = { for peer in try(int.ptp.unicast_peers, []) : peer.ip => {
-      negotiation_schema = try(peer.negotiation_schema, null)
-    } }
-  } if int.device == each.key }
+  interfaces = length(local.ptp_interfaces_map[each.key]) > 0 ? local.ptp_interfaces_map[each.key] : null
 
   depends_on = [
     nxos_feature.feature,

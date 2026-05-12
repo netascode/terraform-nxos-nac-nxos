@@ -38,7 +38,7 @@ resource "nxos_user_management" "user_management" {
   post_login_banner_message = try(local.device_config[each.key].banner.exec, null)
 
   # Users (aaaUser) — data model path: users.accounts
-  users = { for user in try(local.device_config[each.key].aaa.users.accounts, []) : user.username => {
+  users = length(try(local.device_config[each.key].aaa.users.accounts, [])) > 0 ? { for user in try(local.device_config[each.key].aaa.users.accounts, []) : user.username => {
     account_status           = try(user.account_status, null) == null ? null : (try(user.account_status) ? "active" : "inactive")
     allow_expired            = try(user.allow_expired, null) == null ? null : (try(user.allow_expired) ? "yes" : "no")
     clear_password_history   = try(user.clear_password_history, null) == null ? null : (try(user.clear_password_history) ? "yes" : "no")
@@ -57,11 +57,11 @@ resource "nxos_user_management" "user_management" {
     unix_user_id             = try(user.unix_user_id, null)
 
     # User roles (aaaUserRole via aaaUserDomain) — data model path: users.accounts.roles
-    roles = { for role in try(user.roles, []) : role.name => {
+    roles = length(try(user.roles, [])) > 0 ? { for role in try(user.roles, []) : role.name => {
       description    = try(role.description, null)
       privilege_type = try(local.user_privilege_type_map[try(role.privilege_type)], null)
-    } }
-  } }
+    } } : null
+  } } : null
 
   # TACACS+ (aaaTacacsPlusEp) — data model path: tacacs
   tacacs_deadtime         = try(local.device_config[each.key].aaa.tacacs.deadtime, null)
@@ -73,7 +73,7 @@ resource "nxos_user_management" "user_management" {
   tacacs_timeout          = try(local.device_config[each.key].aaa.tacacs.timeout, null)
 
   # TACACS+ providers (aaaTacacsPlusProvider) — data model path: tacacs.servers
-  tacacs_providers = { for server in try(local.device_config[each.key].aaa.tacacs.servers, []) : server.host => {
+  tacacs_providers = length(try(local.device_config[each.key].aaa.tacacs.servers, [])) > 0 ? { for server in try(local.device_config[each.key].aaa.tacacs.servers, []) : server.host => {
     authentication_protocol  = try(server.authentication_protocol, null)
     description              = try(server.description, null)
     key                      = try(server.key, null)
@@ -86,21 +86,21 @@ resource "nxos_user_management" "user_management" {
     retries                  = try(server.retries, null)
     single_connection        = try(server.single_connection, null) == null ? null : (try(server.single_connection) ? "yes" : "no")
     timeout                  = try(server.timeout, null)
-  } }
+  } } : null
 
   # TACACS+ provider groups (aaaTacacsPlusProviderGroup) — data model path: tacacs.server_groups
-  tacacs_provider_groups = { for group in try(local.device_config[each.key].aaa.tacacs.server_groups, []) : group.name => {
+  tacacs_provider_groups = length(try(local.device_config[each.key].aaa.tacacs.server_groups, [])) > 0 ? { for group in try(local.device_config[each.key].aaa.tacacs.server_groups, []) : group.name => {
     deadtime         = try(group.deadtime, null)
     description      = try(group.description, null)
     source_interface = try(group.source_interface_type, null) != null ? "${local.intf_prefix_map[try(group.source_interface_type)]}${try(group.source_interface_id, "")}" : null
     vrf              = try(group.vrf, null)
 
     # TACACS+ provider group server members (aaaProviderRef) — data model path: tacacs.server_groups.servers
-    servers = { for server in try(group.servers, []) : server.host => {
+    servers = length(try(group.servers, [])) > 0 ? { for server in try(group.servers, []) : server.host => {
       description = try(server.description, null)
       order       = try(server.order, null)
-    } }
-  } }
+    } } : null
+  } } : null
 
   # Authentication realm (aaaAuthRealm) — data model path: aaa.authentication
   authentication_realm_default_role_policy     = try(local.device_config[each.key].aaa.authentication.default_role, null)
@@ -140,7 +140,7 @@ resource "nxos_user_management" "user_management" {
   console_authentication_realm            = try(local.device_config[each.key].aaa.authentication.login_console_realm, null)
 
   # Default authorizations (aaaDefaultAuthor) — data model path: aaa.authorization
-  default_authorizations = { for authz in try(local.device_config[each.key].aaa.authorization, []) : authz.command_type => {
+  default_authorizations = length(try(local.device_config[each.key].aaa.authorization, [])) > 0 ? { for authz in try(local.device_config[each.key].aaa.authorization, []) : authz.command_type => {
     authorization_method_none = try(authz.none, null)
     local_rbac                = try(authz.local, null)
     provider_group            = try(authz.groups[0], null)
@@ -151,7 +151,7 @@ resource "nxos_user_management" "user_management" {
     provider_group_6          = try(authz.groups[5], null)
     provider_group_7          = try(authz.groups[6], null)
     provider_group_8          = try(authz.groups[7], null)
-  } }
+  } } : null
 
   # Default accounting (aaaDefaultAcc) — data model path: aaa.accounting
   default_accounting_method_none      = try(local.device_config[each.key].aaa.accounting.none, null)

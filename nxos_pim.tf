@@ -137,23 +137,23 @@ resource "nxos_pim" "pim" {
         ssm_range_route_map    = try(local.device_config[each.key].routing.pim.ssm.route_map, null)
         ssm_range_none         = try(local.device_config[each.key].routing.pim.ssm.none, null)
 
-        static_rps = { for rp in try(local.device_config[each.key].routing.pim.rps, []) : rp.address => {
+        static_rps = length(try(local.device_config[each.key].routing.pim.rps, [])) > 0 ? { for rp in try(local.device_config[each.key].routing.pim.rps, []) : rp.address => {
           group_lists = { for gl in try(rp.group_lists, [{ group_list = try(rp.group_list, "224.0.0.0/4") }]) :
             try(gl.group_list, gl.address, "224.0.0.0/4") => {
               bidir    = try(gl.bidir, rp.bidir, null)
               override = try(gl.override, rp.override, null)
             }
           }
-        } }
+        } } : null
 
         anycast_rp_local_interface  = try(local.device_config[each.key].routing.pim.anycast_rp_local_interface_type, null) != null ? "${local.intf_prefix_map[try(local.device_config[each.key].routing.pim.anycast_rp_local_interface_type)]}${try(local.device_config[each.key].routing.pim.anycast_rp_local_interface_id, "")}" : null
         anycast_rp_source_interface = try(local.device_config[each.key].routing.pim.anycast_rp_source_interface_type, null) != null ? "${local.intf_prefix_map[try(local.device_config[each.key].routing.pim.anycast_rp_source_interface_type)]}${try(local.device_config[each.key].routing.pim.anycast_rp_source_interface_id, "")}" : null
 
-        anycast_rp_peers = { for rp in try(local.device_config[each.key].routing.pim.anycast_rps, []) :
+        anycast_rp_peers = length(try(local.device_config[each.key].routing.pim.anycast_rps, [])) > 0 ? { for rp in try(local.device_config[each.key].routing.pim.anycast_rps, []) :
           "${rp.address}/32;${rp.set_address}/32" => {}
-        }
+        } : null
 
-        interfaces = { for int in try(local.pim_interfaces_by_device_vrf["${each.key}/default"], []) : int.interface_id => {
+        interfaces = length(try(local.pim_interfaces_by_device_vrf["${each.key}/default"], [])) > 0 ? { for int in try(local.pim_interfaces_by_device_vrf["${each.key}/default"], []) : int.interface_id => {
           bfd                  = int.bfd
           dr_priority          = int.dr_priority
           passive              = int.passive
@@ -164,7 +164,7 @@ resource "nxos_pim" "pim" {
           neighbor_route_map   = int.neighbor_route_map
           neighbor_prefix_list = int.neighbor_prefix_list
           rfc_strict           = int.rfc_strict
-        } }
+        } } : null
       }
     },
     # Explicit non-default VRFs
@@ -187,23 +187,23 @@ resource "nxos_pim" "pim" {
       ssm_range_route_map    = try(vrf.ssm.route_map, null)
       ssm_range_none         = try(vrf.ssm.none, null)
 
-      static_rps = { for rp in try(vrf.rps, []) : rp.address => {
+      static_rps = length(try(vrf.rps, [])) > 0 ? { for rp in try(vrf.rps, []) : rp.address => {
         group_lists = { for gl in try(rp.group_lists, [{ group_list = try(rp.group_list, "224.0.0.0/4") }]) :
           try(gl.group_list, gl.address, "224.0.0.0/4") => {
             bidir    = try(gl.bidir, rp.bidir, null)
             override = try(gl.override, rp.override, null)
           }
         }
-      } }
+      } } : null
 
       anycast_rp_local_interface  = try(vrf.anycast_rp_local_interface_type, null) != null ? "${local.intf_prefix_map[try(vrf.anycast_rp_local_interface_type)]}${try(vrf.anycast_rp_local_interface_id, "")}" : null
       anycast_rp_source_interface = try(vrf.anycast_rp_source_interface_type, null) != null ? "${local.intf_prefix_map[try(vrf.anycast_rp_source_interface_type)]}${try(vrf.anycast_rp_source_interface_id, "")}" : null
 
-      anycast_rp_peers = { for rp in try(vrf.anycast_rps, []) :
+      anycast_rp_peers = length(try(vrf.anycast_rps, [])) > 0 ? { for rp in try(vrf.anycast_rps, []) :
         "${rp.address}/32;${rp.set_address}/32" => {}
-      }
+      } : null
 
-      interfaces = { for int in try(local.pim_interfaces_by_device_vrf["${each.key}/${vrf.vrf}"], []) : int.interface_id => {
+      interfaces = length(try(local.pim_interfaces_by_device_vrf["${each.key}/${vrf.vrf}"], [])) > 0 ? { for int in try(local.pim_interfaces_by_device_vrf["${each.key}/${vrf.vrf}"], []) : int.interface_id => {
         bfd                  = int.bfd
         dr_priority          = int.dr_priority
         passive              = int.passive
@@ -214,7 +214,7 @@ resource "nxos_pim" "pim" {
         neighbor_route_map   = int.neighbor_route_map
         neighbor_prefix_list = int.neighbor_prefix_list
         rfc_strict           = int.rfc_strict
-      } }
+      } } : null
     } },
     # Create VRF entries for PIM interfaces that belong to VRFs not explicitly listed in routing.pim.vrfs
     { for vrf_key, ints in local.pim_interfaces_by_device_vrf :
@@ -237,12 +237,12 @@ resource "nxos_pim" "pim" {
         ssm_range_route_map    = null
         ssm_range_none         = null
 
-        static_rps = {}
+        static_rps = null
 
         anycast_rp_local_interface  = null
         anycast_rp_source_interface = null
 
-        anycast_rp_peers = {}
+        anycast_rp_peers = null
 
         interfaces = { for int in ints : int.interface_id => {
           bfd                  = int.bfd

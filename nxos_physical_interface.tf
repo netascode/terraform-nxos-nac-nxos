@@ -126,7 +126,7 @@ resource "nxos_physical_interface" "physical_interface" {
   for_each = { for device in local.devices : device.name => device
   if length(try(local.device_config[device.name].interfaces.ethernets, [])) > 0 }
   device = each.key
-  physical_interfaces = { for int in try(local.device_config[each.key].interfaces.ethernets, []) : "eth${int.id}" => {
+  physical_interfaces = length(try(local.device_config[each.key].interfaces.ethernets, [])) > 0 ? { for int in try(local.device_config[each.key].interfaces.ethernets, []) : "eth${int.id}" => {
     fec_mode                                            = try(int.fec, null)
     access_vlan                                         = try(int.channel_group, null) != null ? null : (!try(int.switchport.enabled, true) ? "unknown" : try(int.switchport.access_vlan, null) != null ? "vlan-${int.switchport.access_vlan}" : null)
     admin_state                                         = try(int.shutdown, null) == null ? null : (try(int.shutdown) ? "down" : "up")
@@ -206,7 +206,7 @@ resource "nxos_physical_interface" "physical_interface" {
     priority_flow_control_watchdog_interval             = try(int.priority_flow_control_watchdog_interval, null) == null ? null : (try(int.priority_flow_control_watchdog_interval) ? "on" : "off")
     priority_flow_control_watchdog_disable_action       = try(int.priority_flow_control_watchdog_disable_action, null)
     priority_flow_control_watchdog_interface_multiplier = try(int.priority_flow_control_watchdog_interface_multiplier, null)
-  } }
+  } } : null
 
   depends_on = [
     nxos_vrf.vrf,

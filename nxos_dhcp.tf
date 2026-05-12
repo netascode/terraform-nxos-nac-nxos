@@ -1,4 +1,18 @@
 locals {
+  dhcp_relay_interfaces_map = { for device in local.devices : device.name =>
+    { for item in local.dhcp_relay_interfaces : item.interface_id => {
+      information_trusted = try(item.ip_dhcp_relay_information_trusted, null)
+      smart_relay         = try(item.ip_dhcp_relay_smart_relay, null)
+      subnet_broadcast    = try(item.ip_dhcp_relay_subnet_broadcast, null)
+      options             = try(item.ip_dhcp_relay_information_option, null) == null ? null : (try(item.ip_dhcp_relay_information_option) ? "relay-info" : "none")
+      subnet_selection    = try(item.ip_dhcp_relay_source_subnet, null)
+      v6_smart_relay      = try(item.ipv6_dhcp_smart_relay, null)
+      addresses = (length(try(item.ip_dhcp_relay_addresses, [])) > 0 || length(try(item.ipv6_dhcp_relay_addresses, [])) > 0) ? merge(
+        { for addr in try(item.ip_dhcp_relay_addresses, []) : "${try(addr.vrf, "none")};${addr.address}" => {} },
+        { for addr in try(item.ipv6_dhcp_relay_addresses, []) : "${try(addr.vrf, "none")};${addr.address}" => {} }
+      ) : null
+    } if item.device == device.name }
+  }
   dhcp_relay_interfaces = flatten([
     for device in local.devices : concat(
       [for int in try(local.device_config[device.name].interfaces.ethernets, []) : {
@@ -91,18 +105,7 @@ resource "nxos_dhcp" "dhcp" {
   dai_validate_destination                    = try(local.device_config[each.key].arp.inspection.validate_destination, null)
   dai_validate_ip                             = try(local.device_config[each.key].arp.inspection.validate_ip, null)
   dai_validate_source                         = try(local.device_config[each.key].arp.inspection.validate_source, null)
-  relay_interfaces = { for item in local.dhcp_relay_interfaces : item.interface_id => {
-    information_trusted = try(item.ip_dhcp_relay_information_trusted, null)
-    smart_relay         = try(item.ip_dhcp_relay_smart_relay, null)
-    subnet_broadcast    = try(item.ip_dhcp_relay_subnet_broadcast, null)
-    options             = try(item.ip_dhcp_relay_information_option, null) == null ? null : (try(item.ip_dhcp_relay_information_option) ? "relay-info" : "none")
-    subnet_selection    = try(item.ip_dhcp_relay_source_subnet, null)
-    v6_smart_relay      = try(item.ipv6_dhcp_smart_relay, null)
-    addresses = merge(
-      { for addr in try(item.ip_dhcp_relay_addresses, []) : "${try(addr.vrf, "none")};${addr.address}" => {} },
-      { for addr in try(item.ipv6_dhcp_relay_addresses, []) : "${try(addr.vrf, "none")};${addr.address}" => {} }
-    )
-  } if item.device == each.key }
+  relay_interfaces                            = length(local.dhcp_relay_interfaces_map[each.key]) > 0 ? local.dhcp_relay_interfaces_map[each.key] : null
 
   depends_on = [
     nxos_feature.feature,

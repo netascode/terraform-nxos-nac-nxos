@@ -1,3 +1,28 @@
+locals {
+  acl_ingress_interfaces_map = { for device in local.devices : device.name =>
+    merge([
+      for acl in try(local.device_config[device.name].ip_access_lists, []) : merge([
+        for intf_type, intf_prefix in { "ethernets" = "eth", "port_channels" = "po", "vlans" = "vlan", "loopbacks" = "lo" } : {
+          for int in try(local.device_config[device.name].interfaces[intf_type], []) : "${intf_prefix}${int.id}" => {
+            access_list_name = acl.name
+          } if try(int.ip.access_group_in, null) == acl.name
+        }
+      ]...)
+    ]...)
+  }
+  acl_egress_interfaces_map = { for device in local.devices : device.name =>
+    merge([
+      for acl in try(local.device_config[device.name].ip_access_lists, []) : merge([
+        for intf_type, intf_prefix in { "ethernets" = "eth", "port_channels" = "po", "vlans" = "vlan", "loopbacks" = "lo" } : {
+          for int in try(local.device_config[device.name].interfaces[intf_type], []) : "${intf_prefix}${int.id}" => {
+            access_list_name = acl.name
+          } if try(int.ip.access_group_out, null) == acl.name
+        }
+      ]...)
+    ]...)
+  }
+}
+
 resource "nxos_access_list" "access_list" {
   for_each = { for device in local.devices : device.name => device
     if length(try(local.device_config[device.name].ip_access_lists, [])) > 0 ||
@@ -5,11 +30,11 @@ resource "nxos_access_list" "access_list" {
     try(local.device_config[device.name].system.line_vty_access_class_in, null) != null ||
   try(local.device_config[device.name].system.line_vty_access_class_out, null) != null }
   device = each.key
-  access_lists = { for acl in try(local.device_config[each.key].ip_access_lists, []) : acl.name => {
+  access_lists = length(try(local.device_config[each.key].ip_access_lists, [])) > 0 ? { for acl in try(local.device_config[each.key].ip_access_lists, []) : acl.name => {
     fragments          = try(acl.fragments, null)
     ignore_routable    = try(acl.ignore_routable, null)
     per_ace_statistics = try(acl.statistics_per_entry, null) == null ? null : (try(acl.statistics_per_entry) ? "on" : "off")
-    entries = { for entry in try(acl.entries, []) : entry.sequence_number => {
+    entries = length(try(acl.entries, [])) > 0 ? { for entry in try(acl.entries, []) : entry.sequence_number => {
       remark                    = try(entry.remark, null)
       action                    = try(entry.action, null)
       protocol                  = try(tostring(entry.protocol), null)
@@ -65,14 +90,14 @@ resource "nxos_access_list" "access_list" {
       telemetry_queue           = try(entry.telemetry_queue, null)
       ttl                       = try(entry.ttl, null)
       type_of_service           = try(entry.tos, null)
-    } }
-  } }
-  ipv6_access_lists = { for acl in try(local.device_config[each.key].ipv6_access_lists, []) : acl.name => {
+    } } : null
+  } } : null
+  ipv6_access_lists = length(try(local.device_config[each.key].ipv6_access_lists, [])) > 0 ? { for acl in try(local.device_config[each.key].ipv6_access_lists, []) : acl.name => {
     extension_header   = try(acl.extension_header, null)
     fragments          = try(acl.fragments, null)
     ignore_routable    = try(acl.ignore_routable, null)
     per_ace_statistics = try(acl.statistics_per_entry, null) == null ? null : (try(acl.statistics_per_entry) ? "on" : "off")
-    entries = { for entry in try(acl.entries, []) : entry.sequence_number => {
+    entries = length(try(acl.entries, [])) > 0 ? { for entry in try(acl.entries, []) : entry.sequence_number => {
       remark                    = try(entry.remark, null)
       action                    = try(entry.action, null)
       protocol                  = try(tostring(entry.protocol), null)
@@ -125,26 +150,10 @@ resource "nxos_access_list" "access_list" {
       tcp_option_length         = try(entry.tcp_option_length, null)
       telemetry_path            = try(entry.telemetry_path, null)
       telemetry_queue           = try(entry.telemetry_queue, null)
-    } }
-  } }
-  ingress_interfaces = merge([
-    for acl in try(local.device_config[each.key].ip_access_lists, []) : merge([
-      for intf_type, intf_prefix in { "ethernets" = "eth", "port_channels" = "po", "vlans" = "vlan", "loopbacks" = "lo" } : {
-        for int in try(local.device_config[each.key].interfaces[intf_type], []) : "${intf_prefix}${int.id}" => {
-          access_list_name = acl.name
-        } if try(int.ip.access_group_in, null) == acl.name
-      }
-    ]...)
-  ]...)
-  egress_interfaces = merge([
-    for acl in try(local.device_config[each.key].ip_access_lists, []) : merge([
-      for intf_type, intf_prefix in { "ethernets" = "eth", "port_channels" = "po", "vlans" = "vlan", "loopbacks" = "lo" } : {
-        for int in try(local.device_config[each.key].interfaces[intf_type], []) : "${intf_prefix}${int.id}" => {
-          access_list_name = acl.name
-        } if try(int.ip.access_group_out, null) == acl.name
-      }
-    ]...)
-  ]...)
+    } } : null
+  } } : null
+  ingress_interfaces           = length(local.acl_ingress_interfaces_map[each.key]) > 0 ? local.acl_ingress_interfaces_map[each.key] : null
+  egress_interfaces            = length(local.acl_egress_interfaces_map[each.key]) > 0 ? local.acl_egress_interfaces_map[each.key] : null
   ingress_vty_access_list_name = try(local.device_config[each.key].system.line_vty_access_class_in, null)
   egress_vty_access_list_name  = try(local.device_config[each.key].system.line_vty_access_class_out, null)
   depends_on = [

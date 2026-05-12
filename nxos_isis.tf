@@ -1,4 +1,51 @@
 locals {
+  isis_interfaces_map = { for device in local.devices : device.name =>
+    { for int in local.isis_interfaces : "${int.type}${int.id}" => {
+      authentication_check         = int.isis_authentication_check
+      authentication_check_l1      = int.isis_authentication_check_level_1
+      authentication_check_l2      = int.isis_authentication_check_level_2
+      authentication_key           = int.isis_authentication_key_chain
+      authentication_key_l1        = int.isis_authentication_key_chain_level_1
+      authentication_key_l2        = int.isis_authentication_key_chain_level_2
+      authentication_type          = int.isis_authentication_type
+      authentication_type_l1       = int.isis_authentication_type_level_1
+      authentication_type_l2       = int.isis_authentication_type_level_2
+      circuit_type                 = int.isis_circuit_type
+      vrf                          = int.vrf
+      hello_interval               = int.isis_hello_interval
+      hello_interval_l1            = int.isis_hello_interval_l1
+      hello_interval_l2            = int.isis_hello_interval_l2
+      hello_multiplier             = int.isis_hello_multiplier
+      hello_multiplier_l1          = int.isis_hello_multiplier_l1
+      hello_multiplier_l2          = int.isis_hello_multiplier_l2
+      hello_padding                = int.isis_hello_padding
+      instance_name                = int.isis_instance_name
+      metric_l1                    = int.isis_metric_l1
+      metric_l2                    = int.isis_metric_l2
+      mtu_check                    = int.isis_mtu_check
+      mtu_check_l1                 = int.isis_mtu_check_l1
+      mtu_check_l2                 = int.isis_mtu_check_l2
+      network_type_p2p             = int.isis_network_point_to_point
+      passive                      = int.isis_passive_interface
+      priority_l1                  = int.isis_priority_l1
+      priority_l2                  = int.isis_priority_l2
+      enable_ipv4                  = coalesce(int.isis_ipv4, true)
+      csnp_interval_l1             = int.isis_csnp_interval_l1
+      csnp_interval_l2             = int.isis_csnp_interval_l2
+      lsp_refresh_interval         = int.isis_lsp_interval
+      mesh_group_blocked           = int.isis_mesh_group_blocked
+      mesh_group_id                = int.isis_mesh_group
+      ipv6_metric_l1               = int.isis_ipv6_metric_l1
+      ipv6_metric_l2               = int.isis_ipv6_metric_l2
+      n_flag_clear                 = int.isis_n_flag_clear
+      retransmit_interval          = int.isis_retransmit_interval
+      retransmit_throttle_interval = int.isis_retransmit_throttle_interval
+      suppressed_state             = int.isis_suppress_prefix
+      ipv4_bfd                     = int.isis_bfd
+      ipv6_bfd                     = int.isis_ipv6_bfd
+      ipv6                         = int.isis_ipv6
+    } if int.device == device.name && int.isis_instance_name != null }
+  }
   isis_interfaces = concat(local.interfaces_ethernets, local.interfaces_loopbacks, local.interfaces_vlans, local.interfaces_port_channels, local.interfaces_subinterfaces)
 }
 
@@ -7,7 +54,7 @@ resource "nxos_isis" "isis" {
   device      = each.key
   admin_state = "enabled"
 
-  instances = { for inst in try(local.device_config[each.key].routing.isis_instances, []) : inst.name => {
+  instances = length(try(local.device_config[each.key].routing.isis_instances, [])) > 0 ? { for inst in try(local.device_config[each.key].routing.isis_instances, []) : inst.name => {
     flush_routes = try(inst.flush_routes, null)
     isolate      = try(inst.isolate, null)
 
@@ -37,7 +84,7 @@ resource "nxos_isis" "isis" {
           overload_bgp_as_number   = try(inst.overload_bgp_as_number, null)
           overload_suppress        = try(inst.overload_suppress, null)
 
-          address_families = { for af in try(inst.address_families, []) : replace(replace(af.address_family, "ipv4-unicast", "v4"), "ipv6-unicast", "v6") => {
+          address_families = length(try(inst.address_families, [])) > 0 ? { for af in try(inst.address_families, []) : replace(replace(af.address_family, "ipv4-unicast", "v4"), "ipv6-unicast", "v6") => {
             segment_routing_mpls                    = try(af.segment_routing_mpls, null)
             enable_bfd                              = try(af.bfd, null)
             prefix_advertise_passive_l1             = try(af.advertise_passive_only_l1, null)
@@ -52,7 +99,7 @@ resource "nxos_isis" "isis" {
             router_id_ip_address                    = try(af.router_id_ip_address, null)
             table_map                               = try(af.table_map, null)
             table_map_filter                        = try(af.table_map_filter, null) != null ? (try(af.table_map_filter) ? "enabled" : "disabled") : null
-          } }
+          } } : null
         }
       },
       # Explicit non-default VRFs
@@ -79,7 +126,7 @@ resource "nxos_isis" "isis" {
         overload_bgp_as_number   = try(vrf.overload_bgp_as_number, null)
         overload_suppress        = try(vrf.overload_suppress, null)
 
-        address_families = { for af in try(vrf.address_families, []) : replace(replace(af.address_family, "ipv4-unicast", "v4"), "ipv6-unicast", "v6") => {
+        address_families = length(try(vrf.address_families, [])) > 0 ? { for af in try(vrf.address_families, []) : replace(replace(af.address_family, "ipv4-unicast", "v4"), "ipv6-unicast", "v6") => {
           segment_routing_mpls                    = try(af.segment_routing_mpls, null)
           enable_bfd                              = try(af.bfd, null)
           prefix_advertise_passive_l1             = try(af.advertise_passive_only_l1, null)
@@ -94,57 +141,13 @@ resource "nxos_isis" "isis" {
           router_id_ip_address                    = try(af.router_id_ip_address, null)
           table_map                               = try(af.table_map, null)
           table_map_filter                        = try(af.table_map_filter, null) != null ? (try(af.table_map_filter) ? "enabled" : "disabled") : null
-        } }
+        } } : null
       } }
     )
 
-  } }
+  } } : null
 
-  interfaces = { for int in local.isis_interfaces : "${int.type}${int.id}" => {
-    authentication_check         = int.isis_authentication_check
-    authentication_check_l1      = int.isis_authentication_check_level_1
-    authentication_check_l2      = int.isis_authentication_check_level_2
-    authentication_key           = int.isis_authentication_key_chain
-    authentication_key_l1        = int.isis_authentication_key_chain_level_1
-    authentication_key_l2        = int.isis_authentication_key_chain_level_2
-    authentication_type          = int.isis_authentication_type
-    authentication_type_l1       = int.isis_authentication_type_level_1
-    authentication_type_l2       = int.isis_authentication_type_level_2
-    circuit_type                 = int.isis_circuit_type
-    vrf                          = int.vrf
-    hello_interval               = int.isis_hello_interval
-    hello_interval_l1            = int.isis_hello_interval_l1
-    hello_interval_l2            = int.isis_hello_interval_l2
-    hello_multiplier             = int.isis_hello_multiplier
-    hello_multiplier_l1          = int.isis_hello_multiplier_l1
-    hello_multiplier_l2          = int.isis_hello_multiplier_l2
-    hello_padding                = int.isis_hello_padding
-    instance_name                = int.isis_instance_name
-    metric_l1                    = int.isis_metric_l1
-    metric_l2                    = int.isis_metric_l2
-    mtu_check                    = int.isis_mtu_check
-    mtu_check_l1                 = int.isis_mtu_check_l1
-    mtu_check_l2                 = int.isis_mtu_check_l2
-    network_type_p2p             = int.isis_network_point_to_point
-    passive                      = int.isis_passive_interface
-    priority_l1                  = int.isis_priority_l1
-    priority_l2                  = int.isis_priority_l2
-    enable_ipv4                  = coalesce(int.isis_ipv4, true) # NX-OS CLI enables IPv4 by default when adding an interface to ISIS
-    csnp_interval_l1             = int.isis_csnp_interval_l1
-    csnp_interval_l2             = int.isis_csnp_interval_l2
-    lsp_refresh_interval         = int.isis_lsp_interval
-    mesh_group_blocked           = int.isis_mesh_group_blocked
-    mesh_group_id                = int.isis_mesh_group
-    ipv6_metric_l1               = int.isis_ipv6_metric_l1
-    ipv6_metric_l2               = int.isis_ipv6_metric_l2
-    n_flag_clear                 = int.isis_n_flag_clear
-    retransmit_interval          = int.isis_retransmit_interval
-    retransmit_throttle_interval = int.isis_retransmit_throttle_interval
-    suppressed_state             = int.isis_suppress_prefix
-    ipv4_bfd                     = int.isis_bfd
-    ipv6_bfd                     = int.isis_ipv6_bfd
-    ipv6                         = int.isis_ipv6
-  } if int.device == each.key && int.isis_instance_name != null }
+  interfaces = length(local.isis_interfaces_map[each.key]) > 0 ? local.isis_interfaces_map[each.key] : null
 
   depends_on = [
     nxos_feature.feature,

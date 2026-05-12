@@ -342,7 +342,7 @@ resource "nxos_system" "system" {
   # arpVpcDom nested map
   arp_vpc_domains = try(local.device_config[each.key].vpc.ip_arp_synchronize, null) != null ? { tostring(try(local.device_config[each.key].vpc.domain_id)) = {
     arp_sync = try(local.device_config[each.key].vpc.ip_arp_synchronize) ? "enabled" : "disabled"
-  } } : {}
+  } } : null
 
   # ndEntity / ndInst attributes
   nd_admin_state                         = "enabled"
@@ -359,10 +359,10 @@ resource "nxos_system" "system" {
   # ndVpcDom nested map
   nd_vpc_domains = try(local.device_config[each.key].vpc.ipv6_nd_synchronize, null) != null ? { tostring(try(local.device_config[each.key].vpc.domain_id)) = {
     nd_sync = try(local.device_config[each.key].vpc.ipv6_nd_synchronize) ? "enabled" : "disabled"
-  } } : {}
+  } } : null
 
   # ndDom -> ndIf nested maps (VRF -> interfaces)
-  nd_vrfs = { for vrf_name, vrf_data in try(local.nd_vrfs_by_device[each.key], {}) : vrf_name => {
+  nd_vrfs = length(try(local.nd_vrfs_by_device[each.key], {})) > 0 ? { for vrf_name, vrf_data in try(local.nd_vrfs_by_device[each.key], {}) : vrf_name => {
     interfaces = { for int_id, nd in vrf_data.interfaces : int_id => {
       boot_file_url                  = try(nd.ra_boot_file_url, null)
       control                        = length(compact([for flag, value in local.nd_control_values : value if try({ "redirects" = nd.redirects, "managed_cfg" = nd.managed_config_flag, "other_cfg" = nd.other_config_flag, "suppress_ra" = nd.suppress_ra, "suppress_ra_mtu" = nd.suppress_ra_mtu }[flag], false)])) > 0 ? join(",", compact([for flag, value in local.nd_control_values : value if try({ "redirects" = nd.redirects, "managed_cfg" = nd.managed_config_flag, "other_cfg" = nd.other_config_flag, "suppress_ra" = nd.suppress_ra, "suppress_ra_mtu" = nd.suppress_ra_mtu }[flag], false)])) : null
@@ -384,7 +384,7 @@ resource "nxos_system" "system" {
       route_suppress                 = try(nd.suppress_ra_route, null) != null ? (nd.suppress_ra_route ? "enabled" : "disabled") : null
       router_preference              = try(nd.router_preference, null)
     } }
-  } }
+  } } : null
 
   # datetimeClock attributes
   clock_format        = try(local.device_config[each.key].system.clock.format, null)
@@ -422,11 +422,11 @@ resource "nxos_system" "system" {
   boot_image_supervisor_2    = try(local.device_config[each.key].system.boot.nxos_image_sup_2, null)
 
   # imBreakout / imMod / imFpP nested maps
-  breakout_modules = { for mod in try(local.device_config[each.key].system.interface_breakout_modules, []) : mod.id => {
-    front_panel_ports = { for port in try(mod.ports, []) : port.id => {
+  breakout_modules = length(try(local.device_config[each.key].system.interface_breakout_modules, [])) > 0 ? { for mod in try(local.device_config[each.key].system.interface_breakout_modules, []) : mod.id => {
+    front_panel_ports = length(try(mod.ports, [])) > 0 ? { for port in try(mod.ports, []) : port.id => {
       breakout_map = try(port.map, null)
-    } }
-  } }
+    } } : null
+  } } : null
 
   # cfsEntity / cfsInst attributes
   cfs_distribute             = try(local.device_config[each.key].system.cfs_distribute, null) == null ? null : (try(local.device_config[each.key].system.cfs_distribute) ? "enabled" : "disabled")
@@ -441,9 +441,9 @@ resource "nxos_system" "system" {
   copp_profile_type = try(local.device_config[each.key].system.copp_profile, null)
 
   # vshdCliAlias nested map
-  cli_aliases = { for alias in try(local.device_config[each.key].system.cli_aliases, []) : alias.name => {
+  cli_aliases = length(try(local.device_config[each.key].system.cli_aliases, [])) > 0 ? { for alias in try(local.device_config[each.key].system.cli_aliases, []) : alias.name => {
     command = try(alias.command, null)
-  } }
+  } } : null
 
   # licensemanagerSmartLicensing attributes
   smart_licensing_transport_mode     = try(local.smart_licensing_transport_map[try(local.device_config[each.key].system.smart_licensing_transport)], null)
@@ -575,17 +575,17 @@ resource "nxos_system" "system" {
     "1" = {
       ipmc_index_size = try(local.device_config[each.key].system.nve_ipmc_index_size, null)
       overlay_vlan_id = try(provider::utils::normalize_vlans(try(local.device_config[each.key].system.nve_overlay_vlans), "string-nxos"), null)
-      infra_vlans = merge([for group in try(local.device_config[each.key].system.nve_infra_vlans, []) : {
+      infra_vlans = length(try(local.device_config[each.key].system.nve_infra_vlans, [])) > 0 ? merge([for group in try(local.device_config[each.key].system.nve_infra_vlans, []) : {
         for vlan_id in try(provider::utils::normalize_vlans(group.vlans, "list"), []) :
         tostring(vlan_id) => {
           force = try(group.force, null) == null ? null : (try(group.force) ? "Enable" : "Disable")
         }
-      }]...)
+      }]...) : null
     }
-  } : {}
+  } : null
 
   # nwVdc nested map
-  vdcs = { for vdc in try(local.device_config[each.key].system.vdcs, []) : vdc.id => {
+  vdcs = length(try(local.device_config[each.key].system.vdcs, [])) > 0 ? { for vdc in try(local.device_config[each.key].system.vdcs, []) : vdc.id => {
     resource_limits = {
       multicast_ipv4_route_memory_maximum = try(vdc.resource_limits.multicast_ipv4_route_memory_maximum, null)
       multicast_ipv4_route_memory_minimum = try(vdc.resource_limits.multicast_ipv4_route_memory_minimum, null)
@@ -602,10 +602,10 @@ resource "nxos_system" "system" {
       vrf_maximum                         = try(vdc.resource_limits.vrf_maximum, null)
       vrf_minimum                         = try(vdc.resource_limits.vrf_minimum, null)
     }
-  } }
+  } } : null
 
   # mgmtMgmtIf nested map
-  management_interfaces = { for int in try(local.device_config[each.key].interfaces.management, []) : int.id => {
+  management_interfaces = length(try(local.device_config[each.key].interfaces.management, [])) > 0 ? { for int in try(local.device_config[each.key].interfaces.management, []) : int.id => {
     admin_state      = try(int.shutdown, null) == null ? null : (try(int.shutdown) ? "down" : "up")
     description      = try(int.description, null)
     duplex           = try(int.duplex, null)
@@ -614,7 +614,7 @@ resource "nxos_system" "system" {
     auto_negotiation = try(int.negotiation_auto, null)
     snmp_trap_state  = try(int.snmp_trap_link_status, null) == null ? null : (try(int.snmp_trap_link_status) ? "enable" : "disable")
     vrf_dn           = try(int.vrf, null) != null ? "sys/inst-${try(int.vrf)}" : null
-  } }
+  } } : null
 
   # cdpInst attributes
   cdp_transmit_frequency = try(local.device_config[each.key].cdp.timer, null)
@@ -624,9 +624,9 @@ resource "nxos_system" "system" {
   cdp_pnp_startup_vlan   = try(local.device_config[each.key].cdp.pnp_startup_vlan, null)
 
   # cdpIf nested map
-  cdp_interfaces = { for entry in try(local.cdp_interfaces_by_device[each.key], []) : entry.interface_id => {
+  cdp_interfaces = length(try(local.cdp_interfaces_by_device[each.key], [])) > 0 ? { for entry in try(local.cdp_interfaces_by_device[each.key], []) : entry.interface_id => {
     admin_state = entry.cdp ? "enabled" : "disabled"
-  } }
+  } } : null
 
   # dnsEntity attributes
   dns_admin_state = try(local.device_config[each.key].dns.domain_lookup, null) == null ? null : (try(local.device_config[each.key].dns.domain_lookup) ? "enabled" : "disabled")
@@ -634,7 +634,7 @@ resource "nxos_system" "system" {
     "default" = {
       domain_name = try(local.device_config[each.key].dns.domain_name, null)
     }
-  } : {}
+  } : null
 
   # lldpInst attributes
   lldp_hold_time                   = try(local.device_config[each.key].lldp.holdtime, null)
@@ -646,24 +646,24 @@ resource "nxos_system" "system" {
   lldp_port_channel                = try(local.device_config[each.key].lldp.portchannel, null) == null ? null : (try(local.device_config[each.key].lldp.portchannel) ? "enabled" : "disabled")
 
   # lldpIf nested map
-  lldp_interfaces = { for entry in try(local.lldp_interfaces_by_device[each.key], []) : entry.interface_id => {
+  lldp_interfaces = length(try(local.lldp_interfaces_by_device[each.key], [])) > 0 ? { for entry in try(local.lldp_interfaces_by_device[each.key], []) : entry.interface_id => {
     admin_receive_state  = try(entry.lldp_receive, null) == null ? null : (entry.lldp_receive ? "enabled" : "disabled")
     admin_transmit_state = try(entry.lldp_transmit, null) == null ? null : (entry.lldp_transmit ? "enabled" : "disabled")
     port_dcbxp_version   = try(entry.lldp_dcbx_version, null)
     tlv_management_ipv4  = try(entry.lldp_tlv_set_management_address_v4, null)
     tlv_management_ipv6  = try(entry.lldp_tlv_set_management_address_v6, null)
     tlv_vlan             = try(entry.lldp_tlv_set_vlan, null)
-  } }
+  } } : null
 
   # udldInst attributes
   udld_aggressive       = try(local.device_config[each.key].udld.aggressive, null) == null ? null : (try(local.device_config[each.key].udld.aggressive) ? "enabled" : "disabled")
   udld_message_interval = try(local.device_config[each.key].udld.message_time, null)
 
   # udldPhysIf nested map
-  udld_interfaces = { for entry in try(local.udld_interfaces_by_device[each.key], []) : entry.interface_id => {
+  udld_interfaces = length(try(local.udld_interfaces_by_device[each.key], [])) > 0 ? { for entry in try(local.udld_interfaces_by_device[each.key], []) : entry.interface_id => {
     admin_state = try(entry.udld, null) == null ? null : (entry.udld ? "port-enabled" : "port-default")
     aggressive  = try(entry.udld_aggressive, null) == null ? null : (entry.udld_aggressive ? "enabled" : "disabled")
-  } }
+  } } : null
 
   # nxapiInst attributes
   nxapi_vrf                               = try(local.device_config[each.key].system.nxapi.vrf, null)
@@ -686,10 +686,10 @@ resource "nxos_system" "system" {
     controller_https_proxy_server = try(local.device_config[each.key].system.hypershield.https_proxy, null)
     controller_https_proxy_port   = try(local.device_config[each.key].system.hypershield.https_proxy_port, null)
     firewall_policy_admin_state   = try(local.device_config[each.key].system.hypershield.firewall_in_service, null) == null ? null : (try(local.device_config[each.key].system.hypershield.firewall_in_service) ? "in-service" : "out-of-service")
-    vrfs = { for vrf in try(local.device_config[each.key].system.hypershield.firewall_vrfs, []) : vrf.name => {
+    vrfs = length(try(local.device_config[each.key].system.hypershield.firewall_vrfs, [])) > 0 ? { for vrf in try(local.device_config[each.key].system.hypershield.firewall_vrfs, []) : vrf.name => {
       affinity = try(vrf.module_affinity, null)
-    } }
-  } } : {}
+    } } : null
+  } } : null
 
   # spanErspanOriginIp attributes
   erspan_origin_ip_is_global      = try(local.device_config[each.key].system.erspan_origin_ip_address, null) != null ? true : null
@@ -700,12 +700,12 @@ resource "nxos_system" "system" {
   # ttagTtagEntity / ttagTtagIf attributes
   ttag_marker_interval = try(local.device_config[each.key].system.ttag_marker_interval, null)
 
-  ttag_interfaces = { for entry in try(local.ttag_interfaces_by_device[each.key], []) : entry.interface_id => {
+  ttag_interfaces = length(try(local.ttag_interfaces_by_device[each.key], [])) > 0 ? { for entry in try(local.ttag_interfaces_by_device[each.key], []) : entry.interface_id => {
     ttag        = try(entry.ttag, null)
     ttag_inner  = try(entry.ttag_inner, null)
     ttag_marker = try(entry.ttag_marker, null)
     ttag_strip  = try(entry.ttag_strip, null)
-  } }
+  } } : null
 
   # platformTcamRegion attributes
   tcam_region_arp_acl_size               = try(local.device_config[each.key].system.hardware_access_list_tcam_region.arp_acl_size, null)
@@ -827,9 +827,9 @@ resource "nxos_system" "system" {
   ssh_port                         = try(local.device_config[each.key].system.ssh.port, null)
 
   # commSshKey nested map
-  ssh_keys = { for key in try(local.device_config[each.key].system.ssh.keys, []) : key.type => {
+  ssh_keys = length(try(local.device_config[each.key].system.ssh.keys, [])) > 0 ? { for key in try(local.device_config[each.key].system.ssh.keys, []) : key.type => {
     key_length = try(key.key_length, null)
-  } }
+  } } : null
 
   depends_on = [
     nxos_feature.feature,

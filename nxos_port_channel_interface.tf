@@ -92,13 +92,21 @@ locals {
       }
     ]
   ])
+
+  port_channel_members_map = { for device in local.devices : device.name =>
+    { for int in try(local.device_config[device.name].interfaces.port_channels, []) : "po${int.id}" =>
+      { for eth in try(local.device_config[device.name].interfaces.ethernets, []) : "sys/intf/phys-[eth${eth.id}]" => {
+        force = try(eth.channel_group_force, null)
+      } if try(eth.channel_group, null) == int.id }
+    }
+  }
 }
 
 resource "nxos_port_channel_interface" "port_channel_interface" {
   for_each = { for device in local.devices : device.name => device
   if length(try(local.device_config[device.name].interfaces.port_channels, [])) > 0 }
   device = each.key
-  port_channel_interfaces = { for int in try(local.device_config[each.key].interfaces.port_channels, []) : "po${int.id}" => {
+  port_channel_interfaces = length(try(local.device_config[each.key].interfaces.port_channels, [])) > 0 ? { for int in try(local.device_config[each.key].interfaces.port_channels, []) : "po${int.id}" => {
     port_channel_mode                                   = try([for eth in try(local.device_config[each.key].interfaces.ethernets, []) : try(eth.channel_group_mode, null) if try(eth.channel_group, null) == int.id][0], null)
     minimum_links                                       = try(int.lacp_min_links, null)
     maximum_links                                       = try(int.lacp_max_bundle, null)
@@ -164,10 +172,8 @@ resource "nxos_port_channel_interface" "port_channel_interface" {
     priority_flow_control_watchdog_interval             = try(int.priority_flow_control_watchdog_interval, null) == null ? null : (try(int.priority_flow_control_watchdog_interval) ? "on" : "off")
     priority_flow_control_watchdog_disable_action       = try(int.priority_flow_control_watchdog_disable_action, null)
     priority_flow_control_watchdog_interface_multiplier = try(int.priority_flow_control_watchdog_interface_multiplier, null)
-    members = { for eth in try(local.device_config[each.key].interfaces.ethernets, []) : "sys/intf/phys-[eth${eth.id}]" => {
-      force = try(eth.channel_group_force, null)
-    } if try(eth.channel_group, null) == int.id }
-  } }
+    members                                             = length(local.port_channel_members_map[each.key]["po${int.id}"]) > 0 ? local.port_channel_members_map[each.key]["po${int.id}"] : null
+  } } : null
 
   depends_on = [
     nxos_feature.feature,

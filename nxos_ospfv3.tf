@@ -1,4 +1,23 @@
 locals {
+  ospfv3_interfaces_map = { for device in local.devices : device.name =>
+    { for int in local.ospfv3_interfaces : "${int.type}${int.id}" => {
+      advertise_secondaries = int.ospfv3_advertise_secondaries
+      area                  = int.ospfv3_area
+      bfd_control           = int.ospfv3_bfd
+      cost                  = int.ospfv3_cost
+      dead_interval         = int.ospfv3_dead_interval
+      hello_interval        = int.ospfv3_hello_interval
+      network_type          = int.ospfv3_network_type
+      passive               = int.ospfv3_passive_interface
+      priority              = int.ospfv3_priority
+      admin_state           = "enabled"
+      instance_name         = int.ospfv3_process
+      instance_id           = int.ospfv3_instance_id
+      mtu_ignore            = int.ospfv3_mtu_ignore
+      retransmit_interval   = int.ospfv3_retransmit_interval
+      transmit_delay        = int.ospfv3_transmit_delay
+    } if int.device == device.name && int.ospfv3_process != null }
+  }
   ospfv3_interfaces = concat(local.interfaces_ethernets, local.interfaces_loopbacks, local.interfaces_vlans, local.interfaces_port_channels, local.interfaces_subinterfaces)
   ospfv3_address_family_map = {
     "ipv6-unicast" = "ipv6-ucast"
@@ -10,7 +29,7 @@ resource "nxos_ospfv3" "ospfv3" {
   device      = each.key
   admin_state = "enabled"
 
-  instances = { for proc in try(local.device_config[each.key].routing.ospfv3_processes, []) : proc.name => {
+  instances = length(try(local.device_config[each.key].routing.ospfv3_processes, [])) > 0 ? { for proc in try(local.device_config[each.key].routing.ospfv3_processes, []) : proc.name => {
     flush_routes = try(proc.flush_routes, null)
     isolate      = try(proc.isolate, null)
 
@@ -29,20 +48,20 @@ resource "nxos_ospfv3" "ospfv3" {
           name_lookup               = try(proc.name_lookup, null)
           passive_interface_default = try(proc.passive_interface_default, null)
 
-          areas = { for area in try(proc.areas, []) : area.id => {
+          areas = length(try(proc.areas, [])) > 0 ? { for area in try(proc.areas, []) : area.id => {
             type                     = try(area.type, null)
             redistribute             = try(area.redistribute, null)
             nssa_translator_role     = try(area.nssa_translate_type7, null)
             summary                  = try(area.summary, null)
             suppress_forward_address = try(area.nssa_translate_type7_suppress_fa, null)
-          } }
+          } } : null
 
-          address_families = { for af in try(proc.address_families, []) : local.ospfv3_address_family_map[af.address_family] => {
+          address_families = length(try(proc.address_families, [])) > 0 ? { for af in try(proc.address_families, []) : local.ospfv3_address_family_map[af.address_family] => {
             administrative_distance       = try(af.distance, null)
             default_metric                = try(af.default_metric, null)
             default_route_nssa_pbit_clear = try(af.default_route_nssa_abr_pbit_clear, null)
             max_ecmp_cost                 = try(af.maximum_paths, null)
-          } }
+          } } : null
         }
       },
       # Explicit non-default VRFs
@@ -58,41 +77,25 @@ resource "nxos_ospfv3" "ospfv3" {
         name_lookup               = try(vrf.name_lookup, null)
         passive_interface_default = try(vrf.passive_interface_default, null)
 
-        areas = { for area in try(vrf.areas, []) : area.id => {
+        areas = length(try(vrf.areas, [])) > 0 ? { for area in try(vrf.areas, []) : area.id => {
           type                     = try(area.type, null)
           redistribute             = try(area.redistribute, null)
           nssa_translator_role     = try(area.nssa_translate_type7, null)
           summary                  = try(area.summary, null)
           suppress_forward_address = try(area.nssa_translate_type7_suppress_fa, null)
-        } }
+        } } : null
 
-        address_families = { for af in try(vrf.address_families, []) : local.ospfv3_address_family_map[af.address_family] => {
+        address_families = length(try(vrf.address_families, [])) > 0 ? { for af in try(vrf.address_families, []) : local.ospfv3_address_family_map[af.address_family] => {
           administrative_distance       = try(af.distance, null)
           default_metric                = try(af.default_metric, null)
           default_route_nssa_pbit_clear = try(af.default_route_nssa_abr_pbit_clear, null)
           max_ecmp_cost                 = try(af.maximum_paths, null)
-        } }
+        } } : null
       } }
     )
-  } }
+  } } : null
 
-  interfaces = { for int in local.ospfv3_interfaces : "${int.type}${int.id}" => {
-    advertise_secondaries = int.ospfv3_advertise_secondaries
-    area                  = int.ospfv3_area
-    bfd_control           = int.ospfv3_bfd
-    cost                  = int.ospfv3_cost
-    dead_interval         = int.ospfv3_dead_interval
-    hello_interval        = int.ospfv3_hello_interval
-    network_type          = int.ospfv3_network_type
-    passive               = int.ospfv3_passive_interface
-    priority              = int.ospfv3_priority
-    admin_state           = "enabled"
-    instance_name         = int.ospfv3_process
-    instance_id           = int.ospfv3_instance_id
-    mtu_ignore            = int.ospfv3_mtu_ignore
-    retransmit_interval   = int.ospfv3_retransmit_interval
-    transmit_delay        = int.ospfv3_transmit_delay
-  } if int.device == each.key && int.ospfv3_process != null }
+  interfaces = length(local.ospfv3_interfaces_map[each.key]) > 0 ? local.ospfv3_interfaces_map[each.key] : null
 
   depends_on = [
     nxos_feature.feature,

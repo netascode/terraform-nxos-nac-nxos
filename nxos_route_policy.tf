@@ -13,36 +13,36 @@ resource "nxos_route_policy" "route_policy" {
   length(try(local.device_config[device.name].community_lists, [])) > 0 }
   device = each.key
 
-  ipv4_prefix_lists = { for pl in try(local.device_config[each.key].ip_prefix_lists, []) : pl.name => {
+  ipv4_prefix_lists = length(try(local.device_config[each.key].ip_prefix_lists, [])) > 0 ? { for pl in try(local.device_config[each.key].ip_prefix_lists, []) : pl.name => {
     description = try(pl.description, null)
 
-    entries = { for entry in try(pl.entries, []) : entry.seq => {
+    entries = length(try(pl.entries, [])) > 0 ? { for entry in try(pl.entries, []) : entry.seq => {
       action     = try(entry.action, null)
       criteria   = try(entry.criteria, null)
       prefix     = try(entry.prefix, null)
       from_range = try(entry.ge, null)
       to_range   = try(entry.le, null)
       mask       = try(entry.mask, null)
-    } }
-  } }
+    } } : null
+  } } : null
 
-  ipv6_prefix_lists = { for pl in try(local.device_config[each.key].ipv6_prefix_lists, []) : pl.name => {
+  ipv6_prefix_lists = length(try(local.device_config[each.key].ipv6_prefix_lists, [])) > 0 ? { for pl in try(local.device_config[each.key].ipv6_prefix_lists, []) : pl.name => {
     description = try(pl.description, null)
 
-    entries = { for entry in try(pl.entries, []) : entry.seq => {
+    entries = length(try(pl.entries, [])) > 0 ? { for entry in try(pl.entries, []) : entry.seq => {
       action     = try(entry.action, null)
       criteria   = try(entry.criteria, null)
       prefix     = try(entry.prefix, null)
       from_range = try(entry.ge, null)
       to_range   = try(entry.le, null)
       mask       = try(entry.mask, null)
-    } }
-  } }
+    } } : null
+  } } : null
 
-  route_maps = { for rm in try(local.device_config[each.key].route_maps, []) : rm.name => {
+  route_maps = length(try(local.device_config[each.key].route_maps, [])) > 0 ? { for rm in try(local.device_config[each.key].route_maps, []) : rm.name => {
     pbr_statistics = try(rm.pbr_statistics, null) != null ? (try(rm.pbr_statistics) ? "enabled" : "disabled") : null
 
-    entries = { for entry in try(rm.entries, []) : entry.order => {
+    entries = length(try(rm.entries, [])) > 0 ? { for entry in try(rm.entries, []) : entry.order => {
       action                  = try(entry.action, null)
       description             = try(entry.description, null)
       drop_on_fail_v4         = try(entry.drop_on_fail_v4, null) != null ? (try(entry.drop_on_fail_v4) ? "enabled" : "disabled") : null
@@ -58,23 +58,23 @@ resource "nxos_route_policy" "route_policy" {
       verify_availability_v4  = try(entry.verify_availability_v4, null) != null ? (try(entry.verify_availability_v4) ? "enabled" : "disabled") : null
       verify_availability_v6  = try(entry.verify_availability_v6, null) != null ? (try(entry.verify_availability_v6) ? "enabled" : "disabled") : null
 
-      match_route_prefix_lists = merge(
+      match_route_prefix_lists = anytrue([try(entry.match_ip_prefix_list, null) != null, try(entry.match_ipv6_prefix_list, null) != null]) ? merge(
         try(entry.match_ip_prefix_list, null) != null ? {
           "sys/rpm/pfxlistv4-[${try(entry.match_ip_prefix_list)}]" = {}
         } : {},
         try(entry.match_ipv6_prefix_list, null) != null ? {
           "sys/rpm/pfxlistv6-[${try(entry.match_ipv6_prefix_list)}]" = {}
         } : {},
-      )
+      ) : null
 
-      match_route_access_lists = merge(
+      match_route_access_lists = anytrue([try(entry.match_ip_access_list, null) != null, try(entry.match_ip_address, null) != null]) ? merge(
         try(entry.match_ip_access_list, null) != null ? {
           "sys/acl/ipv4/name-[${try(entry.match_ip_access_list)}]" = {}
         } : {},
         try(entry.match_ip_address, null) != null ? {
           "sys/rpm/accesslist-[${try(entry.match_ip_address)}]" = {}
         } : {},
-      )
+      ) : null
 
       set_regular_community_additive     = try(entry.set_community, null) != null ? (try(entry.set_community_additive, null) != null ? (try(entry.set_community_additive) ? "enabled" : "disabled") : "disabled") : null
       set_regular_community_no_community = try(entry.set_community, null) != null ? (try(entry.set_community_none, null) != null ? (try(entry.set_community_none) ? "enabled" : "disabled") : "disabled") : null
@@ -82,9 +82,9 @@ resource "nxos_route_policy" "route_policy" {
 
       set_regular_community_items = try(entry.set_community, null) != null ? {
         try(entry.set_community) = {}
-      } : {}
+      } : null
 
-      match_tags = { for tag in try(entry.match_tags, []) : tag => {} }
+      match_tags = length(try(entry.match_tags, [])) > 0 ? { for tag in try(entry.match_tags, []) : tag => {} } : null
 
       set_metric                       = try(entry.set_metric, null)
       set_metric_is_bgp                = try(entry.set_metric_is_bgp, null)
@@ -107,26 +107,26 @@ resource "nxos_route_policy" "route_policy" {
 
       match_next_hop_prefix_lists = try(entry.match_ip_next_hop_prefix_list, null) != null ? {
         "sys/rpm/pfxlistv4-[${try(entry.match_ip_next_hop_prefix_list)}]" = {}
-      } : {}
+      } : null
 
       match_regular_community_criteria = try(entry.match_community, null) != null ? try(entry.match_community_criteria, null) : null
 
       match_regular_community_lists = try(entry.match_community, null) != null ? {
         "sys/rpm/rtregcom-[${try(entry.match_community)}]" = {}
-      } : {}
-    } }
-  } }
+      } : null
+    } } : null
+  } } : null
 
-  community_lists = { for cl in try(local.device_config[each.key].community_lists, []) : cl.name => {
+  community_lists = length(try(local.device_config[each.key].community_lists, [])) > 0 ? { for cl in try(local.device_config[each.key].community_lists, []) : cl.name => {
     mode = try(local.community_list_mode_map[try(cl.mode)], null)
 
-    entries = { for entry in try(cl.entries, []) : entry.seq => {
+    entries = length(try(cl.entries, [])) > 0 ? { for entry in try(cl.entries, []) : entry.seq => {
       action = try(entry.action, null)
       regex  = try(entry.regex, null)
 
-      items = { for community in try(entry.communities, []) : community => {} }
-    } }
-  } }
+      items = length(try(entry.communities, [])) > 0 ? { for community in try(entry.communities, []) : community => {} } : null
+    } } : null
+  } } : null
 
   depends_on = [nxos_access_list.access_list]
 }

@@ -1,4 +1,11 @@
 locals {
+  hmm_interfaces_map = { for device in local.devices : device.name =>
+    { for int in try(local.device_config[device.name].interfaces.vlans, []) : "vlan${int.id}" => {
+      admin_state = "enabled"
+      mode        = try(local.hmm_mode_map[try(int.fabric_forwarding_mode)], null)
+      description = try(int.fabric_forwarding_description, null)
+    } if try(int.fabric_forwarding_mode, null) != null }
+  }
   hmm_mode_map = {
     "standard"   = "standard"
     "anycast-gw" = "anycastGW"
@@ -17,11 +24,7 @@ resource "nxos_hmm" "hmm" {
   administrative_distance = try(local.device_config[each.key].fabric_forwarding.distance, null)
   limit_vlan_mac          = try(local.device_config[each.key].fabric_forwarding.limit_vlan_mac, null)
   selective_host_probe    = try(local.device_config[each.key].fabric_forwarding.selective_host_probe, null) == null ? null : (try(local.device_config[each.key].fabric_forwarding.selective_host_probe) ? "yes" : "no")
-  interfaces = { for int in try(local.device_config[each.key].interfaces.vlans, []) : "vlan${int.id}" => {
-    admin_state = "enabled"
-    mode        = try(local.hmm_mode_map[try(int.fabric_forwarding_mode)], null)
-    description = try(int.fabric_forwarding_description, null)
-  } if try(int.fabric_forwarding_mode, null) != null }
+  interfaces              = length(local.hmm_interfaces_map[each.key]) > 0 ? local.hmm_interfaces_map[each.key] : null
 
   depends_on = [
     nxos_feature.feature,

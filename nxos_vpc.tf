@@ -1,4 +1,9 @@
 locals {
+  vpc_interfaces_map = { for device in local.devices : device.name =>
+    { for int in try(local.device_config[device.name].interfaces.port_channels, []) : tostring(int.vpc_id) => {
+      port_channel_interface_dn = "sys/intf/aggr-[po${int.id}]"
+    } if try(int.vpc_id, null) != null }
+  }
   vpc_keepalive = { for device in local.devices : device.name => {
     precedence_is_string = try(local.device_config[device.name].vpc.keepalive.precedence, null) != null ? can(tonumber(try(local.device_config[device.name].vpc.keepalive.precedence))) == false : false
     precedence_is_number = try(local.device_config[device.name].vpc.keepalive.precedence, null) != null ? can(tonumber(try(local.device_config[device.name].vpc.keepalive.precedence))) : false
@@ -54,9 +59,7 @@ resource "nxos_vpc" "vpc" {
   keepalive_udp_port                           = try(local.device_config[each.key].vpc.keepalive.udp_port, null)
   keepalive_vrf                                = try(local.device_config[each.key].vpc.keepalive.vrf, null)
   peerlink_interface_id                        = try(local.device_config[each.key].vpc.peer_link_channel_group, null) != null ? "po${try(local.device_config[each.key].vpc.peer_link_channel_group)}" : null
-  interfaces = { for int in try(local.device_config[each.key].interfaces.port_channels, []) : tostring(int.vpc_id) => {
-    port_channel_interface_dn = "sys/intf/aggr-[po${int.id}]"
-  } if try(int.vpc_id, null) != null }
+  interfaces                                   = length(local.vpc_interfaces_map[each.key]) > 0 ? local.vpc_interfaces_map[each.key] : null
 
   depends_on = [
     nxos_feature.feature,

@@ -121,6 +121,10 @@ locals {
       } if try(int.ipv6, null) != null],
     )
   ])
+
+  ipv6_interfaces_by_device_vrf = {
+    for entry in local.ipv6_interfaces : "${entry.device}/${entry.vrf}" => entry...
+  }
 }
 
 resource "nxos_ipv6" "ipv6" {
@@ -147,19 +151,19 @@ resource "nxos_ipv6" "ipv6" {
     # "default" VRF
     {
       "default" = {
-        static_routes = { for route in try(local.ipv6_routes_by_device_vrf["${each.key}/default"], []) : route.route.prefix => {
+        static_routes = length(try(local.ipv6_routes_by_device_vrf["${each.key}/default"], [])) > 0 ? { for route in try(local.ipv6_routes_by_device_vrf["${each.key}/default"], []) : route.route.prefix => {
           preference = try(route.route.preference, null)
           tag        = try(route.route.tag, null)
 
-          next_hops = { for nh in try(route.route.next_hops, []) : "${try(nh.interface_type, null) != null ? "${local.intf_prefix_map[try(nh.interface_type)]}${try(nh.interface_id, "")}" : "unspecified"};${try(nh.address, "::")};${try(nh.vrf, "default")}" => {
+          next_hops = length(try(route.route.next_hops, [])) > 0 ? { for nh in try(route.route.next_hops, []) : "${try(nh.interface_type, null) != null ? "${local.intf_prefix_map[try(nh.interface_type)]}${try(nh.interface_id, "")}" : "unspecified"};${try(nh.address, "::")};${try(nh.vrf, "default")}" => {
             object     = try(nh.track, null)
             preference = try(nh.preference, null)
             tag        = try(nh.tag, null)
             name       = try(nh.name, null)
-          } }
-        } }
+          } } : null
+        } } : null
 
-        interfaces = { for int in local.ipv6_interfaces : int.id => {
+        interfaces = length(try(local.ipv6_interfaces_by_device_vrf["${each.key}/default"], [])) > 0 ? { for int in local.ipv6_interfaces_by_device_vrf["${each.key}/default"] : int.id => {
           auto_configuration         = int.ipv6_address_autoconfig != null ? (int.ipv6_address_autoconfig ? "enabled" : "disabled") : null
           default_route              = int.ipv6_nd_default_route != null ? (int.ipv6_nd_default_route ? "enabled" : "disabled") : null
           forward                    = int.ipv6_forward != null ? (int.ipv6_forward ? "enabled" : "disabled") : null
@@ -168,30 +172,30 @@ resource "nxos_ipv6" "ipv6" {
           urpf                       = int.ipv6_verify_unicast_source_reachable_via
           link_local_address         = int.ipv6_address_link_local
 
-          addresses = { for addr in int.ipv6_addresses : addr.address => {
+          addresses = length(int.ipv6_addresses) > 0 ? { for addr in int.ipv6_addresses : addr.address => {
             type       = try(addr.type, null)
             tag        = try(addr.tag, null)
             control    = try(addr.eui64, false) ? "eui64" : null
             preference = try(addr.route_preference, null)
-          } }
-        } if int.device == each.key && int.vrf == "default" }
+          } } : null
+        } } : null
       }
     },
     # VRFs from configuration.vrfs[]
     { for vrf in try(local.device_config[each.key].vrfs, []) : vrf.name => {
-      static_routes = { for route in try(local.ipv6_routes_by_device_vrf["${each.key}/${vrf.name}"], []) : route.route.prefix => {
+      static_routes = length(try(local.ipv6_routes_by_device_vrf["${each.key}/${vrf.name}"], [])) > 0 ? { for route in try(local.ipv6_routes_by_device_vrf["${each.key}/${vrf.name}"], []) : route.route.prefix => {
         preference = try(route.route.preference, null)
         tag        = try(route.route.tag, null)
 
-        next_hops = { for nh in try(route.route.next_hops, []) : "${try(nh.interface_type, null) != null ? "${local.intf_prefix_map[try(nh.interface_type)]}${try(nh.interface_id, "")}" : "unspecified"};${try(nh.address, "::")};${try(nh.vrf, "default")}" => {
+        next_hops = length(try(route.route.next_hops, [])) > 0 ? { for nh in try(route.route.next_hops, []) : "${try(nh.interface_type, null) != null ? "${local.intf_prefix_map[try(nh.interface_type)]}${try(nh.interface_id, "")}" : "unspecified"};${try(nh.address, "::")};${try(nh.vrf, "default")}" => {
           object     = try(nh.track, null)
           preference = try(nh.preference, null)
           tag        = try(nh.tag, null)
           name       = try(nh.name, null)
-        } }
-      } }
+        } } : null
+      } } : null
 
-      interfaces = { for int in local.ipv6_interfaces : int.id => {
+      interfaces = length(try(local.ipv6_interfaces_by_device_vrf["${each.key}/${vrf.name}"], [])) > 0 ? { for int in local.ipv6_interfaces_by_device_vrf["${each.key}/${vrf.name}"] : int.id => {
         auto_configuration         = int.ipv6_address_autoconfig != null ? (int.ipv6_address_autoconfig ? "enabled" : "disabled") : null
         default_route              = int.ipv6_nd_default_route != null ? (int.ipv6_nd_default_route ? "enabled" : "disabled") : null
         forward                    = int.ipv6_forward != null ? (int.ipv6_forward ? "enabled" : "disabled") : null
@@ -200,13 +204,13 @@ resource "nxos_ipv6" "ipv6" {
         urpf                       = int.ipv6_verify_unicast_source_reachable_via
         link_local_address         = int.ipv6_address_link_local
 
-        addresses = { for addr in int.ipv6_addresses : addr.address => {
+        addresses = length(int.ipv6_addresses) > 0 ? { for addr in int.ipv6_addresses : addr.address => {
           type       = try(addr.type, null)
           tag        = try(addr.tag, null)
           control    = try(addr.eui64, false) ? "eui64" : null
           preference = try(addr.route_preference, null)
-        } }
-      } if int.device == each.key && int.vrf == vrf.name }
+        } } : null
+      } } : null
     } }
   )
 

@@ -1,3 +1,32 @@
+locals {
+  spanning_tree_interfaces_map = { for device in local.devices : device.name =>
+    merge(
+      { for int in try(local.device_config[device.name].interfaces.ethernets, []) : "eth${int.id}" => {
+        bpdu_filter               = try(int.spanning_tree.bpdufilter, null) == null ? null : (try(int.spanning_tree.bpdufilter) ? "enable" : "disable")
+        bpdu_guard                = try(int.spanning_tree.bpduguard, null) == null ? null : (try(int.spanning_tree.bpduguard) ? "enable" : "disable")
+        cost                      = try(int.spanning_tree.cost, null)
+        guard                     = try(int.spanning_tree.guard, null)
+        link_type                 = try(int.spanning_tree.link_type, null)
+        mode                      = try(int.spanning_tree.port_type, null)
+        priority                  = try(int.spanning_tree.port_priority, null)
+        prestandard_configuration = try(int.spanning_tree.mst_pre_standard, null) == null ? null : (try(int.spanning_tree.mst_pre_standard) ? "enabled" : "disabled")
+        simulate_pvst             = try(int.spanning_tree.mst_simulate_pvst, null) == null ? null : (try(int.spanning_tree.mst_simulate_pvst) ? "enabled" : "disabled")
+      } if try(int.spanning_tree, null) != null && try(int.switchport.enabled, true) },
+      { for int in try(local.device_config[device.name].interfaces.port_channels, []) : "po${int.id}" => {
+        bpdu_filter               = try(int.spanning_tree.bpdufilter, null) == null ? null : (try(int.spanning_tree.bpdufilter) ? "enable" : "disable")
+        bpdu_guard                = try(int.spanning_tree.bpduguard, null) == null ? null : (try(int.spanning_tree.bpduguard) ? "enable" : "disable")
+        cost                      = try(int.spanning_tree.cost, null)
+        guard                     = try(int.spanning_tree.guard, null)
+        link_type                 = try(int.spanning_tree.link_type, null)
+        mode                      = try(int.spanning_tree.port_type, null)
+        priority                  = try(int.spanning_tree.port_priority, null)
+        prestandard_configuration = try(int.spanning_tree.mst_pre_standard, null) == null ? null : (try(int.spanning_tree.mst_pre_standard) ? "enabled" : "disabled")
+        simulate_pvst             = try(int.spanning_tree.mst_simulate_pvst, null) == null ? null : (try(int.spanning_tree.mst_simulate_pvst) ? "enabled" : "disabled")
+      } if try(int.spanning_tree, null) != null && try(int.switchport.enabled, true) },
+    )
+  }
+}
+
 resource "nxos_spanning_tree" "spanning_tree" {
   for_each = { for device in local.devices : device.name => device
     if try(local.device_config[device.name].spanning_tree, null) != null ||
@@ -22,31 +51,8 @@ resource "nxos_spanning_tree" "spanning_tree" {
   loopguard                = try(local.device_config[each.key].spanning_tree.loopguard, null) != null ? (try(local.device_config[each.key].spanning_tree.loopguard) ? "enabled" : "disabled") : null
   mode                     = try(local.device_config[each.key].spanning_tree.mode, null)
   pathcost_option          = try(local.device_config[each.key].spanning_tree.pathcost_method, null)
-  interfaces = merge(
-    { for int in try(local.device_config[each.key].interfaces.ethernets, []) : "eth${int.id}" => {
-      bpdu_filter               = try(int.spanning_tree.bpdufilter, null) == null ? null : (try(int.spanning_tree.bpdufilter) ? "enable" : "disable")
-      bpdu_guard                = try(int.spanning_tree.bpduguard, null) == null ? null : (try(int.spanning_tree.bpduguard) ? "enable" : "disable")
-      cost                      = try(int.spanning_tree.cost, null)
-      guard                     = try(int.spanning_tree.guard, null)
-      link_type                 = try(int.spanning_tree.link_type, null)
-      mode                      = try(int.spanning_tree.port_type, null)
-      priority                  = try(int.spanning_tree.port_priority, null)
-      prestandard_configuration = try(int.spanning_tree.mst_pre_standard, null) == null ? null : (try(int.spanning_tree.mst_pre_standard) ? "enabled" : "disabled")
-      simulate_pvst             = try(int.spanning_tree.mst_simulate_pvst, null) == null ? null : (try(int.spanning_tree.mst_simulate_pvst) ? "enabled" : "disabled")
-    } if try(int.spanning_tree, null) != null && try(int.switchport.enabled, true) },
-    { for int in try(local.device_config[each.key].interfaces.port_channels, []) : "po${int.id}" => {
-      bpdu_filter               = try(int.spanning_tree.bpdufilter, null) == null ? null : (try(int.spanning_tree.bpdufilter) ? "enable" : "disable")
-      bpdu_guard                = try(int.spanning_tree.bpduguard, null) == null ? null : (try(int.spanning_tree.bpduguard) ? "enable" : "disable")
-      cost                      = try(int.spanning_tree.cost, null)
-      guard                     = try(int.spanning_tree.guard, null)
-      link_type                 = try(int.spanning_tree.link_type, null)
-      mode                      = try(int.spanning_tree.port_type, null)
-      priority                  = try(int.spanning_tree.port_priority, null)
-      prestandard_configuration = try(int.spanning_tree.mst_pre_standard, null) == null ? null : (try(int.spanning_tree.mst_pre_standard) ? "enabled" : "disabled")
-      simulate_pvst             = try(int.spanning_tree.mst_simulate_pvst, null) == null ? null : (try(int.spanning_tree.mst_simulate_pvst) ? "enabled" : "disabled")
-    } if try(int.spanning_tree, null) != null && try(int.switchport.enabled, true) },
-  )
-  vlans = merge([for group in try(local.device_config[each.key].spanning_tree.vlans, []) : {
+  interfaces               = length(local.spanning_tree_interfaces_map[each.key]) > 0 ? local.spanning_tree_interfaces_map[each.key] : null
+  vlans = length(try(local.device_config[each.key].spanning_tree.vlans, [])) > 0 ? merge([for group in try(local.device_config[each.key].spanning_tree.vlans, []) : {
     for vlan_id in try(provider::utils::normalize_vlans(group.vlans, "list"), []) :
     tostring(vlan_id) => {
       diameter     = try(group.diameter, null)
@@ -57,7 +63,7 @@ resource "nxos_spanning_tree" "spanning_tree" {
       root_mode    = try(group.root, null) != null ? "enabled" : null
       root_type    = try(group.root, null)
     }
-  }]...)
+  }]...) : null
 
   depends_on = [
     nxos_physical_interface.physical_interface,

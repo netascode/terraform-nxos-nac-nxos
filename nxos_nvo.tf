@@ -16,7 +16,7 @@ resource "nxos_nvo" "nvo" {
   evpn_multisite_border_gateway_fabric_advertise_pip   = try(local.device_config[each.key].evpn.multisite_border_gateway.fabric_advertise_pip, null)
   evpn_multisite_border_gateway_split_horizon_per_site = try(local.device_config[each.key].evpn.multisite_border_gateway.split_horizon_per_site, null) == null ? null : (try(local.device_config[each.key].evpn.multisite_border_gateway.split_horizon_per_site) ? "enable" : "disable")
 
-  nve_interfaces = { for nve_id in try(local.device_config[each.key].interfaces.nve, null) != null ? ["1"] : [] : nve_id => {
+  nve_interfaces = try(local.device_config[each.key].interfaces.nve, null) != null ? { for nve_id in ["1"] : nve_id => {
     admin_state                        = try(local.device_config[each.key].interfaces.nve.shutdown, null) == null ? null : (try(local.device_config[each.key].interfaces.nve.shutdown) ? "disabled" : "enabled")
     advertise_virtual_mac              = try(local.device_config[each.key].interfaces.nve.advertise_virtual_rmac, null)
     anycast_source_interface           = try(local.device_config[each.key].interfaces.nve.anycast_bundled_interface_type, null) != null ? "${local.intf_prefix_map[try(local.device_config[each.key].interfaces.nve.anycast_bundled_interface_type)]}${try(local.device_config[each.key].interfaces.nve.anycast_bundled_interface_id, "")}" : null
@@ -39,7 +39,7 @@ resource "nxos_nvo" "nvo" {
     suppress_nd                        = try(local.device_config[each.key].interfaces.nve.suppress_nd, null)
     virtual_mac                        = try(local.device_config[each.key].interfaces.nve.virtual_rmac, null)
 
-    vnis = { for vni in try(local.device_config[each.key].interfaces.nve.vnis, []) : vni.vni => {
+    vnis = length(try(local.device_config[each.key].interfaces.nve.vnis, [])) > 0 ? { for vni in try(local.device_config[each.key].interfaces.nve.vnis, []) : vni.vni => {
       associate_vrf                 = try(vni.associate_vrf, null)
       multicast_group               = try(vni.mcast_group, null)
       multisite_ingress_replication = try(vni.multisite_ingress_replication, null)
@@ -48,8 +48,8 @@ resource "nxos_nvo" "nvo" {
       suppress_arp                  = try(vni.suppress_arp, null) == null ? null : (try(vni.suppress_arp) ? "enabled" : "disabled")
 
       ingress_replication_protocol = try(vni.ingress_replication_protocol, null)
-    } }
-  } }
+    } } : null
+  } } : null
 
   depends_on = [
     nxos_bridge_domain.bridge_domain,

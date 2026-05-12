@@ -92,12 +92,12 @@ resource "nxos_evpn" "evpn" {
   device      = each.key
   admin_state = "enabled"
 
-  vnis = { for vni in try(local.evpn_vnis_per_device[each.key], []) : "vxlan-${vni.vni}" => {
+  vnis = length(try(local.evpn_vnis_per_device[each.key], [])) > 0 ? { for vni in try(local.evpn_vnis_per_device[each.key], []) : "vxlan-${vni.vni}" => {
     route_distinguisher = vni.rd_dme_format
     table_map           = vni.table_map
     table_map_filter    = vni.table_map_filter
 
-    route_target_directions = merge(
+    route_target_directions = (length(vni.rt_imports_dme) > 0 || length(vni.rt_exports_dme) > 0) ? merge(
       length(vni.rt_imports_dme) > 0 ? {
         "import" = {
           route_targets = { for rt in vni.rt_imports_dme : rt => {} }
@@ -108,8 +108,8 @@ resource "nxos_evpn" "evpn" {
           route_targets = { for rt in vni.rt_exports_dme : rt => {} }
         }
       } : {}
-    )
-  } }
+    ) : null
+  } } : null
 
   depends_on = [
     nxos_bgp.bgp,

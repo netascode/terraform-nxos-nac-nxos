@@ -11,7 +11,7 @@ resource "nxos_bridge_domain" "bridge_domain" {
   length(try(local.device_config[device.name].vlan.vlans, [])) > 0 }
   device        = each.key
   svi_autostate = try(local.device_config[each.key].system.interface_vlan_autostate, null) == null ? null : try(local.device_config[each.key].system.interface_vlan_autostate) ? "enable" : "disable"
-  bridge_domains = { for vlan in try(local.device_config[each.key].vlan.vlans, []) : "vlan-${vlan.id}" => {
+  bridge_domains = length(try(local.device_config[each.key].vlan.vlans, [])) > 0 ? { for vlan in try(local.device_config[each.key].vlan.vlans, []) : "vlan-${vlan.id}" => {
     access_encap = try(vlan.vni, null) != null ? "vxlan-${try(vlan.vni)}" : null
     name         = try(vlan.name, null)
     admin_state  = try(vlan.state_active, null) == null ? null : try(vlan.state_active) ? "active" : "suspend"
@@ -35,7 +35,7 @@ resource "nxos_bridge_domain" "bridge_domain" {
     mode                = try(local.bridge_domain_mode_map[try(vlan.mode)], null)
     vrf_name            = try(vlan.vrf, null)
     cross_connect       = try(vlan.cross_connect, null) == null ? null : try(vlan.cross_connect) ? "enable" : "disable"
-  } }
+  } } : null
 
   depends_on = [
     nxos_feature.feature,

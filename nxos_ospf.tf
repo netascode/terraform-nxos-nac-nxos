@@ -1,5 +1,37 @@
 locals {
   ospf_interfaces = concat(local.interfaces_ethernets, local.interfaces_loopbacks, local.interfaces_vlans, local.interfaces_port_channels, local.interfaces_subinterfaces)
+
+  ospf_interfaces_map = { for device in local.devices : device.name => {
+    for proc_vrf in distinct([for int in local.ospf_interfaces : "${int.ospf_process_name}/${int.vrf}" if int.device == device.name && int.ospf_process_name != null]) :
+    proc_vrf => { for int in local.ospf_interfaces : "${int.type}${int.id}" => {
+      advertise_secondaries = int.ospf_advertise_secondaries
+      area                  = int.ospf_area
+      bfd                   = int.ospf_bfd
+      cost                  = int.ospf_cost
+      dead_interval         = int.ospf_dead_interval
+      hello_interval        = int.ospf_hello_interval
+      network_type          = int.ospf_network_type
+      passive               = int.ospf_passive
+      priority              = int.ospf_priority
+      control = length(compact([
+        int.ospf_advertise_subnet ? "advert-subnet" : "",
+        int.ospf_mtu_ignore ? "mtu-ignore" : "",
+        ])) > 0 ? join(",", sort(compact([
+          int.ospf_advertise_subnet ? "advert-subnet" : "",
+          int.ospf_mtu_ignore ? "mtu-ignore" : "",
+      ]))) : null
+      node_flag                          = int.ospf_node_flag
+      retransmit_interval                = int.ospf_retransmit_interval
+      transmit_delay                     = int.ospf_transmit_delay
+      authentication_key                 = int.ospf_authentication_key
+      authentication_key_id              = int.ospf_authentication_key_id
+      authentication_key_secure_mode     = int.ospf_authentication_key_secure_mode
+      authentication_keychain            = int.ospf_authentication_keychain
+      authentication_md5_key             = int.ospf_authentication_md5_key
+      authentication_md5_key_secure_mode = int.ospf_authentication_md5_key_secure_mode
+      authentication_type                = int.ospf_authentication_type
+    } if int.device == device.name && int.ospf_process_name == split("/", proc_vrf)[0] && int.vrf == split("/", proc_vrf)[1] }
+  } }
 }
 
 resource "nxos_ospf" "ospf" {
@@ -7,7 +39,7 @@ resource "nxos_ospf" "ospf" {
   device      = each.key
   admin_state = "enabled"
 
-  instances = { for proc in try(local.device_config[each.key].routing.ospf_processes, []) : proc.name => {
+  instances = length(try(local.device_config[each.key].routing.ospf_processes, [])) > 0 ? { for proc in try(local.device_config[each.key].routing.ospf_processes, []) : proc.name => {
     admin_state = "enabled"
 
     vrfs = merge(
@@ -60,7 +92,7 @@ resource "nxos_ospf" "ospf" {
           max_metric_summary_lsa      = try(proc.max_metric_router_lsa.summary_lsa, false) ? try(proc.max_metric_router_lsa.summary_lsa_max_metric, null) : null
           max_metric_startup_interval = try(proc.max_metric_router_lsa.on_startup, false) ? try(proc.max_metric_router_lsa.on_startup_timeout, null) : null
 
-          areas = { for area in try(proc.areas, []) : area.id => {
+          areas = length(try(proc.areas, [])) > 0 ? { for area in try(proc.areas, []) : area.id => {
             authentication_type = try(area.authentication, null)
             cost                = try(area.default_cost, null)
             control = length(compact([
@@ -75,40 +107,13 @@ resource "nxos_ospf" "ospf" {
             nssa_translator_role = try(area.nssa_translate_type7, null)
             segment_routing_mpls = try(area.segment_routing_mpls, null) == null ? null : (try(area.segment_routing_mpls) ? "mpls" : "unspecified")
             type                 = try(area.type, null)
-          } }
+          } } : null
 
-          redistributions = { for redist in try(proc.redistributions, []) : "${redist.protocol};${try(redist.protocol_instance, "none")};${try(redist.asn, "none")}" => {
+          redistributions = length(try(proc.redistributions, [])) > 0 ? { for redist in try(proc.redistributions, []) : "${redist.protocol};${try(redist.protocol_instance, "none")};${try(redist.asn, "none")}" => {
             route_map = try(redist.route_map, null)
-          } }
+          } } : null
 
-          interfaces = { for int in local.ospf_interfaces : "${int.type}${int.id}" => {
-            advertise_secondaries = int.ospf_advertise_secondaries
-            area                  = int.ospf_area
-            bfd                   = int.ospf_bfd
-            cost                  = int.ospf_cost
-            dead_interval         = int.ospf_dead_interval
-            hello_interval        = int.ospf_hello_interval
-            network_type          = int.ospf_network_type
-            passive               = int.ospf_passive
-            priority              = int.ospf_priority
-            control = length(compact([
-              int.ospf_advertise_subnet ? "advert-subnet" : "",
-              int.ospf_mtu_ignore ? "mtu-ignore" : "",
-              ])) > 0 ? join(",", sort(compact([
-                int.ospf_advertise_subnet ? "advert-subnet" : "",
-                int.ospf_mtu_ignore ? "mtu-ignore" : "",
-            ]))) : null
-            node_flag                          = int.ospf_node_flag
-            retransmit_interval                = int.ospf_retransmit_interval
-            transmit_delay                     = int.ospf_transmit_delay
-            authentication_key                 = int.ospf_authentication_key
-            authentication_key_id              = int.ospf_authentication_key_id
-            authentication_key_secure_mode     = int.ospf_authentication_key_secure_mode
-            authentication_keychain            = int.ospf_authentication_keychain
-            authentication_md5_key             = int.ospf_authentication_md5_key
-            authentication_md5_key_secure_mode = int.ospf_authentication_md5_key_secure_mode
-            authentication_type                = int.ospf_authentication_type
-          } if int.device == each.key && int.ospf_process_name == proc.name && int.vrf == "default" }
+          interfaces = length(try(local.ospf_interfaces_map[each.key]["${proc.name}/default"], {})) > 0 ? local.ospf_interfaces_map[each.key]["${proc.name}/default"] : null
         }
       },
       # Explicit non-default VRFs
@@ -159,7 +164,7 @@ resource "nxos_ospf" "ospf" {
         max_metric_summary_lsa      = try(vrf.max_metric_router_lsa.summary_lsa, false) ? try(vrf.max_metric_router_lsa.summary_lsa_max_metric, null) : null
         max_metric_startup_interval = try(vrf.max_metric_router_lsa.on_startup, false) ? try(vrf.max_metric_router_lsa.on_startup_timeout, null) : null
 
-        areas = { for area in try(vrf.areas, []) : area.id => {
+        areas = length(try(vrf.areas, [])) > 0 ? { for area in try(vrf.areas, []) : area.id => {
           authentication_type = try(area.authentication, null)
           cost                = try(area.default_cost, null)
           control = length(compact([
@@ -174,43 +179,16 @@ resource "nxos_ospf" "ospf" {
           nssa_translator_role = try(area.nssa_translate_type7, null)
           segment_routing_mpls = try(area.segment_routing_mpls, null) == null ? null : (try(area.segment_routing_mpls) ? "mpls" : "unspecified")
           type                 = try(area.type, null)
-        } }
+        } } : null
 
-        redistributions = { for redist in try(vrf.redistributions, []) : "${redist.protocol};${try(redist.protocol_instance, "none")};${try(redist.asn, "none")}" => {
+        redistributions = length(try(vrf.redistributions, [])) > 0 ? { for redist in try(vrf.redistributions, []) : "${redist.protocol};${try(redist.protocol_instance, "none")};${try(redist.asn, "none")}" => {
           route_map = try(redist.route_map, null)
-        } }
+        } } : null
 
-        interfaces = { for int in local.ospf_interfaces : "${int.type}${int.id}" => {
-          advertise_secondaries = int.ospf_advertise_secondaries
-          area                  = int.ospf_area
-          bfd                   = int.ospf_bfd
-          cost                  = int.ospf_cost
-          dead_interval         = int.ospf_dead_interval
-          hello_interval        = int.ospf_hello_interval
-          network_type          = int.ospf_network_type
-          passive               = int.ospf_passive
-          priority              = int.ospf_priority
-          control = length(compact([
-            int.ospf_advertise_subnet ? "advert-subnet" : "",
-            int.ospf_mtu_ignore ? "mtu-ignore" : "",
-            ])) > 0 ? join(",", sort(compact([
-              int.ospf_advertise_subnet ? "advert-subnet" : "",
-              int.ospf_mtu_ignore ? "mtu-ignore" : "",
-          ]))) : null
-          node_flag                          = int.ospf_node_flag
-          retransmit_interval                = int.ospf_retransmit_interval
-          transmit_delay                     = int.ospf_transmit_delay
-          authentication_key                 = int.ospf_authentication_key
-          authentication_key_id              = int.ospf_authentication_key_id
-          authentication_key_secure_mode     = int.ospf_authentication_key_secure_mode
-          authentication_keychain            = int.ospf_authentication_keychain
-          authentication_md5_key             = int.ospf_authentication_md5_key
-          authentication_md5_key_secure_mode = int.ospf_authentication_md5_key_secure_mode
-          authentication_type                = int.ospf_authentication_type
-        } if int.device == each.key && int.ospf_process_name == proc.name && int.vrf == vrf.vrf }
+        interfaces = length(try(local.ospf_interfaces_map[each.key]["${proc.name}/${vrf.vrf}"], {})) > 0 ? local.ospf_interfaces_map[each.key]["${proc.name}/${vrf.vrf}"] : null
       } }
     )
-  } }
+  } } : null
 
   depends_on = [
     nxos_feature.feature,

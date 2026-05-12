@@ -108,7 +108,7 @@ resource "nxos_svi_interface" "svi_interface" {
   for_each = { for device in local.devices : device.name => device
   if length(try(local.device_config[device.name].interfaces.vlans, [])) > 0 }
   device = each.key
-  svi_interfaces = { for int in try(local.device_config[each.key].interfaces.vlans, []) : "vlan${int.id}" => {
+  svi_interfaces = length(try(local.device_config[each.key].interfaces.vlans, [])) > 0 ? { for int in try(local.device_config[each.key].interfaces.vlans, []) : "vlan${int.id}" => {
     admin_state                  = try(int.shutdown, null) == null ? null : (try(int.shutdown) ? "down" : "up")
     bandwidth                    = try(int.bandwidth, null)
     delay                        = try(int.delay, null)
@@ -126,7 +126,7 @@ resource "nxos_svi_interface" "svi_interface" {
     mac_address                  = try(int.mac_address, null)
     mtu_inherit                  = try(int.mtu_inherit, null)
     snmp_trap_link_status        = try(int.snmp_trap_link_status, null)
-  } }
+  } } : null
 
   depends_on = [
     nxos_feature.feature,

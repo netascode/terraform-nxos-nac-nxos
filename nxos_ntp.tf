@@ -25,14 +25,14 @@ resource "nxos_ntp" "ntp" {
   access_group_query_only = try(local.device_config[each.key].ntp.access_group_query_only, null)
   access_group_serve      = try(local.device_config[each.key].ntp.access_group_serve, null)
   access_group_serve_only = try(local.device_config[each.key].ntp.access_group_serve_only, null)
-  servers = { for name, server in try(local.ntp_servers[each.key], {}) : name => {
+  servers = length(try(local.ntp_servers[each.key], {})) > 0 ? { for name, server in try(local.ntp_servers[each.key], {}) : name => {
     vrf       = try(server.vrf, null)
     type      = server.type
     key_id    = try(server.key, null)
     min_poll  = try(server.min_poll, null)
     max_poll  = try(server.max_poll, null)
     preferred = try(server.prefer, null)
-  } }
+  } } : null
 
   depends_on = [
     nxos_vrf.vrf,

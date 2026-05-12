@@ -16,7 +16,7 @@ resource "nxos_span" "span" {
   for_each = { for device in local.devices : device.name => device
   if length(try(local.device_config[device.name].monitor_sessions, [])) > 0 }
   device = each.key
-  sessions = { for session in try(local.device_config[each.key].monitor_sessions, []) : session.id => {
+  sessions = length(try(local.device_config[each.key].monitor_sessions, [])) > 0 ? { for session in try(local.device_config[each.key].monitor_sessions, []) : session.id => {
     acl_name                   = try(session.filter_access_group, null)
     config_state               = try(session.shutdown, null) == null ? null : try(session.shutdown) ? "down" : "up"
     description                = try(session.description, null)
@@ -35,15 +35,15 @@ resource "nxos_span" "span" {
     source_ipv6                = try(session.source_ipv6, null)
     type                       = try(local.span_type_map[try(session.type)], null)
     vrf_name                   = try(session.vrf, null)
-    source_interfaces = { for si in try(session.source_interfaces, []) : "${local.intf_prefix_map[try(si.interface_type)]}${try(si.interface_id)}" => {
+    source_interfaces = length(try(session.source_interfaces, [])) > 0 ? { for si in try(session.source_interfaces, []) : "${local.intf_prefix_map[try(si.interface_type)]}${try(si.interface_id)}" => {
       direction = try(si.direction, null)
-    } }
-    source_vlans = merge([for sv in try(session.source_vlans, []) : {
+    } } : null
+    source_vlans = length(try(session.source_vlans, [])) > 0 ? merge([for sv in try(session.source_vlans, []) : {
       for vlan_id in try(provider::utils::normalize_vlans(sv.vlans, "list"), []) :
       "vlan-${vlan_id}" => { direction = try(sv.direction, null) }
-    }]...)
+    }]...) : null
     filter_vlans = try(provider::utils::normalize_vlans(try(session.filter_vlans), "string-nxos"), null)
-  } }
+  } } : null
 
   depends_on = [
     nxos_feature.feature,

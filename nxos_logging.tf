@@ -6,9 +6,9 @@ resource "nxos_logging" "logging" {
   # loggingLogLevel
   all   = try(local.device_config[each.key].logging.logging, null) == null ? null : (try(local.device_config[each.key].logging.logging) ? "enableall" : "disableall")
   level = try(local.device_config[each.key].logging.level, null)
-  facilities = { for facility in try(local.device_config[each.key].logging.facilities, []) : facility.name => {
+  facilities = length(try(local.device_config[each.key].logging.facilities, [])) > 0 ? { for facility in try(local.device_config[each.key].logging.facilities, []) : facility.name => {
     level = try(facility.level, null)
-  } }
+  } } : null
 
   # syslogFile
   file_admin_state          = try(local.device_config[each.key].logging.logfile_name, null) != null ? "enabled" : null
@@ -18,7 +18,7 @@ resource "nxos_logging" "logging" {
   file_persistent_threshold = try(local.device_config[each.key].logging.logfile_persistent_threshold, null)
 
   # syslogRemoteDest
-  remote_destinations = { for server in try(local.device_config[each.key].logging.servers, []) : server.host => {
+  remote_destinations = length(try(local.device_config[each.key].logging.servers, [])) > 0 ? { for server in try(local.device_config[each.key].logging.servers, []) : server.host => {
     admin_state                = "enabled"
     severity                   = try(server.severity, null)
     port                       = try(server.port, null)
@@ -26,7 +26,7 @@ resource "nxos_logging" "logging" {
     forwarding_facility        = try(server.facility, null)
     transport                  = try(server.transport, null)
     trustpoint_client_identity = try(server.trustpoint_client_identity, null)
-  } }
+  } } : null
 
   # syslogSourceInterface
   source_interface_admin_state = try(local.device_config[each.key].logging.source_interface_type, null) != null ? "enabled" : null

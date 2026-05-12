@@ -1,4 +1,15 @@
 locals {
+  icmpv6_interfaces_map = { for device in local.devices : device.name =>
+    { for int in local.icmpv6_interfaces : int.id => {
+      control = length(compact([
+        try(int.redirects, false) == true ? "redirect" : "",
+        try(int.unreachables, false) == true ? "unreachables" : "",
+        ])) > 0 ? join(",", sort(compact([
+          try(int.redirects, false) == true ? "redirect" : "",
+          try(int.unreachables, false) == true ? "unreachables" : "",
+      ]))) : null
+    } if int.device == device.name }
+  }
   icmpv6_interfaces = flatten([
     for device in local.devices : concat(
       [for int in try(local.device_config[device.name].interfaces.ethernets, []) : {
@@ -54,15 +65,7 @@ resource "nxos_icmpv6" "icmpv6" {
   redirect_syslog            = try(local.device_config[each.key].system.ipv6_redirect_syslog, null) == null ? null : (try(local.device_config[each.key].system.ipv6_redirect_syslog) ? "enabled" : "disabled")
   redirect_syslog_interval   = try(local.device_config[each.key].system.ipv6_redirect_syslog_interval, null)
 
-  interfaces = { for int in local.icmpv6_interfaces : int.id => {
-    control = length(compact([
-      try(int.redirects, false) == true ? "redirect" : "",
-      try(int.unreachables, false) == true ? "unreachables" : "",
-      ])) > 0 ? join(",", sort(compact([
-        try(int.redirects, false) == true ? "redirect" : "",
-        try(int.unreachables, false) == true ? "unreachables" : "",
-    ]))) : null
-  } if int.device == each.key }
+  interfaces = length(local.icmpv6_interfaces_map[each.key]) > 0 ? local.icmpv6_interfaces_map[each.key] : null
 
   depends_on = [
     nxos_feature.feature,

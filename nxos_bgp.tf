@@ -16,6 +16,30 @@ locals {
     l2vpn-vpls      = "l2vpn-vpls"
     ipv4-mdt        = "ipv4-mdt"
   }
+
+  bgp_peers_default_vrf_map = { for device in local.devices : device.name => [
+    for nei in try(local.device_config[device.name].routing.bgp.neighbors, []) : true
+    if try(nei.interface_type, null) == null
+  ] }
+
+  bgp_interface_peers_default_vrf_map = { for device in local.devices : device.name => [
+    for nei in try(local.device_config[device.name].routing.bgp.neighbors, []) : true
+    if try(nei.interface_type, null) != null
+  ] }
+
+  bgp_peers_non_default_vrf_map = { for device in local.devices : device.name => {
+    for vrf in try(local.device_config[device.name].routing.bgp.vrfs, []) : vrf.vrf => [
+      for nei in try(vrf.neighbors, []) : true
+      if try(nei.interface_type, null) == null
+    ]
+  } }
+
+  bgp_interface_peers_non_default_vrf_map = { for device in local.devices : device.name => {
+    for vrf in try(local.device_config[device.name].routing.bgp.vrfs, []) : vrf.vrf => [
+      for nei in try(vrf.neighbors, []) : true
+      if try(nei.interface_type, null) != null
+    ]
+  } }
 }
 
 resource "nxos_bgp" "bgp" {
@@ -69,7 +93,7 @@ resource "nxos_bgp" "bgp" {
         graceful_restart_interval       = try(local.device_config[each.key].routing.bgp.graceful_restart_restart_time, null)
         graceful_restart_stale_interval = try(local.device_config[each.key].routing.bgp.graceful_restart_stalepath_time, null)
 
-        address_families = { for af in try(local.device_config[each.key].routing.bgp.address_families, []) : local.address_family_names_map[af.address_family] => {
+        address_families = length(try(local.device_config[each.key].routing.bgp.address_families, [])) > 0 ? { for af in try(local.device_config[each.key].routing.bgp.address_families, []) : local.address_family_names_map[af.address_family] => {
           critical_nexthop_timeout                            = try(af.nexthop_trigger_delay_critical, null)
           non_critical_nexthop_timeout                        = try(af.nexthop_trigger_delay_non_critical, null)
           advertise_l2vpn_evpn                                = try(af.advertise_l2vpn_evpn, null) == null ? null : (try(af.advertise_l2vpn_evpn) ? "enabled" : "disabled")
@@ -112,10 +136,10 @@ resource "nxos_bgp" "bgp" {
           timer_bestpath_defer                                = try(af.timers_bestpath_defer, null)
           timer_bestpath_defer_max                            = try(af.timers_bestpath_defer_maximum, null)
 
-          advertised_prefixes = { for prefix in try(af.networks, []) : prefix.prefix => {
+          advertised_prefixes = length(try(af.networks, [])) > 0 ? { for prefix in try(af.networks, []) : prefix.prefix => {
             route_map = try(prefix.route_map, null)
             evpn      = try(prefix.evpn, null) == null ? null : (try(prefix.evpn) ? "enabled" : "disabled")
-          } }
+          } } : null
 
           additional_paths_capability = length(compact([
             try(af.additional_paths_send, false) ? "send" : "",
@@ -128,23 +152,23 @@ resource "nxos_bgp" "bgp" {
           ]))) : null
           additional_paths_route_map = try(af.additional_paths_selection_route_map, null)
 
-          redistributions = { for redist in try(af.redistributions, []) : "${redist.protocol};${try(redist.protocol_instance, "none")}" => {
+          redistributions = length(try(af.redistributions, [])) > 0 ? { for redist in try(af.redistributions, []) : "${redist.protocol};${try(redist.protocol_instance, "none")}" => {
             route_map        = try(redist.route_map, null)
             scope            = try(redist.scope, null)
             srv6_prefix_type = try(redist.srv6_prefix_type, null)
             asn              = try(redist.asn, null)
-          } }
+          } } : null
 
-          aggregate_addresses = { for agg in try(af.aggregate_addresses, []) : agg.prefix => {
+          aggregate_addresses = length(try(af.aggregate_addresses, [])) > 0 ? { for agg in try(af.aggregate_addresses, []) : agg.prefix => {
             advertise_map = try(agg.advertise_map, null)
             as_set        = try(agg.as_set, null) == null ? null : (try(agg.as_set) ? "enabled" : "disabled")
             attribute_map = try(agg.attribute_map, null)
             summary_only  = try(agg.summary_only, null) == null ? null : (try(agg.summary_only) ? "enabled" : "disabled")
             suppress_map  = try(agg.suppress_map, null)
-          } }
-        } }
+          } } : null
+        } } : null
 
-        peer_templates = { for pt in try(local.device_config[each.key].routing.bgp.peer_templates, []) : pt.name => {
+        peer_templates = length(try(local.device_config[each.key].routing.bgp.peer_templates, [])) > 0 ? { for pt in try(local.device_config[each.key].routing.bgp.peer_templates, []) : pt.name => {
           remote_asn                     = try(pt.remote_as, null)
           description                    = try(pt.description, null)
           peer_type                      = try(pt.peer_type, null)
@@ -180,7 +204,7 @@ resource "nxos_bgp" "bgp" {
           ebgp_multihop_ttl    = try(pt.ebgp_multihop_ttl, null)
           ttl_security_hops    = try(pt.ttl_security_hops, null)
 
-          peer_template_address_families = { for af in try(pt.address_families, []) : local.address_family_names_map[af.address_family] => {
+          peer_template_address_families = length(try(pt.address_families, [])) > 0 ? { for af in try(pt.address_families, []) : local.address_family_names_map[af.address_family] => {
             control = length(compact([
               try(af.advertisement_interval, null) != null ? "advertisement-interval" : "",
               try(af.allowas_in, false) ? "allow-self-as" : "",
@@ -224,10 +248,10 @@ resource "nxos_bgp" "bgp" {
             max_prefix_number       = try(af.maximum_prefix.number, null)
             max_prefix_restart_time = try(af.maximum_prefix.restart_time, null)
             max_prefix_threshold    = try(af.maximum_prefix.threshold, null)
-          } }
-        } }
+          } } : null
+        } } : null
 
-        peers = { for nei in try(local.device_config[each.key].routing.bgp.neighbors, []) : nei.ip => {
+        peers = length(try(local.bgp_peers_default_vrf_map[each.key], [])) > 0 ? { for nei in try(local.device_config[each.key].routing.bgp.neighbors, []) : nei.ip => {
           remote_asn         = try(nei.remote_as, null)
           description        = try(nei.description, null)
           peer_template      = try(nei.inherit_peer, null)
@@ -273,7 +297,7 @@ resource "nxos_bgp" "bgp" {
           egress_peer_engineering_peer_set = try(nei.egress_peer_engineering_peer_set, null)
           internal_vpn_client              = try(nei.internal_vpn_client, null) == null ? null : (try(nei.internal_vpn_client) ? "enabled" : "disabled")
 
-          peer_address_families = { for af in try(nei.address_families, []) : local.address_family_names_map[af.address_family] => {
+          peer_address_families = length(try(nei.address_families, [])) > 0 ? { for af in try(nei.address_families, []) : local.address_family_names_map[af.address_family] => {
             control = length(compact([
               try(af.advertisement_interval, null) != null ? "advertisement-interval" : "",
               try(af.allowas_in, false) ? "allow-self-as" : "",
@@ -318,17 +342,17 @@ resource "nxos_bgp" "bgp" {
             max_prefix_restart_time = try(af.maximum_prefix.restart_time, null)
             max_prefix_threshold    = try(af.maximum_prefix.threshold, null)
 
-            route_controls = { for direction in compact([try(af.route_map_in, null) != null ? "in" : "", try(af.route_map_out, null) != null ? "out" : ""]) : direction => {
+            route_controls = length(compact([try(af.route_map_in, null) != null ? "in" : "", try(af.route_map_out, null) != null ? "out" : ""])) > 0 ? { for direction in compact([try(af.route_map_in, null) != null ? "in" : "", try(af.route_map_out, null) != null ? "out" : ""]) : direction => {
               route_map_name = direction == "in" ? af.route_map_in : af.route_map_out
-            } }
+            } } : null
 
-            prefix_list_controls = { for direction in compact([try(af.prefix_list_in, null) != null ? "in" : "", try(af.prefix_list_out, null) != null ? "out" : ""]) : direction => {
+            prefix_list_controls = length(compact([try(af.prefix_list_in, null) != null ? "in" : "", try(af.prefix_list_out, null) != null ? "out" : ""])) > 0 ? { for direction in compact([try(af.prefix_list_in, null) != null ? "in" : "", try(af.prefix_list_out, null) != null ? "out" : ""]) : direction => {
               list = direction == "in" ? af.prefix_list_in : af.prefix_list_out
-            } }
-          } }
-        } if try(nei.interface_type, null) == null }
+            } } : null
+          } } : null
+        } if try(nei.interface_type, null) == null } : null
 
-        interface_peers = { for nei in try(local.device_config[each.key].routing.bgp.neighbors, []) : "${local.intf_prefix_map[try(nei.interface_type)]}${try(nei.interface_id, "")}" => {
+        interface_peers = length(try(local.bgp_interface_peers_default_vrf_map[each.key], [])) > 0 ? { for nei in try(local.device_config[each.key].routing.bgp.neighbors, []) : "${local.intf_prefix_map[try(nei.interface_type)]}${try(nei.interface_id, "")}" => {
           remote_asn                     = try(nei.remote_as, null)
           description                    = try(nei.description, null)
           peer_template                  = try(nei.inherit_peer, null)
@@ -370,7 +394,7 @@ resource "nxos_bgp" "bgp" {
           internal_vpn_client              = try(nei.internal_vpn_client, null) == null ? null : (try(nei.internal_vpn_client) ? "enabled" : "disabled")
           local_asn                        = try(nei.local_as, null)
           local_asn_propagation            = try(nei.local_as_propagation, null)
-        } if try(nei.interface_type, null) != null }
+        } if try(nei.interface_type, null) != null } : null
       }
     },
     # Explicit non-default VRFs
@@ -401,7 +425,7 @@ resource "nxos_bgp" "bgp" {
       graceful_restart_interval       = try(vrf.graceful_restart_restart_time, null)
       graceful_restart_stale_interval = try(vrf.graceful_restart_stalepath_time, null)
 
-      address_families = { for af in try(vrf.address_families, []) : local.address_family_names_map[af.address_family] => {
+      address_families = length(try(vrf.address_families, [])) > 0 ? { for af in try(vrf.address_families, []) : local.address_family_names_map[af.address_family] => {
         critical_nexthop_timeout                            = try(af.nexthop_trigger_delay_critical, null)
         non_critical_nexthop_timeout                        = try(af.nexthop_trigger_delay_non_critical, null)
         advertise_l2vpn_evpn                                = try(af.advertise_l2vpn_evpn, null) == null ? null : (try(af.advertise_l2vpn_evpn) ? "enabled" : "disabled")
@@ -444,10 +468,10 @@ resource "nxos_bgp" "bgp" {
         timer_bestpath_defer                                = try(af.timers_bestpath_defer, null)
         timer_bestpath_defer_max                            = try(af.timers_bestpath_defer_maximum, null)
 
-        advertised_prefixes = { for prefix in try(af.networks, []) : prefix.prefix => {
+        advertised_prefixes = length(try(af.networks, [])) > 0 ? { for prefix in try(af.networks, []) : prefix.prefix => {
           route_map = try(prefix.route_map, null)
           evpn      = try(prefix.evpn, null) == null ? null : (try(prefix.evpn) ? "enabled" : "disabled")
-        } }
+        } } : null
 
         additional_paths_capability = length(compact([
           try(af.additional_paths_send, false) ? "send" : "",
@@ -460,25 +484,25 @@ resource "nxos_bgp" "bgp" {
         ]))) : null
         additional_paths_route_map = try(af.additional_paths_selection_route_map, null)
 
-        redistributions = { for redist in try(af.redistributions, []) : "${redist.protocol};${try(redist.protocol_instance, "none")}" => {
+        redistributions = length(try(af.redistributions, [])) > 0 ? { for redist in try(af.redistributions, []) : "${redist.protocol};${try(redist.protocol_instance, "none")}" => {
           route_map        = try(redist.route_map, null)
           scope            = try(redist.scope, null)
           srv6_prefix_type = try(redist.srv6_prefix_type, null)
           asn              = try(redist.asn, null)
-        } }
+        } } : null
 
-        aggregate_addresses = { for agg in try(af.aggregate_addresses, []) : agg.prefix => {
+        aggregate_addresses = length(try(af.aggregate_addresses, [])) > 0 ? { for agg in try(af.aggregate_addresses, []) : agg.prefix => {
           advertise_map = try(agg.advertise_map, null)
           as_set        = try(agg.as_set, null) == null ? null : (try(agg.as_set) ? "enabled" : "disabled")
           attribute_map = try(agg.attribute_map, null)
           summary_only  = try(agg.summary_only, null) == null ? null : (try(agg.summary_only) ? "enabled" : "disabled")
           suppress_map  = try(agg.suppress_map, null)
-        } }
-      } }
+        } } : null
+      } } : null
 
-      peer_templates = {}
+      peer_templates = null
 
-      peers = { for nei in try(vrf.neighbors, []) : nei.ip => {
+      peers = length(try(local.bgp_peers_non_default_vrf_map[each.key][vrf.vrf], [])) > 0 ? { for nei in try(vrf.neighbors, []) : nei.ip => {
         remote_asn         = try(nei.remote_as, null)
         description        = try(nei.description, null)
         peer_template      = try(nei.inherit_peer, null)
@@ -524,7 +548,7 @@ resource "nxos_bgp" "bgp" {
         egress_peer_engineering_peer_set = try(nei.egress_peer_engineering_peer_set, null)
         internal_vpn_client              = try(nei.internal_vpn_client, null) == null ? null : (try(nei.internal_vpn_client) ? "enabled" : "disabled")
 
-        peer_address_families = { for af in try(nei.address_families, []) : local.address_family_names_map[af.address_family] => {
+        peer_address_families = length(try(nei.address_families, [])) > 0 ? { for af in try(nei.address_families, []) : local.address_family_names_map[af.address_family] => {
           control = length(compact([
             try(af.advertisement_interval, null) != null ? "advertisement-interval" : "",
             try(af.allowas_in, false) ? "allow-self-as" : "",
@@ -569,17 +593,17 @@ resource "nxos_bgp" "bgp" {
           max_prefix_restart_time = try(af.maximum_prefix.restart_time, null)
           max_prefix_threshold    = try(af.maximum_prefix.threshold, null)
 
-          route_controls = { for direction in compact([try(af.route_map_in, null) != null ? "in" : "", try(af.route_map_out, null) != null ? "out" : ""]) : direction => {
+          route_controls = length(compact([try(af.route_map_in, null) != null ? "in" : "", try(af.route_map_out, null) != null ? "out" : ""])) > 0 ? { for direction in compact([try(af.route_map_in, null) != null ? "in" : "", try(af.route_map_out, null) != null ? "out" : ""]) : direction => {
             route_map_name = direction == "in" ? af.route_map_in : af.route_map_out
-          } }
+          } } : null
 
-          prefix_list_controls = { for direction in compact([try(af.prefix_list_in, null) != null ? "in" : "", try(af.prefix_list_out, null) != null ? "out" : ""]) : direction => {
+          prefix_list_controls = length(compact([try(af.prefix_list_in, null) != null ? "in" : "", try(af.prefix_list_out, null) != null ? "out" : ""])) > 0 ? { for direction in compact([try(af.prefix_list_in, null) != null ? "in" : "", try(af.prefix_list_out, null) != null ? "out" : ""]) : direction => {
             list = direction == "in" ? af.prefix_list_in : af.prefix_list_out
-          } }
-        } }
-      } if try(nei.interface_type, null) == null }
+          } } : null
+        } } : null
+      } if try(nei.interface_type, null) == null } : null
 
-      interface_peers = { for nei in try(vrf.neighbors, []) : "${local.intf_prefix_map[try(nei.interface_type)]}${try(nei.interface_id, "")}" => {
+      interface_peers = length(try(local.bgp_interface_peers_non_default_vrf_map[each.key][vrf.vrf], [])) > 0 ? { for nei in try(vrf.neighbors, []) : "${local.intf_prefix_map[try(nei.interface_type)]}${try(nei.interface_id, "")}" => {
         remote_asn                     = try(nei.remote_as, null)
         description                    = try(nei.description, null)
         peer_template                  = try(nei.inherit_peer, null)
@@ -621,7 +645,7 @@ resource "nxos_bgp" "bgp" {
         internal_vpn_client              = try(nei.internal_vpn_client, null) == null ? null : (try(nei.internal_vpn_client) ? "enabled" : "disabled")
         local_asn                        = try(nei.local_as, null)
         local_asn_propagation            = try(nei.local_as_propagation, null)
-      } if try(nei.interface_type, null) != null }
+      } if try(nei.interface_type, null) != null } : null
     } }
   )
 
