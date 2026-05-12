@@ -48,4 +48,9 @@ resource "nxos_default_qos" "default_qos" {
       } if try(int.service_policy_type_qos_input, null) != null
     }
   ]...)
+  depends_on = [
+    nxos_physical_interface.physical_interface,
+    nxos_svi_interface.svi_interface,
+    nxos_port_channel_interface.port_channel_interface,
+  ]
 }
