@@ -129,6 +129,7 @@ resource "nxos_cli" "cli_0" {
     nxos_ospfv3.ospfv3,
     nxos_physical_interface.physical_interface,
     nxos_pim.pim,
+    nxos_platform.platform,
     nxos_port_channel_interface.port_channel_interface,
     nxos_ptp.ptp,
     nxos_queuing_qos.queuing_qos,
