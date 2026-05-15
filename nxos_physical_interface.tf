@@ -129,7 +129,7 @@ resource "nxos_physical_interface" "physical_interface" {
   physical_interfaces = length(try(local.device_config[each.key].interfaces.ethernets, [])) > 0 ? { for int in try(local.device_config[each.key].interfaces.ethernets, []) : "eth${int.id}" => {
     fec_mode                           = try(int.fec, null)
     access_vlan                        = try(int.channel_group, null) != null ? null : (!try(int.switchport.enabled, true) ? "unknown" : try(int.switchport.access_vlan, null) != null ? "vlan-${int.switchport.access_vlan}" : null)
-    admin_state                        = try(int.shutdown, null) == null ? null : (try(int.shutdown) ? "down" : "up")
+    admin_state                        = try(int.shutdown, null) != null ? (try(int.shutdown) ? "down" : "up") : (!try(int.switchport.enabled, true) ? "up" : null)
     auto_negotiation                   = try(int.negotiate_auto, null)
     bandwidth                          = try(int.bandwidth, null)
     beacon                             = try(int.beacon, null) != null ? (try(int.beacon) ? "on" : "off") : null
@@ -173,7 +173,7 @@ resource "nxos_physical_interface" "physical_interface" {
       "admin_layer",
       try(int.mtu, null) != null ? "admin_mtu" : "",
       try(int.mac_address, null) != null ? "admin_router_mac" : "",
-      try(int.shutdown, null) != null ? "admin_state" : "",
+      try(int.shutdown, null) != null || !try(int.switchport.enabled, true) ? "admin_state" : "",
     ])))
     voice_port_cos                                      = try(int.switchport.voice_cos, null)
     voice_port_trust                                    = try(int.switchport.voice_trust, null) != null ? (try(int.switchport.voice_trust) ? "enable" : "disable") : null

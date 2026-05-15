@@ -190,7 +190,7 @@ locals {
       { for sub in flatten([for int in try(local.device_config[device.name].interfaces.ethernets, []) : [
         for s in try(int.subinterfaces, []) : merge(s, { parent_id = "eth${int.id}" })
         ]]) : "${sub.parent_id}.${sub.id}" => {
-        admin_state             = try(sub.shutdown, null) != null ? (try(sub.shutdown) ? "down" : "up") : null
+        admin_state             = try(sub.shutdown, null) != null ? (try(sub.shutdown) ? "down" : "up") : "up"
         bandwidth               = try(sub.bandwidth, null)
         delay                   = try(sub.delay, null)
         description             = try(sub.description, null)
@@ -207,7 +207,7 @@ locals {
       { for sub in flatten([for int in try(local.device_config[device.name].interfaces.port_channels, []) : [
         for s in try(int.subinterfaces, []) : merge(s, { parent_id = "po${int.id}" })
         ]]) : "${sub.parent_id}.${sub.id}" => {
-        admin_state             = try(sub.shutdown, null) != null ? (try(sub.shutdown) ? "down" : "up") : null
+        admin_state             = try(sub.shutdown, null) != null ? (try(sub.shutdown) ? "down" : "up") : "up"
         bandwidth               = try(sub.bandwidth, null)
         delay                   = try(sub.delay, null)
         description             = try(sub.description, null)

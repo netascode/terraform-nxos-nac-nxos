@@ -112,7 +112,7 @@ resource "nxos_port_channel_interface" "port_channel_interface" {
     maximum_links        = try(int.lacp_max_bundle, null)
     suspend_individual   = try(int.lacp_suspend_individual, null) != null ? (try(int.lacp_suspend_individual) ? "enable" : "disable") : null
     access_vlan          = !try(int.switchport.enabled, true) ? "unknown" : try(int.switchport.access_vlan, null) != null ? "vlan-${int.switchport.access_vlan}" : null
-    admin_state          = try(int.shutdown, null) == null ? null : (try(int.shutdown) ? "down" : "up")
+    admin_state          = try(int.shutdown, null) != null ? (try(int.shutdown) ? "down" : "up") : (!try(int.switchport.enabled, true) ? "up" : null)
     auto_negotiation     = try(int.negotiate_auto, null)
     bandwidth            = try(int.bandwidth, null)
     delay                = try(int.delay, null)
@@ -148,7 +148,7 @@ resource "nxos_port_channel_interface" "port_channel_interface" {
       "admin_layer",
       try(int.mtu, null) != null ? "admin_mtu" : "",
       try(int.mac_address, null) != null ? "admin_router_mac" : "",
-      try(int.shutdown, null) != null ? "admin_state" : "",
+      try(int.shutdown, null) != null || !try(int.switchport.enabled, true) ? "admin_state" : "",
     ])))
     vrf_dn                                              = !try(int.switchport.enabled, true) ? "sys/inst-${try(int.vrf, "default")}" : null
     buffer_boost                                        = try(int.buffer_boost, null) == null ? null : (try(int.buffer_boost) ? "enable" : "disable")

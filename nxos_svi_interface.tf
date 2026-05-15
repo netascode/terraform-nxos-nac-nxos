@@ -109,7 +109,7 @@ resource "nxos_svi_interface" "svi_interface" {
   if length(try(local.device_config[device.name].interfaces.vlans, [])) > 0 }
   device = each.key
   svi_interfaces = length(try(local.device_config[each.key].interfaces.vlans, [])) > 0 ? { for int in try(local.device_config[each.key].interfaces.vlans, []) : "vlan${int.id}" => {
-    admin_state                  = try(int.shutdown, null) == null ? null : (try(int.shutdown) ? "down" : "up")
+    admin_state                  = try(int.shutdown, null) != null ? (try(int.shutdown) ? "down" : "up") : "up"
     bandwidth                    = try(int.bandwidth, null)
     delay                        = try(int.delay, null)
     description                  = try(int.description, null)
