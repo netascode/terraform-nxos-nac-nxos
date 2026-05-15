@@ -127,49 +127,54 @@ resource "nxos_physical_interface" "physical_interface" {
   if length(try(local.device_config[device.name].interfaces.ethernets, [])) > 0 }
   device = each.key
   physical_interfaces = length(try(local.device_config[each.key].interfaces.ethernets, [])) > 0 ? { for int in try(local.device_config[each.key].interfaces.ethernets, []) : "eth${int.id}" => {
-    fec_mode                                            = try(int.fec, null)
-    access_vlan                                         = try(int.channel_group, null) != null ? null : (!try(int.switchport.enabled, true) ? "unknown" : try(int.switchport.access_vlan, null) != null ? "vlan-${int.switchport.access_vlan}" : null)
-    admin_state                                         = try(int.shutdown, null) == null ? null : (try(int.shutdown) ? "down" : "up")
-    auto_negotiation                                    = try(int.negotiate_auto, null)
-    bandwidth                                           = try(int.bandwidth, null)
-    beacon                                              = try(int.beacon, null) != null ? (try(int.beacon) ? "on" : "off") : null
-    delay                                               = try(int.delay, null)
-    description                                         = try(int.description, null)
-    dfe_adaptive_tuning                                 = try(int.dfe_adaptive_tuning, null) != null ? (try(int.dfe_adaptive_tuning) ? "enable" : "disable") : null
-    dfe_tuning_delay                                    = try(int.dfe_tuning_delay, null)
-    dot1q_ethertype                                     = try(int.dot1q_ethertype, null)
-    duplex                                              = try(int.duplex, null)
-    itu_channel                                         = try(int.itu_channel, null)
-    layer                                               = try(int.channel_group, null) != null ? null : (!try(int.switchport.enabled, true) ? "Layer3" : "Layer2")
-    link_active_jitter_management                       = try(int.link_active_jitter_management, null) != null ? (try(int.link_active_jitter_management) ? "enable" : "disable") : null
-    link_debounce_down                                  = try(int.link_debounce_time, null)
-    link_debounce_up                                    = try(int.link_debounce_link_up, null)
-    link_flap_error_disable                             = try(int.link_flap_err_disable, null) != null ? (try(int.link_flap_err_disable) ? "enable" : "disable") : null
-    link_flap_error_max                                 = try(int.link_flap_err_disable_max, null)
-    link_flap_error_seconds                             = try(int.link_flap_err_disable_interval, null)
-    link_logging                                        = try(int.logging_event_port_link_status, null) != null ? (try(int.logging_event_port_link_status) ? "enable" : "disable") : null
-    link_loopback                                       = try(int.loopback, null) != null ? (try(int.loopback) ? "enable" : "disable") : null
-    link_mac_up_timer                                   = try(int.link_mac_up_timer, null)
-    link_max_bring_up_timer                             = try(int.link_max_bring_up_timer, null)
-    link_transmit_reset                                 = try(int.link_transmit_reset, null) != null ? (try(int.link_transmit_reset) ? "enable" : "disable") : null
-    mdix                                                = try(int.mdix, null)
-    media_type                                          = try(int.media_type, null)
-    medium                                              = try(int.medium, null)
-    mode                                                = try(local.switchport_mode_map[try(int.switchport.mode)], try(int.switchport.mode, null))
-    mtu                                                 = try(int.mtu, null)
-    native_vlan                                         = try(int.channel_group, null) != null ? null : (!try(int.switchport.enabled, true) ? "unknown" : try(int.switchport.trunk_native_vlan, null) != null ? "vlan-${int.switchport.trunk_native_vlan}" : null)
-    packet_timestamp_egress_source_id                   = try(int.packet_timestamp_egress_source_id, null)
-    packet_timestamp_ingress_source_id                  = try(int.packet_timestamp_ingress_source_id, null)
-    packet_timestamp_state                              = try(int.packet_timestamp, null)
-    snmp_trap_state                                     = try(int.snmp_trap_link_status, null) != null ? (try(int.snmp_trap_link_status) ? "enable" : "disable") : null
-    speed                                               = try(int.speed, null)
-    speed_group                                         = try(int.speed_group, null)
-    squelch                                             = try(int.squelch, null) != null ? (try(int.squelch) ? "enable" : "disable") : null
-    transparent_mode                                    = try(int.switchport.transparent_mode, null) == null ? null : (try(int.switchport.transparent_mode) ? "trans-port" : "not-a-trans-port")
-    trunk_logging                                       = try(int.logging_event_port_trunk_status, null) != null ? (try(int.logging_event_port_trunk_status) ? "enable" : "disable") : null
-    trunk_vlans                                         = try(int.channel_group, null) != null ? null : (!try(int.switchport.enabled, true) ? "1-4094" : try(provider::utils::normalize_vlans(try(int.switchport.trunk_allowed_vlans), "string-nxos"), null))
-    uni_directional_ethernet                            = try(int.uni_directional_ethernet, null)
-    user_configured_flags                               = try(int.channel_group, null) != null ? null : "admin_layer,admin_mtu,admin_state"
+    fec_mode                           = try(int.fec, null)
+    access_vlan                        = try(int.channel_group, null) != null ? null : (!try(int.switchport.enabled, true) ? "unknown" : try(int.switchport.access_vlan, null) != null ? "vlan-${int.switchport.access_vlan}" : null)
+    admin_state                        = try(int.shutdown, null) == null ? null : (try(int.shutdown) ? "down" : "up")
+    auto_negotiation                   = try(int.negotiate_auto, null)
+    bandwidth                          = try(int.bandwidth, null)
+    beacon                             = try(int.beacon, null) != null ? (try(int.beacon) ? "on" : "off") : null
+    delay                              = try(int.delay, null)
+    description                        = try(int.description, null)
+    dfe_adaptive_tuning                = try(int.dfe_adaptive_tuning, null) != null ? (try(int.dfe_adaptive_tuning) ? "enable" : "disable") : null
+    dfe_tuning_delay                   = try(int.dfe_tuning_delay, null)
+    dot1q_ethertype                    = try(int.dot1q_ethertype, null)
+    duplex                             = try(int.duplex, null)
+    itu_channel                        = try(int.itu_channel, null)
+    layer                              = try(int.channel_group, null) != null ? null : (!try(int.switchport.enabled, true) ? "Layer3" : "Layer2")
+    link_active_jitter_management      = try(int.link_active_jitter_management, null) != null ? (try(int.link_active_jitter_management) ? "enable" : "disable") : null
+    link_debounce_down                 = try(int.link_debounce_time, null)
+    link_debounce_up                   = try(int.link_debounce_link_up, null)
+    link_flap_error_disable            = try(int.link_flap_err_disable, null) != null ? (try(int.link_flap_err_disable) ? "enable" : "disable") : null
+    link_flap_error_max                = try(int.link_flap_err_disable_max, null)
+    link_flap_error_seconds            = try(int.link_flap_err_disable_interval, null)
+    link_logging                       = try(int.logging_event_port_link_status, null) != null ? (try(int.logging_event_port_link_status) ? "enable" : "disable") : null
+    link_loopback                      = try(int.loopback, null) != null ? (try(int.loopback) ? "enable" : "disable") : null
+    link_mac_up_timer                  = try(int.link_mac_up_timer, null)
+    link_max_bring_up_timer            = try(int.link_max_bring_up_timer, null)
+    link_transmit_reset                = try(int.link_transmit_reset, null) != null ? (try(int.link_transmit_reset) ? "enable" : "disable") : null
+    mdix                               = try(int.mdix, null)
+    media_type                         = try(int.media_type, null)
+    medium                             = try(int.medium, null)
+    mode                               = try(local.switchport_mode_map[try(int.switchport.mode)], try(int.switchport.mode, null))
+    mtu                                = try(int.mtu, null)
+    native_vlan                        = try(int.channel_group, null) != null ? null : (!try(int.switchport.enabled, true) ? "unknown" : try(int.switchport.trunk_native_vlan, null) != null ? "vlan-${int.switchport.trunk_native_vlan}" : null)
+    packet_timestamp_egress_source_id  = try(int.packet_timestamp_egress_source_id, null)
+    packet_timestamp_ingress_source_id = try(int.packet_timestamp_ingress_source_id, null)
+    packet_timestamp_state             = try(int.packet_timestamp, null)
+    snmp_trap_state                    = try(int.snmp_trap_link_status, null) != null ? (try(int.snmp_trap_link_status) ? "enable" : "disable") : null
+    speed                              = try(int.speed, null)
+    speed_group                        = try(int.speed_group, null)
+    squelch                            = try(int.squelch, null) != null ? (try(int.squelch) ? "enable" : "disable") : null
+    transparent_mode                   = try(int.switchport.transparent_mode, null) == null ? null : (try(int.switchport.transparent_mode) ? "trans-port" : "not-a-trans-port")
+    trunk_logging                      = try(int.logging_event_port_trunk_status, null) != null ? (try(int.logging_event_port_trunk_status) ? "enable" : "disable") : null
+    trunk_vlans                        = try(int.channel_group, null) != null ? null : (!try(int.switchport.enabled, true) ? "1-4094" : try(provider::utils::normalize_vlans(try(int.switchport.trunk_allowed_vlans), "string-nxos"), null))
+    uni_directional_ethernet           = try(int.uni_directional_ethernet, null)
+    user_configured_flags = try(int.channel_group, null) != null ? null : join(",", sort(compact([
+      "admin_layer",
+      try(int.mtu, null) != null ? "admin_mtu" : "",
+      try(int.mac_address, null) != null ? "admin_router_mac" : "",
+      try(int.shutdown, null) != null ? "admin_state" : "",
+    ])))
     voice_port_cos                                      = try(int.switchport.voice_cos, null)
     voice_port_trust                                    = try(int.switchport.voice_trust, null) != null ? (try(int.switchport.voice_trust) ? "enable" : "disable") : null
     voice_vlan_id                                       = try(int.switchport.voice_vlan, null)

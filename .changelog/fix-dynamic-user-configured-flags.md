@@ -1,0 +1,1 @@
+- Fix `user_configured_flags` for physical and port-channel interfaces to only include flags for attributes that are actually configured (`admin_mtu`, `admin_state`, `admin_router_mac`) instead of always sending all flags
