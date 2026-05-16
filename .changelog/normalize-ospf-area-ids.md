@@ -1,0 +1,1 @@
+- Add support for integer OSPF/OSPFv3 area IDs (e.g., `0` instead of `"0.0.0.0"`)

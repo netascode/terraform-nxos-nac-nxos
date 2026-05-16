@@ -5,7 +5,7 @@ locals {
     for proc_vrf in distinct([for int in local.ospf_interfaces : "${int.ospf_process_name}/${int.vrf}" if int.device == device.name && int.ospf_process_name != null]) :
     proc_vrf => { for int in local.ospf_interfaces : "${int.type}${int.id}" => {
       advertise_secondaries = int.ospf_advertise_secondaries
-      area                  = int.ospf_area
+      area                  = int.ospf_area == null ? null : can(tonumber(int.ospf_area)) ? format("%d.%d.%d.%d", floor(tonumber(int.ospf_area) / 16777216) % 256, floor(tonumber(int.ospf_area) / 65536) % 256, floor(tonumber(int.ospf_area) / 256) % 256, tonumber(int.ospf_area) % 256) : tostring(int.ospf_area)
       bfd                   = int.ospf_bfd
       cost                  = int.ospf_cost
       dead_interval         = int.ospf_dead_interval
@@ -92,7 +92,7 @@ resource "nxos_ospf" "ospf" {
           max_metric_summary_lsa      = try(proc.max_metric_router_lsa.summary_lsa, false) ? try(proc.max_metric_router_lsa.summary_lsa_max_metric, null) : null
           max_metric_startup_interval = try(proc.max_metric_router_lsa.on_startup, false) ? try(proc.max_metric_router_lsa.on_startup_timeout, null) : null
 
-          areas = length(try(proc.areas, [])) > 0 ? { for area in try(proc.areas, []) : area.id => {
+          areas = length(try(proc.areas, [])) > 0 ? { for area in try(proc.areas, []) : (can(tonumber(area.id)) ? format("%d.%d.%d.%d", floor(tonumber(area.id) / 16777216) % 256, floor(tonumber(area.id) / 65536) % 256, floor(tonumber(area.id) / 256) % 256, tonumber(area.id) % 256) : tostring(area.id)) => {
             authentication_type = try(area.authentication, null)
             cost                = try(area.default_cost, null)
             control = length(compact([
@@ -164,7 +164,7 @@ resource "nxos_ospf" "ospf" {
         max_metric_summary_lsa      = try(vrf.max_metric_router_lsa.summary_lsa, false) ? try(vrf.max_metric_router_lsa.summary_lsa_max_metric, null) : null
         max_metric_startup_interval = try(vrf.max_metric_router_lsa.on_startup, false) ? try(vrf.max_metric_router_lsa.on_startup_timeout, null) : null
 
-        areas = length(try(vrf.areas, [])) > 0 ? { for area in try(vrf.areas, []) : area.id => {
+        areas = length(try(vrf.areas, [])) > 0 ? { for area in try(vrf.areas, []) : (can(tonumber(area.id)) ? format("%d.%d.%d.%d", floor(tonumber(area.id) / 16777216) % 256, floor(tonumber(area.id) / 65536) % 256, floor(tonumber(area.id) / 256) % 256, tonumber(area.id) % 256) : tostring(area.id)) => {
           authentication_type = try(area.authentication, null)
           cost                = try(area.default_cost, null)
           control = length(compact([

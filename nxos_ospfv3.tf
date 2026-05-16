@@ -2,7 +2,7 @@ locals {
   ospfv3_interfaces_map = { for device in local.devices : device.name =>
     { for int in local.ospfv3_interfaces : "${int.type}${int.id}" => {
       advertise_secondaries = int.ospfv3_advertise_secondaries
-      area                  = int.ospfv3_area
+      area                  = int.ospfv3_area == null ? null : can(tonumber(int.ospfv3_area)) ? format("%d.%d.%d.%d", floor(tonumber(int.ospfv3_area) / 16777216) % 256, floor(tonumber(int.ospfv3_area) / 65536) % 256, floor(tonumber(int.ospfv3_area) / 256) % 256, tonumber(int.ospfv3_area) % 256) : tostring(int.ospfv3_area)
       bfd_control           = int.ospfv3_bfd
       cost                  = int.ospfv3_cost
       dead_interval         = int.ospfv3_dead_interval
@@ -48,7 +48,7 @@ resource "nxos_ospfv3" "ospfv3" {
           name_lookup               = try(proc.name_lookup, null)
           passive_interface_default = try(proc.passive_interface_default, null)
 
-          areas = length(try(proc.areas, [])) > 0 ? { for area in try(proc.areas, []) : area.id => {
+          areas = length(try(proc.areas, [])) > 0 ? { for area in try(proc.areas, []) : (can(tonumber(area.id)) ? format("%d.%d.%d.%d", floor(tonumber(area.id) / 16777216) % 256, floor(tonumber(area.id) / 65536) % 256, floor(tonumber(area.id) / 256) % 256, tonumber(area.id) % 256) : tostring(area.id)) => {
             type                     = try(area.type, null)
             redistribute             = try(area.redistribute, null)
             nssa_translator_role     = try(area.nssa_translate_type7, null)
@@ -77,7 +77,7 @@ resource "nxos_ospfv3" "ospfv3" {
         name_lookup               = try(vrf.name_lookup, null)
         passive_interface_default = try(vrf.passive_interface_default, null)
 
-        areas = length(try(vrf.areas, [])) > 0 ? { for area in try(vrf.areas, []) : area.id => {
+        areas = length(try(vrf.areas, [])) > 0 ? { for area in try(vrf.areas, []) : (can(tonumber(area.id)) ? format("%d.%d.%d.%d", floor(tonumber(area.id) / 16777216) % 256, floor(tonumber(area.id) / 65536) % 256, floor(tonumber(area.id) / 256) % 256, tonumber(area.id) % 256) : tostring(area.id)) => {
           type                     = try(area.type, null)
           redistribute             = try(area.redistribute, null)
           nssa_translator_role     = try(area.nssa_translate_type7, null)
