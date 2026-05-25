@@ -144,11 +144,11 @@ resource "nxos_physical_interface" "physical_interface" {
     link_active_jitter_management      = try(int.link_active_jitter_management, null) != null ? (try(int.link_active_jitter_management) ? "enable" : "disable") : null
     link_debounce_down                 = try(int.link_debounce_time, null)
     link_debounce_up                   = try(int.link_debounce_link_up, null)
-    link_flap_error_disable            = try(int.link_flap_err_disable, null) != null ? (try(int.link_flap_err_disable) ? "enable" : "disable") : null
-    link_flap_error_max                = try(int.link_flap_err_disable_max, null)
-    link_flap_error_seconds            = try(int.link_flap_err_disable_interval, null)
+    link_flap_error_disable            = try(int.link_flap_error_disable, null) != null ? (try(int.link_flap_error_disable) ? "enable" : "disable") : null
+    link_flap_error_max                = try(int.link_flap_error_disable_count, null)
+    link_flap_error_seconds            = try(int.link_flap_error_disable_interval, null)
     link_logging                       = try(int.logging_event_port_link_status, null) != null ? (try(int.logging_event_port_link_status) ? "enable" : "disable") : null
-    link_loopback                      = try(int.loopback, null) != null ? (try(int.loopback) ? "enable" : "disable") : null
+    link_loopback                      = try(int.link_loopback, null) != null ? (try(int.link_loopback) ? "enable" : "disable") : null
     link_mac_up_timer                  = try(int.link_mac_up_timer, null)
     link_max_bring_up_timer            = try(int.link_max_bring_up_timer, null)
     link_transmit_reset                = try(int.link_transmit_reset, null) != null ? (try(int.link_transmit_reset) ? "enable" : "disable") : null
