@@ -10,7 +10,7 @@ locals {
       authentication_type          = int.isis_authentication_type
       authentication_type_l1       = int.isis_authentication_type_level_1
       authentication_type_l2       = int.isis_authentication_type_level_2
-      circuit_type                 = int.isis_circuit_type != null ? { "level_1" = "l1", "level_2" = "l2", "level_1_2" = "l12" }[int.isis_circuit_type] : null
+      circuit_type                 = int.isis_circuit_type != null ? try({ "level_1" = "l1", "level_2" = "l2", "level_1_2" = "l12" }[int.isis_circuit_type], int.isis_circuit_type) : null
       vrf                          = int.vrf
       hello_interval               = int.isis_hello_interval
       hello_interval_l1            = int.isis_hello_interval_l1
@@ -26,7 +26,7 @@ locals {
       mtu_check_l1                 = int.isis_mtu_check_l1
       mtu_check_l2                 = int.isis_mtu_check_l2
       network_type_p2p             = int.isis_network_point_to_point != null ? (int.isis_network_point_to_point ? "on" : "off") : null
-      passive                      = int.isis_passive_interface != null ? { "level_1" = "l1", "level_2" = "l2", "level_1_2" = "l12", "no_level_1" = "noL1", "no_level_2" = "noL2", "no_level_1_2" = "noL12" }[int.isis_passive_interface] : null
+      passive                      = int.isis_passive_interface != null ? try({ "level_1" = "l1", "level_2" = "l2", "level_1_2" = "l12", "no_level_1" = "noL1", "no_level_2" = "noL2", "no_level_1_2" = "noL12" }[int.isis_passive_interface], int.isis_passive_interface) : null
       priority_l1                  = int.isis_priority_l1
       priority_l2                  = int.isis_priority_l2
       enable_ipv4                  = coalesce(int.isis_ipv4, true)
