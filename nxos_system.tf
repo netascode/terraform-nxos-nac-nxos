@@ -94,48 +94,48 @@ locals {
   lldp_interfaces = flatten([
     for device in local.devices : concat(
       [for int in try(local.device_config[device.name].interfaces.ethernets, []) : {
-        device                             = device.name
-        interface_id                       = "eth${int.id}"
-        lldp_receive                       = try(int.lldp_receive, null)
-        lldp_transmit                      = try(int.lldp_transmit, null)
-        lldp_tlv_set_management_address_v4 = try(int.lldp_tlv_set_management_address_v4, null)
-        lldp_tlv_set_management_address_v6 = try(int.lldp_tlv_set_management_address_v6, null)
-        lldp_tlv_set_vlan                  = try(int.lldp_tlv_set_vlan, null)
-        lldp_dcbx_version                  = try(int.lldp_dcbx_version, null)
+        device                               = device.name
+        interface_id                         = "eth${int.id}"
+        lldp_receive                         = try(int.lldp_receive, null)
+        lldp_transmit                        = try(int.lldp_transmit, null)
+        lldp_tlv_set_management_address      = try(int.lldp_tlv_set_management_address, null)
+        lldp_tlv_set_management_address_ipv6 = try(int.lldp_tlv_set_management_address_ipv6, null)
+        lldp_tlv_set_vlan                    = try(int.lldp_tlv_set_vlan, null)
+        lldp_dcbx_version                    = try(int.lldp_dcbx_version, null)
         } if try(int.lldp_receive, null) != null ||
         try(int.lldp_transmit, null) != null ||
-        try(int.lldp_tlv_set_management_address_v4, null) != null ||
-        try(int.lldp_tlv_set_management_address_v6, null) != null ||
+        try(int.lldp_tlv_set_management_address, null) != null ||
+        try(int.lldp_tlv_set_management_address_ipv6, null) != null ||
         try(int.lldp_tlv_set_vlan, null) != null ||
       try(int.lldp_dcbx_version, null) != null],
       [for int in try(local.device_config[device.name].interfaces.port_channels, []) : {
-        device                             = device.name
-        interface_id                       = "po${int.id}"
-        lldp_receive                       = try(int.lldp_receive, null)
-        lldp_transmit                      = try(int.lldp_transmit, null)
-        lldp_tlv_set_management_address_v4 = try(int.lldp_tlv_set_management_address_v4, null)
-        lldp_tlv_set_management_address_v6 = try(int.lldp_tlv_set_management_address_v6, null)
-        lldp_tlv_set_vlan                  = try(int.lldp_tlv_set_vlan, null)
-        lldp_dcbx_version                  = try(int.lldp_dcbx_version, null)
+        device                               = device.name
+        interface_id                         = "po${int.id}"
+        lldp_receive                         = try(int.lldp_receive, null)
+        lldp_transmit                        = try(int.lldp_transmit, null)
+        lldp_tlv_set_management_address      = try(int.lldp_tlv_set_management_address, null)
+        lldp_tlv_set_management_address_ipv6 = try(int.lldp_tlv_set_management_address_ipv6, null)
+        lldp_tlv_set_vlan                    = try(int.lldp_tlv_set_vlan, null)
+        lldp_dcbx_version                    = try(int.lldp_dcbx_version, null)
         } if try(int.lldp_receive, null) != null ||
         try(int.lldp_transmit, null) != null ||
-        try(int.lldp_tlv_set_management_address_v4, null) != null ||
-        try(int.lldp_tlv_set_management_address_v6, null) != null ||
+        try(int.lldp_tlv_set_management_address, null) != null ||
+        try(int.lldp_tlv_set_management_address_ipv6, null) != null ||
         try(int.lldp_tlv_set_vlan, null) != null ||
       try(int.lldp_dcbx_version, null) != null],
       [for int in try(local.device_config[device.name].interfaces.management, []) : {
-        device                             = device.name
-        interface_id                       = int.id
-        lldp_receive                       = try(int.lldp_receive, null)
-        lldp_transmit                      = try(int.lldp_transmit, null)
-        lldp_tlv_set_management_address_v4 = try(int.lldp_tlv_set_management_address_v4, null)
-        lldp_tlv_set_management_address_v6 = try(int.lldp_tlv_set_management_address_v6, null)
-        lldp_tlv_set_vlan                  = try(int.lldp_tlv_set_vlan, null)
-        lldp_dcbx_version                  = try(int.lldp_dcbx_version, null)
+        device                               = device.name
+        interface_id                         = int.id
+        lldp_receive                         = try(int.lldp_receive, null)
+        lldp_transmit                        = try(int.lldp_transmit, null)
+        lldp_tlv_set_management_address      = try(int.lldp_tlv_set_management_address, null)
+        lldp_tlv_set_management_address_ipv6 = try(int.lldp_tlv_set_management_address_ipv6, null)
+        lldp_tlv_set_vlan                    = try(int.lldp_tlv_set_vlan, null)
+        lldp_dcbx_version                    = try(int.lldp_dcbx_version, null)
         } if try(int.lldp_receive, null) != null ||
         try(int.lldp_transmit, null) != null ||
-        try(int.lldp_tlv_set_management_address_v4, null) != null ||
-        try(int.lldp_tlv_set_management_address_v6, null) != null ||
+        try(int.lldp_tlv_set_management_address, null) != null ||
+        try(int.lldp_tlv_set_management_address_ipv6, null) != null ||
         try(int.lldp_tlv_set_vlan, null) != null ||
       try(int.lldp_dcbx_version, null) != null],
     )
@@ -484,8 +484,8 @@ resource "nxos_system" "system" {
     admin_receive_state  = try(entry.lldp_receive, null) == null ? null : (entry.lldp_receive ? "enabled" : "disabled")
     admin_transmit_state = try(entry.lldp_transmit, null) == null ? null : (entry.lldp_transmit ? "enabled" : "disabled")
     port_dcbxp_version   = try(entry.lldp_dcbx_version, null)
-    tlv_management_ipv4  = try(entry.lldp_tlv_set_management_address_v4, null)
-    tlv_management_ipv6  = try(entry.lldp_tlv_set_management_address_v6, null)
+    tlv_management_ipv4  = try(entry.lldp_tlv_set_management_address, null)
+    tlv_management_ipv6  = try(entry.lldp_tlv_set_management_address_ipv6, null)
     tlv_vlan             = try(entry.lldp_tlv_set_vlan, null)
   } } : null
 
