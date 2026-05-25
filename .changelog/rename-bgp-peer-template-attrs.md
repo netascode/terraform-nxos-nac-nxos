@@ -3,5 +3,5 @@
 - BREAKING CHANGE: Rename `routing.bgp.peer_templates.address_families.address_family` enum value `lnkstate` to `link-state`
 - BREAKING CHANGE: Rename `routing.bgp.peer_templates.address_families.soft_reconfiguration_inbound` enum value `inbound-always` to `inbound_always`
 - BREAKING CHANGE: Rename `routing.bgp.peer_templates.remove_private_as` enum value `remove-exclusive` to `enabled`, `remove-all` to `all`
-- BREAKING CHANGE: Remove `routing.bgp.peer_templates.remote_as_type`, `routing.bgp.peer_templates.bfd_type`
+- BREAKING CHANGE: Remove `routing.bgp.peer_templates.bfd_type`
 - BREAKING CHANGE: Add `routing.bgp.peer_templates.bfd_multihop` as replacement for `bfd_type`
