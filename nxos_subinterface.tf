@@ -198,9 +198,8 @@ locals {
         link_logging            = try(sub.logging_event_port_link_status, null) != null ? (try(sub.logging_event_port_link_status) ? "enable" : "disable") : null
         medium                  = try(sub.medium, null)
         mtu                     = try(sub.mtu, null)
-        mtu_inherit             = try(sub.mtu_inherit, null)
         router_mac              = try(sub.mac_address, null)
-        router_mac_ipv6_extract = try(sub.mac_ipv6_extract, null) != null ? (try(sub.mac_ipv6_extract) ? "enable" : "disable") : null
+        router_mac_ipv6_extract = try(sub.mac_address_ipv6_extract, null) != null ? (try(sub.mac_address_ipv6_extract) ? "enable" : "disable") : null
         snmp_trap               = try(sub.snmp_trap_link_status, null) != null ? (try(sub.snmp_trap_link_status) ? "enable" : "disable") : null
         vrf_dn                  = try(sub.vrf, null) != null ? "sys/inst-${try(sub.vrf)}" : null
       } },
@@ -215,9 +214,8 @@ locals {
         link_logging            = try(sub.logging_event_port_link_status, null) != null ? (try(sub.logging_event_port_link_status) ? "enable" : "disable") : null
         medium                  = try(sub.medium, null)
         mtu                     = try(sub.mtu, null)
-        mtu_inherit             = try(sub.mtu_inherit, null)
         router_mac              = try(sub.mac_address, null)
-        router_mac_ipv6_extract = try(sub.mac_ipv6_extract, null) != null ? (try(sub.mac_ipv6_extract) ? "enable" : "disable") : null
+        router_mac_ipv6_extract = try(sub.mac_address_ipv6_extract, null) != null ? (try(sub.mac_address_ipv6_extract) ? "enable" : "disable") : null
         snmp_trap               = try(sub.snmp_trap_link_status, null) != null ? (try(sub.snmp_trap_link_status) ? "enable" : "disable") : null
         vrf_dn                  = try(sub.vrf, null) != null ? "sys/inst-${try(sub.vrf)}" : null
       } },

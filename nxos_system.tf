@@ -445,7 +445,7 @@ resource "nxos_system" "system" {
     duplex           = try(int.duplex, null)
     mtu              = try(int.mtu, null)
     speed            = try(int.speed, null)
-    auto_negotiation = try(int.negotiation_auto, null)
+    auto_negotiation = try(int.negotiate_auto, null)
     snmp_trap_state  = try(int.snmp_trap_link_status, null) == null ? null : (try(int.snmp_trap_link_status) ? "enable" : "disable")
     vrf_dn           = try(int.vrf, null) != null ? "sys/inst-${try(int.vrf)}" : null
   } } : null
