@@ -19,12 +19,9 @@ resource "nxos_nvo" "nvo" {
   nve_interfaces = try(local.device_config[each.key].interfaces.nve, null) != null ? { for nve_id in ["1"] : nve_id => {
     admin_state                        = try(local.device_config[each.key].interfaces.nve.shutdown, null) == null ? null : (try(local.device_config[each.key].interfaces.nve.shutdown) ? "disabled" : "enabled")
     advertise_virtual_mac              = try(local.device_config[each.key].interfaces.nve.advertise_virtual_rmac, null)
-    anycast_source_interface           = try(local.device_config[each.key].interfaces.nve.anycast_bundled_interface_type, null) != null ? "${local.intf_prefix_map[try(local.device_config[each.key].interfaces.nve.anycast_bundled_interface_type)]}${try(local.device_config[each.key].interfaces.nve.anycast_bundled_interface_id, "")}" : null
-    configuration_source               = try(local.device_config[each.key].interfaces.nve.configuration_source, null)
-    controller_id                      = try(local.device_config[each.key].interfaces.nve.controller_id, null)
+    anycast_source_interface           = try(local.device_config[each.key].interfaces.nve.anycast_source_interface_type, null) != null ? "${local.intf_prefix_map[try(local.device_config[each.key].interfaces.nve.anycast_source_interface_type)]}${try(local.device_config[each.key].interfaces.nve.anycast_source_interface_id, "")}" : null
     description                        = try(local.device_config[each.key].interfaces.nve.description, null)
-    encapsulation_type                 = try(local.device_config[each.key].interfaces.nve.encapsulation_type, null)
-    fabric_ready_time                  = try(local.device_config[each.key].interfaces.nve.fabric_convergence_delay, null)
+    fabric_ready_time                  = try(local.device_config[each.key].interfaces.nve.fabric_ready_time, null)
     hold_down_time                     = try(local.device_config[each.key].interfaces.nve.source_interface_hold_down_time, null)
     host_reachability_protocol         = try(local.device_config[each.key].interfaces.nve.host_reachability_protocol, null)
     ingress_replication_protocol_bgp   = try(local.device_config[each.key].interfaces.nve.global_ingress_replication_protocol_bgp, null)

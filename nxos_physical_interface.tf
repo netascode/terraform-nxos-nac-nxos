@@ -165,7 +165,7 @@ resource "nxos_physical_interface" "physical_interface" {
     speed                              = try(int.speed, null)
     speed_group                        = try(int.speed_group, null)
     squelch                            = try(int.squelch, null) != null ? (try(int.squelch) ? "enable" : "disable") : null
-    transparent_mode                   = try(int.switchport.transparent_mode, null) == null ? null : (try(int.switchport.transparent_mode) ? "trans-port" : "not-a-trans-port")
+    transparent_mode                   = try(int.switchport.monitor, null) == null ? null : (try(int.switchport.monitor) ? "trans-port" : "not-a-trans-port")
     trunk_logging                      = try(int.logging_event_port_trunk_status, null) != null ? (try(int.logging_event_port_trunk_status) ? "enable" : "disable") : null
     trunk_vlans                        = try(int.channel_group, null) != null ? null : (!try(int.switchport.enabled, true) ? "1-4094" : try(provider::utils::normalize_vlans(try(int.switchport.trunk_allowed_vlans), "string-nxos"), null))
     uni_directional_ethernet           = try(int.uni_directional_ethernet, null)
@@ -175,8 +175,8 @@ resource "nxos_physical_interface" "physical_interface" {
       try(int.mac_address, null) != null ? "admin_router_mac" : "",
       try(int.shutdown, null) != null || !try(int.switchport.enabled, true) ? "admin_state" : "",
     ])))
-    voice_port_cos                                      = try(int.switchport.voice_cos, null)
-    voice_port_trust                                    = try(int.switchport.voice_trust, null) != null ? (try(int.switchport.voice_trust) ? "enable" : "disable") : null
+    voice_port_cos                                      = try(int.switchport.priority_extend_cos, null)
+    voice_port_trust                                    = try(int.switchport.priority_extend_trust, null) != null ? (try(int.switchport.priority_extend_trust) ? "enable" : "disable") : null
     voice_vlan_id                                       = try(int.switchport.voice_vlan, null)
     voice_vlan_type                                     = try(int.switchport.voice_vlan_type, null)
     vrf_dn                                              = try(int.channel_group, null) != null ? null : (!try(int.switchport.enabled, true) ? "sys/inst-${try(int.vrf, "default")}" : null)
