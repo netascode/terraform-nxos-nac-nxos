@@ -138,7 +138,7 @@ resource "nxos_port_channel_interface" "port_channel_interface" {
     router_mac           = try(int.mac_address, null)
     snmp_trap_state      = try(int.snmp_trap_link_status, null) != null ? (try(int.snmp_trap_link_status) ? "enable" : "disable") : null
     squelch              = try(int.squelch, null) != null ? (try(int.squelch) ? "enable" : "disable") : null
-    transmission_mode    = try(int.switchport.transparent_mode, null) == null ? null : (try(int.switchport.transparent_mode) ? "trans-port" : "not-a-trans-port")
+    transmission_mode    = try(int.switchport.monitor, null) == null ? null : (try(int.switchport.monitor) ? "trans-port" : "not-a-trans-port")
     trunk_logging        = try(int.logging_event_port_trunk_status, null) != null ? (try(int.logging_event_port_trunk_status) ? "enable" : "disable") : null
     auto_exclude_vlans   = try(provider::utils::normalize_vlans(try(int.switchport.autostate_exclude_vlans), "string-nxos"), null)
     switchport_block     = try(int.switchport.block, null) != null ? join(",", sort(try(int.switchport.block, []))) : null
