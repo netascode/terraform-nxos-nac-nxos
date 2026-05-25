@@ -10,7 +10,7 @@ locals {
       cost                  = int.ospf_cost
       dead_interval         = int.ospf_dead_interval
       hello_interval        = int.ospf_hello_interval
-      network_type          = int.ospf_network_type
+      network_type          = int.ospf_network_type != null ? { "point_to_point" = "p2p", "broadcast" = "bcast" }[int.ospf_network_type] : null
       passive               = int.ospf_passive
       priority              = int.ospf_priority
       control = length(compact([
