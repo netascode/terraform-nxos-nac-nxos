@@ -1,3 +1,9 @@
+locals {
+  multisite_ingress_replication_map = {
+    "optimized" = "enableOptimized"
+  }
+}
+
 resource "nxos_nvo" "nvo" {
   for_each = { for device in local.devices : device.name => device
     if try(local.device_config[device.name].system.nv_overlay_vxlan_udp_port, null) != null ||
@@ -39,7 +45,7 @@ resource "nxos_nvo" "nvo" {
     vnis = length(try(local.device_config[each.key].interfaces.nve.vnis, [])) > 0 ? { for vni in try(local.device_config[each.key].interfaces.nve.vnis, []) : vni.vni => {
       associate_vrf                 = try(vni.associate_vrf, null)
       multicast_group               = try(vni.mcast_group, null)
-      multisite_ingress_replication = try(vni.multisite_ingress_replication, null)
+      multisite_ingress_replication = try(local.multisite_ingress_replication_map[vni.multisite_ingress_replication], vni.multisite_ingress_replication, null)
       multisite_multicast_group     = try(vni.multisite_mcast_group, null)
       spine_anycast_gateway         = try(vni.spine_anycast_gateway, null)
       suppress_arp                  = try(vni.suppress_arp, null) == null ? null : (try(vni.suppress_arp) ? "enabled" : "disabled")

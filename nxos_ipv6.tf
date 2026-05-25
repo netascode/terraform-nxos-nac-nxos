@@ -201,7 +201,7 @@ resource "nxos_ipv6" "ipv6" {
         forward                    = int.ipv6_forward != null ? (int.ipv6_forward ? "enabled" : "disabled") : null
         link_local_address_use_bia = int.ipv6_link_local_use_bia != null ? (int.ipv6_link_local_use_bia ? "enabled" : "disabled") : null
         use_link_local_address     = int.ipv6_address_use_link_local_only != null ? (int.ipv6_address_use_link_local_only ? "enabled" : "disabled") : null
-        urpf                       = int.ipv6_verify_unicast_source_reachable_via
+        urpf                       = try(local.urpf_map[int.ipv6_verify_unicast_source_reachable_via], int.ipv6_verify_unicast_source_reachable_via)
         link_local_address         = int.ipv6_address_link_local
 
         addresses = length(int.ipv6_addresses) > 0 ? { for addr in int.ipv6_addresses : addr.address => {
