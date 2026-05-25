@@ -37,10 +37,10 @@ locals {
       mesh_group_id                = int.isis_mesh_group
       ipv6_metric_l1               = int.isis_ipv6_metric_l1
       ipv6_metric_l2               = int.isis_ipv6_metric_l2
-      n_flag_clear                 = int.isis_n_flag_clear
+      n_flag_clear                 = int.isis_prefix_attributes_n_flag_clear
       retransmit_interval          = int.isis_retransmit_interval
       retransmit_throttle_interval = int.isis_retransmit_throttle_interval
-      suppressed_state             = int.isis_suppress_prefix
+      suppressed_state             = int.isis_suppressed
       ipv4_bfd                     = int.isis_bfd
       ipv6_bfd                     = int.isis_ipv6_bfd
       ipv6                         = int.isis_ipv6

@@ -29,7 +29,7 @@ locals {
         ospf_authentication_type                = try(int.ospf.authentication, null)
         ospf_advertise_subnet                   = try(int.ospf.advertise_subnet, false)
         ospf_mtu_ignore                         = try(int.ospf.mtu_ignore, false)
-        ospf_node_flag                          = try(int.ospf.prefix_attribute_n_flag, null)
+        ospf_node_flag                          = try(int.ospf.prefix_attributes_n_flag_clear, null)
         ospf_retransmit_interval                = try(int.ospf.retransmit_interval, null)
         ospf_transmit_delay                     = try(int.ospf.transmit_delay, null)
         ospfv3_process                          = try(int.ospfv3.process, null)
@@ -90,8 +90,8 @@ locals {
         isis_retransmit_throttle_interval       = try(int.isis.retransmit_throttle_interval, null)
         isis_mesh_group                         = try(int.isis.mesh_group, null)
         isis_mesh_group_blocked                 = try(int.isis.mesh_group_blocked, null)
-        isis_n_flag_clear                       = try(int.isis.n_flag_clear, null)
-        isis_suppress_prefix                    = try(int.isis.suppress_prefix, null)
+        isis_n_flag_clear                       = try(int.isis.prefix_attributes_n_flag_clear, null)
+        isis_suppress_prefix                    = try(int.isis.suppressed, null)
       }
     ]
   ])
