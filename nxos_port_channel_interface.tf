@@ -174,9 +174,9 @@ resource "nxos_port_channel_interface" "port_channel_interface" {
     port_type_fabric                                    = try(int.port_type_fabric, null) == null ? null : (try(int.port_type_fabric) ? "yes" : "no")
     priority_flow_control_mode                          = try(int.priority_flow_control_mode, null)
     priority_flow_control_send_tlv                      = try(int.priority_flow_control_send_tlv, null)
-    priority_flow_control_watchdog_interval             = try(int.priority_flow_control_watchdog_interval, null) == null ? null : (try(int.priority_flow_control_watchdog_interval) ? "on" : "off")
-    priority_flow_control_watchdog_disable_action       = try(int.priority_flow_control_watchdog_disable_action, null)
-    priority_flow_control_watchdog_interface_multiplier = try(int.priority_flow_control_watchdog_interface_multiplier, null)
+    priority_flow_control_watchdog_interval             = try(int.priority_flow_control_watch_dog_interval, null) == null ? null : (try(int.priority_flow_control_watch_dog_interval) ? "on" : "off")
+    priority_flow_control_watchdog_disable_action       = try(int.priority_flow_control_watch_dog_disable_action, null)
+    priority_flow_control_watchdog_interface_multiplier = try(int.priority_flow_control_watch_dog_interface_multiplier, null)
     members                                             = length(local.port_channel_members_map[each.key]["po${int.id}"]) > 0 ? local.port_channel_members_map[each.key]["po${int.id}"] : null
   } } : null
 

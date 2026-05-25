@@ -208,9 +208,9 @@ resource "nxos_physical_interface" "physical_interface" {
     port_type_fabric                                    = try(int.port_type_fabric, null) == null ? null : (try(int.port_type_fabric) ? "yes" : "no")
     priority_flow_control_mode                          = try(int.priority_flow_control_mode, null)
     priority_flow_control_send_tlv                      = try(int.priority_flow_control_send_tlv, null)
-    priority_flow_control_watchdog_interval             = try(int.priority_flow_control_watchdog_interval, null) == null ? null : (try(int.priority_flow_control_watchdog_interval) ? "on" : "off")
-    priority_flow_control_watchdog_disable_action       = try(int.priority_flow_control_watchdog_disable_action, null)
-    priority_flow_control_watchdog_interface_multiplier = try(int.priority_flow_control_watchdog_interface_multiplier, null)
+    priority_flow_control_watchdog_interval             = try(int.priority_flow_control_watch_dog_interval, null) == null ? null : (try(int.priority_flow_control_watch_dog_interval) ? "on" : "off")
+    priority_flow_control_watchdog_disable_action       = try(int.priority_flow_control_watch_dog_disable_action, null)
+    priority_flow_control_watchdog_interface_multiplier = try(int.priority_flow_control_watch_dog_interface_multiplier, null)
   } } : null
 
   depends_on = [
