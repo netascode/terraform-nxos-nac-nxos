@@ -1,4 +1,11 @@
 locals {
+  urpf_map = {
+    "rx"                 = "strict"
+    "any"                = "loose"
+    "any_allow_default"  = "loose-allow-default"
+    "rx_allow_vni_hosts" = "strict-allow-vni-hosts"
+  }
+
   # Group routes by device/vrf for the nxos_ipv4 vrfs nested map
   ip_routes_by_device_vrf = {
     for entry in flatten([
@@ -184,7 +191,7 @@ resource "nxos_ipv4" "ipv4" {
           drop_glean             = int.drop_glean
           forward                = int.forward
           unnumbered             = int.unnumbered
-          urpf                   = int.ip_verify_unicast_source_reachable_via
+          urpf                   = try(local.urpf_map[int.ip_verify_unicast_source_reachable_via], int.ip_verify_unicast_source_reachable_via)
           directed_broadcast     = int.ip_directed_broadcast != null ? (int.ip_directed_broadcast ? "enabled" : "disabled") : null
           directed_broadcast_acl = int.ip_directed_broadcast_acl
 
