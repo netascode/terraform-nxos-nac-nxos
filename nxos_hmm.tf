@@ -3,7 +3,6 @@ locals {
     { for int in try(local.device_config[device.name].interfaces.vlans, []) : "vlan${int.id}" => {
       admin_state = "enabled"
       mode        = try(local.hmm_mode_map[try(int.fabric_forwarding_mode)], null)
-      description = try(int.fabric_forwarding_description, null)
     } if try(int.fabric_forwarding_mode, null) != null }
   }
   hmm_mode_map = {

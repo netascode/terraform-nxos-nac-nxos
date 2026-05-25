@@ -124,7 +124,6 @@ resource "nxos_svi_interface" "svi_interface" {
     load_interval_counter_2      = try(int.load_interval_counter_2, null)
     load_interval_counter_3      = try(int.load_interval_counter_3, null)
     mac_address                  = try(int.mac_address, null)
-    mtu_inherit                  = try(int.mtu_inherit, null)
     snmp_trap_link_status        = try(int.snmp_trap_link_status, null)
   } } : null
 

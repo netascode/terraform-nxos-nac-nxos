@@ -1,0 +1,5 @@
+- BREAKING CHANGE: Rename `interfaces.management.negotiation_auto` to `negotiate_auto`
+- BREAKING CHANGE: Rename `interfaces.subinterfaces.mac_ipv6_extract` to `mac_address_ipv6_extract`
+- BREAKING CHANGE: Remove `interfaces.vlans.mtu_inherit`
+- BREAKING CHANGE: Remove `interfaces.subinterfaces.mtu_inherit`
+- BREAKING CHANGE: Remove `interfaces.vlans.fabric_forwarding_description`
