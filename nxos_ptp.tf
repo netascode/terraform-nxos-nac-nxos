@@ -1,16 +1,16 @@
 locals {
   ptp_interfaces_map = { for device in local.devices : device.name =>
     { for int in local.ptp_interfaces : int.id => {
-      announce_interval_type               = try(int.ptp.announce_interval_profile, null)
+      announce_interval_type               = try(int.ptp.announce_interval_profile, null) != null ? try({ "smpte_2059_2" = "smpte-2059-2" }[int.ptp.announce_interval_profile], int.ptp.announce_interval_profile) : null
       announce_interval_value              = try(int.ptp.announce_interval, null)
-      announce_timeout_type                = try(int.ptp.announce_timeout_profile, null)
+      announce_timeout_type                = try(int.ptp.announce_timeout_profile, null) != null ? try({ "smpte_2059_2" = "smpte-2059-2" }[int.ptp.announce_timeout_profile], int.ptp.announce_timeout_profile) : null
       announce_timeout_value               = try(int.ptp.announce_timeout, null)
       asymmetric_delay_value               = try(int.ptp.asymmetric_delay_value, null)
-      asymmetric_direction                 = try(int.ptp.asymmetric_delay_direction, null)
+      asymmetric_direction                 = try(int.ptp.asymmetric_delay_direction, null) != null ? try({ "forward_path" = "forward-path", "reverse_path" = "reverse-path" }[int.ptp.asymmetric_delay_direction], int.ptp.asymmetric_delay_direction) : null
       cost                                 = try(int.ptp.cost, null)
-      delay_request_min_interval_type      = try(int.ptp.delay_request_minimum_interval_profile, null)
+      delay_request_min_interval_type      = try(int.ptp.delay_request_minimum_interval_profile, null) != null ? try({ "smpte_2059_2" = "smpte-2059-2" }[int.ptp.delay_request_minimum_interval_profile], int.ptp.delay_request_minimum_interval_profile) : null
       delay_request_min_interval_value     = try(int.ptp.delay_request_minimum_interval, null)
-      destination_mac                      = try(int.ptp.destination_mac, null)
+      destination_mac                      = try(int.ptp.destination_mac, null) != null ? try({ "non_forwardable" = "non-forwardable" }[int.ptp.destination_mac], int.ptp.destination_mac) : null
       domain                               = try(int.ptp.domain, null)
       ipv6_multicast_receive_scope         = try(int.ptp.ipv6_multicast_scope_rx, null)
       ipv6_multicast_transmit_scope        = try(int.ptp.ipv6_multicast_scope_tx, null)
@@ -18,12 +18,12 @@ locals {
       neighbor_propagation_delay_threshold = try(int.ptp.neighbor_propagation_delay_threshold, null)
       profile_override                     = try(int.ptp.profile_override, null)
       ptp                                  = try(int.ptp.admin_state, null)
-      receive_no_match                     = try(int.ptp.receive_no_match, null)
+      receive_no_match                     = try(int.ptp.receive_no_match, null) != null ? try({ "follow_rx" = "follow-rx" }[int.ptp.receive_no_match], int.ptp.receive_no_match) : null
       role                                 = try(int.ptp.role, null)
-      sync_interval_type                   = try(int.ptp.sync_interval_profile, null)
+      sync_interval_type                   = try(int.ptp.sync_interval_profile, null) != null ? try({ "smpte_2059_2" = "smpte-2059-2" }[int.ptp.sync_interval_profile], int.ptp.sync_interval_profile) : null
       sync_interval_value                  = try(int.ptp.sync_interval, null)
       transmission                         = try(int.ptp.transmission, null)
-      transport                            = try(int.ptp.transport, null)
+      transport                            = try(int.ptp.transport, null) != null ? try({ "ethernet" = "eth" }[int.ptp.transport], int.ptp.transport) : null
       unicast_source                       = try(int.ptp.ucast_source, null)
       unicast_source_ipv6                  = try(int.ptp.ucast_source_ipv6, null)
       unicast_vrf                          = try(int.ptp.ucast_source_vrf, null)
