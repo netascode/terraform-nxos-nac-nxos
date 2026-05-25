@@ -23,8 +23,8 @@ locals {
         control                               = try(group.preempt, null) == null ? null : (try(group.preempt) ? "preempt" : "")
         follow                                = try(group.follow, null)
         forwarding_lower_threshold            = try(group.forwarding_threshold_lower, null)
-        hello_interval                        = try(group.timers_hello_interval, null)
-        hold_interval                         = try(group.timers_hold_interval, null)
+        hello_interval                        = try(group.timers_hello, null)
+        hold_interval                         = try(group.timers_hold, null)
         ip_address                            = try(group.ip, null)
         ip_obtain_mode                        = try(group.ip, null) != null ? "admin" : null
         mac_address                           = try(group.mac_address, null)
