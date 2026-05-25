@@ -7,7 +7,7 @@
 - BREAKING CHANGE: Rename `interfaces.*.ospf.network` enum values `p2p` to `point_to_point`, `bcast` to `broadcast`
 - BREAKING CHANGE: Remove `interfaces.*.ospf.network` enum value `unspecified`
 - BREAKING CHANGE: Remove `interfaces.*.ospf.authentication` enum value `unspecified`
-- BREAKING CHANGE: Rename `interfaces.*.nd.ra_boot_file_url`, `interfaces.*.nd.delete_adjacency_on_mac_delete`, `interfaces.*.nd.dns_search_list_suppress`, `interfaces.*.nd.dns_suppress`, `interfaces.*.nd.suppress_ra_route` to `ra_bootfile_url`, `delete_adj_on_mac_delete`, `ra_dns_search_list_suppress`, `ra_dns_server_suppress`, `ra_route_suppress`
+- BREAKING CHANGE: Rename `interfaces.*.nd.ra_boot_file_url`, `interfaces.*.nd.dad_ns_interval`, `interfaces.*.nd.delete_adjacency_on_mac_delete`, `interfaces.*.nd.dns_search_list_suppress`, `interfaces.*.nd.dns_suppress`, `interfaces.*.nd.suppress_ra_route` to `ra_bootfile_url`, `dadns_interval`, `delete_adj_on_mac_delete`, `ra_dns_search_list_suppress`, `ra_dns_server_suppress`, `ra_route_suppress`
 - BREAKING CHANGE: Remove `interfaces.*.nd.router_preference` enum value `unspecified`
 - BREAKING CHANGE: Rename `interfaces.*.ptp.announce_interval_type`, `interfaces.*.ptp.announce_timeout_type`, `interfaces.*.ptp.sync_interval_type`, `interfaces.*.ptp.delay_request_minimum_interval_type` to `announce_interval_profile`, `announce_timeout_profile`, `sync_interval_profile`, `delay_request_minimum_interval_profile`
 - BREAKING CHANGE: Rename `interfaces.*.ptp.negotiation_schema` to `transmission_unicast_negotiation_schema`
