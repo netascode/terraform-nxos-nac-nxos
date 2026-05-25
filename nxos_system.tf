@@ -323,7 +323,7 @@ resource "nxos_system" "system" {
       boot_file_url                  = try(nd.ra_bootfile_url, null)
       control                        = length(compact([for flag, value in local.nd_control_values : value if try({ "redirects" = nd.redirects, "managed_cfg" = nd.managed_config_flag, "other_cfg" = nd.other_config_flag, "suppress_ra" = nd.suppress_ra, "suppress_ra_mtu" = nd.suppress_ra_mtu }[flag], false)])) > 0 ? join(",", compact([for flag, value in local.nd_control_values : value if try({ "redirects" = nd.redirects, "managed_cfg" = nd.managed_config_flag, "other_cfg" = nd.other_config_flag, "suppress_ra" = nd.suppress_ra, "suppress_ra_mtu" = nd.suppress_ra_mtu }[flag], false)])) : null
       dad_attempts                   = try(nd.dad_attempts, null)
-      dadns_interval                 = try(nd.ns_interval, null)
+      dadns_interval                 = try(nd.dad_ns_interval, null)
       default_ra_lifetime            = try(nd.default_ra_lifetime, null) != null ? (nd.default_ra_lifetime ? "enabled" : "disabled") : null
       delete_adjacency_on_mac_delete = try(nd.delete_adj_on_mac_delete, null) != null ? (nd.delete_adj_on_mac_delete ? "enabled" : "disabled") : null
       dns_search_list_suppress       = try(nd.ra_dns_search_list_suppress, null) != null ? (nd.ra_dns_search_list_suppress ? "enabled" : "disabled") : null

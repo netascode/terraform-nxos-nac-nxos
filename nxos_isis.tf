@@ -25,7 +25,7 @@ locals {
       mtu_check                    = int.isis_mtu_check
       mtu_check_l1                 = int.isis_mtu_check_l1
       mtu_check_l2                 = int.isis_mtu_check_l2
-      network_type_p2p             = int.isis_network_point_to_point
+      network_type_p2p             = int.isis_network_point_to_point != null ? (int.isis_network_point_to_point ? "on" : "off") : null
       passive                      = int.isis_passive_interface
       priority_l1                  = int.isis_priority_l1
       priority_l2                  = int.isis_priority_l2
