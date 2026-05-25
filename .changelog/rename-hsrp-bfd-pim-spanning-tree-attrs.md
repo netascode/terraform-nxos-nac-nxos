@@ -1,0 +1,4 @@
+- BREAKING CHANGE: Rename `interfaces.*.pim.neighbor_policy_route_map` to `neighbor_policy`
+- BREAKING CHANGE: Rename `interfaces.*.hsrp.groups.timers_hello_interval`, `interfaces.*.hsrp.groups.timers_hold_interval` to `timers_hello`, `timers_hold`
+- BREAKING CHANGE: Rename `interfaces.*.spanning_tree.link_type` enum value `p2p` to `point_to_point`
+- BREAKING CHANGE: Rename `interfaces.*.bfd.authentication_type` enum values `sha1` to `keyed_sha1`, `met-sha1` to `meticulous_keyed_sha1`

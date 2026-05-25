@@ -12,7 +12,7 @@ locals {
         border               = try(int.pim.border, null)
         dr_delay             = try(int.pim.dr_delay, null)
         join_prune_route_map = try(int.pim.jp_policy, null)
-        neighbor_route_map   = try(int.pim.neighbor_policy_route_map, null)
+        neighbor_route_map   = try(int.pim.neighbor_policy, null)
         neighbor_prefix_list = try(int.pim.neighbor_policy_prefix_list, null)
         rfc_strict           = try(int.pim.strict_rfc_compliant, null)
       } if try(int.pim, null) != null],
@@ -27,7 +27,7 @@ locals {
         border               = try(int.pim.border, null)
         dr_delay             = try(int.pim.dr_delay, null)
         join_prune_route_map = try(int.pim.jp_policy, null)
-        neighbor_route_map   = try(int.pim.neighbor_policy_route_map, null)
+        neighbor_route_map   = try(int.pim.neighbor_policy, null)
         neighbor_prefix_list = try(int.pim.neighbor_policy_prefix_list, null)
         rfc_strict           = try(int.pim.strict_rfc_compliant, null)
       } if try(int.pim, null) != null],
@@ -42,7 +42,7 @@ locals {
         border               = try(int.pim.border, null)
         dr_delay             = try(int.pim.dr_delay, null)
         join_prune_route_map = try(int.pim.jp_policy, null)
-        neighbor_route_map   = try(int.pim.neighbor_policy_route_map, null)
+        neighbor_route_map   = try(int.pim.neighbor_policy, null)
         neighbor_prefix_list = try(int.pim.neighbor_policy_prefix_list, null)
         rfc_strict           = try(int.pim.strict_rfc_compliant, null)
       } if try(int.pim, null) != null],
@@ -57,7 +57,7 @@ locals {
         border               = try(int.pim.border, null)
         dr_delay             = try(int.pim.dr_delay, null)
         join_prune_route_map = try(int.pim.jp_policy, null)
-        neighbor_route_map   = try(int.pim.neighbor_policy_route_map, null)
+        neighbor_route_map   = try(int.pim.neighbor_policy, null)
         neighbor_prefix_list = try(int.pim.neighbor_policy_prefix_list, null)
         rfc_strict           = try(int.pim.strict_rfc_compliant, null)
       } if try(int.pim, null) != null],
@@ -74,7 +74,7 @@ locals {
           border               = try(sub.pim.border, null)
           dr_delay             = try(sub.pim.dr_delay, null)
           join_prune_route_map = try(sub.pim.jp_policy, null)
-          neighbor_route_map   = try(sub.pim.neighbor_policy_route_map, null)
+          neighbor_route_map   = try(sub.pim.neighbor_policy, null)
           neighbor_prefix_list = try(sub.pim.neighbor_policy_prefix_list, null)
           rfc_strict           = try(sub.pim.strict_rfc_compliant, null)
         } if try(sub.pim, null) != null]
@@ -92,7 +92,7 @@ locals {
           border               = try(sub.pim.border, null)
           dr_delay             = try(sub.pim.dr_delay, null)
           join_prune_route_map = try(sub.pim.jp_policy, null)
-          neighbor_route_map   = try(sub.pim.neighbor_policy_route_map, null)
+          neighbor_route_map   = try(sub.pim.neighbor_policy, null)
           neighbor_prefix_list = try(sub.pim.neighbor_policy_prefix_list, null)
           rfc_strict           = try(sub.pim.strict_rfc_compliant, null)
         } if try(sub.pim, null) != null]
