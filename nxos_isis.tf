@@ -25,7 +25,7 @@ locals {
       mtu_check                    = int.isis_mtu_check
       mtu_check_l1                 = int.isis_mtu_check_l1
       mtu_check_l2                 = int.isis_mtu_check_l2
-      network_type_p2p             = int.isis_network_point_to_point
+      network_type_p2p             = int.isis_network_point_to_point != null ? (int.isis_network_point_to_point ? "on" : "off") : null
       passive                      = int.isis_passive_interface
       priority_l1                  = int.isis_priority_l1
       priority_l2                  = int.isis_priority_l2
@@ -37,10 +37,10 @@ locals {
       mesh_group_id                = int.isis_mesh_group
       ipv6_metric_l1               = int.isis_ipv6_metric_l1
       ipv6_metric_l2               = int.isis_ipv6_metric_l2
-      n_flag_clear                 = int.isis_n_flag_clear
+      n_flag_clear                 = int.isis_prefix_attributes_n_flag_clear
       retransmit_interval          = int.isis_retransmit_interval
       retransmit_throttle_interval = int.isis_retransmit_throttle_interval
-      suppressed_state             = int.isis_suppress_prefix
+      suppressed_state             = int.isis_suppressed
       ipv4_bfd                     = int.isis_bfd
       ipv6_bfd                     = int.isis_ipv6_bfd
       ipv6                         = int.isis_ipv6

@@ -320,14 +320,14 @@ resource "nxos_system" "system" {
   # ndDom -> ndIf nested maps (VRF -> interfaces)
   nd_vrfs = length(try(local.nd_vrfs_by_device[each.key], {})) > 0 ? { for vrf_name, vrf_data in try(local.nd_vrfs_by_device[each.key], {}) : vrf_name => {
     interfaces = { for int_id, nd in vrf_data.interfaces : int_id => {
-      boot_file_url                  = try(nd.ra_boot_file_url, null)
+      boot_file_url                  = try(nd.ra_bootfile_url, null)
       control                        = length(compact([for flag, value in local.nd_control_values : value if try({ "redirects" = nd.redirects, "managed_cfg" = nd.managed_config_flag, "other_cfg" = nd.other_config_flag, "suppress_ra" = nd.suppress_ra, "suppress_ra_mtu" = nd.suppress_ra_mtu }[flag], false)])) > 0 ? join(",", compact([for flag, value in local.nd_control_values : value if try({ "redirects" = nd.redirects, "managed_cfg" = nd.managed_config_flag, "other_cfg" = nd.other_config_flag, "suppress_ra" = nd.suppress_ra, "suppress_ra_mtu" = nd.suppress_ra_mtu }[flag], false)])) : null
       dad_attempts                   = try(nd.dad_attempts, null)
-      dadns_interval                 = try(nd.dad_ns_interval, null)
+      dadns_interval                 = try(nd.dadns_interval, null)
       default_ra_lifetime            = try(nd.default_ra_lifetime, null) != null ? (nd.default_ra_lifetime ? "enabled" : "disabled") : null
-      delete_adjacency_on_mac_delete = try(nd.delete_adjacency_on_mac_delete, null) != null ? (nd.delete_adjacency_on_mac_delete ? "enabled" : "disabled") : null
-      dns_search_list_suppress       = try(nd.dns_search_list_suppress, null) != null ? (nd.dns_search_list_suppress ? "enabled" : "disabled") : null
-      dns_suppress                   = try(nd.dns_suppress, null) != null ? (nd.dns_suppress ? "enabled" : "disabled") : null
+      delete_adjacency_on_mac_delete = try(nd.delete_adj_on_mac_delete, null) != null ? (nd.delete_adj_on_mac_delete ? "enabled" : "disabled") : null
+      dns_search_list_suppress       = try(nd.ra_dns_search_list_suppress, null) != null ? (nd.ra_dns_search_list_suppress ? "enabled" : "disabled") : null
+      dns_suppress                   = try(nd.ra_dns_server_suppress, null) != null ? (nd.ra_dns_server_suppress ? "enabled" : "disabled") : null
       hop_limit                      = try(nd.hop_limit, null)
       mac_extract                    = try(nd.mac_extract, null)
       mtu                            = try(nd.mtu, null)
@@ -337,7 +337,7 @@ resource "nxos_system" "system" {
       ra_lifetime                    = try(nd.ra_lifetime, null)
       reachable_time                 = try(nd.reachable_time, null)
       retransmit_timer               = try(nd.retrans_timer, null)
-      route_suppress                 = try(nd.suppress_ra_route, null) != null ? (nd.suppress_ra_route ? "enabled" : "disabled") : null
+      route_suppress                 = try(nd.ra_route_suppress, null) != null ? (nd.ra_route_suppress ? "enabled" : "disabled") : null
       router_preference              = try(nd.router_preference, null)
     } }
   } } : null
