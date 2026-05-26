@@ -5,11 +5,8 @@ resource "nxos_analytics" "analytics" {
 
   instances = {
     "analytics" = {
-      admin_state              = try(local.device_config[each.key].analytics.shutdown, null) == null ? null : (try(local.device_config[each.key].analytics.shutdown) ? "disabled" : "enabled")
-      collect_tunnel_header    = try(local.device_config[each.key].analytics.collect_tunnel_header, null)
-      enable_analytics_submode = try(local.device_config[each.key].analytics.analytics_submode, null)
-      geneve_enable            = try(local.device_config[each.key].analytics.geneve, null)
-      timeout                  = try(local.device_config[each.key].analytics.flow_timeout, null)
+      admin_state = try(local.device_config[each.key].analytics.shutdown, null) == null ? null : (try(local.device_config[each.key].analytics.shutdown) ? "disabled" : "enabled")
+      timeout     = try(local.device_config[each.key].analytics.flow_timeout, null)
 
       profiles = length(try(local.device_config[each.key].analytics.flow_profiles, [])) > 0 ? { for profile in try(local.device_config[each.key].analytics.flow_profiles, []) : profile.name => {
         burst_interval_shift                 = try(profile.burst_interval_shift, null)
@@ -55,12 +52,12 @@ resource "nxos_analytics" "analytics" {
         match   = try(join(",", record.match), null)
       } } : null
 
-      collectors = length(try(local.device_config[each.key].analytics.flow_collectors, [])) > 0 ? { for collector in try(local.device_config[each.key].analytics.flow_collectors, []) : collector.name => {
+      collectors = length(try(local.device_config[each.key].analytics.flow_exporters, [])) > 0 ? { for collector in try(local.device_config[each.key].analytics.flow_exporters, []) : collector.name => {
         description            = try(collector.description, null)
         dscp                   = try(collector.dscp, null)
         destination_address    = try(collector.destination, null)
-        destination_port       = try(collector.destination_port, null)
-        event_destination_port = try(collector.event_destination_port, null)
+        destination_port       = try(collector.transport_udp, null)
+        event_destination_port = try(collector.events_transport_udp, null)
         inband_interface       = try(collector.inband_interface, null)
         source_address         = try(collector.source_address, null)
         source_interface       = try(collector.source_interface_type, null) != null ? "${local.intf_prefix_map[try(collector.source_interface_type)]}${try(collector.source_interface_id, "")}" : null
@@ -72,7 +69,7 @@ resource "nxos_analytics" "analytics" {
       monitors = length(try(local.device_config[each.key].analytics.flow_monitors, [])) > 0 ? { for monitor in try(local.device_config[each.key].analytics.flow_monitors, []) : monitor.name => {
         record_target_dn = try(monitor.record, null) != null ? "sys/analytics/inst-analytics/recordp-${monitor.record}" : null
 
-        collector_buckets = length(try(monitor.exporter_buckets, [])) > 0 ? { for bucket in try(monitor.exporter_buckets, []) : tostring(bucket.id) => {
+        collector_buckets = length(try(monitor.exporter_bucket_ids, [])) > 0 ? { for bucket in try(monitor.exporter_bucket_ids, []) : tostring(bucket.id) => {
           hash_high = try(bucket.hash_high, null)
           hash_low  = try(bucket.hash_low, null)
 
@@ -90,7 +87,7 @@ resource "nxos_analytics" "analytics" {
           traffic_analytics_enabled    = try(local.device_config[each.key].analytics.flow_system_config.traffic_analytics, null)
           monitor_attachment_target_dn = try(local.device_config[each.key].analytics.flow_system_config.monitor, null) != null ? "sys/analytics/inst-[analytics]/monitor-[${try(local.device_config[each.key].analytics.flow_system_config.monitor)}]" : null
           profile_attachment_target_dn = try(local.device_config[each.key].analytics.flow_system_config.profile, null) != null ? "sys/analytics/inst-[analytics]/prof-[${try(local.device_config[each.key].analytics.flow_system_config.profile)}]" : null
-          events_attachment_target_dn  = try(local.device_config[each.key].analytics.flow_system_config.events, null) != null ? "sys/analytics/inst-[analytics]/events-[${try(local.device_config[each.key].analytics.flow_system_config.events)}]" : null
+          events_attachment_target_dn  = try(local.device_config[each.key].analytics.flow_system_config.event, null) != null ? "sys/analytics/inst-[analytics]/events-[${try(local.device_config[each.key].analytics.flow_system_config.event)}]" : null
           policy_attachment_target_dn  = try(local.device_config[each.key].analytics.flow_system_config.filter, null) != null ? "sys/analytics/inst-[analytics]/policy-[${try(local.device_config[each.key].analytics.flow_system_config.filter)}]" : null
         }
       } : null
