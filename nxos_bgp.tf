@@ -182,13 +182,14 @@ resource "nxos_bgp" "bgp" {
         } } : null
 
         peer_templates = length(try(local.device_config[each.key].routing.bgp.peer_templates, [])) > 0 ? { for pt in try(local.device_config[each.key].routing.bgp.peer_templates, []) : pt.name => {
-          remote_asn                    = try(pt.remote_as, null)
+          remote_asn = try(pt.remote_as, null)
+          asn_type   = try(pt.remote_as, null) != null ? "none" : null
+
           description                   = try(pt.description, null)
           peer_type                     = try(pt.peer_type, null)
           source_interface              = try(pt.update_source_interface_type, null) != null ? "${local.intf_prefix_map[try(pt.update_source_interface_type)]}${try(pt.update_source_interface_id, "")}" : null
           admin_state                   = try(pt.shutdown, null) == null ? null : (try(pt.shutdown) ? "disabled" : "enabled")
           affinity_group                = try(pt.affinity_group, null)
-          asn_type                      = try(pt.remote_as, null) == null ? "none" : (tostring(try(pt.remote_as)) == tostring(local.device_config[each.key].routing.bgp.asn) ? "internal" : "external")
           bfd_type                      = try(pt.bfd_multihop, null) == null ? null : (try(pt.bfd_multihop) ? "multihop" : "singlehop")
           bmp_server_1                  = try(pt.bmp_activate_server_1, null) == null ? null : (try(pt.bmp_activate_server_1) ? "enabled" : "disabled")
           bmp_server_2                  = try(pt.bmp_activate_server_2, null) == null ? null : (try(pt.bmp_activate_server_2) ? "enabled" : "disabled")
@@ -266,6 +267,7 @@ resource "nxos_bgp" "bgp" {
 
         peers = length(try(local.bgp_peers_default_vrf_map[each.key], [])) > 0 ? { for nei in try(local.device_config[each.key].routing.bgp.neighbors, []) : nei.ip => {
           remote_asn         = try(nei.remote_as, null)
+          asn_type           = try(nei.remote_as, null) != null ? "none" : null
           description        = try(nei.description, null)
           peer_template      = try(nei.inherit_peer, null)
           peer_type          = try(nei.peer_type, null)
@@ -288,7 +290,6 @@ resource "nxos_bgp" "bgp" {
           password                      = try(nei.password, null)
           admin_state                   = try(nei.shutdown, null) == null ? null : (try(nei.shutdown) ? "disabled" : "enabled")
           affinity_group                = try(nei.affinity_group, null)
-          asn_type                      = try(nei.remote_as, null) == null ? "none" : (tostring(try(nei.remote_as)) == tostring(local.device_config[each.key].routing.bgp.asn) ? "internal" : "external")
           bfd_type                      = try(nei.bfd_multihop, null) == null ? null : (try(nei.bfd_multihop) ? "multihop" : "singlehop")
           bmp_server_1                  = try(nei.bmp_activate_server_1, null) == null ? null : (try(nei.bmp_activate_server_1) ? "enabled" : "disabled")
           bmp_server_2                  = try(nei.bmp_activate_server_2, null) == null ? null : (try(nei.bmp_activate_server_2) ? "enabled" : "disabled")
@@ -366,13 +367,14 @@ resource "nxos_bgp" "bgp" {
         } if try(nei.interface_type, null) == null } : null
 
         interface_peers = length(try(local.bgp_interface_peers_default_vrf_map[each.key], [])) > 0 ? { for nei in try(local.device_config[each.key].routing.bgp.neighbors, []) : "${local.intf_prefix_map[try(nei.interface_type)]}${try(nei.interface_id, "")}" => {
-          remote_asn                    = try(nei.remote_as, null)
+          remote_asn = try(nei.remote_as, null)
+          asn_type   = try(nei.remote_as, null) != null ? "none" : null
+
           description                   = try(nei.description, null)
           peer_template                 = try(nei.inherit_peer, null)
           peer_type                     = try(nei.peer_type, null)
           admin_state                   = try(nei.shutdown, null) == null ? null : (try(nei.shutdown) ? "disabled" : "enabled")
           affinity_group                = try(nei.affinity_group, null)
-          asn_type                      = try(nei.remote_as, null) == null ? "none" : (tostring(try(nei.remote_as)) == tostring(local.device_config[each.key].routing.bgp.asn) ? "internal" : "external")
           bfd_type                      = try(nei.bfd_multihop, null) == null ? null : (try(nei.bfd_multihop) ? "multihop" : "singlehop")
           bmp_server_1                  = try(nei.bmp_activate_server_1, null) == null ? null : (try(nei.bmp_activate_server_1) ? "enabled" : "disabled")
           bmp_server_2                  = try(nei.bmp_activate_server_2, null) == null ? null : (try(nei.bmp_activate_server_2) ? "enabled" : "disabled")
@@ -517,6 +519,7 @@ resource "nxos_bgp" "bgp" {
 
       peers = length(try(local.bgp_peers_non_default_vrf_map[each.key][vrf.vrf], [])) > 0 ? { for nei in try(vrf.neighbors, []) : nei.ip => {
         remote_asn         = try(nei.remote_as, null)
+        asn_type           = try(nei.remote_as, null) != null ? "none" : null
         description        = try(nei.description, null)
         peer_template      = try(nei.inherit_peer, null)
         peer_type          = try(nei.peer_type, null)
@@ -539,7 +542,6 @@ resource "nxos_bgp" "bgp" {
         password                      = try(nei.password, null)
         admin_state                   = try(nei.shutdown, null) == null ? null : (try(nei.shutdown) ? "disabled" : "enabled")
         affinity_group                = try(nei.affinity_group, null)
-        asn_type                      = try(nei.remote_as, null) == null ? "none" : (tostring(try(nei.remote_as)) == tostring(local.device_config[each.key].routing.bgp.asn) ? "internal" : "external")
         bfd_type                      = try(nei.bfd_multihop, null) == null ? null : (try(nei.bfd_multihop) ? "multihop" : "singlehop")
         bmp_server_1                  = try(nei.bmp_activate_server_1, null) == null ? null : (try(nei.bmp_activate_server_1) ? "enabled" : "disabled")
         bmp_server_2                  = try(nei.bmp_activate_server_2, null) == null ? null : (try(nei.bmp_activate_server_2) ? "enabled" : "disabled")
@@ -617,13 +619,14 @@ resource "nxos_bgp" "bgp" {
       } if try(nei.interface_type, null) == null } : null
 
       interface_peers = length(try(local.bgp_interface_peers_non_default_vrf_map[each.key][vrf.vrf], [])) > 0 ? { for nei in try(vrf.neighbors, []) : "${local.intf_prefix_map[try(nei.interface_type)]}${try(nei.interface_id, "")}" => {
-        remote_asn                    = try(nei.remote_as, null)
+        remote_asn = try(nei.remote_as, null)
+        asn_type   = try(nei.remote_as, null) != null ? "none" : null
+
         description                   = try(nei.description, null)
         peer_template                 = try(nei.inherit_peer, null)
         peer_type                     = try(nei.peer_type, null)
         admin_state                   = try(nei.shutdown, null) == null ? null : (try(nei.shutdown) ? "disabled" : "enabled")
         affinity_group                = try(nei.affinity_group, null)
-        asn_type                      = try(nei.remote_as, null) == null ? "none" : (tostring(try(nei.remote_as)) == tostring(local.device_config[each.key].routing.bgp.asn) ? "internal" : "external")
         bfd_type                      = try(nei.bfd_multihop, null) == null ? null : (try(nei.bfd_multihop) ? "multihop" : "singlehop")
         bmp_server_1                  = try(nei.bmp_activate_server_1, null) == null ? null : (try(nei.bmp_activate_server_1) ? "enabled" : "disabled")
         bmp_server_2                  = try(nei.bmp_activate_server_2, null) == null ? null : (try(nei.bmp_activate_server_2) ? "enabled" : "disabled")
