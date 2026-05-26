@@ -18,20 +18,56 @@ resource "nxos_netflow" "netflow" {
   } } : null
 
   records = length(try(local.device_config[each.key].netflow.records, [])) > 0 ? { for record in try(local.device_config[each.key].netflow.records, []) : record.name => {
-    description        = try(record.description, null)
-    collect_parameters = try(join(",", sort(record.collect_parameters)), null)
-    match_parameters   = try(join(",", sort(record.match_parameters)), null)
+    description = try(record.description, null)
+    collect_parameters = sum([
+      try(record.collect_counter_bytes, false) ? 1 : 0,
+      try(record.collect_counter_packets, false) ? 2 : 0,
+      try(record.collect_timestamp_sys_uptime_first, false) ? 16 : 0,
+      try(record.collect_timestamp_sys_uptime_last, false) ? 32 : 0,
+      ]) > 0 ? join(",", sort([
+        for pair in [
+          { v = "count-bytes", b = try(record.collect_counter_bytes, false) },
+          { v = "count-pkts", b = try(record.collect_counter_packets, false) },
+          { v = "ts-first", b = try(record.collect_timestamp_sys_uptime_first, false) },
+          { v = "ts-recent", b = try(record.collect_timestamp_sys_uptime_last, false) },
+        ] : pair.v if pair.b
+    ])) : null
+    match_parameters = sum([
+      try(record.match_datalink_ethertype, false) ? 1 : 0,
+      try(record.match_datalink_mac_destination_address, false) ? 1 : 0,
+      try(record.match_datalink_mac_source_address, false) ? 1 : 0,
+      try(record.match_datalink_vlan, false) ? 1 : 0,
+      try(record.match_ip_protocol, false) ? 1 : 0,
+      try(record.match_ip_tos, false) ? 1 : 0,
+      try(record.match_ipv4_source_address, false) ? 1 : 0,
+      try(record.match_ipv4_destination_address, false) ? 1 : 0,
+      try(record.match_ipv6_source_address, false) ? 1 : 0,
+      try(record.match_ipv6_destination_address, false) ? 1 : 0,
+      try(record.match_transport_source_port, false) ? 1 : 0,
+      try(record.match_transport_destination_port, false) ? 1 : 0,
+      ]) > 0 ? join(",", sort([
+        for pair in [
+          { v = "ethertype", b = try(record.match_datalink_ethertype, false) },
+          { v = "dst-mac", b = try(record.match_datalink_mac_destination_address, false) },
+          { v = "src-mac", b = try(record.match_datalink_mac_source_address, false) },
+          { v = "vlan", b = try(record.match_datalink_vlan, false) },
+          { v = "protocol", b = try(record.match_ip_protocol, false) },
+          { v = "tos", b = try(record.match_ip_tos, false) },
+          { v = "src-ipv4", b = try(record.match_ipv4_source_address, false) },
+          { v = "dst-ipv4", b = try(record.match_ipv4_destination_address, false) },
+          { v = "src-ipv6", b = try(record.match_ipv6_source_address, false) },
+          { v = "dst-ipv6", b = try(record.match_ipv6_destination_address, false) },
+          { v = "src-port", b = try(record.match_transport_source_port, false) },
+          { v = "dst-port", b = try(record.match_transport_destination_port, false) },
+        ] : pair.v if pair.b
+    ])) : null
   } } : null
 
   monitors = length(try(local.device_config[each.key].netflow.monitors, [])) > 0 ? { for monitor in try(local.device_config[each.key].netflow.monitors, []) : monitor.name => {
-    description      = try(monitor.description, null)
-    record_target_dn = try(monitor.record, null) != null ? "sys/flow/fr-[${monitor.record}]" : null
-    exporter_buckets = length(try(monitor.exporter_buckets, [])) > 0 ? { for bucket in try(monitor.exporter_buckets, []) : tostring(bucket.id) => {
-      exporter1_target_dn = try(bucket.exporter_1, null) != null ? "sys/flow/fe-[${bucket.exporter_1}]" : null
-      exporter2_target_dn = try(bucket.exporter_2, null) != null ? "sys/flow/fe-[${bucket.exporter_2}]" : null
-      hash_high           = try(bucket.hash_high, null)
-      hash_low            = try(bucket.hash_low, null)
-    } } : null
+    description         = try(monitor.description, null)
+    record_target_dn    = try(monitor.record, null) != null ? "sys/flow/fr-[${monitor.record}]" : null
+    exporter1_target_dn = try(monitor.exporter_1, null) != null ? "sys/flow/fe-[${monitor.exporter_1}]" : null
+    exporter2_target_dn = try(monitor.exporter_2, null) != null ? "sys/flow/fe-[${monitor.exporter_2}]" : null
   } } : null
 
   hardware_profiles = length(try(local.device_config[each.key].netflow.hardware_profiles, [])) > 0 ? { for profile in try(local.device_config[each.key].netflow.hardware_profiles, []) : profile.name => {
