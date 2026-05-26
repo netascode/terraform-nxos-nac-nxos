@@ -1,2 +1,3 @@
 - BREAKING CHANGE: Rename `arp.cache_interface_limit`, `arp.unnumbered_svi_software_replication`, `arp.rarp_fabric_forwarding_rate`, `arp.resolve_outside_subnet` to `cache_intf_limit`, `unnum_svi_sw_replication`, `rarp_fabric_forwarding_rate_limit`, `outside_subnet`
 - BREAKING CHANGE: Rename `arp.inspection.validate_destination`, `arp.inspection.validate_source` to `validate_dst_mac`, `validate_src_mac`
+- BREAKING CHANGE: Change `evpn.multisite_border_gateway.fabric_advertise_pip` type from enum (`disable`/`enableL3`) to boolean

@@ -19,7 +19,7 @@ resource "nxos_nvo" "nvo" {
   evpn_multisite_border_gateway_dci_advertise_pip      = try(local.device_config[each.key].evpn.multisite_border_gateway.dci_advertise_pip, null) == null ? null : (try(local.device_config[each.key].evpn.multisite_border_gateway.dci_advertise_pip) ? "enable" : "disable")
   evpn_multisite_border_gateway_delay_restore_time     = try(local.device_config[each.key].evpn.multisite_border_gateway.delay_restore_time, null)
   evpn_multisite_border_gateway_df_election_time       = try(local.device_config[each.key].evpn.multisite_border_gateway.df_election_time, null) == null ? null : format("%f", local.device_config[each.key].evpn.multisite_border_gateway.df_election_time)
-  evpn_multisite_border_gateway_fabric_advertise_pip   = try(local.device_config[each.key].evpn.multisite_border_gateway.fabric_advertise_pip, null)
+  evpn_multisite_border_gateway_fabric_advertise_pip   = try(local.device_config[each.key].evpn.multisite_border_gateway.fabric_advertise_pip, null) == null ? null : (try(local.device_config[each.key].evpn.multisite_border_gateway.fabric_advertise_pip) ? "enableL3" : "disable")
   evpn_multisite_border_gateway_split_horizon_per_site = try(local.device_config[each.key].evpn.multisite_border_gateway.split_horizon_per_site, null) == null ? null : (try(local.device_config[each.key].evpn.multisite_border_gateway.split_horizon_per_site) ? "enable" : "disable")
 
   nve_interfaces = try(local.device_config[each.key].interfaces.nve, null) != null ? { for nve_id in ["1"] : nve_id => {
