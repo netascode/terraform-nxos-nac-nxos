@@ -281,17 +281,17 @@ resource "nxos_system" "system" {
   arp_admin_state                         = "enabled"
   arp_instance_admin_state                = "enabled"
   arp_allow_static_arp_outside_subnet     = try(local.device_config[each.key].arp.allow_static_arp_outside_subnet, null) != null ? (try(local.device_config[each.key].arp.allow_static_arp_outside_subnet) ? "enabled" : "disabled") : null
-  arp_unnumbered_svi_software_replication = try(local.device_config[each.key].arp.unnumbered_svi_software_replication, null) != null ? (try(local.device_config[each.key].arp.unnumbered_svi_software_replication) ? "enabled" : "disabled") : null
+  arp_unnumbered_svi_software_replication = try(local.device_config[each.key].arp.unnum_svi_sw_replication, null) != null ? (try(local.device_config[each.key].arp.unnum_svi_sw_replication) ? "enabled" : "disabled") : null
   arp_cache_limit                         = try(local.device_config[each.key].arp.cache_limit, null)
   arp_cache_syslog_rate                   = try(local.device_config[each.key].arp.cache_syslog_rate, null)
   arp_evpn_timeout                        = try(local.device_config[each.key].arp.evpn_timeout, null)
-  arp_interface_cache_limit               = try(local.device_config[each.key].arp.cache_interface_limit, null)
+  arp_interface_cache_limit               = try(local.device_config[each.key].arp.cache_intf_limit, null)
   arp_ip_adjacency_route_distance         = try(local.device_config[each.key].arp.adjacency_route_distance, null)
   arp_ip_arp_cos                          = try(local.device_config[each.key].arp.cos, null)
   arp_off_list_timeout                    = try(local.device_config[each.key].arp.off_list_timeout, null)
   arp_rarp_fabric_forwarding              = try(local.device_config[each.key].arp.rarp_fabric_forwarding, null) != null ? (try(local.device_config[each.key].arp.rarp_fabric_forwarding) ? "enabled" : "disabled") : null
-  arp_rarp_fabric_forwarding_rate         = try(local.device_config[each.key].arp.rarp_fabric_forwarding_rate, null)
-  arp_resolve_outside_subnet              = try(local.device_config[each.key].arp.resolve_outside_subnet, null) != null ? (try(local.device_config[each.key].arp.resolve_outside_subnet) ? "enabled" : "disabled") : null
+  arp_rarp_fabric_forwarding_rate         = try(local.device_config[each.key].arp.rarp_fabric_forwarding_rate_limit, null)
+  arp_resolve_outside_subnet              = try(local.device_config[each.key].arp.outside_subnet, null) != null ? (try(local.device_config[each.key].arp.outside_subnet) ? "enabled" : "disabled") : null
   arp_suppression_timeout                 = try(local.device_config[each.key].arp.suppression_timeout, null)
   arp_timeout                             = try(local.device_config[each.key].arp.timeout, null)
 
