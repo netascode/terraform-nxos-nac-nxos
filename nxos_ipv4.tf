@@ -175,7 +175,7 @@ resource "nxos_ipv4" "ipv4" {
         icmp_errors_source_interface = null
 
         static_routes = length(try(local.ip_routes_by_device_vrf["${each.key}/default"], [])) > 0 ? { for route in try(local.ip_routes_by_device_vrf["${each.key}/default"], []) : route.route.prefix => {
-          control    = try(route.route.bfd, false) ? "bfd" : (try(route.route.pervasive, false) ? "pervasive" : null)
+          control    = try(route.route.bfd, false) ? "bfd" : null
           preference = try(route.route.preference, null)
           tag        = try(route.route.tag, null)
 
