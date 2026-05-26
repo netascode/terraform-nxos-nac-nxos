@@ -294,7 +294,7 @@ resource "nxos_bgp" "bgp" {
           bmp_server_1                  = try(nei.bmp_activate_server_1, null) == null ? null : (try(nei.bmp_activate_server_1) ? "enabled" : "disabled")
           bmp_server_2                  = try(nei.bmp_activate_server_2, null) == null ? null : (try(nei.bmp_activate_server_2) ? "enabled" : "disabled")
           capability_suppress_4_byte_as = try(nei.capability_suppress_4_byte_as, null) == null ? null : (try(nei.capability_suppress_4_byte_as) ? "enabled" : "disabled")
-          connection_mode               = try(nei.connection_mode, null)
+          connection_mode               = try(nei.transport_connection_mode, null)
           log_neighbor_changes          = try(nei.log_neighbor_changes, null) == null ? "none" : (try(nei.log_neighbor_changes) ? "enable" : "disable")
           low_memory_exempt             = try(nei.low_memory_exempt, null) == null ? null : (try(nei.low_memory_exempt) ? "enabled" : "disabled")
           max_peer_count                = try(nei.maximum_peers, null)
@@ -307,8 +307,8 @@ resource "nxos_bgp" "bgp" {
 
           dscp                             = try(tostring(nei.dscp), null) != null ? try(local.dscp_int_to_string_map[nei.dscp], tostring(nei.dscp)) : null
           dynamic_route_map                = try(nei.dynamic_route_map, null)
-          egress_peer_engineering          = try(nei.egress_peer_engineering, null) == null ? null : (try(nei.egress_peer_engineering) ? "enabled" : "disabled")
-          egress_peer_engineering_peer_set = try(nei.egress_peer_engineering_peer_set, null)
+          egress_peer_engineering          = try(nei.egress_engineering, null) == null ? null : (try(nei.egress_engineering) ? "enabled" : "disabled")
+          egress_peer_engineering_peer_set = try(nei.egress_engineering_peer_set, null)
           internal_vpn_client              = try(nei.internal_vpn_client, null) == null ? null : (try(nei.internal_vpn_client) ? "enabled" : "disabled")
 
           peer_address_families = length(try(nei.address_families, [])) > 0 ? { for af in try(nei.address_families, []) : local.address_family_names_map[af.address_family] => {
@@ -379,7 +379,7 @@ resource "nxos_bgp" "bgp" {
           bmp_server_1                  = try(nei.bmp_activate_server_1, null) == null ? null : (try(nei.bmp_activate_server_1) ? "enabled" : "disabled")
           bmp_server_2                  = try(nei.bmp_activate_server_2, null) == null ? null : (try(nei.bmp_activate_server_2) ? "enabled" : "disabled")
           capability_suppress_4_byte_as = try(nei.capability_suppress_4_byte_as, null) == null ? null : (try(nei.capability_suppress_4_byte_as) ? "enabled" : "disabled")
-          connection_mode               = try(nei.connection_mode, null)
+          connection_mode               = try(nei.transport_connection_mode, null)
           peer_control = length(compact([
             try(nei.bfd, false) ? "bfd" : "",
             try(nei.dont_capability_negotiate, false) ? "cap-neg-off" : "",
@@ -393,8 +393,8 @@ resource "nxos_bgp" "bgp" {
           ]))) : null
           dscp                             = try(tostring(nei.dscp), null) != null ? try(local.dscp_int_to_string_map[nei.dscp], tostring(nei.dscp)) : null
           dynamic_route_map                = try(nei.dynamic_route_map, null)
-          egress_peer_engineering          = try(nei.egress_peer_engineering, null) == null ? null : (try(nei.egress_peer_engineering) ? "enabled" : "disabled")
-          egress_peer_engineering_peer_set = try(nei.egress_peer_engineering_peer_set, null)
+          egress_peer_engineering          = try(nei.egress_engineering, null) == null ? null : (try(nei.egress_engineering) ? "enabled" : "disabled")
+          egress_peer_engineering_peer_set = try(nei.egress_engineering_peer_set, null)
           hold_time                        = try(nei.hold_time, null)
           keepalive_interval               = try(nei.keepalive_interval, null)
           log_neighbor_changes             = try(nei.log_neighbor_changes, null) == null ? "none" : (try(nei.log_neighbor_changes) ? "enable" : "disable")
@@ -418,8 +418,8 @@ resource "nxos_bgp" "bgp" {
       alloc_index              = try(vrf.allocate_index, null)
       bestpath_first_always    = try(vrf.bestpath_limit_always, null) == null ? null : (try(vrf.bestpath_limit_always) ? "enabled" : "disabled")
       bestpath_interval        = try(vrf.bestpath_limit, null)
-      bandwidth_reference      = try(vrf.bandwidth_reference, null)
-      bandwidth_reference_unit = try(vrf.bandwidth_reference_unit, null)
+      bandwidth_reference      = try(vrf.reference_bandwidth, null)
+      bandwidth_reference_unit = try(vrf.reference_bandwidth_unit, null)
       cluster_id               = try(vrf.cluster_id, null)
       hold_time                = try(vrf.hold_time, null)
       keepalive_interval       = try(vrf.keepalive_interval, null)
@@ -546,7 +546,7 @@ resource "nxos_bgp" "bgp" {
         bmp_server_1                  = try(nei.bmp_activate_server_1, null) == null ? null : (try(nei.bmp_activate_server_1) ? "enabled" : "disabled")
         bmp_server_2                  = try(nei.bmp_activate_server_2, null) == null ? null : (try(nei.bmp_activate_server_2) ? "enabled" : "disabled")
         capability_suppress_4_byte_as = try(nei.capability_suppress_4_byte_as, null) == null ? null : (try(nei.capability_suppress_4_byte_as) ? "enabled" : "disabled")
-        connection_mode               = try(nei.connection_mode, null)
+        connection_mode               = try(nei.transport_connection_mode, null)
         log_neighbor_changes          = try(nei.log_neighbor_changes, null) == null ? "none" : (try(nei.log_neighbor_changes) ? "enable" : "disable")
         low_memory_exempt             = try(nei.low_memory_exempt, null) == null ? null : (try(nei.low_memory_exempt) ? "enabled" : "disabled")
         max_peer_count                = try(nei.maximum_peers, null)
@@ -559,8 +559,8 @@ resource "nxos_bgp" "bgp" {
 
         dscp                             = try(tostring(nei.dscp), null) != null ? try(local.dscp_int_to_string_map[nei.dscp], tostring(nei.dscp)) : null
         dynamic_route_map                = try(nei.dynamic_route_map, null)
-        egress_peer_engineering          = try(nei.egress_peer_engineering, null) == null ? null : (try(nei.egress_peer_engineering) ? "enabled" : "disabled")
-        egress_peer_engineering_peer_set = try(nei.egress_peer_engineering_peer_set, null)
+        egress_peer_engineering          = try(nei.egress_engineering, null) == null ? null : (try(nei.egress_engineering) ? "enabled" : "disabled")
+        egress_peer_engineering_peer_set = try(nei.egress_engineering_peer_set, null)
         internal_vpn_client              = try(nei.internal_vpn_client, null) == null ? null : (try(nei.internal_vpn_client) ? "enabled" : "disabled")
 
         peer_address_families = length(try(nei.address_families, [])) > 0 ? { for af in try(nei.address_families, []) : local.address_family_names_map[af.address_family] => {
@@ -631,7 +631,7 @@ resource "nxos_bgp" "bgp" {
         bmp_server_1                  = try(nei.bmp_activate_server_1, null) == null ? null : (try(nei.bmp_activate_server_1) ? "enabled" : "disabled")
         bmp_server_2                  = try(nei.bmp_activate_server_2, null) == null ? null : (try(nei.bmp_activate_server_2) ? "enabled" : "disabled")
         capability_suppress_4_byte_as = try(nei.capability_suppress_4_byte_as, null) == null ? null : (try(nei.capability_suppress_4_byte_as) ? "enabled" : "disabled")
-        connection_mode               = try(nei.connection_mode, null)
+        connection_mode               = try(nei.transport_connection_mode, null)
         peer_control = length(compact([
           try(nei.bfd, false) ? "bfd" : "",
           try(nei.dont_capability_negotiate, false) ? "cap-neg-off" : "",
@@ -645,8 +645,8 @@ resource "nxos_bgp" "bgp" {
         ]))) : null
         dscp                             = try(tostring(nei.dscp), null) != null ? try(local.dscp_int_to_string_map[nei.dscp], tostring(nei.dscp)) : null
         dynamic_route_map                = try(nei.dynamic_route_map, null)
-        egress_peer_engineering          = try(nei.egress_peer_engineering, null) == null ? null : (try(nei.egress_peer_engineering) ? "enabled" : "disabled")
-        egress_peer_engineering_peer_set = try(nei.egress_peer_engineering_peer_set, null)
+        egress_peer_engineering          = try(nei.egress_engineering, null) == null ? null : (try(nei.egress_engineering) ? "enabled" : "disabled")
+        egress_peer_engineering_peer_set = try(nei.egress_engineering_peer_set, null)
         hold_time                        = try(nei.hold_time, null)
         keepalive_interval               = try(nei.keepalive_interval, null)
         log_neighbor_changes             = try(nei.log_neighbor_changes, null) == null ? "none" : (try(nei.log_neighbor_changes) ? "enable" : "disable")
