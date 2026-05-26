@@ -1,1 +1,3 @@
 - Add `netflow` support including `netflow.exporters`, `netflow.records`, `netflow.monitors`, `netflow.hardware_profiles`, and `netflow.class_maps`
+- Add `netflow.records` boolean match attributes: `match_datalink_ethertype`, `match_datalink_mac_destination_address`, `match_datalink_mac_source_address`, `match_datalink_vlan`, `match_ip_protocol`, `match_ip_tos`, `match_ipv4_source_address`, `match_ipv4_destination_address`, `match_ipv6_source_address`, `match_ipv6_destination_address`, `match_transport_source_port`, `match_transport_destination_port`
+- Add `netflow.records` boolean collect attributes: `collect_counter_bytes`, `collect_counter_packets`, `collect_timestamp_sys_uptime_first`, `collect_timestamp_sys_uptime_last`
