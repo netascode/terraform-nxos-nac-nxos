@@ -40,6 +40,7 @@ locals {
   intf_prefix_map = {
     "ethernet"     = "eth"
     "loopback"     = "lo"
+    "management"   = "mgmt"
     "mgmt"         = "mgmt"
     "port-channel" = "po"
     "vlan"         = "vlan"

@@ -67,34 +67,34 @@ resource "nxos_isis" "isis" {
           authentication_check_l2  = try(inst.authentication_check_level_2, null)
           authentication_key_l1    = try(inst.authentication_key_chain_level_1, null)
           authentication_key_l2    = try(inst.authentication_key_chain_level_2, null)
-          authentication_type_l1   = try(inst.authentication_type_level_1, null)
-          authentication_type_l2   = try(inst.authentication_type_level_2, null)
-          bandwidth_reference      = try(inst.bandwidth_reference, null)
-          bandwidth_reference_unit = try(inst.bandwidth_reference_unit, null)
-          is_type                  = try(inst.is_type, null)
+          authentication_type_l1   = try(inst.authentication_type_level_1, null) != null ? try({ "cleartext" = "clear" }[inst.authentication_type_level_1], inst.authentication_type_level_1) : null
+          authentication_type_l2   = try(inst.authentication_type_level_2, null) != null ? try({ "cleartext" = "clear" }[inst.authentication_type_level_2], inst.authentication_type_level_2) : null
+          bandwidth_reference      = try(inst.reference_bandwidth, null)
+          bandwidth_reference_unit = try(inst.reference_bandwidth_unit, null)
+          is_type                  = try(inst.is_type, null) != null ? try({ "level_1" = "l1", "level_2" = "l2", "level_1_2" = "l12" }[inst.is_type], inst.is_type) : null
           metric_type              = try(inst.metric_style, null)
           mtu                      = try(inst.lsp_mtu, null)
           net                      = try(inst.net, null)
-          passive_default          = try(inst.passive_default, null)
+          passive_default          = try(inst.passive_interface_default, null) != null ? try({ "level_1" = "l1", "level_2" = "l2", "level_1_2" = "l12" }[inst.passive_interface_default], inst.passive_interface_default) : null
           control                  = try(inst.log_adjacency_changes, null) != null ? (try(inst.log_adjacency_changes) ? "log-adj-changes" : "unspecified") : null
           lsp_lifetime             = try(inst.max_lsp_lifetime, null)
           queue_limit              = try(inst.queue_limit, null)
-          overload_admin_state     = try(inst.set_overload_bit, null)
-          overload_startup_time    = try(inst.overload_startup_time, null)
-          overload_bgp_as_number   = try(inst.overload_bgp_as_number, null)
-          overload_suppress        = try(inst.overload_suppress, null)
+          overload_admin_state     = try(inst.set_overload_bit, null) != null ? try({ "always" = "always-on", "on_startup" = "bootup", "on_startup_wait_for_bgp" = "bgp-converge", "on_startup_wait_for_bgp_max_wait" = "bgp-converge-max-wait" }[inst.set_overload_bit], inst.set_overload_bit) : null
+          overload_startup_time    = try(inst.set_overload_bit_on_startup, null)
+          overload_bgp_as_number   = try(inst.set_overload_bit_wait_for_bgp, null)
+          overload_suppress        = try(inst.set_overload_bit_suppress, null)
 
-          address_families = length(try(inst.address_families, [])) > 0 ? { for af in try(inst.address_families, []) : replace(replace(af.address_family, "ipv4-unicast", "v4"), "ipv6-unicast", "v6") => {
+          address_families = length(try(inst.address_families, [])) > 0 ? { for af in try(inst.address_families, []) : replace(replace(af.address_family, "ipv4_unicast", "v4"), "ipv6_unicast", "v6") => {
             segment_routing_mpls                    = try(af.segment_routing_mpls, null)
             enable_bfd                              = try(af.bfd, null)
-            prefix_advertise_passive_l1             = try(af.advertise_passive_only_l1, null)
-            prefix_advertise_passive_l2             = try(af.advertise_passive_only_l2, null)
+            prefix_advertise_passive_l1             = try(af.advertise_passive_only_level_1, null)
+            prefix_advertise_passive_l2             = try(af.advertise_passive_only_level_2, null)
             control                                 = try(af.adjacency_check, null) != null ? (try(af.adjacency_check) ? "adj-check" : null) : null
             default_information_originate           = try(af.default_information_originate, null)
             default_information_originate_route_map = try(af.default_information_originate_route_map, null)
             distance                                = try(af.distance, null)
             max_ecmp                                = try(af.maximum_paths, null)
-            multi_topology                          = try(replace(replace(replace(af.multi_topology, "standard", "st"), "multi-topology-transition", "mtt"), "multi-topology", "mt"), null)
+            multi_topology                          = try(replace(replace(replace(af.multi_topology, "standard", "st"), "multi_topology_transition", "mtt"), "multi_topology", "mt"), null)
             router_id_interface                     = try(af.router_id_interface_type, null) != null ? "${local.intf_prefix_map[try(af.router_id_interface_type)]}${try(af.router_id_interface_id, "")}" : null
             router_id_ip_address                    = try(af.router_id_ip_address, null)
             table_map                               = try(af.table_map, null)
@@ -109,34 +109,34 @@ resource "nxos_isis" "isis" {
         authentication_check_l2  = try(vrf.authentication_check_level_2, null)
         authentication_key_l1    = try(vrf.authentication_key_chain_level_1, null)
         authentication_key_l2    = try(vrf.authentication_key_chain_level_2, null)
-        authentication_type_l1   = try(vrf.authentication_type_level_1, null)
-        authentication_type_l2   = try(vrf.authentication_type_level_2, null)
-        bandwidth_reference      = try(vrf.bandwidth_reference, null)
-        bandwidth_reference_unit = try(vrf.bandwidth_reference_unit, null)
-        is_type                  = try(vrf.is_type, null)
+        authentication_type_l1   = try(vrf.authentication_type_level_1, null) != null ? try({ "cleartext" = "clear" }[vrf.authentication_type_level_1], vrf.authentication_type_level_1) : null
+        authentication_type_l2   = try(vrf.authentication_type_level_2, null) != null ? try({ "cleartext" = "clear" }[vrf.authentication_type_level_2], vrf.authentication_type_level_2) : null
+        bandwidth_reference      = try(vrf.reference_bandwidth, null)
+        bandwidth_reference_unit = try(vrf.reference_bandwidth_unit, null)
+        is_type                  = try(vrf.is_type, null) != null ? try({ "level_1" = "l1", "level_2" = "l2", "level_1_2" = "l12" }[vrf.is_type], vrf.is_type) : null
         metric_type              = try(vrf.metric_style, null)
         mtu                      = try(vrf.lsp_mtu, null)
         net                      = try(vrf.net, null)
-        passive_default          = try(vrf.passive_default, null)
+        passive_default          = try(vrf.passive_interface_default, null) != null ? try({ "level_1" = "l1", "level_2" = "l2", "level_1_2" = "l12" }[vrf.passive_interface_default], vrf.passive_interface_default) : null
         control                  = try(vrf.log_adjacency_changes, null) != null ? (try(vrf.log_adjacency_changes) ? "log-adj-changes" : "unspecified") : null
         lsp_lifetime             = try(vrf.max_lsp_lifetime, null)
         queue_limit              = try(vrf.queue_limit, null)
-        overload_admin_state     = try(vrf.set_overload_bit, null)
-        overload_startup_time    = try(vrf.overload_startup_time, null)
-        overload_bgp_as_number   = try(vrf.overload_bgp_as_number, null)
-        overload_suppress        = try(vrf.overload_suppress, null)
+        overload_admin_state     = try(vrf.set_overload_bit, null) != null ? try({ "always" = "always-on", "on_startup" = "bootup", "on_startup_wait_for_bgp" = "bgp-converge", "on_startup_wait_for_bgp_max_wait" = "bgp-converge-max-wait" }[vrf.set_overload_bit], vrf.set_overload_bit) : null
+        overload_startup_time    = try(vrf.set_overload_bit_on_startup, null)
+        overload_bgp_as_number   = try(vrf.set_overload_bit_wait_for_bgp, null)
+        overload_suppress        = try(vrf.set_overload_bit_suppress, null)
 
-        address_families = length(try(vrf.address_families, [])) > 0 ? { for af in try(vrf.address_families, []) : replace(replace(af.address_family, "ipv4-unicast", "v4"), "ipv6-unicast", "v6") => {
+        address_families = length(try(vrf.address_families, [])) > 0 ? { for af in try(vrf.address_families, []) : replace(replace(af.address_family, "ipv4_unicast", "v4"), "ipv6_unicast", "v6") => {
           segment_routing_mpls                    = try(af.segment_routing_mpls, null)
           enable_bfd                              = try(af.bfd, null)
-          prefix_advertise_passive_l1             = try(af.advertise_passive_only_l1, null)
-          prefix_advertise_passive_l2             = try(af.advertise_passive_only_l2, null)
+          prefix_advertise_passive_l1             = try(af.advertise_passive_only_level_1, null)
+          prefix_advertise_passive_l2             = try(af.advertise_passive_only_level_2, null)
           control                                 = try(af.adjacency_check, null) != null ? (try(af.adjacency_check) ? "adj-check" : null) : null
           default_information_originate           = try(af.default_information_originate, null)
           default_information_originate_route_map = try(af.default_information_originate_route_map, null)
           distance                                = try(af.distance, null)
           max_ecmp                                = try(af.maximum_paths, null)
-          multi_topology                          = try(replace(replace(replace(af.multi_topology, "standard", "st"), "multi-topology-transition", "mtt"), "multi-topology", "mt"), null)
+          multi_topology                          = try(replace(replace(replace(af.multi_topology, "standard", "st"), "multi_topology_transition", "mtt"), "multi_topology", "mt"), null)
           router_id_interface                     = try(af.router_id_interface_type, null) != null ? "${local.intf_prefix_map[try(af.router_id_interface_type)]}${try(af.router_id_interface_id, "")}" : null
           router_id_ip_address                    = try(af.router_id_ip_address, null)
           table_map                               = try(af.table_map, null)
