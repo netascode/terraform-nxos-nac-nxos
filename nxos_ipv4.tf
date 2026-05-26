@@ -2,8 +2,8 @@ locals {
   urpf_map = {
     "rx"                 = "strict"
     "any"                = "loose"
-    "any_allow_default"  = "loose-allow-default"
-    "rx_allow_vni_hosts" = "strict-allow-vni-hosts"
+    "any-allow-default"  = "loose-allow-default"
+    "rx-allow-vni-hosts" = "strict-allow-vni-hosts"
   }
 
   # Group routes by device/vrf for the nxos_ipv4 vrfs nested map

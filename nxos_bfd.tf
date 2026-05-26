@@ -19,7 +19,7 @@ locals {
       authentication_interop = try(int.bfd.authentication_interop, null) == null ? null : try(int.bfd.authentication_interop) ? "enable" : "disable"
       authentication_key     = try(int.bfd.authentication_key, null)
       authentication_key_id  = try(int.bfd.authentication_key_id, null)
-      authentication_type    = try(int.bfd.authentication_type, null) == "keyed_sha1" ? "sha1" : try(int.bfd.authentication_type, null) == "meticulous_keyed_sha1" ? "met-sha1" : try(int.bfd.authentication_type, null)
+      authentication_type    = try(int.bfd.authentication_type, null) == "keyed-sha1" ? "sha1" : try(int.bfd.authentication_type, null) == "meticulous-keyed-sha1" ? "met-sha1" : try(int.bfd.authentication_type, null)
     } if int.device == device.name }
   }
   bfd_interfaces = flatten([

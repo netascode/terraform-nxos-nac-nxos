@@ -1,10 +1,10 @@
 - BREAKING CHANGE: Rename `interfaces.*.isis.n_flag_clear`, `interfaces.*.isis.suppress_prefix` to `prefix_attributes_n_flag_clear`, `suppressed`
-- BREAKING CHANGE: Rename `interfaces.*.isis.circuit_type` enum values `l1` to `level_1`, `l2` to `level_2`, `l12` to `level_1_2`
-- BREAKING CHANGE: Rename `interfaces.*.isis.passive_interface` enum values `l1` to `level_1`, `l2` to `level_2`, `l12` to `level_1_2`, `no-l1` to `no_level_1`, `no-l2` to `no_level_2`, `no-l12` to `no_level_1_2`
+- BREAKING CHANGE: Rename `interfaces.*.isis.circuit_type` enum values `l1` to `level-1`, `l2` to `level-2`, `l12` to `level-1-2`
+- BREAKING CHANGE: Rename `interfaces.*.isis.passive_interface` enum values `l1` to `level-1`, `l2` to `level-2`, `l12` to `level-1-2`, `no-l1` to `no-level-1`, `no-l2` to `no-level-2`, `no-l12` to `no-level-1-2`
 - BREAKING CHANGE: Remove `interfaces.*.isis.passive_interface` enum value `inherit-def`
 - BREAKING CHANGE: Convert `interfaces.*.isis.network_point_to_point` from enum to boolean
 - BREAKING CHANGE: Rename `interfaces.*.ospf.prefix_attribute_n_flag` to `prefix_attributes_n_flag_clear`
-- BREAKING CHANGE: Rename `interfaces.*.ospf.network` enum values `p2p` to `point_to_point`, `bcast` to `broadcast`
+- BREAKING CHANGE: Rename `interfaces.*.ospf.network` enum values `p2p` to `point-to-point`, `bcast` to `broadcast`
 - BREAKING CHANGE: Remove `interfaces.*.ospf.network` enum value `unspecified`
 - BREAKING CHANGE: Remove `interfaces.*.ospf.authentication` enum value `unspecified`
 - BREAKING CHANGE: Rename `interfaces.*.nd.ra_boot_file_url`, `interfaces.*.nd.dad_ns_interval`, `interfaces.*.nd.delete_adjacency_on_mac_delete`, `interfaces.*.nd.dns_search_list_suppress`, `interfaces.*.nd.dns_suppress`, `interfaces.*.nd.suppress_ra_route` to `ra_bootfile_url`, `dadns_interval`, `delete_adj_on_mac_delete`, `ra_dns_search_list_suppress`, `ra_dns_server_suppress`, `ra_route_suppress`
@@ -15,8 +15,4 @@
 - BREAKING CHANGE: Rename `interfaces.*.ptp.ipv6_multicast_transmit_scope`, `interfaces.*.ptp.ipv6_multicast_receive_scope` to `ipv6_multicast_scope_tx`, `ipv6_multicast_scope_rx`
 - BREAKING CHANGE: Rename `interfaces.*.ptp.unicast_peers` to `ucast_peers`
 - BREAKING CHANGE: Rename `interfaces.*.ptp.transport` enum value `eth` to `ethernet`
-- BREAKING CHANGE: Rename `interfaces.*.ptp.announce_interval_profile`, `interfaces.*.ptp.announce_timeout_profile`, `interfaces.*.ptp.sync_interval_profile`, `interfaces.*.ptp.delay_request_minimum_interval_profile` enum value `smpte-2059-2` to `smpte_2059_2`
-- BREAKING CHANGE: Rename `interfaces.*.ptp.receive_no_match` enum value `follow-rx` to `follow_rx`
-- BREAKING CHANGE: Rename `interfaces.*.ptp.destination_mac` enum value `non-forwardable` to `non_forwardable`
-- BREAKING CHANGE: Rename `interfaces.*.ptp.asymmetric_delay_direction` enum values `forward-path` to `forward_path`, `reverse-path` to `reverse_path`
 - BREAKING CHANGE: Rename `ptp.ipv6_multicast_transmit_scope`, `ptp.ipv6_multicast_receive_scope` to `ipv6_multicast_scope_tx`, `ipv6_multicast_scope_rx`

@@ -5,4 +5,4 @@
 - BREAKING CHANGE: Rename `interfaces.switchport.voice_cos` to `priority_extend_cos`
 - BREAKING CHANGE: Rename `interfaces.switchport.voice_trust` to `priority_extend_trust`
 - BREAKING CHANGE: Rename `interfaces.nves_vnis.multisite_ingress_replication` enum value `enableOptimized` to `optimized`
-- BREAKING CHANGE: Rename `interfaces.ip.verify_unicast_source_reachable_via` enum values `strict` to `rx`, `loose` to `any`, `loose-allow-default` to `any_allow_default`, `strict-allow-vni-hosts` to `rx_allow_vni_hosts`
+- BREAKING CHANGE: Rename `interfaces.ip.verify_unicast_source_reachable_via` enum values `strict` to `rx`, `loose` to `any`, `loose-allow-default` to `any-allow-default`, `strict-allow-vni-hosts` to `rx-allow-vni-hosts`

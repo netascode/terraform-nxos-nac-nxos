@@ -10,7 +10,7 @@ locals {
       cost                  = int.ospf_cost
       dead_interval         = int.ospf_dead_interval
       hello_interval        = int.ospf_hello_interval
-      network_type          = int.ospf_network_type != null ? try({ "point_to_point" = "p2p", "broadcast" = "bcast" }[int.ospf_network_type], int.ospf_network_type) : null
+      network_type          = int.ospf_network_type != null ? try({ "point-to-point" = "p2p", "broadcast" = "bcast" }[int.ospf_network_type], int.ospf_network_type) : null
       passive               = int.ospf_passive
       priority              = int.ospf_priority
       control = length(compact([
@@ -93,7 +93,7 @@ resource "nxos_ospf" "ospf" {
           max_metric_startup_interval = try(proc.max_metric_router_lsa.on_startup, false) ? try(proc.max_metric_router_lsa.on_startup_timeout, null) : null
 
           areas = length(try(proc.areas, [])) > 0 ? { for area in try(proc.areas, []) : (can(tonumber(area.id)) ? format("%d.%d.%d.%d", floor(tonumber(area.id) / 16777216) % 256, floor(tonumber(area.id) / 65536) % 256, floor(tonumber(area.id) / 256) % 256, tonumber(area.id) % 256) : tostring(area.id)) => {
-            authentication_type = try(area.authentication, null) == null ? null : { "simple" = "simple", "message_digest" = "md5" }[try(area.authentication)]
+            authentication_type = try(area.authentication, null) == null ? null : { "simple" = "simple", "message-digest" = "md5" }[try(area.authentication)]
             cost                = try(area.default_cost, null)
             control = length(compact([
               try(area.nssa_no_redistribution, null) != null ? (try(area.nssa_no_redistribution, false) ? "" : "redistribute") : "",
@@ -165,7 +165,7 @@ resource "nxos_ospf" "ospf" {
         max_metric_startup_interval = try(vrf.max_metric_router_lsa.on_startup, false) ? try(vrf.max_metric_router_lsa.on_startup_timeout, null) : null
 
         areas = length(try(vrf.areas, [])) > 0 ? { for area in try(vrf.areas, []) : (can(tonumber(area.id)) ? format("%d.%d.%d.%d", floor(tonumber(area.id) / 16777216) % 256, floor(tonumber(area.id) / 65536) % 256, floor(tonumber(area.id) / 256) % 256, tonumber(area.id) % 256) : tostring(area.id)) => {
-          authentication_type = try(area.authentication, null) == null ? null : { "simple" = "simple", "message_digest" = "md5" }[try(area.authentication)]
+          authentication_type = try(area.authentication, null) == null ? null : { "simple" = "simple", "message-digest" = "md5" }[try(area.authentication)]
           cost                = try(area.default_cost, null)
           control = length(compact([
             try(area.nssa_no_redistribution, null) != null ? (try(area.nssa_no_redistribution, false) ? "" : "redistribute") : "",

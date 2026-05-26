@@ -27,7 +27,7 @@ locals {
   soft_reconfiguration_inbound_map = {
     none           = "none"
     inbound        = "inbound"
-    inbound_always = "inbound-always"
+    inbound-always = "inbound-always"
   }
 
   bgp_peers_default_vrf_map = { for device in local.devices : device.name => [

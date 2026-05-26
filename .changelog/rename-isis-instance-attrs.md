@@ -1,10 +1,8 @@
 - BREAKING CHANGE: Rename `routing.isis_instances.bandwidth_reference`, `routing.isis_instances.bandwidth_reference_unit` to `reference_bandwidth`, `reference_bandwidth_unit`
 - BREAKING CHANGE: Rename `routing.isis_instances.passive_default` to `passive_interface_default`
 - BREAKING CHANGE: Rename `routing.isis_instances.overload_startup_time`, `routing.isis_instances.overload_bgp_as_number`, `routing.isis_instances.overload_suppress` to `set_overload_bit_on_startup`, `set_overload_bit_wait_for_bgp`, `set_overload_bit_suppress`
-- BREAKING CHANGE: Rename `routing.isis_instances.is_type` enum values `l1` to `level_1`, `l2` to `level_2`, `l12` to `level_1_2`
-- BREAKING CHANGE: Rename `routing.isis_instances.passive_interface_default` enum values `l1` to `level_1`, `l2` to `level_2`, `l12` to `level_1_2`
-- BREAKING CHANGE: Rename `routing.isis_instances.set_overload_bit` enum values `always-on` to `always`, `bootup` to `on_startup`, `bgp-converge` to `on_startup_wait_for_bgp`, `bgp-converge-max-wait` to `on_startup_wait_for_bgp_max_wait`
+- BREAKING CHANGE: Rename `routing.isis_instances.is_type` enum values `l1` to `level-1`, `l2` to `level-2`, `l12` to `level-1-2`
+- BREAKING CHANGE: Rename `routing.isis_instances.passive_interface_default` enum values `l1` to `level-1`, `l2` to `level-2`, `l12` to `level-1-2`
+- BREAKING CHANGE: Rename `routing.isis_instances.set_overload_bit` enum values `always-on` to `always`, `bootup` to `on-startup`, `bgp-converge` to `on-startup-wait-for-bgp`, `bgp-converge-max-wait` to `on-startup-wait-for-bgp-max-wait`
 - BREAKING CHANGE: Rename `routing.isis_instances.authentication_type_level_1`, `routing.isis_instances.authentication_type_level_2` enum value `clear` to `cleartext`
 - BREAKING CHANGE: Rename `routing.isis_instances.vrfs.address_families.advertise_passive_only_l1`, `routing.isis_instances.vrfs.address_families.advertise_passive_only_l2` to `advertise_passive_only_level_1`, `advertise_passive_only_level_2`
-- BREAKING CHANGE: Rename `routing.isis_instances.vrfs.address_families.address_family` enum values `ipv4-unicast` to `ipv4_unicast`, `ipv6-unicast` to `ipv6_unicast`
-- BREAKING CHANGE: Rename `routing.isis_instances.vrfs.address_families.multi_topology` enum values `multi-topology` to `multi_topology`, `multi-topology-transition` to `multi_topology_transition`
