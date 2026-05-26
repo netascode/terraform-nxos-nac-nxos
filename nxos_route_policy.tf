@@ -108,7 +108,7 @@ resource "nxos_route_policy" "route_policy" {
         "sys/rpm/pfxlistv4-[${try(entry.match_ip_next_hop_prefix_list)}]" = {}
       } : null
 
-      match_regular_community_criteria = try(entry.match_community, null) != null ? (try(entry.match_community_criteria, null) != null ? { "exact_match" = "exact" }[try(entry.match_community_criteria)] : null) : null
+      match_regular_community_criteria = try(entry.match_community, null) != null ? (try(entry.match_community_exact_match, null) != null ? (try(entry.match_community_exact_match) ? "exact" : null) : null) : null
 
       match_regular_community_lists = try(entry.match_community, null) != null ? {
         "sys/rpm/rtregcom-[${try(entry.match_community)}]" = {}
