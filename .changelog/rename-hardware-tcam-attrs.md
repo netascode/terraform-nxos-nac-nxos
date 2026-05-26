@@ -1,16 +1,5 @@
-- **BREAKING CHANGE**: Rename `system.hardware.tcam_atomic_update` to `system.hardware.access_list_update_atomic`
-- **BREAKING CHANGE**: Rename `system.hardware.tcam_atomic_update_strict` to `system.hardware.access_list_update_atomic_strict`
-- **BREAKING CHANGE**: Rename `system.hardware.tcam_default_result` to `system.hardware.access_list_update_default_result`
-- **BREAKING CHANGE**: Rename `system.hardware.tcam_per_entry_stats_template` to `system.hardware.access_list_tcam_per_entry_stats_template`
-- **BREAKING CHANGE**: Rename `system.hardware_access_list_tcam_region.n9k_arp_acl_size` to `arp_ether_size`
-- **BREAKING CHANGE**: Rename `system.hardware_access_list_tcam_region.egress_*` attributes to `e_*` (e.g., `egress_racl_size` → `e_racl_size`)
-- **BREAKING CHANGE**: Rename `system.hardware_access_list_tcam_region.redirect_v4_size` to `redirect_size`
-- **BREAKING CHANGE**: Rename `system.hardware_access_list_tcam_region.l3_qos_intra_lite_size` to `l3qos_intra_lite_size`
-- **BREAKING CHANGE**: Rename `system.hardware_access_list_tcam_region.mpls_doublewide` to `mpls_double_wide`
-- **BREAKING CHANGE**: Rename `system.hardware_access_list_tcam_region.openflow_doublewide` to `openflow_double_wide`
-- **BREAKING CHANGE**: Remove `system.hardware.ptp_correction_hardware` (DME-only, no CLI equivalent)
-- **BREAKING CHANGE**: Remove `system.hardware.qos_latency_optimized` (DME-only, no CLI equivalent)
-- **BREAKING CHANGE**: Remove `system.hardware.udf_netflow_rtp_multicast` (DME-only, no CLI equivalent)
-- **BREAKING CHANGE**: Remove `system.hardware_access_list_tcam_region.copp_system_size` (DME-only, no CLI equivalent)
-- **BREAKING CHANGE**: Remove `system.hardware_access_list_tcam_region.qos_label_size` (DME-only, no CLI equivalent)
-- **BREAKING CHANGE**: Remove `system.hardware_access_list_tcam_region.span_tahoe_size` (DME-only, no CLI equivalent)
+- BREAKING CHANGE: Rename `system.hardware.tcam_atomic_update`, `system.hardware.tcam_atomic_update_strict`, `system.hardware.tcam_default_result`, `system.hardware.tcam_per_entry_stats_template` to `access_list_update_atomic`, `access_list_update_atomic_strict`, `access_list_update_default_result`, `access_list_tcam_per_entry_stats_template`
+- BREAKING CHANGE: Rename `system.hardware_access_list_tcam_region.n9k_arp_acl_size`, `system.hardware_access_list_tcam_region.egress_ipv6_qos_size`, `system.hardware_access_list_tcam_region.egress_ipv6_racl_size`, `system.hardware_access_list_tcam_region.egress_mac_qos_size`, `system.hardware_access_list_tcam_region.egress_qos_lite_size`, `system.hardware_access_list_tcam_region.egress_qos_size`, `system.hardware_access_list_tcam_region.egress_racl_size` to `arp_ether_size`, `e_ipv6_qos_size`, `e_ipv6_racl_size`, `e_mac_qos_size`, `e_qos_lite_size`, `e_qos_size`, `e_racl_size`
+- BREAKING CHANGE: Rename `system.hardware_access_list_tcam_region.redirect_v4_size`, `system.hardware_access_list_tcam_region.l3_qos_intra_lite_size`, `system.hardware_access_list_tcam_region.mpls_doublewide`, `system.hardware_access_list_tcam_region.openflow_doublewide` to `redirect_size`, `l3qos_intra_lite_size`, `mpls_double_wide`, `openflow_double_wide`
+- BREAKING CHANGE: Remove `system.hardware.ptp_correction_hardware`, `system.hardware.qos_latency_optimized`, `system.hardware.udf_netflow_rtp_multicast` (DME-only, no CLI equivalent)
+- BREAKING CHANGE: Remove `system.hardware_access_list_tcam_region.copp_system_size`, `system.hardware_access_list_tcam_region.qos_label_size`, `system.hardware_access_list_tcam_region.span_tahoe_size` (DME-only, no CLI equivalent)
