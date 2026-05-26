@@ -27,15 +27,10 @@ resource "nxos_esg" "esg" {
   class_maps = length(try(local.device_config[each.key].security_group.class_maps, [])) > 0 ? { for cm in try(local.device_config[each.key].security_group.class_maps, []) : cm.name => {
     description = try(cm.description, null)
     filter_entries = length(try(cm.filter_entries, [])) > 0 ? { for fe in try(cm.filter_entries, []) : fe.name => {
-      apply_to_fragment           = try(fe.apply_to_fragment, null)
-      arp_opcode                  = try(fe.arp_opcode, null)
-      ether_type                  = try(fe.ether_type, null)
-      icmpv4_type                 = try(fe.icmpv4_type, null)
-      icmpv6_type                 = try(fe.icmpv6_type, null)
-      match_destination_port_zero = try(fe.match_dest_port_zero, null)
-      match_dscp                  = try(fe.match_dscp, null)
-      match_source_port_zero      = try(fe.match_source_port_zero, null)
-      stateful                    = try(fe.stateful, null)
+      apply_to_fragment = try(fe.fragments, null)
+      icmpv4_type       = try(fe.icmpv4_type, null)
+      icmpv6_type       = try(fe.icmpv6_type, null)
+      match_dscp        = try(fe.dscp, null)
     } } : null
   } } : null
 
