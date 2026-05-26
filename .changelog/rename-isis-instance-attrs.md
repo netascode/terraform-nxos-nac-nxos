@@ -8,4 +8,3 @@
 - BREAKING CHANGE: Rename `routing.isis_instances.vrfs.address_families.advertise_passive_only_l1`, `routing.isis_instances.vrfs.address_families.advertise_passive_only_l2` to `advertise_passive_only_level_1`, `advertise_passive_only_level_2`
 - BREAKING CHANGE: Rename `routing.isis_instances.vrfs.address_families.address_family` enum values `ipv4-unicast` to `ipv4_unicast`, `ipv6-unicast` to `ipv6_unicast`
 - BREAKING CHANGE: Rename `routing.isis_instances.vrfs.address_families.multi_topology` enum values `multi-topology` to `multi_topology`, `multi-topology-transition` to `multi_topology_transition`
-- BREAKING CHANGE: Rename `routing.isis_instances.vrfs.address_families.router_id_interface_type` enum value `mgmt` to `management`
