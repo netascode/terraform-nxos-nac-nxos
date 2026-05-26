@@ -102,9 +102,9 @@ resource "nxos_dhcp" "dhcp" {
   snooping_sub_option_format_non_tlv          = try(local.device_config[each.key].dhcp.ip_dhcp_snooping.sub_option_format_non_tlv, null)
   snoop_sub_option_circuit_id_format_string   = try(local.device_config[each.key].dhcp.ip_dhcp_snooping.sub_option_circuit_id_format_string, null)
   dai_log_buffer_entries                      = try(local.device_config[each.key].arp.inspection.log_buffer_entries, null)
-  dai_validate_destination                    = try(local.device_config[each.key].arp.inspection.validate_destination, null)
+  dai_validate_destination                    = try(local.device_config[each.key].arp.inspection.validate_dst_mac, null)
   dai_validate_ip                             = try(local.device_config[each.key].arp.inspection.validate_ip, null)
-  dai_validate_source                         = try(local.device_config[each.key].arp.inspection.validate_source, null)
+  dai_validate_source                         = try(local.device_config[each.key].arp.inspection.validate_src_mac, null)
   relay_interfaces                            = length(local.dhcp_relay_interfaces_map[each.key]) > 0 ? local.dhcp_relay_interfaces_map[each.key] : null
 
   depends_on = [
