@@ -10,11 +10,24 @@ locals {
     l2vpn-evpn      = "l2vpn-evpn"
     ipv4-lucast     = "ipv4-lucast"
     ipv6-lucast     = "ipv6-lucast"
-    lnkstate        = "lnkstate"
+    link-state      = "lnkstate"
     ipv4-mvpn       = "ipv4-mvpn"
     ipv6-mvpn       = "ipv6-mvpn"
     l2vpn-vpls      = "l2vpn-vpls"
     ipv4-mdt        = "ipv4-mdt"
+  }
+
+  remove_private_as_map = {
+    none       = "none"
+    enabled    = "remove-exclusive"
+    all        = "remove-all"
+    replace-as = "replace-as"
+  }
+
+  soft_reconfiguration_inbound_map = {
+    none           = "none"
+    inbound        = "inbound"
+    inbound_always = "inbound-always"
   }
 
   bgp_peers_default_vrf_map = { for device in local.devices : device.name => [
@@ -169,18 +182,18 @@ resource "nxos_bgp" "bgp" {
         } } : null
 
         peer_templates = length(try(local.device_config[each.key].routing.bgp.peer_templates, [])) > 0 ? { for pt in try(local.device_config[each.key].routing.bgp.peer_templates, []) : pt.name => {
-          remote_asn                     = try(pt.remote_as, null)
-          description                    = try(pt.description, null)
-          peer_type                      = try(pt.peer_type, null)
-          source_interface               = try(pt.update_source_interface_type, null) != null ? "${local.intf_prefix_map[try(pt.update_source_interface_type)]}${try(pt.update_source_interface_id, "")}" : null
-          admin_state                    = try(pt.shutdown, null) == null ? null : (try(pt.shutdown) ? "disabled" : "enabled")
-          affinity_group                 = try(pt.affinity_group, null)
-          asn_type                       = try(pt.remote_as_type, null)
-          bfd_type                       = try(pt.bfd_type, null)
-          bmp_server_1                   = try(pt.bmp_activate_server_1, null) == null ? null : (try(pt.bmp_activate_server_1) ? "enabled" : "disabled")
-          bmp_server_2                   = try(pt.bmp_activate_server_2, null) == null ? null : (try(pt.bmp_activate_server_2) ? "enabled" : "disabled")
-          capability_suppress_4_byte_asn = try(pt.capability_suppress_4_byte_asn, null) == null ? null : (try(pt.capability_suppress_4_byte_asn) ? "enabled" : "disabled")
-          connection_mode                = try(pt.connection_mode, null)
+          remote_asn                    = try(pt.remote_as, null)
+          description                   = try(pt.description, null)
+          peer_type                     = try(pt.peer_type, null)
+          source_interface              = try(pt.update_source_interface_type, null) != null ? "${local.intf_prefix_map[try(pt.update_source_interface_type)]}${try(pt.update_source_interface_id, "")}" : null
+          admin_state                   = try(pt.shutdown, null) == null ? null : (try(pt.shutdown) ? "disabled" : "enabled")
+          affinity_group                = try(pt.affinity_group, null)
+          asn_type                      = try(pt.remote_as, null) == null ? "none" : (tostring(try(pt.remote_as)) == tostring(local.device_config[each.key].routing.bgp.asn) ? "internal" : "external")
+          bfd_type                      = try(pt.bfd_multihop, null) == null ? null : (try(pt.bfd_multihop) ? "multihop" : "singlehop")
+          bmp_server_1                  = try(pt.bmp_activate_server_1, null) == null ? null : (try(pt.bmp_activate_server_1) ? "enabled" : "disabled")
+          bmp_server_2                  = try(pt.bmp_activate_server_2, null) == null ? null : (try(pt.bmp_activate_server_2) ? "enabled" : "disabled")
+          capability_suppress_4_byte_as = try(pt.capability_suppress_4_byte_as, null) == null ? null : (try(pt.capability_suppress_4_byte_as) ? "enabled" : "disabled")
+          connection_mode               = try(pt.connection_mode, null)
           peer_control = length(compact([
             try(pt.bfd, false) ? "bfd" : "",
             try(pt.dont_capability_negotiate, false) ? "cap-neg-off" : "",
@@ -199,7 +212,7 @@ resource "nxos_bgp" "bgp" {
           max_peer_count       = try(pt.maximum_peers, null)
           password_type        = try(pt.password_type, null)
           password             = try(pt.password, null)
-          private_as_control   = try(pt.remove_private_as, null)
+          private_as_control   = try(local.remove_private_as_map[pt.remove_private_as], null)
           session_template     = try(pt.inherit_peer_session, null)
           ebgp_multihop_ttl    = try(pt.ebgp_multihop_ttl, null)
           ttl_security_hops    = try(pt.ttl_security_hops, null)
@@ -239,8 +252,8 @@ resource "nxos_bgp" "bgp" {
             link_bandwidth_cumulative     = try(af.link_bandwidth_cumulative, null) == null ? null : (try(af.link_bandwidth_cumulative) ? "enabled" : "disabled")
             nexthop_thirdparty            = try(af.next_hop_third_party, null) == null ? null : (try(af.next_hop_third_party) ? "enabled" : "disabled")
             rewrite_rt_asn                = try(af.rewrite_evpn_rt_asn, null) == null ? null : (try(af.rewrite_evpn_rt_asn) ? "enabled" : "disabled")
-            soft_reconfiguration_backup   = try(af.soft_reconfiguration_inbound, null)
-            site_of_origin                = try(af.site_of_origin, null)
+            soft_reconfiguration_backup   = try(local.soft_reconfiguration_inbound_map[af.soft_reconfiguration_inbound], null)
+            site_of_origin                = try(af.soo, null)
             unsuppress_map                = try(af.unsuppress_map, null)
             weight                        = try(af.weight, null)
 
@@ -271,22 +284,22 @@ resource "nxos_bgp" "bgp" {
               try(nei.disable_connected_check, false) ? "dis-conn-check" : "",
               !try(nei.dynamic_capability, true) ? "no-dyn-cap" : "",
           ]))) : null
-          password_type                  = try(nei.password_type, null)
-          password                       = try(nei.password, null)
-          admin_state                    = try(nei.shutdown, null) == null ? null : (try(nei.shutdown) ? "disabled" : "enabled")
-          affinity_group                 = try(nei.affinity_group, null)
-          asn_type                       = try(nei.remote_as_type, null)
-          bfd_type                       = try(nei.bfd_type, null)
-          bmp_server_1                   = try(nei.bmp_activate_server_1, null) == null ? null : (try(nei.bmp_activate_server_1) ? "enabled" : "disabled")
-          bmp_server_2                   = try(nei.bmp_activate_server_2, null) == null ? null : (try(nei.bmp_activate_server_2) ? "enabled" : "disabled")
-          capability_suppress_4_byte_asn = try(nei.capability_suppress_4_byte_asn, null) == null ? null : (try(nei.capability_suppress_4_byte_asn) ? "enabled" : "disabled")
-          connection_mode                = try(nei.connection_mode, null)
-          log_neighbor_changes           = try(nei.log_neighbor_changes, null) == null ? "none" : (try(nei.log_neighbor_changes) ? "enable" : "disable")
-          low_memory_exempt              = try(nei.low_memory_exempt, null) == null ? null : (try(nei.low_memory_exempt) ? "enabled" : "disabled")
-          max_peer_count                 = try(nei.maximum_peers, null)
-          private_as_control             = try(nei.remove_private_as, null)
-          session_template               = try(nei.inherit_peer_session, null)
-          ttl_security_hops              = try(nei.ttl_security_hops, null)
+          password_type                 = try(nei.password_type, null)
+          password                      = try(nei.password, null)
+          admin_state                   = try(nei.shutdown, null) == null ? null : (try(nei.shutdown) ? "disabled" : "enabled")
+          affinity_group                = try(nei.affinity_group, null)
+          asn_type                      = try(nei.remote_as, null) == null ? "none" : (tostring(try(nei.remote_as)) == tostring(local.device_config[each.key].routing.bgp.asn) ? "internal" : "external")
+          bfd_type                      = try(nei.bfd_multihop, null) == null ? null : (try(nei.bfd_multihop) ? "multihop" : "singlehop")
+          bmp_server_1                  = try(nei.bmp_activate_server_1, null) == null ? null : (try(nei.bmp_activate_server_1) ? "enabled" : "disabled")
+          bmp_server_2                  = try(nei.bmp_activate_server_2, null) == null ? null : (try(nei.bmp_activate_server_2) ? "enabled" : "disabled")
+          capability_suppress_4_byte_as = try(nei.capability_suppress_4_byte_as, null) == null ? null : (try(nei.capability_suppress_4_byte_as) ? "enabled" : "disabled")
+          connection_mode               = try(nei.connection_mode, null)
+          log_neighbor_changes          = try(nei.log_neighbor_changes, null) == null ? "none" : (try(nei.log_neighbor_changes) ? "enable" : "disable")
+          low_memory_exempt             = try(nei.low_memory_exempt, null) == null ? null : (try(nei.low_memory_exempt) ? "enabled" : "disabled")
+          max_peer_count                = try(nei.maximum_peers, null)
+          private_as_control            = try(local.remove_private_as_map[nei.remove_private_as], null)
+          session_template              = try(nei.inherit_peer_session, null)
+          ttl_security_hops             = try(nei.ttl_security_hops, null)
 
           local_asn_propagation = try(nei.local_as_propagation, null)
           local_asn             = try(nei.local_as, null)
@@ -332,8 +345,8 @@ resource "nxos_bgp" "bgp" {
             link_bandwidth_cumulative     = try(af.link_bandwidth_cumulative, null) == null ? null : (try(af.link_bandwidth_cumulative) ? "enabled" : "disabled")
             nexthop_thirdparty            = try(af.next_hop_third_party, null) == null ? null : (try(af.next_hop_third_party) ? "enabled" : "disabled")
             rewrite_rt_asn                = try(af.rewrite_evpn_rt_asn, null) == null ? null : (try(af.rewrite_evpn_rt_asn) ? "enabled" : "disabled")
-            soft_reconfiguration_backup   = try(af.soft_reconfiguration_inbound, null)
-            site_of_origin                = try(af.site_of_origin, null)
+            soft_reconfiguration_backup   = try(local.soft_reconfiguration_inbound_map[af.soft_reconfiguration_inbound], null)
+            site_of_origin                = try(af.soo, null)
             unsuppress_map                = try(af.unsuppress_map, null)
             weight                        = try(af.weight, null)
 
@@ -353,18 +366,18 @@ resource "nxos_bgp" "bgp" {
         } if try(nei.interface_type, null) == null } : null
 
         interface_peers = length(try(local.bgp_interface_peers_default_vrf_map[each.key], [])) > 0 ? { for nei in try(local.device_config[each.key].routing.bgp.neighbors, []) : "${local.intf_prefix_map[try(nei.interface_type)]}${try(nei.interface_id, "")}" => {
-          remote_asn                     = try(nei.remote_as, null)
-          description                    = try(nei.description, null)
-          peer_template                  = try(nei.inherit_peer, null)
-          peer_type                      = try(nei.peer_type, null)
-          admin_state                    = try(nei.shutdown, null) == null ? null : (try(nei.shutdown) ? "disabled" : "enabled")
-          affinity_group                 = try(nei.affinity_group, null)
-          asn_type                       = try(nei.remote_as_type, null)
-          bfd_type                       = try(nei.bfd_type, null)
-          bmp_server_1                   = try(nei.bmp_activate_server_1, null) == null ? null : (try(nei.bmp_activate_server_1) ? "enabled" : "disabled")
-          bmp_server_2                   = try(nei.bmp_activate_server_2, null) == null ? null : (try(nei.bmp_activate_server_2) ? "enabled" : "disabled")
-          capability_suppress_4_byte_asn = try(nei.capability_suppress_4_byte_asn, null) == null ? null : (try(nei.capability_suppress_4_byte_asn) ? "enabled" : "disabled")
-          connection_mode                = try(nei.connection_mode, null)
+          remote_asn                    = try(nei.remote_as, null)
+          description                   = try(nei.description, null)
+          peer_template                 = try(nei.inherit_peer, null)
+          peer_type                     = try(nei.peer_type, null)
+          admin_state                   = try(nei.shutdown, null) == null ? null : (try(nei.shutdown) ? "disabled" : "enabled")
+          affinity_group                = try(nei.affinity_group, null)
+          asn_type                      = try(nei.remote_as, null) == null ? "none" : (tostring(try(nei.remote_as)) == tostring(local.device_config[each.key].routing.bgp.asn) ? "internal" : "external")
+          bfd_type                      = try(nei.bfd_multihop, null) == null ? null : (try(nei.bfd_multihop) ? "multihop" : "singlehop")
+          bmp_server_1                  = try(nei.bmp_activate_server_1, null) == null ? null : (try(nei.bmp_activate_server_1) ? "enabled" : "disabled")
+          bmp_server_2                  = try(nei.bmp_activate_server_2, null) == null ? null : (try(nei.bmp_activate_server_2) ? "enabled" : "disabled")
+          capability_suppress_4_byte_as = try(nei.capability_suppress_4_byte_as, null) == null ? null : (try(nei.capability_suppress_4_byte_as) ? "enabled" : "disabled")
+          connection_mode               = try(nei.connection_mode, null)
           peer_control = length(compact([
             try(nei.bfd, false) ? "bfd" : "",
             try(nei.dont_capability_negotiate, false) ? "cap-neg-off" : "",
@@ -387,7 +400,7 @@ resource "nxos_bgp" "bgp" {
           max_peer_count                   = try(nei.maximum_peers, null)
           password_type                    = try(nei.password_type, null)
           password                         = try(nei.password, null)
-          private_as_control               = try(nei.remove_private_as, null)
+          private_as_control               = try(local.remove_private_as_map[nei.remove_private_as], null)
           session_template                 = try(nei.inherit_peer_session, null)
           ebgp_multihop_ttl                = try(nei.ebgp_multihop_ttl, null)
           ttl_security_hops                = try(nei.ttl_security_hops, null)
@@ -522,22 +535,22 @@ resource "nxos_bgp" "bgp" {
             try(nei.disable_connected_check, false) ? "dis-conn-check" : "",
             !try(nei.dynamic_capability, true) ? "no-dyn-cap" : "",
         ]))) : null
-        password_type                  = try(nei.password_type, null)
-        password                       = try(nei.password, null)
-        admin_state                    = try(nei.shutdown, null) == null ? null : (try(nei.shutdown) ? "disabled" : "enabled")
-        affinity_group                 = try(nei.affinity_group, null)
-        asn_type                       = try(nei.remote_as_type, null)
-        bfd_type                       = try(nei.bfd_type, null)
-        bmp_server_1                   = try(nei.bmp_activate_server_1, null) == null ? null : (try(nei.bmp_activate_server_1) ? "enabled" : "disabled")
-        bmp_server_2                   = try(nei.bmp_activate_server_2, null) == null ? null : (try(nei.bmp_activate_server_2) ? "enabled" : "disabled")
-        capability_suppress_4_byte_asn = try(nei.capability_suppress_4_byte_asn, null) == null ? null : (try(nei.capability_suppress_4_byte_asn) ? "enabled" : "disabled")
-        connection_mode                = try(nei.connection_mode, null)
-        log_neighbor_changes           = try(nei.log_neighbor_changes, null) == null ? "none" : (try(nei.log_neighbor_changes) ? "enable" : "disable")
-        low_memory_exempt              = try(nei.low_memory_exempt, null) == null ? null : (try(nei.low_memory_exempt) ? "enabled" : "disabled")
-        max_peer_count                 = try(nei.maximum_peers, null)
-        private_as_control             = try(nei.remove_private_as, null)
-        session_template               = try(nei.inherit_peer_session, null)
-        ttl_security_hops              = try(nei.ttl_security_hops, null)
+        password_type                 = try(nei.password_type, null)
+        password                      = try(nei.password, null)
+        admin_state                   = try(nei.shutdown, null) == null ? null : (try(nei.shutdown) ? "disabled" : "enabled")
+        affinity_group                = try(nei.affinity_group, null)
+        asn_type                      = try(nei.remote_as, null) == null ? "none" : (tostring(try(nei.remote_as)) == tostring(local.device_config[each.key].routing.bgp.asn) ? "internal" : "external")
+        bfd_type                      = try(nei.bfd_multihop, null) == null ? null : (try(nei.bfd_multihop) ? "multihop" : "singlehop")
+        bmp_server_1                  = try(nei.bmp_activate_server_1, null) == null ? null : (try(nei.bmp_activate_server_1) ? "enabled" : "disabled")
+        bmp_server_2                  = try(nei.bmp_activate_server_2, null) == null ? null : (try(nei.bmp_activate_server_2) ? "enabled" : "disabled")
+        capability_suppress_4_byte_as = try(nei.capability_suppress_4_byte_as, null) == null ? null : (try(nei.capability_suppress_4_byte_as) ? "enabled" : "disabled")
+        connection_mode               = try(nei.connection_mode, null)
+        log_neighbor_changes          = try(nei.log_neighbor_changes, null) == null ? "none" : (try(nei.log_neighbor_changes) ? "enable" : "disable")
+        low_memory_exempt             = try(nei.low_memory_exempt, null) == null ? null : (try(nei.low_memory_exempt) ? "enabled" : "disabled")
+        max_peer_count                = try(nei.maximum_peers, null)
+        private_as_control            = try(local.remove_private_as_map[nei.remove_private_as], null)
+        session_template              = try(nei.inherit_peer_session, null)
+        ttl_security_hops             = try(nei.ttl_security_hops, null)
 
         local_asn_propagation = try(nei.local_as_propagation, null)
         local_asn             = try(nei.local_as, null)
@@ -583,8 +596,8 @@ resource "nxos_bgp" "bgp" {
           link_bandwidth_cumulative     = try(af.link_bandwidth_cumulative, null) == null ? null : (try(af.link_bandwidth_cumulative) ? "enabled" : "disabled")
           nexthop_thirdparty            = try(af.next_hop_third_party, null) == null ? null : (try(af.next_hop_third_party) ? "enabled" : "disabled")
           rewrite_rt_asn                = try(af.rewrite_evpn_rt_asn, null) == null ? null : (try(af.rewrite_evpn_rt_asn) ? "enabled" : "disabled")
-          soft_reconfiguration_backup   = try(af.soft_reconfiguration_inbound, null)
-          site_of_origin                = try(af.site_of_origin, null)
+          soft_reconfiguration_backup   = try(local.soft_reconfiguration_inbound_map[af.soft_reconfiguration_inbound], null)
+          site_of_origin                = try(af.soo, null)
           unsuppress_map                = try(af.unsuppress_map, null)
           weight                        = try(af.weight, null)
 
@@ -604,18 +617,18 @@ resource "nxos_bgp" "bgp" {
       } if try(nei.interface_type, null) == null } : null
 
       interface_peers = length(try(local.bgp_interface_peers_non_default_vrf_map[each.key][vrf.vrf], [])) > 0 ? { for nei in try(vrf.neighbors, []) : "${local.intf_prefix_map[try(nei.interface_type)]}${try(nei.interface_id, "")}" => {
-        remote_asn                     = try(nei.remote_as, null)
-        description                    = try(nei.description, null)
-        peer_template                  = try(nei.inherit_peer, null)
-        peer_type                      = try(nei.peer_type, null)
-        admin_state                    = try(nei.shutdown, null) == null ? null : (try(nei.shutdown) ? "disabled" : "enabled")
-        affinity_group                 = try(nei.affinity_group, null)
-        asn_type                       = try(nei.remote_as_type, null)
-        bfd_type                       = try(nei.bfd_type, null)
-        bmp_server_1                   = try(nei.bmp_activate_server_1, null) == null ? null : (try(nei.bmp_activate_server_1) ? "enabled" : "disabled")
-        bmp_server_2                   = try(nei.bmp_activate_server_2, null) == null ? null : (try(nei.bmp_activate_server_2) ? "enabled" : "disabled")
-        capability_suppress_4_byte_asn = try(nei.capability_suppress_4_byte_asn, null) == null ? null : (try(nei.capability_suppress_4_byte_asn) ? "enabled" : "disabled")
-        connection_mode                = try(nei.connection_mode, null)
+        remote_asn                    = try(nei.remote_as, null)
+        description                   = try(nei.description, null)
+        peer_template                 = try(nei.inherit_peer, null)
+        peer_type                     = try(nei.peer_type, null)
+        admin_state                   = try(nei.shutdown, null) == null ? null : (try(nei.shutdown) ? "disabled" : "enabled")
+        affinity_group                = try(nei.affinity_group, null)
+        asn_type                      = try(nei.remote_as, null) == null ? "none" : (tostring(try(nei.remote_as)) == tostring(local.device_config[each.key].routing.bgp.asn) ? "internal" : "external")
+        bfd_type                      = try(nei.bfd_multihop, null) == null ? null : (try(nei.bfd_multihop) ? "multihop" : "singlehop")
+        bmp_server_1                  = try(nei.bmp_activate_server_1, null) == null ? null : (try(nei.bmp_activate_server_1) ? "enabled" : "disabled")
+        bmp_server_2                  = try(nei.bmp_activate_server_2, null) == null ? null : (try(nei.bmp_activate_server_2) ? "enabled" : "disabled")
+        capability_suppress_4_byte_as = try(nei.capability_suppress_4_byte_as, null) == null ? null : (try(nei.capability_suppress_4_byte_as) ? "enabled" : "disabled")
+        connection_mode               = try(nei.connection_mode, null)
         peer_control = length(compact([
           try(nei.bfd, false) ? "bfd" : "",
           try(nei.dont_capability_negotiate, false) ? "cap-neg-off" : "",
@@ -638,7 +651,7 @@ resource "nxos_bgp" "bgp" {
         max_peer_count                   = try(nei.maximum_peers, null)
         password_type                    = try(nei.password_type, null)
         password                         = try(nei.password, null)
-        private_as_control               = try(nei.remove_private_as, null)
+        private_as_control               = try(local.remove_private_as_map[nei.remove_private_as], null)
         session_template                 = try(nei.inherit_peer_session, null)
         ebgp_multihop_ttl                = try(nei.ebgp_multihop_ttl, null)
         ttl_security_hops                = try(nei.ttl_security_hops, null)
