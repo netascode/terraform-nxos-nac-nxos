@@ -1,0 +1,7 @@
+- BREAKING CHANGE: Rename `snmp.users.authentication_type`, `snmp.users.authentication_password` to `auth_type`, `auth_password`
+- BREAKING CHANGE: Rename `snmp.users.privacy_type`, `snmp.users.privacy_password` to `priv_type`, `priv_password`
+- BREAKING CHANGE: Rename `snmp.users.enforce_privacy` to `enforce_priv`
+- BREAKING CHANGE: Rename `snmp.users.ipv4_acl`, `snmp.users.ipv6_acl` to `use_ipv4acl`, `use_ipv6acl`
+- BREAKING CHANGE: Rename `snmp.users.priv_type` enum values `aes128`, `aes256` to `aes-128`, `aes-256`
+- BREAKING CHANGE: Rename `snmp.traps.license_notify_license_file_missing` to `license_notify_licensefile_missing`
+- BREAKING CHANGE: Rename `snmp.traps.link_err_disable_interface_event_rev1` to `link_cerr_disable_interface_event_rev1`
