@@ -1,4 +1,9 @@
 locals {
+  spanning_tree_mode_map = {
+    "rapid-pvst" = "pvrst"
+    "mst"        = "mst"
+  }
+
   spanning_tree_interfaces_map = { for device in local.devices : device.name =>
     merge(
       { for int in try(local.device_config[device.name].interfaces.ethernets, []) : "eth${int.id}" => {
@@ -46,10 +51,10 @@ resource "nxos_spanning_tree" "spanning_tree" {
       "normal",
   ]))) : null
   fcoe                     = try(local.device_config[each.key].spanning_tree.fcoe, null) != null ? (try(local.device_config[each.key].spanning_tree.fcoe) ? "enabled" : "disabled") : null
-  l2_gateway_stp_domain_id = try(local.device_config[each.key].spanning_tree.l2_gateway_stp_domain_id, null)
-  linecard_issu            = try(local.device_config[each.key].spanning_tree.linecard_issu, null)
+  l2_gateway_stp_domain_id = try(local.device_config[each.key].spanning_tree.l2gateway_stp_domain_id, null)
+  linecard_issu            = try(local.device_config[each.key].spanning_tree.lc_issu, null)
   loopguard                = try(local.device_config[each.key].spanning_tree.loopguard, null) != null ? (try(local.device_config[each.key].spanning_tree.loopguard) ? "enabled" : "disabled") : null
-  mode                     = try(local.device_config[each.key].spanning_tree.mode, null)
+  mode                     = try(local.spanning_tree_mode_map[try(local.device_config[each.key].spanning_tree.mode)], null)
   pathcost_option          = try(local.device_config[each.key].spanning_tree.pathcost_method, null)
   interfaces               = length(local.spanning_tree_interfaces_map[each.key]) > 0 ? local.spanning_tree_interfaces_map[each.key] : null
   vlans = length(try(local.device_config[each.key].spanning_tree.vlans, [])) > 0 ? merge([for group in try(local.device_config[each.key].spanning_tree.vlans, []) : {
