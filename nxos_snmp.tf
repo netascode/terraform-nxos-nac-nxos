@@ -8,6 +8,7 @@ resource "nxos_snmp" "snmp" {
   logging_level                                         = try(local.device_config[each.key].snmp.logging_level, null)
   packet_size                                           = try(local.device_config[each.key].snmp.packetsize, null)
   enforce_privacy                                       = try(local.device_config[each.key].snmp.global_enforce_priv, null) == null ? null : (try(local.device_config[each.key].snmp.global_enforce_priv) ? "yes" : "no")
+  disable_aaa_sync                                      = try(local.device_config[each.key].snmp.disable_aaa_sync, null) == null ? null : (try(local.device_config[each.key].snmp.disable_aaa_sync) ? "yes" : "no")
   tcp_session_authentication                            = try(local.device_config[each.key].snmp.tcp_session_auth, null) == null ? null : (try(local.device_config[each.key].snmp.tcp_session_auth) ? "tcpSessAuth" : "no")
   source_interface_traps                                = try(local.device_config[each.key].snmp.source_interface_type, null) != null ? "${local.intf_prefix_map[try(local.device_config[each.key].snmp.source_interface_type)]}${try(local.device_config[each.key].snmp.source_interface_id, "")}" : null
   enable_all                                            = try(local.device_config[each.key].snmp.enable_traps, null) == null ? null : (try(local.device_config[each.key].snmp.enable_traps) ? "yes" : "no")
