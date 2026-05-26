@@ -22,7 +22,7 @@ resource "nxos_logging" "logging" {
     admin_state                = "enabled"
     severity                   = try(server.severity, null)
     port                       = try(server.port, null)
-    vrf_name                   = try(server.vrf, null)
+    vrf_name                   = try(server.use_vrf, null)
     forwarding_facility        = try(server.facility, null)
     transport                  = try(server.transport, null)
     trustpoint_client_identity = try(server.trustpoint_client_identity, null)
