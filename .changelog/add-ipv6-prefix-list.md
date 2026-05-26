@@ -1,2 +1,2 @@
 - Add IPv6 prefix list support
-- Add route map `match_ipv6_prefix_list` support
+- Add route map `match_ipv6_address_prefix_list` support
