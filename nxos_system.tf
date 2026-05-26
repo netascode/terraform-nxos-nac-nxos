@@ -303,13 +303,13 @@ resource "nxos_system" "system" {
   # ndEntity / ndInst attributes
   nd_admin_state                         = "enabled"
   nd_instance_admin_state                = "enabled"
-  nd_accept_solicit_neighbor_entry       = try(local.device_config[each.key].nd.accept_solicit_neighbor_entry, null)
+  nd_accept_solicit_neighbor_entry       = try(local.device_config[each.key].nd.solicit_na, null)
   nd_aging_interval                      = try(local.device_config[each.key].nd.aging_interval, null)
   nd_cache_limit                         = try(local.device_config[each.key].nd.cache_limit, null)
   nd_cache_syslog_rate                   = try(local.device_config[each.key].nd.cache_syslog_rate, null)
   nd_ipv6_adjacency_route_distance       = try(local.device_config[each.key].nd.adjacency_route_distance, null)
   nd_off_list_timeout                    = try(local.device_config[each.key].nd.off_list_timeout, null)
-  nd_probe_interval_for_solicit_neighbor = try(local.device_config[each.key].nd.probe_interval_for_solicit_neighbor, null)
+  nd_probe_interval_for_solicit_neighbor = try(local.device_config[each.key].nd.solicit_na_interval, null)
   nd_solicit_neighbor_advertisement      = try(local.device_config[each.key].nd.solicit_neighbor_advertisement, null) != null ? (try(local.device_config[each.key].nd.solicit_neighbor_advertisement) ? "enabled" : "disabled") : null
 
   # ndVpcDom nested map
@@ -477,7 +477,7 @@ resource "nxos_system" "system" {
   lldp_optional_tlv_select         = try(local.device_config[each.key].lldp.tlv_select, null)
   lldp_port_id_sub_type            = try(local.device_config[each.key].lldp.portid_subtype, null)
   lldp_advertise_system_chassis_id = try(local.device_config[each.key].lldp.chassis_id, null) == null ? null : (try(local.device_config[each.key].lldp.chassis_id) ? "enabled" : "disabled")
-  lldp_port_channel                = try(local.device_config[each.key].lldp.portchannel, null) == null ? null : (try(local.device_config[each.key].lldp.portchannel) ? "enabled" : "disabled")
+  lldp_port_channel                = try(local.device_config[each.key].lldp.port_channel, null) == null ? null : (try(local.device_config[each.key].lldp.port_channel) ? "enabled" : "disabled")
 
   # lldpIf nested map
   lldp_interfaces = length(try(local.lldp_interfaces_by_device[each.key], [])) > 0 ? { for entry in try(local.lldp_interfaces_by_device[each.key], []) : entry.interface_id => {
