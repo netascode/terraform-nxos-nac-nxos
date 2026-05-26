@@ -1,0 +1,4 @@
+- BREAKING CHANGE: Remove `routing.pim.anycast_rp_local_interface_type`, `routing.pim.anycast_rp_local_interface_id`, `routing.pim.anycast_rp_source_interface_type`, `routing.pim.anycast_rp_source_interface_id` and corresponding VRF-level attributes
+- BREAKING CHANGE: Remove `routing.pim.jp_delay` and `routing.pim.vrfs.jp_delay`
+- BREAKING CHANGE: Remove `routing.pim.ssm.route_map` and `routing.pim.vrfs.ssm.route_map`
+- BREAKING CHANGE: Remove `routing.ip_routes.pervasive`

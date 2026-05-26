@@ -113,7 +113,6 @@ resource "nxos_pim" "pim" {
   instance_admin_state = "enabled"
   evpn_border_leaf     = try(local.device_config[each.key].routing.pim.evpn_border_leaf, null)
   extra_net            = try(local.device_config[each.key].routing.pim.extranet, null)
-  join_prune_delay     = try(local.device_config[each.key].routing.pim.jp_delay, null)
 
   vrfs = merge(
     # Synthetic "default" VRF from process-level attributes
@@ -122,7 +121,6 @@ resource "nxos_pim" "pim" {
         bfd                  = try(local.device_config[each.key].routing.pim.bfd, null)
         auto_enable          = try(local.device_config[each.key].routing.pim.auto_enable, null)
         flush_routes         = try(local.device_config[each.key].routing.pim.flush_routes, null)
-        join_prune_delay     = try(local.device_config[each.key].routing.pim.jp_delay, null)
         log_neighbor_changes = try(local.device_config[each.key].routing.pim.log_neighbor_changes, null)
         mtu                  = try(local.device_config[each.key].routing.pim.mtu, null)
         register_rate_limit  = try(local.device_config[each.key].routing.pim.register_rate_limit, null)
@@ -134,7 +132,6 @@ resource "nxos_pim" "pim" {
         ssm_range_group_list_3 = try(local.device_config[each.key].routing.pim.ssm.range_3, null)
         ssm_range_group_list_4 = try(local.device_config[each.key].routing.pim.ssm.range_4, null)
         ssm_range_prefix_list  = try(local.device_config[each.key].routing.pim.ssm.prefix_list, null)
-        ssm_range_route_map    = try(local.device_config[each.key].routing.pim.ssm.route_map, null)
         ssm_range_none         = try(local.device_config[each.key].routing.pim.ssm.none, null)
 
         static_rps = length(try(local.device_config[each.key].routing.pim.rps, [])) > 0 ? { for rp in try(local.device_config[each.key].routing.pim.rps, []) : rp.address => {
@@ -145,9 +142,6 @@ resource "nxos_pim" "pim" {
             }
           }
         } } : null
-
-        anycast_rp_local_interface  = try(local.device_config[each.key].routing.pim.anycast_rp_local_interface_type, null) != null ? "${local.intf_prefix_map[try(local.device_config[each.key].routing.pim.anycast_rp_local_interface_type)]}${try(local.device_config[each.key].routing.pim.anycast_rp_local_interface_id, "")}" : null
-        anycast_rp_source_interface = try(local.device_config[each.key].routing.pim.anycast_rp_source_interface_type, null) != null ? "${local.intf_prefix_map[try(local.device_config[each.key].routing.pim.anycast_rp_source_interface_type)]}${try(local.device_config[each.key].routing.pim.anycast_rp_source_interface_id, "")}" : null
 
         anycast_rp_peers = length(try(local.device_config[each.key].routing.pim.anycast_rps, [])) > 0 ? { for rp in try(local.device_config[each.key].routing.pim.anycast_rps, []) :
           "${rp.address}/32;${rp.set_address}/32" => {}
@@ -172,7 +166,6 @@ resource "nxos_pim" "pim" {
       bfd                  = try(vrf.bfd, null)
       auto_enable          = try(vrf.auto_enable, null)
       flush_routes         = try(vrf.flush_routes, null)
-      join_prune_delay     = try(vrf.jp_delay, null)
       log_neighbor_changes = try(vrf.log_neighbor_changes, null)
       mtu                  = try(vrf.mtu, null)
       register_rate_limit  = try(vrf.register_rate_limit, null)
@@ -184,7 +177,6 @@ resource "nxos_pim" "pim" {
       ssm_range_group_list_3 = try(vrf.ssm.range_3, null)
       ssm_range_group_list_4 = try(vrf.ssm.range_4, null)
       ssm_range_prefix_list  = try(vrf.ssm.prefix_list, null)
-      ssm_range_route_map    = try(vrf.ssm.route_map, null)
       ssm_range_none         = try(vrf.ssm.none, null)
 
       static_rps = length(try(vrf.rps, [])) > 0 ? { for rp in try(vrf.rps, []) : rp.address => {
@@ -195,9 +187,6 @@ resource "nxos_pim" "pim" {
           }
         }
       } } : null
-
-      anycast_rp_local_interface  = try(vrf.anycast_rp_local_interface_type, null) != null ? "${local.intf_prefix_map[try(vrf.anycast_rp_local_interface_type)]}${try(vrf.anycast_rp_local_interface_id, "")}" : null
-      anycast_rp_source_interface = try(vrf.anycast_rp_source_interface_type, null) != null ? "${local.intf_prefix_map[try(vrf.anycast_rp_source_interface_type)]}${try(vrf.anycast_rp_source_interface_id, "")}" : null
 
       anycast_rp_peers = length(try(vrf.anycast_rps, [])) > 0 ? { for rp in try(vrf.anycast_rps, []) :
         "${rp.address}/32;${rp.set_address}/32" => {}
@@ -222,7 +211,6 @@ resource "nxos_pim" "pim" {
         bfd                  = null
         auto_enable          = null
         flush_routes         = null
-        join_prune_delay     = null
         log_neighbor_changes = null
         mtu                  = null
         register_rate_limit  = null
@@ -234,13 +222,9 @@ resource "nxos_pim" "pim" {
         ssm_range_group_list_3 = null
         ssm_range_group_list_4 = null
         ssm_range_prefix_list  = null
-        ssm_range_route_map    = null
         ssm_range_none         = null
 
         static_rps = null
-
-        anycast_rp_local_interface  = null
-        anycast_rp_source_interface = null
 
         anycast_rp_peers = null
 
