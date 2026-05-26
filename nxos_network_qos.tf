@@ -1,11 +1,11 @@
 resource "nxos_network_qos" "network_qos" {
   for_each = { for device in local.devices : device.name => device
-    if try(local.device_config[device.name].qos.system_service_policy_network_input, null) != null ||
+    if try(local.device_config[device.name].qos.system_service_policy_network, null) != null ||
     length(try(local.device_config[device.name].qos.network_class_maps, [])) > 0 ||
   length(try(local.device_config[device.name].qos.network_policy_maps, [])) > 0 }
   device                    = each.key
-  system_in_policy_map_name = try(local.device_config[each.key].qos.system_service_policy_network_input, null)
-  policy_map_statistics     = try(local.device_config[each.key].qos.system_service_policy_network_input_statistics, null)
+  system_in_policy_map_name = try(local.device_config[each.key].qos.system_service_policy_network, null)
+  policy_map_statistics     = try(local.device_config[each.key].qos.system_service_policy_network_statistics, null)
   class_maps = length(try(local.device_config[each.key].qos.network_class_maps, [])) > 0 ? { for cm in try(local.device_config[each.key].qos.network_class_maps, []) : cm.name => {
     match_type = try(cm.match_type, null)
     cos_values = length(try(cm.match_cos_values, [])) > 0 ? { for cos in try(cm.match_cos_values, []) : cos => {
@@ -24,13 +24,13 @@ resource "nxos_network_qos" "network_qos" {
       pause_pfc_cos_5        = try(contains(cls.pause_pfc_cos, 5), null)
       pause_pfc_cos_6        = try(contains(cls.pause_pfc_cos, 6), null)
       pause_pfc_cos_7        = try(contains(cls.pause_pfc_cos, 7), null)
-      pause_receive          = try(cls.pause_buffer_size_receive, null)
+      pause_receive          = try(cls.pause_receive, null)
       pause_buffer_size      = try(cls.pause_buffer_size, null)
-      pause_headroom         = try(cls.pause_buffer_size_headroom, null)
-      pause_dynamic          = try(cls.congestion_control_dynamic, null)
-      pause_threshold        = try(cls.congestion_control_threshold, null)
-      pause_resume_threshold = try(cls.congestion_control_resume_threshold, null)
-      pause_resume_offset    = try(cls.congestion_control_resume_offset, null)
+      pause_headroom         = try(cls.pause_headroom, null)
+      pause_dynamic          = try(cls.pause_dynamic, null)
+      pause_threshold        = try(cls.pause_threshold, null)
+      pause_resume_threshold = try(cls.pause_resume_threshold, null)
+      pause_resume_offset    = try(cls.pause_resume_offset, null)
     } } : null
   } } : null
 }
