@@ -5,4 +5,3 @@
 - BREAKING CHANGE: Rename `snmp.users.priv_type` enum values `aes128`, `aes256` to `aes-128`, `aes-256`
 - BREAKING CHANGE: Rename `snmp.traps.license_notify_license_file_missing` to `license_notify_licensefile_missing`
 - BREAKING CHANGE: Rename `snmp.traps.link_err_disable_interface_event_rev1` to `link_cerr_disable_interface_event_rev1`
-- BREAKING CHANGE: Remove `snmp.disable_snmp_aaa_sync`
