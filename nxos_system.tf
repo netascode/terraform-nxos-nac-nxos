@@ -230,11 +230,11 @@ resource "nxos_system" "system" {
     try(local.device_config[device.name].system.copp_rate_limit, null) != null ||
     try(local.device_config[device.name].system.clock, null) != null ||
     try(local.device_config[device.name].system.icam_monitor_interval, null) != null ||
-    try(local.device_config[device.name].system.icam_monitor_intervals, null) != null ||
+    try(local.device_config[device.name].system.icam_monitor_history, null) != null ||
     try(local.device_config[device.name].system.icam_monitor_scale, null) != null ||
     try(local.device_config[device.name].system.smart_licensing_transport, null) != null ||
     try(local.device_config[device.name].system.smart_licensing_url_cslu, null) != null ||
-    try(local.device_config[device.name].system.terminal_console_exec_timeout, null) != null ||
+    try(local.device_config[device.name].system.line_console_exec_timeout, null) != null ||
     try(local.device_config[device.name].system.line_vty_exec_timeout, null) != null ||
     try(local.device_config[device.name].system.line_vty_session_limit, null) != null ||
     length(try(local.device_config[device.name].system.vdcs, [])) > 0 ||
@@ -406,17 +406,17 @@ resource "nxos_system" "system" {
   smart_licensing_transport_cslu_url = try(local.device_config[each.key].system.smart_licensing_url_cslu, null)
 
   # terminalTerminal attributes
-  console_exec_timeout = try(local.device_config[each.key].system.terminal_console_exec_timeout, null)
+  console_exec_timeout = try(local.device_config[each.key].system.line_console_exec_timeout, null)
   vty_exec_timeout     = try(local.device_config[each.key].system.line_vty_exec_timeout, null)
   vty_session_limit    = try(local.device_config[each.key].system.line_vty_session_limit, null)
 
   # icamEntity / icamInst / icamScale attributes
   icam_monitor_interval         = try(local.device_config[each.key].system.icam_monitor_interval, null)
-  icam_number_of_intervals      = try(local.device_config[each.key].system.icam_monitor_intervals, null)
+  icam_number_of_intervals      = try(local.device_config[each.key].system.icam_monitor_history, null)
   icam_scale_configuration      = try(local.device_config[each.key].system.icam_monitor_scale, null)
-  icam_scale_critical_threshold = try(local.device_config[each.key].system.icam_monitor_threshold_critical, null)
-  icam_scale_info_threshold     = try(local.device_config[each.key].system.icam_monitor_threshold_info, null)
-  icam_scale_warning_threshold  = try(local.device_config[each.key].system.icam_monitor_threshold_warning, null)
+  icam_scale_critical_threshold = try(local.device_config[each.key].system.icam_monitor_scale_threshold_critical, null)
+  icam_scale_info_threshold     = try(local.device_config[each.key].system.icam_monitor_scale_threshold_info, null)
+  icam_scale_warning_threshold  = try(local.device_config[each.key].system.icam_monitor_scale_threshold_warning, null)
 
   # nwVdc nested map
   vdcs = length(try(local.device_config[each.key].system.vdcs, [])) > 0 ? { for vdc in try(local.device_config[each.key].system.vdcs, []) : vdc.id => {
