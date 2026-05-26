@@ -1,0 +1,2 @@
+- BREAKING CHANGE: Rename `ip_access_lists.entries.source.address_group`, `ip_access_lists.entries.destination.address_group`, `ipv6_access_lists.entries.source.address_group`, `ipv6_access_lists.entries.destination.address_group` to `addrgroup`
+- BREAKING CHANGE: Rename `ip_access_lists.entries.source.port_group`, `ip_access_lists.entries.destination.port_group`, `ipv6_access_lists.entries.source.port_group`, `ipv6_access_lists.entries.destination.port_group` to `portgroup`
