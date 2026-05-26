@@ -113,7 +113,7 @@ resource "nxos_bgp" "bgp" {
           advertise_physical_ip_for_type5_routes              = try(af.advertise_pip, null) == null ? null : (try(af.advertise_pip) ? "enabled" : "disabled")
           max_ecmp_paths                                      = try(af.maximum_paths, null)
           max_external_ecmp_paths                             = try(af.maximum_paths_eibgp, null)
-          max_external_internal_ecmp_paths                    = try(af.maximum_paths_eibgp_ibgp, null)
+          max_external_internal_ecmp_paths                    = try(af.maximum_paths_ibgp, null)
           max_local_ecmp_paths                                = try(af.maximum_paths_local, null)
           max_mixed_ecmp_paths                                = try(af.maximum_paths_mixed, null)
           default_information_originate                       = try(af.default_information_originate, null) == null ? null : (try(af.default_information_originate) ? "enabled" : "disabled")
@@ -166,10 +166,8 @@ resource "nxos_bgp" "bgp" {
           additional_paths_route_map = try(af.additional_paths_selection_route_map, null)
 
           redistributions = length(try(af.redistributions, [])) > 0 ? { for redist in try(af.redistributions, []) : "${redist.protocol};${try(redist.protocol_instance, "none")}" => {
-            route_map        = try(redist.route_map, null)
-            scope            = try(redist.scope, null)
-            srv6_prefix_type = try(redist.srv6_prefix_type, null)
-            asn              = try(redist.asn, null)
+            route_map = try(redist.route_map, null)
+            asn       = try(redist.asn, null)
           } } : null
 
           aggregate_addresses = length(try(af.aggregate_addresses, [])) > 0 ? { for agg in try(af.aggregate_addresses, []) : agg.prefix => {
@@ -447,7 +445,7 @@ resource "nxos_bgp" "bgp" {
         advertise_physical_ip_for_type5_routes              = try(af.advertise_pip, null) == null ? null : (try(af.advertise_pip) ? "enabled" : "disabled")
         max_ecmp_paths                                      = try(af.maximum_paths, null)
         max_external_ecmp_paths                             = try(af.maximum_paths_eibgp, null)
-        max_external_internal_ecmp_paths                    = try(af.maximum_paths_eibgp_ibgp, null)
+        max_external_internal_ecmp_paths                    = try(af.maximum_paths_ibgp, null)
         max_local_ecmp_paths                                = try(af.maximum_paths_local, null)
         max_mixed_ecmp_paths                                = try(af.maximum_paths_mixed, null)
         default_information_originate                       = try(af.default_information_originate, null) == null ? null : (try(af.default_information_originate) ? "enabled" : "disabled")
@@ -500,10 +498,8 @@ resource "nxos_bgp" "bgp" {
         additional_paths_route_map = try(af.additional_paths_selection_route_map, null)
 
         redistributions = length(try(af.redistributions, [])) > 0 ? { for redist in try(af.redistributions, []) : "${redist.protocol};${try(redist.protocol_instance, "none")}" => {
-          route_map        = try(redist.route_map, null)
-          scope            = try(redist.scope, null)
-          srv6_prefix_type = try(redist.srv6_prefix_type, null)
-          asn              = try(redist.asn, null)
+          route_map = try(redist.route_map, null)
+          asn       = try(redist.asn, null)
         } } : null
 
         aggregate_addresses = length(try(af.aggregate_addresses, [])) > 0 ? { for agg in try(af.aggregate_addresses, []) : agg.prefix => {
