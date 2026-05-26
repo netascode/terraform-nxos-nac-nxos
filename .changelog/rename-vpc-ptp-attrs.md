@@ -1,0 +1,6 @@
+- BREAKING CHANGE: Rename `vpc.peer_link_channel_group` to `peer_link_port_channel`
+- BREAKING CHANGE: Rename `ptp.peer_delay_request_interval` to `pdelay_req_interval`
+- BREAKING CHANGE: Rename `ptp.notification_grandmaster_change` to `notification_gm_change`
+- BREAKING CHANGE: Rename `ptp.notification_high_correction_periodic` to `notification_high_correction_periodic_notification`
+- BREAKING CHANGE: Rename `ptp.notification_port_state_change_periodic` to `notification_port_state_change_periodic_notification`
+- BREAKING CHANGE: Rename `ptp.multi_domain_transition_priority1`, `ptp.multi_domain_transition_priority2` to `multi_domain_transition_attributes_priority1`, `multi_domain_transition_attributes_priority2`

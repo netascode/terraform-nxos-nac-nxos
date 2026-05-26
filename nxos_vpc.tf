@@ -58,7 +58,7 @@ resource "nxos_vpc" "vpc" {
   keepalive_type_of_service_value              = local.vpc_keepalive[each.key].tos_is_number ? tonumber(local.vpc_keepalive[each.key].tos_value) : null
   keepalive_udp_port                           = try(local.device_config[each.key].vpc.keepalive.udp_port, null)
   keepalive_vrf                                = try(local.device_config[each.key].vpc.keepalive.vrf, null)
-  peerlink_interface_id                        = try(local.device_config[each.key].vpc.peer_link_channel_group, null) != null ? "po${try(local.device_config[each.key].vpc.peer_link_channel_group)}" : null
+  peerlink_interface_id                        = try(local.device_config[each.key].vpc.peer_link_port_channel, null) != null ? "po${try(local.device_config[each.key].vpc.peer_link_port_channel)}" : null
   interfaces                                   = length(local.vpc_interfaces_map[each.key]) > 0 ? local.vpc_interfaces_map[each.key] : null
 
   depends_on = [

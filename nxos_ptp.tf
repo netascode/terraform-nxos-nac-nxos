@@ -83,12 +83,12 @@ resource "nxos_ptp" "ptp" {
   management                           = try(local.device_config[each.key].ptp.management, null) == null ? null : (try(local.device_config[each.key].ptp.management) ? "enabled" : "disabled")
   mean_path_delay                      = try(local.device_config[each.key].ptp.mean_path_delay, null)
   multi_domain                         = try(local.device_config[each.key].ptp.multi_domain, null) == null ? null : (try(local.device_config[each.key].ptp.multi_domain) ? "enabled" : "disabled")
-  multi_domain_transition_priority1    = try(local.device_config[each.key].ptp.multi_domain_transition_priority1, null)
-  multi_domain_transition_priority2    = try(local.device_config[each.key].ptp.multi_domain_transition_priority2, null)
-  notify_grandmaster_change            = try(local.device_config[each.key].ptp.notification_grandmaster_change, null) == null ? null : (try(local.device_config[each.key].ptp.notification_grandmaster_change) ? "enabled" : "disabled")
+  multi_domain_transition_priority1    = try(local.device_config[each.key].ptp.multi_domain_transition_attributes_priority1, null)
+  multi_domain_transition_priority2    = try(local.device_config[each.key].ptp.multi_domain_transition_attributes_priority2, null)
+  notify_grandmaster_change            = try(local.device_config[each.key].ptp.notification_gm_change, null) == null ? null : (try(local.device_config[each.key].ptp.notification_gm_change) ? "enabled" : "disabled")
   notify_parent_change                 = try(local.device_config[each.key].ptp.notification_parent_change, null) == null ? null : (try(local.device_config[each.key].ptp.notification_parent_change) ? "enabled" : "disabled")
   offload                              = try(local.device_config[each.key].ptp.offload, null) == null ? null : (try(local.device_config[each.key].ptp.offload) ? "enabled" : "disabled")
-  peer_delay_request_interval          = try(local.device_config[each.key].ptp.peer_delay_request_interval, null)
+  peer_delay_request_interval          = try(local.device_config[each.key].ptp.pdelay_req_interval, null)
   priority1                            = try(local.device_config[each.key].ptp.priority1, null)
   priority2                            = try(local.device_config[each.key].ptp.priority2, null)
   scale_1g                             = try(local.device_config[each.key].ptp.scale_on_1g, null)
@@ -110,12 +110,12 @@ resource "nxos_ptp" "ptp" {
 
   notify_high_correction_interval = try(local.device_config[each.key].ptp.notification_high_correction_interval, null)
   notify_high_correction          = try(local.device_config[each.key].ptp.notification_high_correction, null) == null ? null : (try(local.device_config[each.key].ptp.notification_high_correction) ? "enabled" : "disabled")
-  notify_high_correction_periodic = try(local.device_config[each.key].ptp.notification_high_correction_periodic, null) == null ? null : (try(local.device_config[each.key].ptp.notification_high_correction_periodic) ? "enabled" : "disabled")
+  notify_high_correction_periodic = try(local.device_config[each.key].ptp.notification_high_correction_periodic_notification, null) == null ? null : (try(local.device_config[each.key].ptp.notification_high_correction_periodic_notification) ? "enabled" : "disabled")
 
   notify_port_state_change_category = try(local.device_config[each.key].ptp.notification_port_state_change_category, null)
   notify_port_state_change_interval = try(local.device_config[each.key].ptp.notification_port_state_change_interval, null)
   notify_port_state_change          = try(local.device_config[each.key].ptp.notification_port_state_change, null) == null ? null : (try(local.device_config[each.key].ptp.notification_port_state_change) ? "enabled" : "disabled")
-  notify_port_state_change_periodic = try(local.device_config[each.key].ptp.notification_port_state_change_periodic, null) == null ? null : (try(local.device_config[each.key].ptp.notification_port_state_change_periodic) ? "enabled" : "disabled")
+  notify_port_state_change_periodic = try(local.device_config[each.key].ptp.notification_port_state_change_periodic_notification, null) == null ? null : (try(local.device_config[each.key].ptp.notification_port_state_change_periodic_notification) ? "enabled" : "disabled")
 
   interfaces = length(local.ptp_interfaces_map[each.key]) > 0 ? local.ptp_interfaces_map[each.key] : null
 
