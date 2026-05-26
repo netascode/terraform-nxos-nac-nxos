@@ -132,6 +132,7 @@ resource "nxos_pim" "pim" {
         ssm_range_group_list_3 = try(local.device_config[each.key].routing.pim.ssm.range_3, null)
         ssm_range_group_list_4 = try(local.device_config[each.key].routing.pim.ssm.range_4, null)
         ssm_range_prefix_list  = try(local.device_config[each.key].routing.pim.ssm.prefix_list, null)
+        ssm_range_route_map    = try(local.device_config[each.key].routing.pim.ssm.route_map, null)
         ssm_range_none         = try(local.device_config[each.key].routing.pim.ssm.none, null)
 
         static_rps = length(try(local.device_config[each.key].routing.pim.rps, [])) > 0 ? { for rp in try(local.device_config[each.key].routing.pim.rps, []) : rp.address => {
@@ -177,6 +178,7 @@ resource "nxos_pim" "pim" {
       ssm_range_group_list_3 = try(vrf.ssm.range_3, null)
       ssm_range_group_list_4 = try(vrf.ssm.range_4, null)
       ssm_range_prefix_list  = try(vrf.ssm.prefix_list, null)
+      ssm_range_route_map    = try(vrf.ssm.route_map, null)
       ssm_range_none         = try(vrf.ssm.none, null)
 
       static_rps = length(try(vrf.rps, [])) > 0 ? { for rp in try(vrf.rps, []) : rp.address => {
@@ -222,6 +224,7 @@ resource "nxos_pim" "pim" {
         ssm_range_group_list_3 = null
         ssm_range_group_list_4 = null
         ssm_range_prefix_list  = null
+        ssm_range_route_map    = null
         ssm_range_none         = null
 
         static_rps = null
