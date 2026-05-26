@@ -1,0 +1,1 @@
+- BREAKING CHANGE: Remove `ip_prefix_lists.entries.criteria` and `ipv6_prefix_lists.entries.criteria`

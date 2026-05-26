@@ -18,7 +18,7 @@ resource "nxos_route_policy" "route_policy" {
 
     entries = length(try(pl.entries, [])) > 0 ? { for entry in try(pl.entries, []) : entry.seq => {
       action     = try(entry.action, null)
-      criteria   = try(entry.criteria, null)
+      criteria   = try(entry.ge, null) != null || try(entry.le, null) != null ? "inexact" : "exact"
       prefix     = try(entry.prefix, null)
       from_range = try(entry.ge, null)
       to_range   = try(entry.le, null)
@@ -31,7 +31,7 @@ resource "nxos_route_policy" "route_policy" {
 
     entries = length(try(pl.entries, [])) > 0 ? { for entry in try(pl.entries, []) : entry.seq => {
       action     = try(entry.action, null)
-      criteria   = try(entry.criteria, null)
+      criteria   = try(entry.ge, null) != null || try(entry.le, null) != null ? "inexact" : "exact"
       prefix     = try(entry.prefix, null)
       from_range = try(entry.ge, null)
       to_range   = try(entry.le, null)
