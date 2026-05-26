@@ -374,8 +374,8 @@ resource "nxos_system" "system" {
   boot_poap                  = try(local.device_config[each.key].system.boot.poap, null) == null ? null : (try(local.device_config[each.key].system.boot.poap) ? "enable" : "disable")
   boot_aci                   = try(local.device_config[each.key].system.boot.aci, null)
   boot_image_verification    = try(local.device_config[each.key].system.boot.image_verify, null) == null ? null : (try(local.device_config[each.key].system.boot.image_verify) ? "enable" : "disable")
-  boot_image_supervisor_1    = try(local.device_config[each.key].system.boot.nxos_image_sup_1, null)
-  boot_image_supervisor_2    = try(local.device_config[each.key].system.boot.nxos_image_sup_2, null)
+  boot_image_supervisor_1    = try(local.device_config[each.key].system.boot.nxos_sup_1, null)
+  boot_image_supervisor_2    = try(local.device_config[each.key].system.boot.nxos_sup_2, null)
 
   # imBreakout / imMod / imFpP nested maps
   breakout_modules = length(try(local.device_config[each.key].system.interface_breakout_modules, [])) > 0 ? { for mod in try(local.device_config[each.key].system.interface_breakout_modules, []) : mod.id => {
@@ -421,20 +421,12 @@ resource "nxos_system" "system" {
   # nwVdc nested map
   vdcs = length(try(local.device_config[each.key].system.vdcs, [])) > 0 ? { for vdc in try(local.device_config[each.key].system.vdcs, []) : vdc.id => {
     resource_limits = {
-      multicast_ipv4_route_memory_maximum = try(vdc.resource_limits.multicast_ipv4_route_memory_maximum, null)
-      multicast_ipv4_route_memory_minimum = try(vdc.resource_limits.multicast_ipv4_route_memory_minimum, null)
-      multicast_ipv6_route_memory_maximum = try(vdc.resource_limits.multicast_ipv6_route_memory_maximum, null)
-      multicast_ipv6_route_memory_minimum = try(vdc.resource_limits.multicast_ipv6_route_memory_minimum, null)
-      port_channel_maximum                = try(vdc.resource_limits.port_channel_maximum, null)
-      port_channel_minimum                = try(vdc.resource_limits.port_channel_minimum, null)
-      unicast_ipv4_route_memory_maximum   = try(vdc.resource_limits.unicast_ipv4_route_memory_maximum, null)
-      unicast_ipv4_route_memory_minimum   = try(vdc.resource_limits.unicast_ipv4_route_memory_minimum, null)
-      unicast_ipv6_route_memory_maximum   = try(vdc.resource_limits.unicast_ipv6_route_memory_maximum, null)
-      unicast_ipv6_route_memory_minimum   = try(vdc.resource_limits.unicast_ipv6_route_memory_minimum, null)
-      vlan_maximum                        = try(vdc.resource_limits.vlan_maximum, null)
-      vlan_minimum                        = try(vdc.resource_limits.vlan_minimum, null)
-      vrf_maximum                         = try(vdc.resource_limits.vrf_maximum, null)
-      vrf_minimum                         = try(vdc.resource_limits.vrf_minimum, null)
+      port_channel_maximum = try(vdc.resource_limits.port_channel_maximum, null)
+      port_channel_minimum = try(vdc.resource_limits.port_channel_minimum, null)
+      vlan_maximum         = try(vdc.resource_limits.vlan_maximum, null)
+      vlan_minimum         = try(vdc.resource_limits.vlan_minimum, null)
+      vrf_maximum          = try(vdc.resource_limits.vrf_maximum, null)
+      vrf_minimum          = try(vdc.resource_limits.vrf_minimum, null)
     }
   } } : null
 

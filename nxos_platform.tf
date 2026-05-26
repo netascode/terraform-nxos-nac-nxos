@@ -6,10 +6,6 @@ locals {
     "rtag7-local-crc" = "PC_LB_ALGO_RTAG7_LOCAL_CRC"
     "dynamic-pin"     = "PC_LB_ALGO_DYNAMIC_PIN"
   }
-  platform_switching_mode_map = {
-    "store-forward" = "STORE_FORWARD"
-    "cut-through"   = "CUT_THROUGH"
-  }
   platform_routing_map = {
     "non-hierarchical-routing"                    = "NON_HIER_DEFAULT"
     "non-hierarchical-routing max-l3-mode"        = "NON_HIER_MAX_L3"
@@ -40,7 +36,10 @@ locals {
 
 resource "nxos_platform" "platform" {
   for_each = { for device in local.devices : device.name => device
-    if try(local.device_config[device.name].system.platform, null) != null ||
+    if try(local.device_config[device.name].system.hardware_profile, null) != null ||
+    try(local.device_config[device.name].system.port_channel, null) != null ||
+    try(local.device_config[device.name].system.switch_mode, null) != null ||
+    try(local.device_config[device.name].system.fabric_mode, null) != null ||
     try(local.device_config[device.name].system.hardware, null) != null ||
     try(local.device_config[device.name].system.hardware_access_list_tcam_region, null) != null ||
     try(local.device_config[device.name].system.nve_ipmc_index_size, null) != null ||
@@ -50,63 +49,61 @@ resource "nxos_platform" "platform" {
   device = each.key
 
   # platformEntity attributes
-  access_list_match_inner_header            = try(local.device_config[each.key].system.platform.access_list_match_inner_header, null) == null ? null : (try(local.device_config[each.key].system.platform.access_list_match_inner_header) ? "enable" : "disable")
-  acl_tap_aggregation                       = try(local.device_config[each.key].system.platform.acl_tap_aggregation, null) == null ? null : (try(local.device_config[each.key].system.platform.acl_tap_aggregation) ? "enable" : "disable")
-  disable_parse_error                       = try(local.device_config[each.key].system.platform.disable_parse_error, null) == null ? null : (try(local.device_config[each.key].system.platform.disable_parse_error) ? "enable" : "disable")
-  global_tx_span                            = try(local.device_config[each.key].system.platform.global_tx_span, null) == null ? null : (try(local.device_config[each.key].system.platform.global_tx_span) ? "enable" : "disable")
-  high_multicast_priority                   = try(local.device_config[each.key].system.platform.high_multicast_priority, null) == null ? null : (try(local.device_config[each.key].system.platform.high_multicast_priority) ? "enabled" : "disabled")
-  hardware_lou_resource_threshold           = try(local.device_config[each.key].system.platform.hardware_lou_resource_threshold, null)
-  ingress_bd_ifacl_label_optimization       = try(local.device_config[each.key].system.platform.ingress_bd_ifacl_label_optimization, null) == null ? null : (try(local.device_config[each.key].system.platform.ingress_bd_ifacl_label_optimization) ? "enable" : "disable")
-  ingress_racl_size                         = try(local.device_config[each.key].system.platform.ingress_racl_size, null) == null ? null : (try(local.device_config[each.key].system.platform.ingress_racl_size) ? "enable" : "disable")
-  ingress_replication_round_robin           = try(local.device_config[each.key].system.platform.ingress_replication_round_robin, null)
-  ip_statistics                             = try(local.device_config[each.key].system.platform.ip_statistics, null) == null ? null : (try(local.device_config[each.key].system.platform.ip_statistics) ? "enable" : "disable")
-  ipv6_alpm_carve_value                     = try(local.device_config[each.key].system.platform.ipv6_alpm_carve_value, null)
-  ipv6_lpm_max_entries                      = try(local.device_config[each.key].system.platform.ipv6_lpm_max_entries, null)
-  lpm_max_limit                             = try(local.device_config[each.key].system.platform.lpm_max_limit, null)
-  multicast_dcs_check                       = try(local.device_config[each.key].system.platform.multicast_dcs_check, null) == null ? null : (try(local.device_config[each.key].system.platform.multicast_dcs_check) ? "enable" : "disable")
-  multicast_flex_stats                      = try(local.device_config[each.key].system.platform.multicast_flex_stats, null) == null ? null : (try(local.device_config[each.key].system.platform.multicast_flex_stats) ? "enable" : "disable")
-  multicast_lpm_max_entries                 = try(local.device_config[each.key].system.platform.multicast_lpm_max_entries, null)
-  multicast_max_limit                       = try(local.device_config[each.key].system.platform.multicast_max_limit, null)
-  multicast_nlb                             = try(local.device_config[each.key].system.platform.multicast_nlb, null) == null ? null : (try(local.device_config[each.key].system.platform.multicast_nlb) ? "enable" : "disable")
-  multicast_racl_bridge                     = try(local.device_config[each.key].system.platform.multicast_racl_bridge, null) == null ? null : (try(local.device_config[each.key].system.platform.multicast_racl_bridge) ? "enabled" : "disabled")
-  multicast_rpf_check_optimization          = try(local.device_config[each.key].system.platform.multicast_rpf_check_optimization, null) == null ? null : (try(local.device_config[each.key].system.platform.multicast_rpf_check_optimization) ? "enabled" : "disabled")
-  multicast_service_reflect_port            = try(local.device_config[each.key].system.platform.multicast_service_reflect_port, null)
-  multicast_syslog_threshold                = try(local.device_config[each.key].system.platform.multicast_syslog_threshold, null)
-  mld_snooping                              = try(local.device_config[each.key].system.platform.mld_snooping, null) == null ? null : (try(local.device_config[each.key].system.platform.mld_snooping) ? "enable" : "disable")
-  mpls_adjacency_stats_mode                 = try(local.device_config[each.key].system.platform.mpls_adjacency_stats_mode, null)
-  mpls_ecmp_mode                            = try(local.device_config[each.key].system.platform.mpls_ecmp, null) == null ? null : (try(local.device_config[each.key].system.platform.mpls_ecmp) ? "enable" : "disable")
-  mrouting_disable_l2_update                = try(local.device_config[each.key].system.platform.mrouting_disable_l2_update, null) == null ? null : (try(local.device_config[each.key].system.platform.mrouting_disable_l2_update) ? "enable" : "disable")
-  mrouting_disable_second_route_update      = try(local.device_config[each.key].system.platform.mrouting_disable_second_route_update, null) == null ? null : (try(local.device_config[each.key].system.platform.mrouting_disable_second_route_update) ? "enable" : "disable")
-  mrouting_performance_mode                 = try(local.device_config[each.key].system.platform.mrouting_performance_mode, null) == null ? null : (try(local.device_config[each.key].system.platform.mrouting_performance_mode) ? "enable" : "disable")
-  openflow_forward_pdu                      = try(local.device_config[each.key].system.platform.openflow_forward_pdu, null) == null ? null : (try(local.device_config[each.key].system.platform.openflow_forward_pdu) ? "enabled" : "disabled")
-  pbr_skip_self_ip                          = try(local.device_config[each.key].system.platform.pbr_skip_self_ip, null) == null ? null : (try(local.device_config[each.key].system.platform.pbr_skip_self_ip) ? "enabled" : "disabled")
-  pic_core_enable                           = try(local.device_config[each.key].system.platform.pic_core, null) == null ? null : (try(local.device_config[each.key].system.platform.pic_core) ? "enabled" : "disabled")
-  port_channel_fast_convergence             = try(local.device_config[each.key].system.platform.port_channel_fast_convergence, null) == null ? null : (try(local.device_config[each.key].system.platform.port_channel_fast_convergence) ? "enable" : "disable")
-  port_channel_load_balance_algorithm       = try(local.platform_pc_lb_algo_map[try(local.device_config[each.key].system.platform.port_channel_load_balance)], null)
-  port_channel_load_balance_resilient       = try(local.device_config[each.key].system.platform.port_channel_load_balance_resilient, null) == null ? null : (try(local.device_config[each.key].system.platform.port_channel_load_balance_resilient) ? "yes" : "no")
-  port_channel_mpls_load_balance_label_ip   = try(local.device_config[each.key].system.platform.port_channel_mpls_load_balance_label_ip, null) == null ? null : (try(local.device_config[each.key].system.platform.port_channel_mpls_load_balance_label_ip) ? "LABEL_IP" : "DEFAULT")
-  port_channel_mpls_load_balance_label_only = try(local.device_config[each.key].system.platform.port_channel_mpls_load_balance_label_only, null) == null ? null : (try(local.device_config[each.key].system.platform.port_channel_mpls_load_balance_label_only) ? "LABEL_ONLY" : "DEFAULT")
-  port_channel_scale_fanout                 = try(local.device_config[each.key].system.platform.port_channel_scale_fanout, null) == null ? null : (try(local.device_config[each.key].system.platform.port_channel_scale_fanout) ? "enable" : "disable")
-  profile_front_port_mode                   = try(local.device_config[each.key].system.platform.profile_front_portmode, null)
-  profile_mode                              = try(local.device_config[each.key].system.platform.profile_mode, null)
-  profile_tuple                             = try(local.device_config[each.key].system.platform.profile_tuple, null) == null ? null : (try(local.device_config[each.key].system.platform.profile_tuple) ? "Enable" : "Disable")
-  pstat_configuration                       = try(local.device_config[each.key].system.platform.pstat, null) == null ? null : (try(local.device_config[each.key].system.platform.pstat) ? "PSTAT_ENABLE" : "PSTAT_DISABLE")
-  qos_min_buffer                            = try(local.device_config[each.key].system.platform.qos_min_buffer, null)
+  access_list_match_inner_header            = try(local.device_config[each.key].system.hardware_profile.access_list_match_inner_header, null) == null ? null : (try(local.device_config[each.key].system.hardware_profile.access_list_match_inner_header) ? "enable" : "disable")
+  acl_tap_aggregation                       = try(local.device_config[each.key].system.hardware_profile.acl_tap_aggregation, null) == null ? null : (try(local.device_config[each.key].system.hardware_profile.acl_tap_aggregation) ? "enable" : "disable")
+  disable_parse_error                       = try(local.device_config[each.key].system.hardware_profile.disable_parse_error, null) == null ? null : (try(local.device_config[each.key].system.hardware_profile.disable_parse_error) ? "enable" : "disable")
+  global_tx_span                            = try(local.device_config[each.key].system.hardware_profile.global_tx_span, null) == null ? null : (try(local.device_config[each.key].system.hardware_profile.global_tx_span) ? "enable" : "disable")
+  high_multicast_priority                   = try(local.device_config[each.key].system.hardware_profile.high_multicast_priority, null) == null ? null : (try(local.device_config[each.key].system.hardware_profile.high_multicast_priority) ? "enabled" : "disabled")
+  hardware_lou_resource_threshold           = try(local.device_config[each.key].system.hardware_profile.hardware_lou_resource_threshold, null)
+  ingress_bd_ifacl_label_optimization       = try(local.device_config[each.key].system.hardware_profile.ingress_bd_ifacl_label_optimization, null) == null ? null : (try(local.device_config[each.key].system.hardware_profile.ingress_bd_ifacl_label_optimization) ? "enable" : "disable")
+  ingress_racl_size                         = try(local.device_config[each.key].system.hardware_profile.ingress_racl_size, null) == null ? null : (try(local.device_config[each.key].system.hardware_profile.ingress_racl_size) ? "enable" : "disable")
+  ingress_replication_round_robin           = try(local.device_config[each.key].system.hardware_profile.ingress_replication_round_robin, null)
+  ip_statistics                             = try(local.device_config[each.key].system.hardware_profile.ip_statistics, null) == null ? null : (try(local.device_config[each.key].system.hardware_profile.ip_statistics) ? "enable" : "disable")
+  ipv6_alpm_carve_value                     = try(local.device_config[each.key].system.hardware_profile.ipv6_alpm_carve_value, null)
+  ipv6_lpm_max_entries                      = try(local.device_config[each.key].system.hardware_profile.ipv6_lpm_max_entries, null)
+  lpm_max_limit                             = try(local.device_config[each.key].system.hardware_profile.lpm_max_limit, null)
+  multicast_dcs_check                       = try(local.device_config[each.key].system.hardware_profile.multicast_dcs_check, null) == null ? null : (try(local.device_config[each.key].system.hardware_profile.multicast_dcs_check) ? "enable" : "disable")
+  multicast_flex_stats                      = try(local.device_config[each.key].system.hardware_profile.multicast_flex_stats, null) == null ? null : (try(local.device_config[each.key].system.hardware_profile.multicast_flex_stats) ? "enable" : "disable")
+  multicast_lpm_max_entries                 = try(local.device_config[each.key].system.hardware_profile.multicast_lpm_max_entries, null)
+  multicast_max_limit                       = try(local.device_config[each.key].system.hardware_profile.multicast_max_limit, null)
+  multicast_nlb                             = try(local.device_config[each.key].system.hardware_profile.multicast_nlb, null) == null ? null : (try(local.device_config[each.key].system.hardware_profile.multicast_nlb) ? "enable" : "disable")
+  multicast_racl_bridge                     = try(local.device_config[each.key].system.hardware_profile.multicast_racl_bridge, null) == null ? null : (try(local.device_config[each.key].system.hardware_profile.multicast_racl_bridge) ? "enabled" : "disabled")
+  multicast_rpf_check_optimization          = try(local.device_config[each.key].system.hardware_profile.multicast_rpf_check_optimization, null) == null ? null : (try(local.device_config[each.key].system.hardware_profile.multicast_rpf_check_optimization) ? "enabled" : "disabled")
+  multicast_service_reflect_port            = try(local.device_config[each.key].system.hardware_profile.multicast_service_reflect_port, null)
+  multicast_syslog_threshold                = try(local.device_config[each.key].system.hardware_profile.multicast_syslog_threshold, null)
+  mld_snooping                              = try(local.device_config[each.key].system.hardware_profile.mld_snooping, null) == null ? null : (try(local.device_config[each.key].system.hardware_profile.mld_snooping) ? "enable" : "disable")
+  mpls_adjacency_stats_mode                 = try(local.device_config[each.key].system.hardware_profile.mpls_adjacency_stats_mode, null)
+  mpls_ecmp_mode                            = try(local.device_config[each.key].system.hardware_profile.mpls_ecmp, null) == null ? null : (try(local.device_config[each.key].system.hardware_profile.mpls_ecmp) ? "enable" : "disable")
+  mrouting_disable_l2_update                = try(local.device_config[each.key].system.hardware_profile.mrouting_disable_l2_update, null) == null ? null : (try(local.device_config[each.key].system.hardware_profile.mrouting_disable_l2_update) ? "enable" : "disable")
+  mrouting_disable_second_route_update      = try(local.device_config[each.key].system.hardware_profile.mrouting_disable_second_route_update, null) == null ? null : (try(local.device_config[each.key].system.hardware_profile.mrouting_disable_second_route_update) ? "enable" : "disable")
+  mrouting_performance_mode                 = try(local.device_config[each.key].system.hardware_profile.mrouting_performance_mode, null) == null ? null : (try(local.device_config[each.key].system.hardware_profile.mrouting_performance_mode) ? "enable" : "disable")
+  openflow_forward_pdu                      = try(local.device_config[each.key].system.hardware_profile.flow_redirect_forward_pdu, null) == null ? null : (try(local.device_config[each.key].system.hardware_profile.flow_redirect_forward_pdu) ? "enabled" : "disabled")
+  pbr_skip_self_ip                          = try(local.device_config[each.key].system.hardware_profile.pbr_skip_self_ip, null) == null ? null : (try(local.device_config[each.key].system.hardware_profile.pbr_skip_self_ip) ? "enabled" : "disabled")
+  pic_core_enable                           = try(local.device_config[each.key].system.hardware_profile.pic_core, null) == null ? null : (try(local.device_config[each.key].system.hardware_profile.pic_core) ? "enabled" : "disabled")
+  port_channel_fast_convergence             = try(local.device_config[each.key].system.port_channel.fast_convergence, null) == null ? null : (try(local.device_config[each.key].system.port_channel.fast_convergence) ? "enable" : "disable")
+  port_channel_load_balance_algorithm       = try(local.platform_pc_lb_algo_map[try(local.device_config[each.key].system.port_channel.load_balance)], null)
+  port_channel_load_balance_resilient       = try(local.device_config[each.key].system.port_channel.load_balance2_resilient, null) == null ? null : (try(local.device_config[each.key].system.port_channel.load_balance2_resilient) ? "yes" : "no")
+  port_channel_mpls_load_balance_label_ip   = try(local.device_config[each.key].system.port_channel.load_balance_mpls_label_ip, null) == null ? null : (try(local.device_config[each.key].system.port_channel.load_balance_mpls_label_ip) ? "LABEL_IP" : "DEFAULT")
+  port_channel_mpls_load_balance_label_only = try(local.device_config[each.key].system.port_channel.load_balance_mpls_label_only, null) == null ? null : (try(local.device_config[each.key].system.port_channel.load_balance_mpls_label_only) ? "LABEL_ONLY" : "DEFAULT")
+  port_channel_scale_fanout                 = try(local.device_config[each.key].system.port_channel.scale_fanout, null) == null ? null : (try(local.device_config[each.key].system.port_channel.scale_fanout) ? "enable" : "disable")
+  profile_front_port_mode                   = try(local.device_config[each.key].system.hardware_profile.front_portmode, null)
+  profile_mode                              = try(local.device_config[each.key].system.hardware_profile.forwarding_mode, null)
+  profile_tuple                             = try(local.device_config[each.key].system.hardware_profile.portmode_tuple, null) == null ? null : (try(local.device_config[each.key].system.hardware_profile.portmode_tuple) ? "Enable" : "Disable")
+  pstat_configuration                       = try(local.device_config[each.key].system.hardware_profile.pstat, null) == null ? null : (try(local.device_config[each.key].system.hardware_profile.pstat) ? "PSTAT_ENABLE" : "PSTAT_DISABLE")
+  qos_min_buffer                            = try(local.device_config[each.key].system.hardware_profile.qos_min_buffer, null)
   routing_mode                              = try(local.platform_routing_map[try(local.device_config[each.key].system.routing)], null)
-  service_template_name                     = try(local.device_config[each.key].system.platform.service_template_name, null)
-  svi_and_si_flex_stats                     = try(local.device_config[each.key].system.platform.svi_and_si_flex_stats, null) == null ? null : (try(local.device_config[each.key].system.platform.svi_and_si_flex_stats) ? "enable" : "disable")
-  svi_flex_stats                            = try(local.device_config[each.key].system.platform.svi_flex_stats, null) == null ? null : (try(local.device_config[each.key].system.platform.svi_flex_stats) ? "enable" : "disable")
-  switch_mode                               = try(local.device_config[each.key].system.platform.switch_mode, null)
-  switching_fabric_speed                    = try(local.device_config[each.key].system.platform.switching_fabric_speed, null)
-  switching_mode                            = try(local.platform_switching_mode_map[try(local.device_config[each.key].system.platform.switching_mode)], null)
-  system_fabric_mode                        = try(local.device_config[each.key].system.platform.system_fabric_mode, null)
-  tcam_syslog_threshold                     = try(local.device_config[each.key].system.platform.tcam_syslog_threshold, null)
-  unicast_max_limit                         = try(local.device_config[each.key].system.platform.unicast_max_limit, null)
-  unicast_syslog_threshold                  = try(local.device_config[each.key].system.platform.unicast_syslog_threshold, null)
-  unicast_trace                             = try(local.device_config[each.key].system.platform.unicast_trace, null) == null ? null : (try(local.device_config[each.key].system.platform.unicast_trace) ? "enable" : "disable")
-  unknown_unicast_flood                     = try(local.device_config[each.key].system.platform.unknown_unicast_flood, null) == null ? null : (try(local.device_config[each.key].system.platform.unknown_unicast_flood) ? "enabled" : "disabled")
-  urpf_status                               = try(local.device_config[each.key].system.platform.urpf, null) == null ? null : (try(local.device_config[each.key].system.platform.urpf) ? "enabled" : "disabled")
-  wrr_unicast_bandwidth                     = try(local.device_config[each.key].system.platform.wrr_unicast_bandwidth, null)
+  service_template_name                     = try(local.device_config[each.key].system.hardware_profile.service_template_name, null)
+  svi_and_si_flex_stats                     = try(local.device_config[each.key].system.hardware_profile.svi_and_si_flex_stats_enable, null) == null ? null : (try(local.device_config[each.key].system.hardware_profile.svi_and_si_flex_stats_enable) ? "enable" : "disable")
+  svi_flex_stats                            = try(local.device_config[each.key].system.hardware_profile.svi_flex_stats, null) == null ? null : (try(local.device_config[each.key].system.hardware_profile.svi_flex_stats) ? "enable" : "disable")
+  switch_mode                               = try(local.device_config[each.key].system.switch_mode, null)
+  system_fabric_mode                        = try(local.device_config[each.key].system.fabric_mode, null)
+  tcam_syslog_threshold                     = try(local.device_config[each.key].system.hardware_profile.tcam_syslog_threshold, null)
+  unicast_max_limit                         = try(local.device_config[each.key].system.hardware_profile.unicast_max_limit, null)
+  unicast_syslog_threshold                  = try(local.device_config[each.key].system.hardware_profile.unicast_syslog_threshold, null)
+  unicast_trace                             = try(local.device_config[each.key].system.hardware_profile.unicast_trace, null) == null ? null : (try(local.device_config[each.key].system.hardware_profile.unicast_trace) ? "enable" : "disable")
+  unknown_unicast_flood                     = try(local.device_config[each.key].system.hardware_profile.unknown_unicast_flood, null) == null ? null : (try(local.device_config[each.key].system.hardware_profile.unknown_unicast_flood) ? "enabled" : "disabled")
+  urpf_status                               = try(local.device_config[each.key].system.hardware_profile.urpf, null) == null ? null : (try(local.device_config[each.key].system.hardware_profile.urpf) ? "enabled" : "disabled")
+  wrr_unicast_bandwidth                     = try(local.device_config[each.key].system.hardware_profile.wrr_unicast_bandwidth, null)
 
   # platformEntityExtended attributes
   extended_acl_disable_redirect_share          = try(local.device_config[each.key].system.hardware.acl_redirect_share_disable, null) == null ? null : (try(local.device_config[each.key].system.hardware.acl_redirect_share_disable) ? "enable" : "disable")
