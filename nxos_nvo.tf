@@ -23,7 +23,7 @@ resource "nxos_nvo" "nvo" {
   evpn_multisite_border_gateway_split_horizon_per_site = try(local.device_config[each.key].evpn.multisite_border_gateway.split_horizon_per_site, null) == null ? null : (try(local.device_config[each.key].evpn.multisite_border_gateway.split_horizon_per_site) ? "enable" : "disable")
 
   nve_interfaces = try(local.device_config[each.key].interfaces.nve, null) != null ? { for nve_id in ["1"] : nve_id => {
-    admin_state                        = try(local.device_config[each.key].interfaces.nve.shutdown, null) == null ? null : (try(local.device_config[each.key].interfaces.nve.shutdown) ? "disabled" : "enabled")
+    admin_state                        = try(local.device_config[each.key].interfaces.nve.shutdown, null) == null ? "enabled" : (try(local.device_config[each.key].interfaces.nve.shutdown) ? "disabled" : "enabled")
     advertise_virtual_mac              = try(local.device_config[each.key].interfaces.nve.advertise_virtual_rmac, null)
     anycast_source_interface           = try(local.device_config[each.key].interfaces.nve.anycast_source_interface_type, null) != null ? "${local.intf_prefix_map[try(local.device_config[each.key].interfaces.nve.anycast_source_interface_type)]}${try(local.device_config[each.key].interfaces.nve.anycast_source_interface_id, "")}" : null
     description                        = try(local.device_config[each.key].interfaces.nve.description, null)

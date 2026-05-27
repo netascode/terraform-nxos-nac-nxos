@@ -112,7 +112,7 @@ resource "nxos_port_channel_interface" "port_channel_interface" {
     maximum_links        = try(int.lacp_max_bundle, null)
     suspend_individual   = try(int.lacp_suspend_individual, null) != null ? (try(int.lacp_suspend_individual) ? "enable" : "disable") : null
     access_vlan          = !try(int.switchport.enabled, true) ? "unknown" : try(int.switchport.access_vlan, null) != null ? "vlan-${int.switchport.access_vlan}" : null
-    admin_state          = try(int.shutdown, null) != null ? (try(int.shutdown) ? "down" : "up") : (!try(int.switchport.enabled, true) ? "up" : null)
+    admin_state          = try(int.shutdown, null) != null ? (try(int.shutdown) ? "down" : "up") : "up"
     auto_negotiation     = try(int.negotiate_auto, null)
     bandwidth            = try(int.bandwidth, null)
     delay                = try(int.delay, null)

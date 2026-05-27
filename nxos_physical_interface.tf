@@ -129,7 +129,7 @@ resource "nxos_physical_interface" "physical_interface" {
   physical_interfaces = length(try(local.device_config[each.key].interfaces.ethernets, [])) > 0 ? { for int in try(local.device_config[each.key].interfaces.ethernets, []) : "eth${int.id}" => {
     fec_mode                           = try(int.fec, null)
     access_vlan                        = try(int.channel_group, null) != null ? null : (!try(int.switchport.enabled, true) ? "unknown" : try(int.switchport.access_vlan, null) != null ? "vlan-${int.switchport.access_vlan}" : null)
-    admin_state                        = try(int.shutdown, null) != null ? (try(int.shutdown) ? "down" : "up") : (!try(int.switchport.enabled, true) ? "up" : null)
+    admin_state                        = try(int.shutdown, null) != null ? (try(int.shutdown) ? "down" : "up") : "up"
     auto_negotiation                   = try(int.negotiate_auto, null)
     bandwidth                          = try(int.bandwidth, null)
     beacon                             = try(int.beacon, null) != null ? (try(int.beacon) ? "on" : "off") : null
