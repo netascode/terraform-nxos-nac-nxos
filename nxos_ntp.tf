@@ -9,7 +9,7 @@ resource "nxos_ntp" "ntp" {
   for_each = { for device in local.devices : device.name => device
   if try(local.device_config[device.name].ntp, null) != null }
   device                  = each.key
-  admin_state             = "enabled"
+  admin_state             = null
   allow_control           = try(local.device_config[each.key].ntp.allow_control, null) == null ? null : (try(local.device_config[each.key].ntp.allow_control) ? "enabled" : "disabled")
   allow_private           = try(local.device_config[each.key].ntp.allow_private, null) == null ? null : (try(local.device_config[each.key].ntp.allow_private) ? "enabled" : "disabled")
   authentication_state    = try(local.device_config[each.key].ntp.authenticate, null) == null ? null : (try(local.device_config[each.key].ntp.authenticate) ? "enabled" : "disabled")

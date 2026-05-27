@@ -56,8 +56,8 @@ resource "nxos_icmpv6" "icmpv6" {
     try(local.device_config[device.name].system.ipv6_redirect_syslog_interval, null) != null ||
   length([for int in local.icmpv6_interfaces : int if int.device == device.name]) > 0 }
   device               = each.key
-  admin_state          = "enabled"
-  instance_admin_state = "enabled"
+  admin_state          = null
+  instance_admin_state = null
   control              = ""
 
   adjacency_stale_timer      = try(local.device_config[each.key].system.ipv6_adjacency_stale_timer, null)

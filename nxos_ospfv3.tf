@@ -10,7 +10,7 @@ locals {
       network_type          = int.ospfv3_network_type
       passive               = int.ospfv3_passive_interface
       priority              = int.ospfv3_priority
-      admin_state           = "enabled"
+      admin_state           = null
       instance_name         = int.ospfv3_process
       instance_id           = int.ospfv3_instance_id
       mtu_ignore            = int.ospfv3_mtu_ignore
@@ -27,7 +27,7 @@ locals {
 resource "nxos_ospfv3" "ospfv3" {
   for_each    = { for device in local.devices : device.name => device if try(local.device_config[device.name].feature.ospfv3, false) }
   device      = each.key
-  admin_state = "enabled"
+  admin_state = null
 
   instances = length(try(local.device_config[each.key].routing.ospfv3_processes, [])) > 0 ? { for proc in try(local.device_config[each.key].routing.ospfv3_processes, []) : proc.name => {
     flush_routes = try(proc.flush_routes, null)

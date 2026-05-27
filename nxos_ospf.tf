@@ -37,10 +37,10 @@ locals {
 resource "nxos_ospf" "ospf" {
   for_each    = { for device in local.devices : device.name => device if try(local.device_config[device.name].feature.ospf, false) }
   device      = each.key
-  admin_state = "enabled"
+  admin_state = null
 
   instances = length(try(local.device_config[each.key].routing.ospf_processes, [])) > 0 ? { for proc in try(local.device_config[each.key].routing.ospf_processes, []) : proc.name => {
-    admin_state = "enabled"
+    admin_state = null
 
     vrfs = merge(
       # Synthetic "default" VRF from process-level attributes

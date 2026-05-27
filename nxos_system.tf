@@ -278,8 +278,8 @@ resource "nxos_system" "system" {
   ethernet_vlan_tag_native                      = try(local.device_config[each.key].system.ethernet.dot1q_tag_native, null)
 
   # arpEntity / arpInst attributes
-  arp_admin_state                         = "enabled"
-  arp_instance_admin_state                = "enabled"
+  arp_admin_state                         = null
+  arp_instance_admin_state                = null
   arp_allow_static_arp_outside_subnet     = try(local.device_config[each.key].arp.allow_static_arp_outside_subnet, null) != null ? (try(local.device_config[each.key].arp.allow_static_arp_outside_subnet) ? "enabled" : "disabled") : null
   arp_unnumbered_svi_software_replication = try(local.device_config[each.key].arp.unnum_svi_sw_replication, null) != null ? (try(local.device_config[each.key].arp.unnum_svi_sw_replication) ? "enabled" : "disabled") : null
   arp_cache_limit                         = try(local.device_config[each.key].arp.cache_limit, null)
@@ -301,8 +301,8 @@ resource "nxos_system" "system" {
   } } : null
 
   # ndEntity / ndInst attributes
-  nd_admin_state                         = "enabled"
-  nd_instance_admin_state                = "enabled"
+  nd_admin_state                         = null
+  nd_instance_admin_state                = null
   nd_accept_solicit_neighbor_entry       = try(local.device_config[each.key].nd.solicit_na, null)
   nd_aging_interval                      = try(local.device_config[each.key].nd.aging_interval, null)
   nd_cache_limit                         = try(local.device_config[each.key].nd.cache_limit, null)

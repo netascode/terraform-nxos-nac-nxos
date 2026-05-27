@@ -1,7 +1,7 @@
 locals {
   hsrp_interfaces_map = { for device in local.devices : device.name =>
     { for int in local.hsrp_interfaces : int.id => {
-      admin_state                        = "enabled"
+      admin_state                        = null
       bfd                                = try(int.hsrp.bfd, null) == null ? null : (try(int.hsrp.bfd) ? "enabled" : "disabled")
       bia_scope                          = try(int.hsrp.use_bia_scope, null)
       control                            = try(int.hsrp.use_bia, null) == null ? null : (try(int.hsrp.use_bia) ? "bia" : "")
@@ -82,8 +82,8 @@ resource "nxos_hsrp" "hsrp" {
     try(local.device_config[device.name].system.hsrp_timers_extended_hold, null) != null ||
   length([for int in local.hsrp_interfaces : int if int.device == device.name]) > 0 }
   device                               = each.key
-  admin_state                          = "enabled"
-  instance_admin_state                 = "enabled"
+  admin_state                          = null
+  instance_admin_state                 = null
   bfd                                  = try(local.device_config[each.key].system.hsrp_bfd, null) == null ? null : (try(local.device_config[each.key].system.hsrp_bfd) ? "enabled" : "disabled")
   extended_hold_interval               = try(local.device_config[each.key].system.hsrp_timers_extended_hold, null)
   extended_hold_interval_configuration = try(local.device_config[each.key].system.hsrp_timers_extended_hold, null) != null ? "enabled" : null

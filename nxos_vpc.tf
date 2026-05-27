@@ -19,8 +19,8 @@ resource "nxos_vpc" "vpc" {
   for_each = { for device in local.devices : device.name => device
   if try(local.device_config[device.name].vpc.domain_id, null) != null }
   device                                       = each.key
-  admin_state                                  = "enabled"
-  instance_admin_state                         = "enabled"
+  admin_state                                  = null
+  instance_admin_state                         = null
   domain_id                                    = try(local.device_config[each.key].vpc.domain_id, null)
   auto_recovery                                = try(local.device_config[each.key].vpc.auto_recovery, null) == null ? null : (try(local.device_config[each.key].vpc.auto_recovery) ? "enabled" : "disabled")
   auto_recovery_interval                       = try(local.device_config[each.key].vpc.auto_recovery_reload_delay, null)

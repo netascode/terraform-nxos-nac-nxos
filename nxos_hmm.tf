@@ -1,7 +1,7 @@
 locals {
   hmm_interfaces_map = { for device in local.devices : device.name =>
     { for int in try(local.device_config[device.name].interfaces.vlans, []) : "vlan${int.id}" => {
-      admin_state = "enabled"
+      admin_state = null
       mode        = try(local.hmm_mode_map[try(int.fabric_forwarding_mode)], null)
     } if try(int.fabric_forwarding_mode, null) != null }
   }
@@ -17,8 +17,8 @@ resource "nxos_hmm" "hmm" {
     if try(local.device_config[device.name].fabric_forwarding, null) != null ||
   length([for int in try(local.device_config[device.name].interfaces.vlans, []) : int if try(int.fabric_forwarding_mode, null) != null]) > 0 }
   device                  = each.key
-  admin_state             = "enabled"
-  instance_admin_state    = "enabled"
+  admin_state             = null
+  instance_admin_state    = null
   anycast_mac             = try(local.device_config[each.key].fabric_forwarding.anycast_gateway_mac, null)
   administrative_distance = try(local.device_config[each.key].fabric_forwarding.distance, null)
   limit_vlan_mac          = try(local.device_config[each.key].fabric_forwarding.limit_vlan_mac, null)

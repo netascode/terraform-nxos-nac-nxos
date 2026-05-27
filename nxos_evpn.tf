@@ -90,7 +90,7 @@ resource "nxos_evpn" "evpn" {
   for_each = { for device in local.devices : device.name => device
   if try(local.device_config[device.name].evpn, null) != null }
   device      = each.key
-  admin_state = "enabled"
+  admin_state = null
 
   vnis = length(try(local.evpn_vnis_per_device[each.key], [])) > 0 ? { for vni in try(local.evpn_vnis_per_device[each.key], []) : "vxlan-${vni.vni}" => {
     route_distinguisher = vni.rd_dme_format

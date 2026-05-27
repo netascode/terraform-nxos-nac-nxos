@@ -109,8 +109,8 @@ resource "nxos_pim" "pim" {
     if try(local.device_config[device.name].routing.pim, null) != null ||
   length([for int in local.pim_interfaces : int if int.device == device.name]) > 0 }
   device               = each.key
-  admin_state          = "enabled"
-  instance_admin_state = "enabled"
+  admin_state          = null
+  instance_admin_state = null
   evpn_border_leaf     = try(local.device_config[each.key].routing.pim.evpn_border_leaf, null)
   extra_net            = try(local.device_config[each.key].routing.pim.extranet, null)
 

@@ -76,7 +76,7 @@ resource "nxos_dhcp" "dhcp" {
     length([for int in try(local.device_config[device.name].interfaces.loopbacks, []) : int if try(int.ip.dhcp_relay_addresses, null) != null || try(int.ip.dhcp_relay_information_trusted, null) != null || try(int.ip.dhcp_relay_smart_relay, null) != null || try(int.ipv6.dhcp_smart_relay, null) != null || try(int.ipv6.dhcp_relay_addresses, null) != null]) > 0 ||
   length([for int in try(local.device_config[device.name].interfaces.port_channels, []) : int if try(int.ip.dhcp_relay_addresses, null) != null || try(int.ip.dhcp_relay_information_trusted, null) != null || try(int.ip.dhcp_relay_smart_relay, null) != null || try(int.ipv6.dhcp_smart_relay, null) != null || try(int.ipv6.dhcp_relay_addresses, null) != null]) > 0 }
   device                                      = each.key
-  admin_state                                 = "enabled"
+  admin_state                                 = null
   relay_information_option                    = try(local.device_config[each.key].dhcp.ip_dhcp_relay.information_option, null)
   relay_information_option_trust              = try(local.device_config[each.key].dhcp.ip_dhcp_relay.information_option_trust, null)
   relay_information_option_vpn                = try(local.device_config[each.key].dhcp.ip_dhcp_relay.information_option_vpn, null)

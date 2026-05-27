@@ -38,7 +38,7 @@ resource "nxos_spanning_tree" "spanning_tree" {
     length([for int in try(local.device_config[device.name].interfaces.ethernets, []) : int if try(int.spanning_tree, null) != null]) > 0 ||
   length([for int in try(local.device_config[device.name].interfaces.port_channels, []) : int if try(int.spanning_tree, null) != null]) > 0 }
   device               = each.key
-  instance_admin_state = "enabled"
+  instance_admin_state = null
   bridge_assurance     = try(local.device_config[each.key].spanning_tree.bridge_assurance, null) != null ? (try(local.device_config[each.key].spanning_tree.bridge_assurance) ? "enabled" : "disabled") : null
   control = length(compact([
     try(local.device_config[each.key].spanning_tree.port_type_edge_bpdufilter_default, false) ? "extchp-bpdu-filter" : "",

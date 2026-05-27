@@ -19,7 +19,7 @@ resource "nxos_logging" "logging" {
 
   # syslogRemoteDest
   remote_destinations = length(try(local.device_config[each.key].logging.servers, [])) > 0 ? { for server in try(local.device_config[each.key].logging.servers, []) : server.host => {
-    admin_state                = "enabled"
+    admin_state                = null
     severity                   = try(server.severity, null)
     port                       = try(server.port, null)
     vrf_name                   = try(server.use_vrf, null)

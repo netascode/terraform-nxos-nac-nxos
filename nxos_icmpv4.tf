@@ -79,8 +79,8 @@ resource "nxos_icmpv4" "icmpv4" {
   for_each = { for device in local.devices : device.name => device
   if length([for int in local.icmpv4_interfaces : int if int.device == device.name]) > 0 }
   device               = each.key
-  admin_state          = "enabled"
-  instance_admin_state = "enabled"
+  admin_state          = null
+  instance_admin_state = null
   control              = ""
   vrfs                 = length(local.icmpv4_vrfs_map[each.key]) > 0 ? local.icmpv4_vrfs_map[each.key] : null
 

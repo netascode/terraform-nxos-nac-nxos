@@ -61,7 +61,7 @@ resource "nxos_bgp" "bgp" {
   device      = each.key
   admin_state = try(local.device_config[each.key].routing.bgp.shutdown, null) == null ? null : (try(local.device_config[each.key].routing.bgp.shutdown) ? "disabled" : "enabled")
 
-  instance_admin_state                     = "enabled"
+  instance_admin_state                     = null
   asn                                      = try(local.device_config[each.key].routing.bgp.asn, null)
   disable_policy_batching                  = try(local.device_config[each.key].routing.bgp.disable_policy_batching, null) == null ? null : (try(local.device_config[each.key].routing.bgp.disable_policy_batching) ? "enabled" : "disabled")
   disable_policy_batching_nexthop          = try(local.device_config[each.key].routing.bgp.disable_policy_batching_nexthop, null) == null ? null : (try(local.device_config[each.key].routing.bgp.disable_policy_batching_nexthop) ? "enabled" : "disabled")

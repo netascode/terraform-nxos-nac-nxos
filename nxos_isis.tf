@@ -52,7 +52,7 @@ locals {
 resource "nxos_isis" "isis" {
   for_each    = { for device in local.devices : device.name => device if try(local.device_config[device.name].feature.isis, false) }
   device      = each.key
-  admin_state = "enabled"
+  admin_state = null
 
   instances = length(try(local.device_config[each.key].routing.isis_instances, [])) > 0 ? { for inst in try(local.device_config[each.key].routing.isis_instances, []) : inst.name => {
     flush_routes = try(inst.flush_routes, null)
