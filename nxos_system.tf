@@ -297,7 +297,7 @@ resource "nxos_system" "system" {
 
   # arpVpcDom nested map
   arp_vpc_domains = try(local.device_config[each.key].vpc.ip_arp_synchronize, null) != null ? { tostring(try(local.device_config[each.key].vpc.domain_id)) = {
-    arp_sync = try(local.device_config[each.key].vpc.ip_arp_synchronize) ? "enabled" : "disabled"
+    arp_sync = try(local.device_config[each.key].vpc.ip_arp_synchronize, null) == null ? null : (try(local.device_config[each.key].vpc.ip_arp_synchronize) ? "enabled" : "disabled")
   } } : null
 
   # ndEntity / ndInst attributes
@@ -314,7 +314,7 @@ resource "nxos_system" "system" {
 
   # ndVpcDom nested map
   nd_vpc_domains = try(local.device_config[each.key].vpc.ipv6_nd_synchronize, null) != null ? { tostring(try(local.device_config[each.key].vpc.domain_id)) = {
-    nd_sync = try(local.device_config[each.key].vpc.ipv6_nd_synchronize) ? "enabled" : "disabled"
+    nd_sync = try(local.device_config[each.key].vpc.ipv6_nd_synchronize, null) == null ? null : (try(local.device_config[each.key].vpc.ipv6_nd_synchronize) ? "enabled" : "disabled")
   } } : null
 
   # ndDom -> ndIf nested maps (VRF -> interfaces)
@@ -451,7 +451,7 @@ resource "nxos_system" "system" {
 
   # cdpIf nested map
   cdp_interfaces = length(try(local.cdp_interfaces_by_device[each.key], [])) > 0 ? { for entry in try(local.cdp_interfaces_by_device[each.key], []) : entry.interface_id => {
-    admin_state = entry.cdp ? "enabled" : "disabled"
+    admin_state = try(entry.cdp, null) == null ? null : (entry.cdp ? "enabled" : "disabled")
   } } : null
 
   # dnsEntity attributes
