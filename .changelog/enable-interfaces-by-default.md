@@ -1,1 +1,0 @@
-- All configured interfaces (ethernets, port-channels, loopbacks, subinterfaces, SVIs, and NVE) now default to `admin_state = up` when `shutdown` is not explicitly set, instead of leaving the admin state unmanaged

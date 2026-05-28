@@ -1,4 +1,0 @@
-- Add BGP additional paths support including `additional_paths_send`, `additional_paths_receive`, `additional_paths_install_backup`, and `additional_paths_selection_route_map` for address families
-- Add BGP aggregate addresses support including `prefix`, `as_set`, `summary_only`, `advertise_map`, `attribute_map`, and `suppress_map` for address families
-- Add BGP interface peers support including `interface_type` and `interface_id` for neighbors
-- Add BGP neighbor attributes `dscp`, `dynamic_route_map`, `egress_peer_engineering`, `egress_peer_engineering_peer_set`, and `internal_vpn_client`

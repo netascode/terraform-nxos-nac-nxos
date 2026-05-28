@@ -1,3 +1,0 @@
-- BREAKING CHANGE: Rename `system.icam_monitor_intervals` to `icam_monitor_history`
-- BREAKING CHANGE: Rename `system.icam_monitor_threshold_critical`, `system.icam_monitor_threshold_info`, `system.icam_monitor_threshold_warning` to `icam_monitor_scale_threshold_critical`, `icam_monitor_scale_threshold_info`, `icam_monitor_scale_threshold_warning`
-- BREAKING CHANGE: Rename `system.terminal_console_exec_timeout` to `line_console_exec_timeout`

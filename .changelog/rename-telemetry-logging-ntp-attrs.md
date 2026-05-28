@@ -1,3 +1,0 @@
-- BREAKING CHANGE: Rename `ntp.servers.vrf`, `ntp.peers.vrf` to `use_vrf`
-- BREAKING CHANGE: Rename `ntp.servers.min_poll`, `ntp.servers.max_poll`, `ntp.peers.min_poll`, `ntp.peers.max_poll` to `minpoll`, `maxpoll`
-- BREAKING CHANGE: Rename `logging.servers.vrf` to `use_vrf`

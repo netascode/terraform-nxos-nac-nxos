@@ -1,8 +1,0 @@
-- BREAKING CHANGE: Rename `interfaces.nve.anycast_bundled_interface_type`, `interfaces.nve.anycast_bundled_interface_id` to `anycast_source_interface_type`, `anycast_source_interface_id`
-- BREAKING CHANGE: Rename `interfaces.nve.fabric_convergence_delay` to `fabric_ready_time`
-- BREAKING CHANGE: Remove `interfaces.nve.configuration_source`, `interfaces.nve.controller_id`, `interfaces.nve.encapsulation_type`
-- BREAKING CHANGE: Rename `interfaces.switchport.transparent_mode` to `monitor`
-- BREAKING CHANGE: Rename `interfaces.switchport.voice_cos` to `priority_extend_cos`
-- BREAKING CHANGE: Rename `interfaces.switchport.voice_trust` to `priority_extend_trust`
-- BREAKING CHANGE: Rename `interfaces.nves_vnis.multisite_ingress_replication` enum value `enableOptimized` to `optimized`
-- BREAKING CHANGE: Rename `interfaces.ip.verify_unicast_source_reachable_via` enum values `strict` to `rx`, `loose` to `any`, `loose-allow-default` to `any-allow-default`, `strict-allow-vni-hosts` to `rx-allow-vni-hosts`

@@ -1,1 +1,0 @@
-- Add PTP (Precision Time Protocol) support including global clock settings, domain configuration, notifications, and interface-level PTP settings with unicast peers

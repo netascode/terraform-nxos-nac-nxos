@@ -1,7 +1,0 @@
-- BREAKING CHANGE: Rename `spanning_tree.l2_gateway_stp_domain_id` to `l2gateway_stp_domain_id`
-- BREAKING CHANGE: Rename `spanning_tree.linecard_issu` to `lc_issu`
-- BREAKING CHANGE: Rename `spanning_tree.mode` enum value `pvrst` to `rapid-pvst`
-- BREAKING CHANGE: Rename `vlan.vlans.vni` to `vn_segment`
-- BREAKING CHANGE: Rename `vlan.vlans.policy_enforced` to `policy_enforce_vlan`
-- BREAKING CHANGE: Rename `vlan.vlans.mode` enum value `fabric-path` to `fabricpath`
-- BREAKING CHANGE: Remove `vlan.vlans.forwarding_mode_route`, `vlan.vlans.forwarding_mode_bridge`

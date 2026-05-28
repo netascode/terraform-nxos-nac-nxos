@@ -1,2 +1,0 @@
-- BREAKING CHANGE: Rename `interfaces.ethernets.link_flap_err_disable`, `interfaces.ethernets.link_flap_err_disable_max`, `interfaces.ethernets.link_flap_err_disable_interval` to `link_flap_error_disable`, `link_flap_error_disable_count`, `link_flap_error_disable_interval`
-- BREAKING CHANGE: Rename `interfaces.ethernets.loopback` to `link_loopback`

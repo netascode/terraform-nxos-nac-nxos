@@ -1,1 +1,0 @@
-- BREAKING CHANGE: Rename `system.platform.routing_mode` to `system.routing` with CLI-aligned enum values

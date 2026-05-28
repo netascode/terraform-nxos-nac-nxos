@@ -1,2 +1,0 @@
-- BREAKING CHANGE: Rename `lldp.portchannel` to `port_channel`
-- BREAKING CHANGE: Rename `nd.accept_solicit_neighbor_entry`, `nd.probe_interval_for_solicit_neighbor` to `solicit_na`, `solicit_na_interval`

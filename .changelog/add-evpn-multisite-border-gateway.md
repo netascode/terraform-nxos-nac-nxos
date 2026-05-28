@@ -1,1 +1,0 @@
-- Add EVPN multisite border gateway support including `evpn.multisite_border_gateway.site_id`, `evpn.multisite_border_gateway.dci_advertise_pip`, `evpn.multisite_border_gateway.delay_restore_time`, `evpn.multisite_border_gateway.df_election_time`, `evpn.multisite_border_gateway.fabric_advertise_pip`, and `evpn.multisite_border_gateway.split_horizon_per_site`

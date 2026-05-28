@@ -1,3 +1,0 @@
-- BREAKING CHANGE: Rename `routing.bgp.vrfs.address_families.maximum_paths_eibgp_ibgp` to `maximum_paths_ibgp`
-- BREAKING CHANGE: Remove `routing.bgp.vrfs.address_families.redistributions.scope`
-- BREAKING CHANGE: Remove `routing.bgp.vrfs.address_families.redistributions.srv6_prefix_type`

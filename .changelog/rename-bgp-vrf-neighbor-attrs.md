@@ -1,3 +1,0 @@
-- BREAKING CHANGE: Rename `routing.bgp.vrfs.neighbors.connection_mode`, `routing.bgp.neighbors.connection_mode` to `transport_connection_mode`
-- BREAKING CHANGE: Rename `routing.bgp.vrfs.neighbors.egress_peer_engineering`, `routing.bgp.vrfs.neighbors.egress_peer_engineering_peer_set`, `routing.bgp.neighbors.egress_peer_engineering`, `routing.bgp.neighbors.egress_peer_engineering_peer_set` to `egress_engineering`, `egress_engineering_peer_set`
-- BREAKING CHANGE: Rename `routing.bgp.vrfs.bandwidth_reference`, `routing.bgp.vrfs.bandwidth_reference_unit` to `reference_bandwidth`, `reference_bandwidth_unit`

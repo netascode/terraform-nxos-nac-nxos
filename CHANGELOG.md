@@ -1,3 +1,198 @@
+## 0.3.0
+
+- Add `analytics.flow_records`, `analytics.flow_collectors`, and `analytics.flow_monitors` support
+- Add `analytics.flow_filters.ipv4_acl`, `analytics.flow_filters.ipv6_acl`, and `analytics.flow_filters.ce_acl` support
+- Add `analytics.flow_system_config` support
+- Add `analytics` support including instances, flow profiles, flow events, flow filters, and flow traffic analytics configuration
+- Add BGP additional paths support including `additional_paths_send`, `additional_paths_receive`, `additional_paths_install_backup`, and `additional_paths_selection_route_map` for address families
+- Add BGP aggregate addresses support including `prefix`, `as_set`, `summary_only`, `advertise_map`, `attribute_map`, and `suppress_map` for address families
+- Add BGP interface peers support including `interface_type` and `interface_id` for neighbors
+- Add BGP neighbor attributes `dscp`, `dynamic_route_map`, `egress_peer_engineering`, `egress_peer_engineering_peer_set`, and `internal_vpn_client`
+- Add BGP address family `default_information_originate_always_rd`, `default_information_originate_always_route_target`, `load_balance_egress_filter_policy_route_map`, and `load_balance_egress_multipath_auto_policy_route_map` support
+- Add `system.erspan_origin_ip_address` and `system.erspan_origin_ipv6_address` support
+- Add ESG (Endpoint Security Group) support including security groups, selectors, class maps, policy maps, and VRF domain security enforcement
+- Add EVPN multisite border gateway support including `evpn.multisite_border_gateway.site_id`, `evpn.multisite_border_gateway.dci_advertise_pip`, `evpn.multisite_border_gateway.delay_restore_time`, `evpn.multisite_border_gateway.df_election_time`, `evpn.multisite_border_gateway.fabric_advertise_pip`, and `evpn.multisite_border_gateway.split_horizon_per_site`
+- Add `analytics`, `grpc`, `scp_server`, `security_group`, `sftp_server`, and `telemetry` feature flag support
+- Add `system.hardware_access_list_tcam_region` support for hardware access-list TCAM region configuration
+- Add `evpn_multisite_dci_tracking` and `evpn_multisite_fabric_tracking` support for ethernet, port-channel, and SVI interfaces
+- Add `system.ttag_marker_interval` and per-interface `ttag`, `ttag_inner`, `ttag_marker`, `ttag_strip` support for ethernet and port-channel interfaces
+- Add IPv6 access list support
+- Add IPv6 prefix list support
+- Add route map `match_ipv6_address_prefix_list` support
+- Add `netflow.monitors.record`, `netflow.monitors.exporter_1`, and `netflow.monitors.exporter_2` support
+- Add `netflow` support including `netflow.exporters`, `netflow.records`, `netflow.monitors`, `netflow.hardware_profiles`, and `netflow.class_maps`
+- Add `netflow.records` boolean match attributes: `match_datalink_ethertype`, `match_datalink_mac_destination_address`, `match_datalink_mac_source_address`, `match_datalink_vlan`, `match_ip_protocol`, `match_ip_tos`, `match_ipv4_source_address`, `match_ipv4_destination_address`, `match_ipv6_source_address`, `match_ipv6_destination_address`, `match_transport_source_port`, `match_transport_destination_port`
+- Add `netflow.records` boolean collect attributes: `collect_counter_bytes`, `collect_counter_packets`, `collect_timestamp_sys_uptime_first`, `collect_timestamp_sys_uptime_last`
+- Add network QoS support including class maps, policy maps, and system service policy network input
+- Add priority flow control support for ethernet and port-channel interfaces
+- Add NVE platform configuration support including `system.nve_ipmc_index_size`, `system.nve_overlay_vlans`, and `system.nve_infra_vlans`
+- Add `system.hardware` extended hardware profile attributes (TCAM atomic update, PBR tuning, counter management, multicast, storm control, etc.)
+- Add `port_type_fabric` support for ethernet and port-channel interfaces
+- Add PTP (Precision Time Protocol) support including global clock settings, domain configuration, notifications, and interface-level PTP settings with unicast peers
+- Add `ipv6_prefix_lists` support
+- Add route map `match_ip_address_access_list`, `match_ipv6_address_prefix_list`, `match_ip_next_hop_prefix_list`, `match_community`, `match_community_exact_match`, `set_local_preference`, `set_path_selection_advertise`, `set_evpn_gateway_ip`, and `set_evpn_gateway_ip_type` support
+- Add route map `set_policy_tag` and `match_ip_address` support
+- Add `snmp.disable_snmp_aaa_sync` support
+- Add SPAN monitor session support including `monitor_sessions.type`, `monitor_sessions.shutdown`, `monitor_sessions.description`, `monitor_sessions.destination_interface_type`, `monitor_sessions.destination_interface_id`, `monitor_sessions.filter_access_group`, `monitor_sessions.mtu`, `monitor_sessions.erspan_id`, `monitor_sessions.destination_ip`, `monitor_sessions.destination_ipv6`, `monitor_sessions.source_ip`, `monitor_sessions.source_ipv6`, `monitor_sessions.ip_dscp`, `monitor_sessions.ip_ttl`, `monitor_sessions.vrf`, `monitor_sessions.header_type`, `monitor_sessions.source_forward_drops`, `monitor_sessions.marker_packet`, `monitor_sessions.marker_packet_interval`, `monitor_sessions.source_interfaces`, `monitor_sessions.source_vlans`, and `monitor_sessions.filter_vlans`
+- Add SSH server configuration support including `system.ssh.ciphers_all`, `system.ssh.ciphers_weak`, `system.ssh.kexalgos_all`, `system.ssh.keytypes_all`, `system.ssh.login_attempts`, `system.ssh.login_gracetime`, `system.ssh.macs_all`, `system.ssh.port`, and `system.ssh.keys` host key generation
+- Add `telemetry.destination_profile_use_vrf` support
+- Add `telemetry` support including destination groups, sensor groups, subscriptions, and their relationships
+- Add VRF address family import/export map support including `vrfs.address_families.import_map` and `vrfs.address_families.export_map`
+- All configured interfaces (ethernets, port-channels, loopbacks, subinterfaces, SVIs, and NVE) now default to `admin_state = up` when `shutdown` is not explicitly set, instead of leaving the admin state unmanaged
+- IS-IS interface IPv4 address family is now enabled by default when an IS-IS instance is configured on an interface
+- Fix ACL interface policy bindings (`access_group_in`, `access_group_out`) not being applied to interfaces
+- Fix `user_configured_flags` for physical and port-channel interfaces to only include flags for attributes that are actually configured (`admin_mtu`, `admin_state`, `admin_router_mac`) instead of always sending all flags
+- BREAKING CHANGE: `spanning_tree.vlans[].vlan_id` replaced by `spanning_tree.vlans[].vlans` with `ids`/`ranges` to allow configuring multiple VLANs with the same spanning tree parameters in a single entry
+- BREAKING CHANGE: `vpc.dual_active_exclude_interface_vlan` (string) renamed to `vpc.dual_active_exclude_interface_vlans` with `ids`/`ranges`
+- BREAKING CHANGE: `vpc.peer_gateway_exclude_vlan` (string) renamed to `vpc.peer_gateway_exclude_vlans` with `ids`/`ranges`
+- Add support for integer OSPF/OSPFv3 area IDs (e.g., `0` instead of `"0.0.0.0"`)
+- BREAKING CHANGE: Remove `routing.pim.anycast_rp_local_interface_type`, `routing.pim.anycast_rp_local_interface_id`, `routing.pim.anycast_rp_source_interface_type`, `routing.pim.anycast_rp_source_interface_id` and corresponding VRF-level attributes
+- BREAKING CHANGE: Remove `routing.pim.jp_delay` and `routing.pim.vrfs.jp_delay`
+- BREAKING CHANGE: Remove `routing.ip_routes.pervasive`
+- BREAKING CHANGE: Remove `ip_prefix_lists.entries.criteria` and `ipv6_prefix_lists.entries.criteria`
+- BREAKING CHANGE: Rename `aaa.tacacs.servers.authentication_protocol` to `test_authentication_protocol`
+- BREAKING CHANGE: Rename `aaa.users.accounts.shell_type` to `shelltype`
+- BREAKING CHANGE: Rename `aaa.authorization.command_type` enum value `config` to `config-commands`, `exec` to `commands`
+- BREAKING CHANGE: Rename `aaa.users.accounts.password_encryption_type` enum value `encrypt` to `5`, `clear` to `0`
+- BREAKING CHANGE: Remove `aaa.users.accounts.password_encryption_type` enum value `unspecified`
+- BREAKING CHANGE: Remove `aaa.tacacs.description`, `aaa.tacacs.servers.description`, `aaa.tacacs.server_groups.description`, `aaa.tacacs.server_groups.servers.description`
+- BREAKING CHANGE: Remove `aaa.users.description`, `aaa.users.password_secure_mode`
+- BREAKING CHANGE: Remove `aaa.users.accounts.description`, `aaa.users.accounts.account_status`, `aaa.users.accounts.allow_expired`, `aaa.users.accounts.clear_password_history`, `aaa.users.accounts.email`, `aaa.users.accounts.first_name`, `aaa.users.accounts.force`, `aaa.users.accounts.last_name`, `aaa.users.accounts.password_hash`, `aaa.users.accounts.phone`, `aaa.users.accounts.unix_user_id`
+- BREAKING CHANGE: Remove `aaa.users.accounts.roles.description`, `aaa.users.accounts.roles.privilege_type`
+- BREAKING CHANGE: Remove `aaa.authentication.login_default_realm`, `aaa.authentication.login_console_realm`
+- BREAKING CHANGE: Remove `aaa.accounting.realm`
+- BREAKING CHANGE: Rename `ip_access_lists.entries.source.address_group`, `ip_access_lists.entries.destination.address_group`, `ipv6_access_lists.entries.source.address_group`, `ipv6_access_lists.entries.destination.address_group` to `addrgroup`
+- BREAKING CHANGE: Rename `ip_access_lists.entries.source.port_group`, `ip_access_lists.entries.destination.port_group`, `ipv6_access_lists.entries.source.port_group`, `ipv6_access_lists.entries.destination.port_group` to `portgroup`
+- BREAKING CHANGE: Rename `analytics.flow_collectors` to `flow_exporters`
+- BREAKING CHANGE: Rename `analytics.flow_exporters.destination_port`, `analytics.flow_exporters.event_destination_port` to `transport_udp`, `events_transport_udp`
+- BREAKING CHANGE: Rename `analytics.flow_monitors.exporter_buckets` to `exporter_bucket_ids`
+- BREAKING CHANGE: Rename `analytics.flow_system_config.events` to `event`
+- BREAKING CHANGE: Remove `analytics.analytics_submode`, `analytics.geneve`, `analytics.collect_tunnel_header`
+- BREAKING CHANGE: Rename `arp.cache_interface_limit`, `arp.unnumbered_svi_software_replication`, `arp.rarp_fabric_forwarding_rate`, `arp.resolve_outside_subnet` to `cache_intf_limit`, `unnum_svi_sw_replication`, `rarp_fabric_forwarding_rate_limit`, `outside_subnet`
+- BREAKING CHANGE: Rename `arp.inspection.validate_destination`, `arp.inspection.validate_source` to `validate_dst_mac`, `validate_src_mac`
+- BREAKING CHANGE: Change `evpn.multisite_border_gateway.fabric_advertise_pip` type from enum (`disable`/`enableL3`) to boolean
+- BREAKING CHANGE: Rename `routing.bgp.vrfs.address_families.maximum_paths_eibgp_ibgp` to `maximum_paths_ibgp`
+- BREAKING CHANGE: Remove `routing.bgp.vrfs.address_families.redistributions.scope`
+- BREAKING CHANGE: Remove `routing.bgp.vrfs.address_families.redistributions.srv6_prefix_type`
+- BREAKING CHANGE: Rename `routing.bgp.peer_templates.capability_suppress_4_byte_asn` to `capability_suppress_4_byte_as`
+- BREAKING CHANGE: Rename `routing.bgp.peer_templates.address_families.site_of_origin` to `soo`
+- BREAKING CHANGE: Rename `routing.bgp.peer_templates.address_families.address_family` enum value `lnkstate` to `link-state`
+- BREAKING CHANGE: Rename `routing.bgp.peer_templates.remove_private_as` enum value `remove-exclusive` to `enabled`, `remove-all` to `all`
+- BREAKING CHANGE: Remove `routing.bgp.peer_templates.remote_as_type`, `routing.bgp.peer_templates.bfd_type`; `asn_type` is now derived from `remote_as`
+- BREAKING CHANGE: Add `routing.bgp.peer_templates.bfd_multihop` as replacement for `bfd_type`
+- BREAKING CHANGE: Rename `routing.bgp.vrfs.neighbors.connection_mode`, `routing.bgp.neighbors.connection_mode` to `transport_connection_mode`
+- BREAKING CHANGE: Rename `routing.bgp.vrfs.neighbors.egress_peer_engineering`, `routing.bgp.vrfs.neighbors.egress_peer_engineering_peer_set`, `routing.bgp.neighbors.egress_peer_engineering`, `routing.bgp.neighbors.egress_peer_engineering_peer_set` to `egress_engineering`, `egress_engineering_peer_set`
+- BREAKING CHANGE: Rename `routing.bgp.vrfs.bandwidth_reference`, `routing.bgp.vrfs.bandwidth_reference_unit` to `reference_bandwidth`, `reference_bandwidth_unit`
+- BREAKING CHANGE: Rename `system.hardware.tcam_atomic_update`, `system.hardware.tcam_atomic_update_strict`, `system.hardware.tcam_default_result`, `system.hardware.tcam_per_entry_stats_template` to `access_list_update_atomic`, `access_list_update_atomic_strict`, `access_list_update_default_result`, `access_list_tcam_per_entry_stats_template`
+- BREAKING CHANGE: Rename `system.hardware_access_list_tcam_region.n9k_arp_acl_size`, `system.hardware_access_list_tcam_region.egress_ipv6_qos_size`, `system.hardware_access_list_tcam_region.egress_ipv6_racl_size`, `system.hardware_access_list_tcam_region.egress_mac_qos_size`, `system.hardware_access_list_tcam_region.egress_qos_lite_size`, `system.hardware_access_list_tcam_region.egress_qos_size`, `system.hardware_access_list_tcam_region.egress_racl_size` to `arp_ether_size`, `e_ipv6_qos_size`, `e_ipv6_racl_size`, `e_mac_qos_size`, `e_qos_lite_size`, `e_qos_size`, `e_racl_size`
+- BREAKING CHANGE: Rename `system.hardware_access_list_tcam_region.redirect_v4_size`, `system.hardware_access_list_tcam_region.l3_qos_intra_lite_size`, `system.hardware_access_list_tcam_region.mpls_doublewide`, `system.hardware_access_list_tcam_region.openflow_doublewide` to `redirect_size`, `l3qos_intra_lite_size`, `mpls_double_wide`, `openflow_double_wide`
+- BREAKING CHANGE: Remove `system.hardware.ptp_correction_hardware`, `system.hardware.qos_latency_optimized`, `system.hardware.udf_netflow_rtp_multicast` (DME-only, no CLI equivalent)
+- BREAKING CHANGE: Remove `system.hardware_access_list_tcam_region.copp_system_size`, `system.hardware_access_list_tcam_region.qos_label_size`, `system.hardware_access_list_tcam_region.span_tahoe_size` (DME-only, no CLI equivalent)
+- BREAKING CHANGE: Rename `interfaces.*.pim.neighbor_policy_route_map` to `neighbor_policy`
+- BREAKING CHANGE: Rename `interfaces.*.hsrp.groups.timers_hello_interval`, `interfaces.*.hsrp.groups.timers_hold_interval` to `timers_hello`, `timers_hold`
+- BREAKING CHANGE: Rename `interfaces.*.spanning_tree.link_type` enum value `p2p` to `point-to-point`
+- BREAKING CHANGE: Rename `interfaces.*.bfd.authentication_type` enum values `sha1` to `keyed-sha1`, `met-sha1` to `meticulous-keyed-sha1`
+- BREAKING CHANGE: Rename `interfaces.ethernets.link_flap_err_disable`, `interfaces.ethernets.link_flap_err_disable_max`, `interfaces.ethernets.link_flap_err_disable_interval` to `link_flap_error_disable`, `link_flap_error_disable_count`, `link_flap_error_disable_interval`
+- BREAKING CHANGE: Rename `interfaces.ethernets.loopback` to `link_loopback`
+- BREAKING CHANGE: Rename `routing.isis_instances.bandwidth_reference`, `routing.isis_instances.bandwidth_reference_unit` to `reference_bandwidth`, `reference_bandwidth_unit`
+- BREAKING CHANGE: Rename `routing.isis_instances.passive_default` to `passive_interface_default`
+- BREAKING CHANGE: Rename `routing.isis_instances.overload_startup_time`, `routing.isis_instances.overload_bgp_as_number`, `routing.isis_instances.overload_suppress` to `set_overload_bit_on_startup`, `set_overload_bit_wait_for_bgp`, `set_overload_bit_suppress`
+- BREAKING CHANGE: Rename `routing.isis_instances.is_type` enum values `l1` to `level-1`, `l2` to `level-2`, `l12` to `level-1-2`
+- BREAKING CHANGE: Rename `routing.isis_instances.passive_interface_default` enum values `l1` to `level-1`, `l2` to `level-2`, `l12` to `level-1-2`
+- BREAKING CHANGE: Rename `routing.isis_instances.set_overload_bit` enum values `always-on` to `always`, `bootup` to `on-startup`, `bgp-converge` to `on-startup-wait-for-bgp`, `bgp-converge-max-wait` to `on-startup-wait-for-bgp-max-wait`
+- BREAKING CHANGE: Rename `routing.isis_instances.authentication_type_level_1`, `routing.isis_instances.authentication_type_level_2` enum value `clear` to `cleartext`
+- BREAKING CHANGE: Rename `routing.isis_instances.vrfs.address_families.advertise_passive_only_l1`, `routing.isis_instances.vrfs.address_families.advertise_passive_only_l2` to `advertise_passive_only_level_1`, `advertise_passive_only_level_2`
+- BREAKING CHANGE: Rename `interfaces.*.isis.n_flag_clear`, `interfaces.*.isis.suppress_prefix` to `prefix_attributes_n_flag_clear`, `suppressed`
+- BREAKING CHANGE: Rename `interfaces.*.isis.circuit_type` enum values `l1` to `level-1`, `l2` to `level-2`, `l12` to `level-1-2`
+- BREAKING CHANGE: Rename `interfaces.*.isis.passive_interface` enum values `l1` to `level-1`, `l2` to `level-2`, `l12` to `level-1-2`, `no-l1` to `no-level-1`, `no-l2` to `no-level-2`, `no-l12` to `no-level-1-2`
+- BREAKING CHANGE: Remove `interfaces.*.isis.passive_interface` enum value `inherit-def`
+- BREAKING CHANGE: Convert `interfaces.*.isis.network_point_to_point` from enum to boolean
+- BREAKING CHANGE: Rename `interfaces.*.ospf.prefix_attribute_n_flag` to `prefix_attributes_n_flag_clear`
+- BREAKING CHANGE: Rename `interfaces.*.ospf.network` enum values `p2p` to `point-to-point`, `bcast` to `broadcast`
+- BREAKING CHANGE: Remove `interfaces.*.ospf.network` enum value `unspecified`
+- BREAKING CHANGE: Remove `interfaces.*.ospf.authentication` enum value `unspecified`
+- BREAKING CHANGE: Rename `interfaces.*.nd.ra_boot_file_url`, `interfaces.*.nd.dad_ns_interval`, `interfaces.*.nd.delete_adjacency_on_mac_delete`, `interfaces.*.nd.dns_search_list_suppress`, `interfaces.*.nd.dns_suppress`, `interfaces.*.nd.suppress_ra_route` to `ra_bootfile_url`, `dadns_interval`, `delete_adj_on_mac_delete`, `ra_dns_search_list_suppress`, `ra_dns_server_suppress`, `ra_route_suppress`
+- BREAKING CHANGE: Remove `interfaces.*.nd.router_preference` enum value `unspecified`
+- BREAKING CHANGE: Rename `interfaces.*.ptp.announce_interval_type`, `interfaces.*.ptp.announce_timeout_type`, `interfaces.*.ptp.sync_interval_type`, `interfaces.*.ptp.delay_request_minimum_interval_type` to `announce_interval_profile`, `announce_timeout_profile`, `sync_interval_profile`, `delay_request_minimum_interval_profile`
+- BREAKING CHANGE: Rename `interfaces.*.ptp.negotiation_schema` to `transmission_unicast_negotiation_schema`
+- BREAKING CHANGE: Rename `interfaces.*.ptp.unicast_source`, `interfaces.*.ptp.unicast_source_ipv6`, `interfaces.*.ptp.unicast_vrf`, `interfaces.*.ptp.unicast_vrf_ipv6` to `ucast_source`, `ucast_source_ipv6`, `ucast_source_vrf`, `ucast_source_vrf_ipv6`
+- BREAKING CHANGE: Rename `interfaces.*.ptp.ipv6_multicast_transmit_scope`, `interfaces.*.ptp.ipv6_multicast_receive_scope` to `ipv6_multicast_scope_tx`, `ipv6_multicast_scope_rx`
+- BREAKING CHANGE: Rename `interfaces.*.ptp.unicast_peers` to `ucast_peers`
+- BREAKING CHANGE: Rename `interfaces.*.ptp.transport` enum value `eth` to `ethernet`
+- BREAKING CHANGE: Rename `ptp.ipv6_multicast_transmit_scope`, `ptp.ipv6_multicast_receive_scope` to `ipv6_multicast_scope_tx`, `ipv6_multicast_scope_rx`
+- BREAKING CHANGE: Rename `lldp.portchannel` to `port_channel`
+- BREAKING CHANGE: Rename `nd.accept_solicit_neighbor_entry`, `nd.probe_interval_for_solicit_neighbor` to `solicit_na`, `solicit_na_interval`
+- BREAKING CHANGE: Rename `interfaces.nve.anycast_bundled_interface_type`, `interfaces.nve.anycast_bundled_interface_id` to `anycast_source_interface_type`, `anycast_source_interface_id`
+- BREAKING CHANGE: Rename `interfaces.nve.fabric_convergence_delay` to `fabric_ready_time`
+- BREAKING CHANGE: Remove `interfaces.nve.configuration_source`, `interfaces.nve.controller_id`, `interfaces.nve.encapsulation_type`
+- BREAKING CHANGE: Rename `interfaces.switchport.transparent_mode` to `monitor`
+- BREAKING CHANGE: Rename `interfaces.switchport.voice_cos` to `priority_extend_cos`
+- BREAKING CHANGE: Rename `interfaces.switchport.voice_trust` to `priority_extend_trust`
+- BREAKING CHANGE: Rename `interfaces.nves_vnis.multisite_ingress_replication` enum value `enableOptimized` to `optimized`
+- BREAKING CHANGE: Rename `interfaces.ip.verify_unicast_source_reachable_via` enum values `strict` to `rx`, `loose` to `any`, `loose-allow-default` to `any-allow-default`, `strict-allow-vni-hosts` to `rx-allow-vni-hosts`
+- BREAKING CHANGE: Rename `routing.ospf_processes.areas.authentication` enum value `md5` to `message-digest`
+- BREAKING CHANGE: Remove `routing.ospf_processes.areas.authentication` enum values `unspecified`, `none`
+- BREAKING CHANGE: Remove `routing.ospf_processes.capability_vrf_lite` enum value `unspecified`
+- BREAKING CHANGE: Remove `routing.ospf_processes.vrfs.capability_vrf_lite` enum value `unspecified`
+- BREAKING CHANGE: Rename `system.platform` section to `system.hardware_profile` and `system.port_channel`, with `switch_mode` and `fabric_mode` moved inline under `system`
+- BREAKING CHANGE: Rename `system.hardware_profile.profile_front_portmode`, `system.hardware_profile.profile_mode`, `system.hardware_profile.profile_tuple`, `system.hardware_profile.svi_and_si_flex_stats`, `system.hardware_profile.openflow_forward_pdu` to `front_portmode`, `forwarding_mode`, `portmode_tuple`, `svi_and_si_flex_stats_enable`, `flow_redirect_forward_pdu`
+- BREAKING CHANGE: Rename `system.port_channel.port_channel_fast_convergence`, `system.port_channel.port_channel_load_balance`, `system.port_channel.port_channel_load_balance_resilient`, `system.port_channel.port_channel_mpls_load_balance_label_ip`, `system.port_channel.port_channel_mpls_load_balance_label_only`, `system.port_channel.port_channel_scale_fanout` to `fast_convergence`, `load_balance`, `load_balance2_resilient`, `load_balance_mpls_label_ip`, `load_balance_mpls_label_only`, `scale_fanout`
+- BREAKING CHANGE: Rename `system.platform.system_fabric_mode` to `system.fabric_mode`
+- BREAKING CHANGE: Rename `system.platform.mpls_adjacency_stats_mode` enum values `PACKETS`, `BYTES` to `packets`, `bytes`
+- BREAKING CHANGE: Rename `system.boot.nxos_image_sup_1`, `system.boot.nxos_image_sup_2` to `nxos_sup_1`, `nxos_sup_2`
+- BREAKING CHANGE: Remove `system.platform.switching_fabric_speed`, `system.platform.switching_mode` (N7K-only)
+- BREAKING CHANGE: Remove `system.vdcs.resource_limits.multicast_ipv4_route_memory_maximum`, `system.vdcs.resource_limits.multicast_ipv4_route_memory_minimum`, `system.vdcs.resource_limits.multicast_ipv6_route_memory_maximum`, `system.vdcs.resource_limits.multicast_ipv6_route_memory_minimum`, `system.vdcs.resource_limits.unicast_ipv4_route_memory_maximum`, `system.vdcs.resource_limits.unicast_ipv4_route_memory_minimum`, `system.vdcs.resource_limits.unicast_ipv6_route_memory_maximum`, `system.vdcs.resource_limits.unicast_ipv6_route_memory_minimum` (N7K VDC-only)
+- BREAKING CHANGE: Rename `interfaces.ethernets.lldp_tlv_set_management_address_v4`, `interfaces.port_channels.lldp_tlv_set_management_address_v4` to `lldp_tlv_set_management_address`
+- BREAKING CHANGE: Rename `interfaces.ethernets.lldp_tlv_set_management_address_v6`, `interfaces.port_channels.lldp_tlv_set_management_address_v6` to `lldp_tlv_set_management_address_ipv6`
+- BREAKING CHANGE: Rename `interfaces.ethernets.priority_flow_control_watchdog_interval`, `interfaces.ethernets.priority_flow_control_watchdog_disable_action`, `interfaces.ethernets.priority_flow_control_watchdog_interface_multiplier`, `interfaces.port_channels.priority_flow_control_watchdog_interval`, `interfaces.port_channels.priority_flow_control_watchdog_disable_action`, `interfaces.port_channels.priority_flow_control_watchdog_interface_multiplier` to `priority_flow_control_watch_dog_interval`, `priority_flow_control_watch_dog_disable_action`, `priority_flow_control_watch_dog_interface_multiplier`
+- BREAKING CHANGE: Rename `interfaces.ethernets.negotiate_auto`, `interfaces.port_channels.negotiate_auto` enum value `25g` to `25000`
+- BREAKING CHANGE: Rename `qos.system_service_policy_network_input`, `qos.system_service_policy_network_input_statistics` to `system_service_policy_network`, `system_service_policy_network_statistics`
+- BREAKING CHANGE: Rename `qos.network_policy_maps.classes.pause_buffer_size_receive`, `qos.network_policy_maps.classes.pause_buffer_size_headroom`, `qos.network_policy_maps.classes.congestion_control_dynamic`, `qos.network_policy_maps.classes.congestion_control_threshold`, `qos.network_policy_maps.classes.congestion_control_resume_threshold`, `qos.network_policy_maps.classes.congestion_control_resume_offset` to `pause_receive`, `pause_headroom`, `pause_dynamic`, `pause_threshold`, `pause_resume_threshold`, `pause_resume_offset`
+- BREAKING CHANGE: Rename `qos.policy_maps.classes.police.cir_unit`, `qos.policy_maps.classes.police.pir_unit` enum value `pct` to `percent`
+- BREAKING CHANGE: Remove `unspecified` enum value from `qos.policy_maps.classes.police.cir_unit`, `qos.policy_maps.classes.police.pir_unit`, `qos.policy_maps.classes.police.bc_unit`, `qos.policy_maps.classes.police.be_unit`, `qos.policy_maps.classes.police.conform_action`, `qos.policy_maps.classes.police.exceed_action`, `qos.policy_maps.classes.police.violate_action`
+- BREAKING CHANGE: Remove `qos.queuing_policy_maps.classes.next_class_map`, `qos.queuing_policy_maps.classes.previous_class_map`
+- BREAKING CHANGE: Rename `route_maps.entries.match_ip_prefix_list` to `match_ip_address_prefix_list`
+- BREAKING CHANGE: Replace `route_maps.entries.match_community_criteria` (enum) with `match_community_exact_match` (bool)
+- BREAKING CHANGE: Rename `route_maps.entries.set_path_selection_advertise` enum values `ps-all` to `all`, `ps-bestplus` to `backup`, `ps-best2` to `best2`, `ps-mpath` to `multipaths`
+- BREAKING CHANGE: Remove `route_maps.entries.set_community_criteria`, `route_maps.entries.set_metric_is_bgp`
+- BREAKING CHANGE: Rename `sflow.agent_address`, `sflow.max_header_size` to `agent_ip`, `max_sampled_size`
+- BREAKING CHANGE: Remove `netflow_exporters.version` enum values `unspecified` and `cisco1`
+- BREAKING CHANGE: Rename `snmp.users.authentication_type`, `snmp.users.authentication_password` to `auth_type`, `auth_password`
+- BREAKING CHANGE: Rename `snmp.users.privacy_type`, `snmp.users.privacy_password` to `priv_type`, `priv_password`
+- BREAKING CHANGE: Rename `snmp.users.enforce_privacy` to `enforce_priv`
+- BREAKING CHANGE: Rename `snmp.users.ipv4_acl`, `snmp.users.ipv6_acl` to `use_ipv4acl`, `use_ipv6acl`
+- BREAKING CHANGE: Rename `snmp.users.priv_type` enum values `aes128`, `aes256` to `aes-128`, `aes-256`
+- BREAKING CHANGE: Rename `snmp.traps.license_notify_license_file_missing` to `license_notify_licensefile_missing`
+- BREAKING CHANGE: Rename `snmp.traps.link_err_disable_interface_event_rev1` to `link_cerr_disable_interface_event_rev1`
+- BREAKING CHANGE: Rename `spanning_tree.l2_gateway_stp_domain_id` to `l2gateway_stp_domain_id`
+- BREAKING CHANGE: Rename `spanning_tree.linecard_issu` to `lc_issu`
+- BREAKING CHANGE: Rename `spanning_tree.mode` enum value `pvrst` to `rapid-pvst`
+- BREAKING CHANGE: Rename `vlan.vlans.vni` to `vn_segment`
+- BREAKING CHANGE: Rename `vlan.vlans.policy_enforced` to `policy_enforce_vlan`
+- BREAKING CHANGE: Rename `vlan.vlans.mode` enum value `fabric-path` to `fabricpath`
+- BREAKING CHANGE: Remove `vlan.vlans.forwarding_mode_route`, `vlan.vlans.forwarding_mode_bridge`
+- BREAKING CHANGE: Rename `system.icam_monitor_intervals` to `icam_monitor_history`
+- BREAKING CHANGE: Rename `system.icam_monitor_threshold_critical`, `system.icam_monitor_threshold_info`, `system.icam_monitor_threshold_warning` to `icam_monitor_scale_threshold_critical`, `icam_monitor_scale_threshold_info`, `icam_monitor_scale_threshold_warning`
+- BREAKING CHANGE: Rename `system.terminal_console_exec_timeout` to `line_console_exec_timeout`
+- BREAKING CHANGE: Rename `system.platform.routing_mode` to `system.routing` with CLI-aligned enum values
+- BREAKING CHANGE: Rename `ntp.servers.vrf`, `ntp.peers.vrf` to `use_vrf`
+- BREAKING CHANGE: Rename `ntp.servers.min_poll`, `ntp.servers.max_poll`, `ntp.peers.min_poll`, `ntp.peers.max_poll` to `minpoll`, `maxpoll`
+- BREAKING CHANGE: Rename `logging.servers.vrf` to `use_vrf`
+- BREAKING CHANGE: Rename `interfaces.management.negotiation_auto` to `negotiate_auto`
+- BREAKING CHANGE: Rename `interfaces.subinterfaces.mac_ipv6_extract` to `mac_address_ipv6_extract`
+- BREAKING CHANGE: Remove `interfaces.vlans.mtu_inherit`
+- BREAKING CHANGE: Remove `interfaces.subinterfaces.mtu_inherit`
+- BREAKING CHANGE: Remove `interfaces.vlans.fabric_forwarding_description`
+- BREAKING CHANGE: Rename `vpc.peer_link_channel_group` to `peer_link_port_channel`
+- BREAKING CHANGE: Rename `ptp.peer_delay_request_interval` to `pdelay_req_interval`
+- BREAKING CHANGE: Rename `ptp.notification_grandmaster_change` to `notification_gm_change`
+- BREAKING CHANGE: Rename `ptp.notification_high_correction_periodic` to `notification_high_correction_periodic_notification`
+- BREAKING CHANGE: Rename `ptp.notification_port_state_change_periodic` to `notification_port_state_change_periodic_notification`
+- BREAKING CHANGE: Rename `ptp.multi_domain_transition_priority1`, `ptp.multi_domain_transition_priority2` to `multi_domain_transition_attributes_priority1`, `multi_domain_transition_attributes_priority2`
+- BREAKING CHANGE: Replace flat sFlow collector attributes (`sflow.collector_address`, `sflow.collector_source`, `sflow.collector_vrf`) with `sflow.collectors` list supporting multiple collectors, each with `address`, `vrf`, and `source_address`
+- Refactor `system.platform`, `system.hardware`, `system.hardware_access_list_tcam_region`, and NVE configuration into a dedicated platform module
+- BREAKING CHANGE: Change DSCP fields from string to `int(0-63)`: `qos.class_maps.match_dscp_values`, `qos.policy_maps.classes.police.conform_set_dscp`, `qos.policy_maps.classes.police.exceed_set_dscp`, `qos.policy_maps.classes.police.violate_set_dscp`, and `routing.bgp.vrfs.neighbors.dscp`
+
 ## 0.2.0
 
 - Add AAA authentication, authorization, and accounting support

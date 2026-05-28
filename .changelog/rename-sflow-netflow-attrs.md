@@ -1,2 +1,0 @@
-- BREAKING CHANGE: Rename `sflow.agent_address`, `sflow.max_header_size` to `agent_ip`, `max_sampled_size`
-- BREAKING CHANGE: Remove `netflow_exporters.version` enum values `unspecified` and `cisco1`

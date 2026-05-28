@@ -1,5 +1,0 @@
-- BREAKING CHANGE: Rename `analytics.flow_collectors` to `flow_exporters`
-- BREAKING CHANGE: Rename `analytics.flow_exporters.destination_port`, `analytics.flow_exporters.event_destination_port` to `transport_udp`, `events_transport_udp`
-- BREAKING CHANGE: Rename `analytics.flow_monitors.exporter_buckets` to `exporter_bucket_ids`
-- BREAKING CHANGE: Rename `analytics.flow_system_config.events` to `event`
-- BREAKING CHANGE: Remove `analytics.analytics_submode`, `analytics.geneve`, `analytics.collect_tunnel_header`

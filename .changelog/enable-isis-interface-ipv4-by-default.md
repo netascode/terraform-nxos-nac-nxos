@@ -1,1 +1,0 @@
-- IS-IS interface IPv4 address family is now enabled by default when an IS-IS instance is configured on an interface

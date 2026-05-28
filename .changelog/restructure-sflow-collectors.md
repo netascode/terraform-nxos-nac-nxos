@@ -1,1 +1,0 @@
-- BREAKING CHANGE: Replace flat sFlow collector attributes (`sflow.collector_address`, `sflow.collector_source`, `sflow.collector_vrf`) with `sflow.collectors` list supporting multiple collectors, each with `address`, `vrf`, and `source_address`

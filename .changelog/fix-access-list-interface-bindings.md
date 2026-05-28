@@ -1,1 +1,0 @@
-- Fix ACL interface policy bindings (`access_group_in`, `access_group_out`) not being applied to interfaces

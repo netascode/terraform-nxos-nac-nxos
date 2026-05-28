@@ -1,4 +1,0 @@
-- BREAKING CHANGE: Rename `routing.ospf_processes.areas.authentication` enum value `md5` to `message-digest`
-- BREAKING CHANGE: Remove `routing.ospf_processes.areas.authentication` enum values `unspecified`, `none`
-- BREAKING CHANGE: Remove `routing.ospf_processes.capability_vrf_lite` enum value `unspecified`
-- BREAKING CHANGE: Remove `routing.ospf_processes.vrfs.capability_vrf_lite` enum value `unspecified`

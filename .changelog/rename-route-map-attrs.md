@@ -1,4 +1,0 @@
-- BREAKING CHANGE: Rename `route_maps.entries.match_ip_prefix_list` to `match_ip_address_prefix_list`
-- BREAKING CHANGE: Replace `route_maps.entries.match_community_criteria` (enum) with `match_community_exact_match` (bool)
-- BREAKING CHANGE: Rename `route_maps.entries.set_path_selection_advertise` enum values `ps-all` to `all`, `ps-bestplus` to `backup`, `ps-best2` to `best2`, `ps-mpath` to `multipaths`
-- BREAKING CHANGE: Remove `route_maps.entries.set_community_criteria`, `route_maps.entries.set_metric_is_bgp`
