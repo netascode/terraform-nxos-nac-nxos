@@ -1,3 +1,11 @@
+locals {
+  snmp_privacy_type_map = {
+    "des"     = "des"
+    "aes-128" = "aes128"
+    "aes-256" = "aes256"
+  }
+}
+
 resource "nxos_snmp" "snmp" {
   for_each = { for device in local.devices : device.name => device
   if try(local.device_config[device.name].snmp, null) != null }
@@ -97,7 +105,7 @@ resource "nxos_snmp" "snmp" {
     localized_v2_key        = try(user.localized_v2_key, null)
     localized_key           = try(user.localized_key, null)
     privacy_password        = try(user.priv_password, null)
-    privacy_type            = try(user.priv_type, null)
+    privacy_type            = try(local.snmp_privacy_type_map[try(user.priv_type)], null)
     engine_id               = try(user.engine_id, null)
     groups                  = length(try(user.groups, [])) > 0 ? { for group in try(user.groups, []) : group => {} } : null
   } } : null
