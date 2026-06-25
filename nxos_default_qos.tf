@@ -9,6 +9,10 @@ locals {
       }
     ]...)
   }
+
+  police_unit_map = {
+    "percent" = "pct"
+  }
 }
 
 resource "nxos_default_qos" "default_qos" {
@@ -29,11 +33,11 @@ resource "nxos_default_qos" "default_qos" {
     match_class_maps = length(try(pm.classes, [])) > 0 ? { for cls in try(pm.classes, []) : cls.name => {
       set_qos_group_id              = try(cls.set_qos_group, null)
       police_cir_rate               = try(cls.police.cir_rate, null)
-      police_cir_unit               = try(cls.police.cir_unit, null)
+      police_cir_unit               = try(local.police_unit_map[try(cls.police.cir_unit)], try(cls.police.cir_unit, null))
       police_bc_rate                = try(cls.police.bc_rate, null)
       police_bc_unit                = try(cls.police.bc_unit, null)
       police_pir_rate               = try(cls.police.pir_rate, null)
-      police_pir_unit               = try(cls.police.pir_unit, null)
+      police_pir_unit               = try(local.police_unit_map[try(cls.police.pir_unit)], try(cls.police.pir_unit, null))
       police_be_rate                = try(cls.police.be_rate, null)
       police_be_unit                = try(cls.police.be_unit, null)
       police_conform_action         = try(cls.police.conform_action, null)

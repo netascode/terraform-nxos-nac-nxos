@@ -72,7 +72,7 @@ resource "nxos_platform" "platform" {
   multicast_service_reflect_port            = try(local.device_config[each.key].system.hardware_profile.multicast_service_reflect_port, null)
   multicast_syslog_threshold                = try(local.device_config[each.key].system.hardware_profile.multicast_syslog_threshold, null)
   mld_snooping                              = try(local.device_config[each.key].system.hardware_profile.mld_snooping, null) == null ? null : (try(local.device_config[each.key].system.hardware_profile.mld_snooping) ? "enable" : "disable")
-  mpls_adjacency_stats_mode                 = try(local.device_config[each.key].system.hardware_profile.mpls_adjacency_stats_mode, null)
+  mpls_adjacency_stats_mode                 = try(upper(local.device_config[each.key].system.hardware_profile.mpls_adjacency_stats_mode), null)
   mpls_ecmp_mode                            = try(local.device_config[each.key].system.hardware_profile.mpls_ecmp, null) == null ? null : (try(local.device_config[each.key].system.hardware_profile.mpls_ecmp) ? "enable" : "disable")
   mrouting_disable_l2_update                = try(local.device_config[each.key].system.hardware_profile.mrouting_disable_l2_update, null) == null ? null : (try(local.device_config[each.key].system.hardware_profile.mrouting_disable_l2_update) ? "enable" : "disable")
   mrouting_disable_second_route_update      = try(local.device_config[each.key].system.hardware_profile.mrouting_disable_second_route_update, null) == null ? null : (try(local.device_config[each.key].system.hardware_profile.mrouting_disable_second_route_update) ? "enable" : "disable")

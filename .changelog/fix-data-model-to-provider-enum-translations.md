@@ -1,0 +1,7 @@
+- Fix `snmp.users.priv_type` values `aes-128` and `aes-256` not being applied correctly due to data model values not being translated to the provider's expected format
+- Fix `interfaces.ethernets.speed` and `interfaces.port_channels.speed` values (e.g. `100m`, `1g`, `25000`, `auto-100m-1g`) not being applied correctly due to data model values not being translated to the provider's expected format
+- Fix `interfaces.ethernets.negotiate_auto` and `interfaces.port_channels.negotiate_auto` value `25000` not being applied correctly due to data model value not being translated to the provider's expected format
+- Fix `interfaces.nve.host_reachability_protocol` values `flood-and-learn` and `openflow-ir` not being applied correctly due to data model values not being translated to the provider's expected format
+- Fix `routing.bgp.vrfs.neighbors.password_type` and `routing.bgp.vrfs.peer_templates.password_type` value `line` not being applied correctly due to data model value not being translated to the provider's expected format
+- Fix `system.hardware_profile.mpls_adjacency_stats_mode` values `packets` and `bytes` not being applied correctly due to data model values not being translated to the provider's expected format
+- Fix `qos.policy_maps.classes.police.cir_unit` and `qos.policy_maps.classes.police.pir_unit` value `percent` not being applied correctly due to data model value not being translated to the provider's expected format
