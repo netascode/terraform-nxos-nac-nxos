@@ -5,3 +5,5 @@
 - Fix `routing.bgp.vrfs.neighbors.password_type` and `routing.bgp.vrfs.peer_templates.password_type` value `line` not being applied correctly due to data model value not being translated to the provider's expected format
 - Fix `system.hardware_profile.mpls_adjacency_stats_mode` values `packets` and `bytes` not being applied correctly due to data model values not being translated to the provider's expected format
 - Fix `qos.policy_maps.classes.police.cir_unit` and `qos.policy_maps.classes.police.pir_unit` value `percent` not being applied correctly due to data model value not being translated to the provider's expected format
+- Fix `logging.facilities.name` value `pltfm-config` not being applied correctly due to data model value not being translated to the provider's expected format
+- Fix `ip_access_lists.entries.source.prefix`, `ip_access_lists.entries.destination.prefix`, `ipv6_access_lists.entries.source.prefix`, and `ipv6_access_lists.entries.destination.prefix` value `any` not being applied correctly due to data model value not being translated to the provider's expected format (IPv4 ACLs use `0.0.0.0`, IPv6 ACLs use `::`)
