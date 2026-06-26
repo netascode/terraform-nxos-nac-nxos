@@ -3,6 +3,13 @@ locals {
     "standard" = "standard"
     "expanded" = "regex"
   }
+
+  rp_community_well_known_map = {
+    "internet"     = "regular:wk-nn2:internet"
+    "no-export"    = "regular:wk-nn2:no-export"
+    "no-advertise" = "regular:wk-nn2:no-advertise"
+    "local-AS"     = "regular:wk-nn2:no-export-subconfed"
+  }
 }
 
 resource "nxos_route_policy" "route_policy" {
@@ -81,7 +88,13 @@ resource "nxos_route_policy" "route_policy" {
       set_regular_community_criteria     = try(entry.set_community, null) != null ? "none" : null
 
       set_regular_community_items = try(entry.set_community, null) != null ? {
-        try(entry.set_community) = {}
+        for c in compact(split(" ", try(entry.set_community))) :
+        try(
+          local.rp_community_well_known_map[c],
+          can(regex("^[0-9]+:[0-9]+$", c)) ? (
+            tonumber(split(":", c)[0]) <= 65535 ? "regular:as2-nn2:${c}" : "regular:as4-nn2:${c}"
+          ) : c
+        ) => {}
       } : null
 
       match_tags = length(try(entry.match_tags, [])) > 0 ? { for tag in try(entry.match_tags, []) : tag => {} } : null
@@ -123,7 +136,14 @@ resource "nxos_route_policy" "route_policy" {
       action = try(entry.action, null)
       regex  = try(entry.regex, null)
 
-      items = length(try(entry.communities, [])) > 0 ? { for community in try(entry.communities, []) : community => {} } : null
+      items = length(try(entry.communities, [])) > 0 ? { for community in try(entry.communities, []) :
+        try(
+          local.rp_community_well_known_map[community],
+          can(regex("^[0-9]+:[0-9]+$", community)) ? (
+            tonumber(split(":", community)[0]) <= 65535 ? "regular:as2-nn2:${community}" : "regular:as4-nn2:${community}"
+          ) : community
+        ) => {}
+      } : null
     } } : null
   } } : null
 
