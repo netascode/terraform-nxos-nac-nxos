@@ -125,6 +125,7 @@ resource "nxos_cli" "cli_0" {
 
   depends_on = [
     nxos_access_list.access_list,
+    nxos_acl_log.acl_log,
     nxos_analytics.analytics,
     nxos_bfd.bfd,
     nxos_bgp.bgp,
