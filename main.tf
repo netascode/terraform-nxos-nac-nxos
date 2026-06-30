@@ -125,6 +125,7 @@ resource "nxos_cli" "cli_0" {
 
   depends_on = [
     nxos_access_list.access_list,
+    nxos_acl_log.acl_log,
     nxos_analytics.analytics,
     nxos_bfd.bfd,
     nxos_bgp.bgp,
@@ -139,6 +140,7 @@ resource "nxos_cli" "cli_0" {
     nxos_hsrp.hsrp,
     nxos_icmpv4.icmpv4,
     nxos_icmpv6.icmpv6,
+    nxos_igmp_snooping.igmp_snooping,
     nxos_ipv4.ipv4,
     nxos_ipv6.ipv6,
     nxos_isis.isis,

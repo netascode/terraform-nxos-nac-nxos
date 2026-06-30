@@ -257,6 +257,10 @@ resource "nxos_system" "system" {
     try(local.device_config[device.name].system.erspan_origin_ipv6_address, null) != null ||
     try(local.device_config[device.name].system.ttag_marker_interval, null) != null ||
     length(try(local.ttag_interfaces_by_device[device.name], [])) > 0 ||
+    try(local.device_config[device.name].system.password_encryption_aes, null) != null ||
+    try(local.device_config[device.name].system.password_encryption_use_tam, null) != null ||
+    length(try(local.device_config[device.name].system.ssh_source_interfaces, [])) > 0 ||
+    length(try(local.device_config[device.name].system.ftp_source_interfaces, [])) > 0 ||
   length(try(local.device_config[device.name].interfaces.management, [])) > 0 }
   device = each.key
 
@@ -547,6 +551,20 @@ resource "nxos_system" "system" {
   ssh_keys = length(try(local.device_config[each.key].system.ssh.keys, [])) > 0 ? { for key in try(local.device_config[each.key].system.ssh.keys, []) : key.type => {
     key_length = try(key.key_length, null)
   } } : null
+
+  # srcintfSsh nested map (per-VRF SSH source interface)
+  ssh_source_interfaces = length(try(local.device_config[each.key].system.ssh_source_interfaces, [])) > 0 ? { for s in try(local.device_config[each.key].system.ssh_source_interfaces, []) : s.vrf => {
+    source_interface = try(s.source_interface_type, null) != null ? "${local.intf_prefix_map[try(s.source_interface_type)]}${try(s.source_interface_id, "")}" : null
+  } } : null
+
+  # srcintfFtp nested map (per-VRF FTP source interface)
+  ftp_source_interfaces = length(try(local.device_config[each.key].system.ftp_source_interfaces, [])) > 0 ? { for s in try(local.device_config[each.key].system.ftp_source_interfaces, []) : s.vrf => {
+    source_interface = try(s.source_interface_type, null) != null ? "${local.intf_prefix_map[try(s.source_interface_type)]}${try(s.source_interface_id, "")}" : null
+  } } : null
+
+  # smartcardPasswdEncrypt attributes (feature password encryption aes)
+  password_encryption_admin_state = try(local.device_config[each.key].system.password_encryption_aes, null) == null ? null : (try(local.device_config[each.key].system.password_encryption_aes) ? "enabled" : "disabled")
+  password_encryption_use_tam     = try(local.device_config[each.key].system.password_encryption_use_tam, null) == null ? null : (try(local.device_config[each.key].system.password_encryption_use_tam) ? "enabled" : "disabled")
 
   depends_on = [
     nxos_feature.feature,
