@@ -1,0 +1,5 @@
+- Add `system.ssh_source_interfaces` support (per-VRF SSH source interface)
+- Add `system.ftp_source_interfaces` support (per-VRF FTP source interface)
+- Add `system.password_encryption_aes` and `system.password_encryption_use_tam` support (`feature password encryption aes`)
+- Add `system.acl_log` support (ACL logging match level, cache entries, interval, threshold, and detailed/MAC/SGT options)
+- Add `igmp_snooping` support (global IGMP snooping including VXLAN snooping, NVE static router port, querier, optimised multicast flood, routing, and stateful-HA)

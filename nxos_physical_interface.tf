@@ -130,7 +130,7 @@ resource "nxos_physical_interface" "physical_interface" {
     fec_mode                           = try(int.fec, null)
     access_vlan                        = try(int.channel_group, null) != null ? null : (!try(int.switchport.enabled, true) ? "unknown" : try(int.switchport.access_vlan, null) != null ? "vlan-${int.switchport.access_vlan}" : null)
     admin_state                        = try(int.shutdown, null) != null ? (try(int.shutdown) ? "down" : "up") : "up"
-    auto_negotiation                   = try(int.negotiate_auto, null)
+    auto_negotiation                   = try(local.interface_negotiate_auto_map[try(int.negotiate_auto)], try(int.negotiate_auto, null))
     bandwidth                          = try(int.bandwidth, null)
     beacon                             = try(int.beacon, null) != null ? (try(int.beacon) ? "on" : "off") : null
     delay                              = try(int.delay, null)
@@ -162,7 +162,7 @@ resource "nxos_physical_interface" "physical_interface" {
     packet_timestamp_ingress_source_id = try(int.packet_timestamp_ingress_source_id, null)
     packet_timestamp_state             = try(int.packet_timestamp, null)
     snmp_trap_state                    = try(int.snmp_trap_link_status, null) != null ? (try(int.snmp_trap_link_status) ? "enable" : "disable") : null
-    speed                              = try(int.speed, null)
+    speed                              = try(local.interface_speed_map[try(int.speed)], try(int.speed, null))
     speed_group                        = try(int.speed_group, null)
     squelch                            = try(int.squelch, null) != null ? (try(int.squelch) ? "enable" : "disable") : null
     transparent_mode                   = try(int.switchport.monitor, null) == null ? null : (try(int.switchport.monitor) ? "trans-port" : "not-a-trans-port")

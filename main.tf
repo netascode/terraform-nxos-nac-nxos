@@ -46,6 +46,30 @@ locals {
     "vni"          = "vni"
   }
 
+  interface_speed_map = {
+    "100m"                 = "100M"
+    "1g"                   = "1G"
+    "10g"                  = "10G"
+    "40g"                  = "40G"
+    "100g"                 = "100G"
+    "25000"                = "25G"
+    "10m"                  = "10M"
+    "50g"                  = "50G"
+    "200g"                 = "200G"
+    "400g"                 = "400G"
+    "2.5g"                 = "2.5G"
+    "5g"                   = "5G"
+    "800g"                 = "800G"
+    "auto-100m"            = "auto 100M"
+    "auto-100m-1g"         = "auto 100M 1G"
+    "auto-2.5g-5g-10g"     = "auto 2.5G 5G 10G"
+    "auto-100m-1g-2.5g-5g" = "auto 100M 1G 2.5G 5G"
+  }
+
+  interface_negotiate_auto_map = {
+    "25000" = "25G"
+  }
+
   dscp_int_to_string_map = {
     0  = "default"
     8  = "cs1"
@@ -115,6 +139,7 @@ resource "nxos_cli" "cli_0" {
     nxos_hsrp.hsrp,
     nxos_icmpv4.icmpv4,
     nxos_icmpv6.icmpv6,
+    nxos_igmp_snooping.igmp_snooping,
     nxos_ipv4.ipv4,
     nxos_ipv6.ipv6,
     nxos_isis.isis,

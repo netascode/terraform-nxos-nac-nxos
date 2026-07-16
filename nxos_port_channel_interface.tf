@@ -113,7 +113,7 @@ resource "nxos_port_channel_interface" "port_channel_interface" {
     suspend_individual   = try(int.lacp_suspend_individual, null) != null ? (try(int.lacp_suspend_individual) ? "enable" : "disable") : null
     access_vlan          = !try(int.switchport.enabled, true) ? "unknown" : try(int.switchport.access_vlan, null) != null ? "vlan-${int.switchport.access_vlan}" : null
     admin_state          = try(int.shutdown, null) != null ? (try(int.shutdown) ? "down" : "up") : "up"
-    auto_negotiation     = try(int.negotiate_auto, null)
+    auto_negotiation     = try(local.interface_negotiate_auto_map[try(int.negotiate_auto)], try(int.negotiate_auto, null))
     bandwidth            = try(int.bandwidth, null)
     delay                = try(int.delay, null)
     description          = try(int.description, null)
@@ -124,7 +124,7 @@ resource "nxos_port_channel_interface" "port_channel_interface" {
     mode                 = try(local.switchport_mode_map[try(int.switchport.mode)], try(int.switchport.mode, null))
     mtu                  = try(int.mtu, null)
     native_vlan          = !try(int.switchport.enabled, true) ? "unknown" : try(int.switchport.trunk_native_vlan, null) != null ? "vlan-${int.switchport.trunk_native_vlan}" : null
-    speed                = try(int.speed, null)
+    speed                = try(local.interface_speed_map[try(int.speed)], try(int.speed, null))
     trunk_vlans          = !try(int.switchport.enabled, true) ? "1-4094" : try(provider::utils::normalize_vlans(try(int.switchport.trunk_allowed_vlans), "string-nxos"), null)
     dot1q_ethertype      = try(int.dot1q_ethertype, null)
     graceful_convergence = try(int.lacp_graceful_convergence, null) != null ? (try(int.lacp_graceful_convergence) ? "enable" : "disable") : null

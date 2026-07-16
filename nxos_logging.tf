@@ -1,3 +1,9 @@
+locals {
+  logging_facility_name_map = {
+    "pltfm-config" = "pltfm_config"
+  }
+}
+
 resource "nxos_logging" "logging" {
   for_each = { for device in local.devices : device.name => device
   if try(local.device_config[device.name].logging, null) != null }
@@ -6,7 +12,7 @@ resource "nxos_logging" "logging" {
   # loggingLogLevel
   all   = try(local.device_config[each.key].logging.logging, null) == null ? null : (try(local.device_config[each.key].logging.logging) ? "enableall" : "disableall")
   level = try(local.device_config[each.key].logging.level, null)
-  facilities = length(try(local.device_config[each.key].logging.facilities, [])) > 0 ? { for facility in try(local.device_config[each.key].logging.facilities, []) : facility.name => {
+  facilities = length(try(local.device_config[each.key].logging.facilities, [])) > 0 ? { for facility in try(local.device_config[each.key].logging.facilities, []) : try(local.logging_facility_name_map[facility.name], facility.name) => {
     level = try(facility.level, null)
   } } : null
 

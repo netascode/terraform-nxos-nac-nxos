@@ -24,6 +24,10 @@ locals {
     replace-as = "replace-as"
   }
 
+  bgp_password_type_map = {
+    "line" = "LINE"
+  }
+
   soft_reconfiguration_inbound_map = {
     none           = "none"
     inbound        = "inbound"
@@ -209,7 +213,7 @@ resource "nxos_bgp" "bgp" {
           log_neighbor_changes = try(pt.log_neighbor_changes, null) == null ? null : (try(pt.log_neighbor_changes) ? "enable" : "disable")
           low_memory_exempt    = try(pt.low_memory_exempt, null) == null ? null : (try(pt.low_memory_exempt) ? "enabled" : "disabled")
           max_peer_count       = try(pt.maximum_peers, null)
-          password_type        = try(pt.password_type, null)
+          password_type        = try(local.bgp_password_type_map[try(pt.password_type)], try(pt.password_type, null))
           password             = try(pt.password, null)
           private_as_control   = try(local.remove_private_as_map[pt.remove_private_as], null)
           session_template     = try(pt.inherit_peer_session, null)
@@ -284,7 +288,7 @@ resource "nxos_bgp" "bgp" {
               try(nei.disable_connected_check, false) ? "dis-conn-check" : "",
               !try(nei.dynamic_capability, true) ? "no-dyn-cap" : "",
           ]))) : null
-          password_type                 = try(nei.password_type, null)
+          password_type                 = try(local.bgp_password_type_map[try(nei.password_type)], try(nei.password_type, null))
           password                      = try(nei.password, null)
           admin_state                   = try(nei.shutdown, null) == null ? null : (try(nei.shutdown) ? "disabled" : "enabled")
           affinity_group                = try(nei.affinity_group, null)
@@ -398,7 +402,7 @@ resource "nxos_bgp" "bgp" {
           log_neighbor_changes             = try(nei.log_neighbor_changes, null) == null ? null : (try(nei.log_neighbor_changes) ? "enable" : "disable")
           low_memory_exempt                = try(nei.low_memory_exempt, null) == null ? null : (try(nei.low_memory_exempt) ? "enabled" : "disabled")
           max_peer_count                   = try(nei.maximum_peers, null)
-          password_type                    = try(nei.password_type, null)
+          password_type                    = try(local.bgp_password_type_map[try(nei.password_type)], try(nei.password_type, null))
           password                         = try(nei.password, null)
           private_as_control               = try(local.remove_private_as_map[nei.remove_private_as], null)
           session_template                 = try(nei.inherit_peer_session, null)
@@ -534,7 +538,7 @@ resource "nxos_bgp" "bgp" {
             try(nei.disable_connected_check, false) ? "dis-conn-check" : "",
             !try(nei.dynamic_capability, true) ? "no-dyn-cap" : "",
         ]))) : null
-        password_type                 = try(nei.password_type, null)
+        password_type                 = try(local.bgp_password_type_map[try(nei.password_type)], try(nei.password_type, null))
         password                      = try(nei.password, null)
         admin_state                   = try(nei.shutdown, null) == null ? null : (try(nei.shutdown) ? "disabled" : "enabled")
         affinity_group                = try(nei.affinity_group, null)
@@ -648,7 +652,7 @@ resource "nxos_bgp" "bgp" {
         log_neighbor_changes             = try(nei.log_neighbor_changes, null) == null ? null : (try(nei.log_neighbor_changes) ? "enable" : "disable")
         low_memory_exempt                = try(nei.low_memory_exempt, null) == null ? null : (try(nei.low_memory_exempt) ? "enabled" : "disabled")
         max_peer_count                   = try(nei.maximum_peers, null)
-        password_type                    = try(nei.password_type, null)
+        password_type                    = try(local.bgp_password_type_map[try(nei.password_type)], try(nei.password_type, null))
         password                         = try(nei.password, null)
         private_as_control               = try(local.remove_private_as_map[nei.remove_private_as], null)
         session_template                 = try(nei.inherit_peer_session, null)
