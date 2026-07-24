@@ -125,6 +125,7 @@ resource "nxos_cli" "cli_0" {
     nxos_network_qos.network_qos,
     nxos_ntp.ntp,
     nxos_nvo.nvo,
+    nxos_object_group.object_group,
     nxos_ospf.ospf,
     nxos_ospfv3.ospfv3,
     nxos_physical_interface.physical_interface,

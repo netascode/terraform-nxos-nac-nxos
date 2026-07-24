@@ -1,0 +1,1 @@
+- Add object group support (`ipv4_address_object_groups`, `ipv6_address_object_groups`, `port_object_groups`) rendered into the `nxos_object_group` resource
