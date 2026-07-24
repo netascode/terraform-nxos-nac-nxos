@@ -157,6 +157,7 @@ resource "nxos_access_list" "access_list" {
   ingress_vty_access_list_name = try(local.device_config[each.key].system.line_vty_access_class_in, null)
   egress_vty_access_list_name  = try(local.device_config[each.key].system.line_vty_access_class_out, null)
   depends_on = [
+    nxos_object_group.object_group,
     nxos_physical_interface.physical_interface,
     nxos_svi_interface.svi_interface,
     nxos_loopback_interface.loopback_interface,

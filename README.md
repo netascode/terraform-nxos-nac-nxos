@@ -99,6 +99,7 @@ No outputs.
 | [nxos_network_qos.network_qos](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/network_qos) | resource |
 | [nxos_ntp.ntp](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/ntp) | resource |
 | [nxos_nvo.nvo](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/nvo) | resource |
+| [nxos_object_group.object_group](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/object_group) | resource |
 | [nxos_ospf.ospf](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/ospf) | resource |
 | [nxos_ospfv3.ospfv3](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/ospfv3) | resource |
 | [nxos_physical_interface.physical_interface](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/physical_interface) | resource |
