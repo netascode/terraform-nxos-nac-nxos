@@ -2,6 +2,10 @@ locals {
   multisite_ingress_replication_map = {
     "optimized" = "enableOptimized"
   }
+  host_reachability_protocol_map = {
+    "flood-and-learn" = "Flood-and-learn"
+    "openflow-ir"     = "openflowIR"
+  }
 }
 
 resource "nxos_nvo" "nvo" {
@@ -29,7 +33,7 @@ resource "nxos_nvo" "nvo" {
     description                        = try(local.device_config[each.key].interfaces.nve.description, null)
     fabric_ready_time                  = try(local.device_config[each.key].interfaces.nve.fabric_ready_time, null)
     hold_down_time                     = try(local.device_config[each.key].interfaces.nve.source_interface_hold_down_time, null)
-    host_reachability_protocol         = try(local.device_config[each.key].interfaces.nve.host_reachability_protocol, null)
+    host_reachability_protocol         = try(local.host_reachability_protocol_map[try(local.device_config[each.key].interfaces.nve.host_reachability_protocol)], try(local.device_config[each.key].interfaces.nve.host_reachability_protocol, null))
     ingress_replication_protocol_bgp   = try(local.device_config[each.key].interfaces.nve.global_ingress_replication_protocol_bgp, null)
     multicast_group_l2                 = try(local.device_config[each.key].interfaces.nve.global_mcast_group_l2, null)
     multicast_group_l3                 = try(local.device_config[each.key].interfaces.nve.global_mcast_group_l3, null)
