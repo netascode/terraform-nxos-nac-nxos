@@ -1,0 +1,8 @@
+- Add support for Private VLAN (PVLAN) configuration using provider version `0.14.0`:
+  - `vlan.vlans[].private_vlan_type` - VLAN type (`primary`, `isolated`, `community`)
+  - `vlan.vlans[].private_vlan_association` - Primary VLAN association list (e.g. `101-102`)
+  - `vlan.vlans[].mac_address_table_learning` - MAC address table learning under `vlan configuration <id>`
+  - `system.private_vlan_fex_trunk` - Enable private-VLAN FEX trunk mode
+  - `interfaces.ethernets[].switchport.private_vlan` - PVLAN switchport config on Ethernet interfaces
+  - `interfaces.port_channels[].switchport.private_vlan` - PVLAN switchport config on port-channel interfaces
+  - `interfaces.vlans[].private_vlan_mapping` - Secondary VLAN mapping on SVI interfaces

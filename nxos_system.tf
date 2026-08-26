@@ -210,6 +210,54 @@ locals {
     "suppress_ra"     = "suppress-ra"
     "suppress_ra_mtu" = "suppress-ra-mtu"
   }
+
+  pvlan_vlans = { for device in local.devices : device.name => [
+    for vlan in try(local.device_config[device.name].vlan.vlans, []) : true
+    if try(vlan.private_vlan_type, null) != null
+  ] }
+
+  pvlan_interfaces = flatten([
+    for device in local.devices : concat(
+      [for int in try(local.device_config[device.name].interfaces.ethernets, []) : {
+        device                          = device.name
+        interface_id                    = "eth${int.id}"
+        mapping_primary_vlan            = try(int.switchport.private_vlan.mapping_primary_vlan, null)
+        mapping_secondary_vlans         = try(int.switchport.private_vlan.mapping_secondary_vlans, null)
+        host_association_primary_vlan   = try(int.switchport.private_vlan.host_association_primary_vlan, null)
+        host_association_secondary_vlan = try(int.switchport.private_vlan.host_association_secondary_vlan, null)
+        trunk_native_vlan               = try(int.switchport.private_vlan.trunk_native_vlan, null)
+        trunk_allowed_vlans             = try(int.switchport.private_vlan.trunk_allowed_vlans, null)
+        trunk_promiscuous_mappings      = try(int.switchport.private_vlan.trunk_promiscuous_mappings, [])
+        trunk_secondary_associations    = try(int.switchport.private_vlan.trunk_secondary_associations, [])
+      } if try(int.switchport.private_vlan, null) != null],
+      [for int in try(local.device_config[device.name].interfaces.port_channels, []) : {
+        device                          = device.name
+        interface_id                    = "po${int.id}"
+        mapping_primary_vlan            = try(int.switchport.private_vlan.mapping_primary_vlan, null)
+        mapping_secondary_vlans         = try(int.switchport.private_vlan.mapping_secondary_vlans, null)
+        host_association_primary_vlan   = try(int.switchport.private_vlan.host_association_primary_vlan, null)
+        host_association_secondary_vlan = try(int.switchport.private_vlan.host_association_secondary_vlan, null)
+        trunk_native_vlan               = try(int.switchport.private_vlan.trunk_native_vlan, null)
+        trunk_allowed_vlans             = try(int.switchport.private_vlan.trunk_allowed_vlans, null)
+        trunk_promiscuous_mappings      = try(int.switchport.private_vlan.trunk_promiscuous_mappings, [])
+        trunk_secondary_associations    = try(int.switchport.private_vlan.trunk_secondary_associations, [])
+      } if try(int.switchport.private_vlan, null) != null],
+    )
+  ])
+
+  pvlan_interfaces_by_device = { for entry in local.pvlan_interfaces : entry.device => entry... }
+
+  pvlan_svis = flatten([
+    for device in local.devices : [
+      for int in try(local.device_config[device.name].interfaces.vlans, []) : {
+        device          = device.name
+        interface_id    = "vlan${int.id}"
+        secondary_vlans = try(int.private_vlan_mapping, null)
+      } if try(int.private_vlan_mapping, null) != null
+    ]
+  ])
+
+  pvlan_svis_by_device = { for entry in local.pvlan_svis : entry.device => entry... }
 }
 
 resource "nxos_system" "system" {
@@ -257,6 +305,10 @@ resource "nxos_system" "system" {
     try(local.device_config[device.name].system.erspan_origin_ipv6_address, null) != null ||
     try(local.device_config[device.name].system.ttag_marker_interval, null) != null ||
     length(try(local.ttag_interfaces_by_device[device.name], [])) > 0 ||
+    try(local.device_config[device.name].system.private_vlan_fex_trunk, null) != null ||
+    length(try(local.pvlan_vlans[device.name], [])) > 0 ||
+    length(try(local.pvlan_interfaces_by_device[device.name], [])) > 0 ||
+    length(try(local.pvlan_svis_by_device[device.name], [])) > 0 ||
   length(try(local.device_config[device.name].interfaces.management, [])) > 0 }
   device = each.key
 
@@ -546,6 +598,36 @@ resource "nxos_system" "system" {
   # commSshKey nested map
   ssh_keys = length(try(local.device_config[each.key].system.ssh.keys, [])) > 0 ? { for key in try(local.device_config[each.key].system.ssh.keys, []) : key.type => {
     key_length = try(key.key_length, null)
+  } } : null
+
+  # pvlanPrivateVlan attributes
+  pvlan_fex_trunk = try(local.device_config[each.key].system.private_vlan_fex_trunk, null) == null ? null : (try(local.device_config[each.key].system.private_vlan_fex_trunk) ? "enabled" : "disabled")
+
+  # pvlanVlan nested map
+  pvlans = length(try(local.pvlan_vlans[each.key], [])) > 0 ? { for vlan in try(local.device_config[each.key].vlan.vlans, []) : "vlan-${vlan.id}" => {
+    type        = try(vlan.private_vlan_type, null)
+    association = try(vlan.private_vlan_association, null)
+  } if try(vlan.private_vlan_type, null) != null } : null
+
+  # pvlanIf nested map
+  pvlan_interfaces = length(try(local.pvlan_interfaces_by_device[each.key], [])) > 0 ? { for entry in try(local.pvlan_interfaces_by_device[each.key], []) : entry.interface_id => {
+    access_promiscuous_primary_vlan    = try(entry.mapping_primary_vlan, null) != null ? "vlan-${entry.mapping_primary_vlan}" : null
+    access_promiscuous_secondary_vlans = try(entry.mapping_secondary_vlans, null)
+    access_secondary_primary_vlan      = try(entry.host_association_primary_vlan, null) != null ? "vlan-${entry.host_association_primary_vlan}" : null
+    access_secondary_secondary_vlan    = try(entry.host_association_secondary_vlan, null) != null ? "vlan-${entry.host_association_secondary_vlan}" : null
+    trunk_native_vlan                  = try(entry.trunk_native_vlan, null) != null ? "vlan-${entry.trunk_native_vlan}" : null
+    trunk_allowed_vlans                = try(entry.trunk_allowed_vlans, null)
+    trunk_promiscuous_mappings = length(try(entry.trunk_promiscuous_mappings, [])) > 0 ? { for mapping in try(entry.trunk_promiscuous_mappings, []) : "vlan-${mapping.primary_vlan}" => {
+      secondary_vlans = try(mapping.secondary_vlans, null)
+    } } : null
+    trunk_secondary_associations = length(try(entry.trunk_secondary_associations, [])) > 0 ? { for assoc in try(entry.trunk_secondary_associations, []) : "vlan-${assoc.primary_vlan}" => {
+      secondary_vlan = try(assoc.secondary_vlan, null) != null ? "vlan-${assoc.secondary_vlan}" : null
+    } } : null
+  } } : null
+
+  # pvlanSvi nested map
+  pvlan_svis = length(try(local.pvlan_svis_by_device[each.key], [])) > 0 ? { for entry in try(local.pvlan_svis_by_device[each.key], []) : entry.interface_id => {
+    secondary_vlans = try(entry.secondary_vlans, null)
   } } : null
 
   depends_on = [
