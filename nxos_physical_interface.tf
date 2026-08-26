@@ -1,7 +1,9 @@
 locals {
   switchport_mode_map = {
-    "trunk-secondary"   = "trunk_secondary"
-    "trunk-promiscuous" = "trunk_promiscuous"
+    "private-vlan-host"              = "host"
+    "private-vlan-promiscuous"       = "promiscuous"
+    "private-vlan-trunk-secondary"   = "trunk_secondary"
+    "private-vlan-trunk-promiscuous" = "trunk_promiscuous"
   }
   interfaces_ethernets = flatten([
     for device in local.devices : [
