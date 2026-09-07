@@ -146,7 +146,7 @@ resource "nxos_port_channel_interface" "port_channel_interface" {
     switchport_mac_learn = try(int.switchport.mac_learning, null) == null ? null : (try(int.switchport.mac_learning) ? "enable" : "disable")
     user_configured_flags = join(",", sort(compact([
       "admin_layer",
-      try(int.mtu, null) != null ? "admin_mtu" : "",
+      "admin_mtu",
       try(int.mac_address, null) != null ? "admin_router_mac" : "",
       try(int.shutdown, null) != null || !try(int.switchport.enabled, true) ? "admin_state" : "",
     ])))
