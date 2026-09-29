@@ -1,0 +1,5 @@
+- Add EIGRP support (requires a provider version that includes the `nxos_eigrp` resource):
+  - `feature.eigrp` - Enable `feature eigrp`
+  - `routing.eigrp_processes` - EIGRP processes (`router eigrp <name>`) with autonomous system, router ID, distances, maximum paths, metric version/weights/rib-scale/maximum-hops, default metric, authentication, BFD, graceful restart and NSF timers, active time, logging, passive-interface default, stub, table-map, default-information originate, redistribution (with route-maps) and redistribute maximum-prefix
+  - `routing.eigrp_processes[].vrfs` - Per-VRF EIGRP address family configuration with the same attributes
+  - `interfaces.*.eigrp` - Interface EIGRP configuration (`ip router eigrp <name>`) for loopbacks, VLANs, Ethernets, port-channels and subinterfaces, including timers, bandwidth/delay/MTU, passive-interface, split-horizon, next-hop-self, BFD, authentication, distribute-lists, offset-lists and summary addresses
