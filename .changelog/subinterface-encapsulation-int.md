@@ -1,0 +1,1 @@
+- BREAKING CHANGE: `interfaces.ethernets.subinterfaces.encapsulation` and `interfaces.port_channels.subinterfaces.encapsulation` changed from string (e.g., `vlan-100`) to integer VLAN ID (1-4094, e.g., `100`); the `vlan-` prefix is now added by the module

@@ -194,7 +194,7 @@ locals {
         bandwidth               = try(sub.bandwidth, null)
         delay                   = try(sub.delay, null)
         description             = try(sub.description, null)
-        encap                   = try(sub.encapsulation, null)
+        encap                   = try(sub.encapsulation, null) != null ? "vlan-${try(sub.encapsulation)}" : null
         link_logging            = try(sub.logging_event_port_link_status, null) != null ? (try(sub.logging_event_port_link_status) ? "enable" : "disable") : null
         medium                  = try(sub.medium, null)
         mtu                     = try(sub.mtu, null)
@@ -210,7 +210,7 @@ locals {
         bandwidth               = try(sub.bandwidth, null)
         delay                   = try(sub.delay, null)
         description             = try(sub.description, null)
-        encap                   = try(sub.encapsulation, null)
+        encap                   = try(sub.encapsulation, null) != null ? "vlan-${try(sub.encapsulation)}" : null
         link_logging            = try(sub.logging_event_port_link_status, null) != null ? (try(sub.logging_event_port_link_status) ? "enable" : "disable") : null
         medium                  = try(sub.medium, null)
         mtu                     = try(sub.mtu, null)
