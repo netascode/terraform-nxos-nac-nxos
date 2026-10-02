@@ -89,6 +89,7 @@ No outputs.
 | [nxos_hsrp.hsrp](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/hsrp) | resource |
 | [nxos_icmpv4.icmpv4](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/icmpv4) | resource |
 | [nxos_icmpv6.icmpv6](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/icmpv6) | resource |
+| [nxos_igmp_snooping.igmp_snooping](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/igmp_snooping) | resource |
 | [nxos_ipv4.ipv4](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/ipv4) | resource |
 | [nxos_ipv6.ipv6](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/ipv6) | resource |
 | [nxos_isis.isis](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/isis) | resource |

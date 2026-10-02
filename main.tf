@@ -139,6 +139,7 @@ resource "nxos_cli" "cli_0" {
     nxos_hsrp.hsrp,
     nxos_icmpv4.icmpv4,
     nxos_icmpv6.icmpv6,
+    nxos_igmp_snooping.igmp_snooping,
     nxos_ipv4.ipv4,
     nxos_ipv6.ipv6,
     nxos_isis.isis,
