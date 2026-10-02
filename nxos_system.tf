@@ -222,11 +222,11 @@ locals {
         device                          = device.name
         interface_id                    = "eth${int.id}"
         mapping_primary_vlan            = try(int.switchport.private_vlan.mapping_primary_vlan, null)
-        mapping_secondary_vlans         = try(int.switchport.private_vlan.mapping_secondary_vlans, null)
+        mapping_secondary_vlans         = try(provider::utils::normalize_vlans(try(int.switchport.private_vlan.mapping_secondary_vlans), "string-nxos"), null)
         host_association_primary_vlan   = try(int.switchport.private_vlan.host_association_primary_vlan, null)
         host_association_secondary_vlan = try(int.switchport.private_vlan.host_association_secondary_vlan, null)
         trunk_native_vlan               = try(int.switchport.private_vlan.trunk_native_vlan, null)
-        trunk_allowed_vlans             = try(int.switchport.private_vlan.trunk_allowed_vlans, null)
+        trunk_allowed_vlans             = try(provider::utils::normalize_vlans(try(int.switchport.private_vlan.trunk_allowed_vlans), "string-nxos"), null)
         trunk_promiscuous_mappings      = try(int.switchport.private_vlan.trunk_promiscuous_mappings, [])
         trunk_secondary_associations    = try(int.switchport.private_vlan.trunk_secondary_associations, [])
       } if try(int.switchport.private_vlan, null) != null],
@@ -234,11 +234,11 @@ locals {
         device                          = device.name
         interface_id                    = "po${int.id}"
         mapping_primary_vlan            = try(int.switchport.private_vlan.mapping_primary_vlan, null)
-        mapping_secondary_vlans         = try(int.switchport.private_vlan.mapping_secondary_vlans, null)
+        mapping_secondary_vlans         = try(provider::utils::normalize_vlans(try(int.switchport.private_vlan.mapping_secondary_vlans), "string-nxos"), null)
         host_association_primary_vlan   = try(int.switchport.private_vlan.host_association_primary_vlan, null)
         host_association_secondary_vlan = try(int.switchport.private_vlan.host_association_secondary_vlan, null)
         trunk_native_vlan               = try(int.switchport.private_vlan.trunk_native_vlan, null)
-        trunk_allowed_vlans             = try(int.switchport.private_vlan.trunk_allowed_vlans, null)
+        trunk_allowed_vlans             = try(provider::utils::normalize_vlans(try(int.switchport.private_vlan.trunk_allowed_vlans), "string-nxos"), null)
         trunk_promiscuous_mappings      = try(int.switchport.private_vlan.trunk_promiscuous_mappings, [])
         trunk_secondary_associations    = try(int.switchport.private_vlan.trunk_secondary_associations, [])
       } if try(int.switchport.private_vlan, null) != null],
@@ -252,7 +252,7 @@ locals {
       for int in try(local.device_config[device.name].interfaces.vlans, []) : {
         device          = device.name
         interface_id    = "vlan${int.id}"
-        secondary_vlans = try(int.private_vlan_mapping, null)
+        secondary_vlans = try(provider::utils::normalize_vlans(try(int.private_vlan_mapping), "string-nxos"), null)
       } if try(int.private_vlan_mapping, null) != null
     ]
   ])
@@ -606,7 +606,7 @@ resource "nxos_system" "system" {
   # pvlanVlan nested map
   pvlans = length(try(local.pvlan_vlans[each.key], [])) > 0 ? { for vlan in try(local.device_config[each.key].vlan.vlans, []) : "vlan-${vlan.id}" => {
     type        = try(vlan.private_vlan_type, null)
-    association = try(vlan.private_vlan_association, null)
+    association = try(provider::utils::normalize_vlans(try(vlan.private_vlan_association), "string-nxos"), null)
   } if try(vlan.private_vlan_type, null) != null } : null
 
   # pvlanIf nested map
@@ -618,7 +618,7 @@ resource "nxos_system" "system" {
     trunk_native_vlan                  = try(entry.trunk_native_vlan, null) != null ? "vlan-${entry.trunk_native_vlan}" : null
     trunk_allowed_vlans                = try(entry.trunk_allowed_vlans, null)
     trunk_promiscuous_mappings = length(try(entry.trunk_promiscuous_mappings, [])) > 0 ? { for mapping in try(entry.trunk_promiscuous_mappings, []) : "vlan-${mapping.primary_vlan}" => {
-      secondary_vlans = try(mapping.secondary_vlans, null)
+      secondary_vlans = try(provider::utils::normalize_vlans(try(mapping.secondary_vlans), "string-nxos"), null)
     } } : null
     trunk_secondary_associations = length(try(entry.trunk_secondary_associations, [])) > 0 ? { for assoc in try(entry.trunk_secondary_associations, []) : "vlan-${assoc.primary_vlan}" => {
       secondary_vlan = try(assoc.secondary_vlan, null) != null ? "vlan-${assoc.secondary_vlan}" : null

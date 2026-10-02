@@ -6,7 +6,7 @@ locals {
 
   bridge_domain_vlans_with_config = { for device in local.devices : device.name => [
     for vlan in try(local.device_config[device.name].vlan.vlans, []) : true
-    if try(vlan.mac_address_table_learning, null) != null
+    if try(vlan.mac_learn, null) != null
   ] }
 }
 
@@ -36,8 +36,8 @@ resource "nxos_bridge_domain" "bridge_domain" {
     cross_connect       = try(vlan.cross_connect, null) == null ? null : try(vlan.cross_connect) ? "enable" : "disable"
   } } : null
   vlan_configurations = length(try(local.bridge_domain_vlans_with_config[each.key], [])) > 0 ? { for vlan in try(local.device_config[each.key].vlan.vlans, []) : "vlan-${vlan.id}" => {
-    mac_learning = try(vlan.mac_address_table_learning, null) == null ? null : try(vlan.mac_address_table_learning) ? "enable" : "disable"
-  } if try(vlan.mac_address_table_learning, null) != null } : null
+    mac_learning = try(vlan.mac_learn, null) == null ? null : try(vlan.mac_learn) ? "enable" : "disable"
+  } if try(vlan.mac_learn, null) != null } : null
 
   depends_on = [
     nxos_feature.feature,

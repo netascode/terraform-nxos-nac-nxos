@@ -1,8 +1,4 @@
-- Add support for Private VLAN (PVLAN) configuration using provider version `0.14.0`:
-  - `vlan.vlans[].private_vlan_type` - VLAN type (`primary`, `isolated`, `community`)
-  - `vlan.vlans[].private_vlan_association` - Primary VLAN association list (e.g. `101-102`)
-  - `vlan.vlans[].mac_address_table_learning` - MAC address table learning under `vlan configuration <id>`
-  - `system.private_vlan_fex_trunk` - Enable private-VLAN FEX trunk mode
-  - `interfaces.ethernets[].switchport.private_vlan` - PVLAN switchport config on Ethernet interfaces
-  - `interfaces.port_channels[].switchport.private_vlan` - PVLAN switchport config on port-channel interfaces
-  - `interfaces.vlans[].private_vlan_mapping` - Secondary VLAN mapping on SVI interfaces
+- Add Private VLAN (PVLAN) support including `vlan.vlans.private_vlan_type`, `vlan.vlans.private_vlan_association`, `vlan.vlans.mac_learn`, and `system.private_vlan_fex_trunk`
+- Add `interfaces.ethernets.switchport.private_vlan` and `interfaces.port_channels.switchport.private_vlan` support including `mapping_primary_vlan`, `mapping_secondary_vlans`, `host_association_primary_vlan`, `host_association_secondary_vlan`, `trunk_native_vlan`, `trunk_allowed_vlans`, `trunk_promiscuous_mappings`, and `trunk_secondary_associations`
+- Add `interfaces.vlans.private_vlan_mapping` support
+- BREAKING CHANGE: Rename `interfaces.ethernets.switchport.mode` and `interfaces.port_channels.switchport.mode` enum value `host` to `private-vlan-host`, `promiscuous` to `private-vlan-promiscuous`, `trunk-secondary` to `private-vlan-trunk-secondary`, `trunk-promiscuous` to `private-vlan-trunk-promiscuous`
