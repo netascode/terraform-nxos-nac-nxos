@@ -1,0 +1,1 @@
+- Add `object_group` support including `ip_addresses`, `ipv6_addresses`, and `ip_ports` with their `entries`

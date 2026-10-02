@@ -27,6 +27,9 @@ resource "nxos_access_list" "access_list" {
   for_each = { for device in local.devices : device.name => device
     if length(try(local.device_config[device.name].ip_access_lists, [])) > 0 ||
     length(try(local.device_config[device.name].ipv6_access_lists, [])) > 0 ||
+    length(try(local.device_config[device.name].object_group.ip_addresses, [])) > 0 ||
+    length(try(local.device_config[device.name].object_group.ipv6_addresses, [])) > 0 ||
+    length(try(local.device_config[device.name].object_group.ip_ports, [])) > 0 ||
     try(local.device_config[device.name].system.line_vty_access_class_in, null) != null ||
   try(local.device_config[device.name].system.line_vty_access_class_out, null) != null }
   device = each.key
@@ -150,6 +153,27 @@ resource "nxos_access_list" "access_list" {
       tcp_option_length         = try(entry.tcp_option_length, null)
       telemetry_path            = try(entry.telemetry_path, null)
       telemetry_queue           = try(entry.telemetry_queue, null)
+    } } : null
+  } } : null
+  ipv4_address_object_groups = length(try(local.device_config[each.key].object_group.ip_addresses, [])) > 0 ? { for og in try(local.device_config[each.key].object_group.ip_addresses, []) : og.name => {
+    members = length(try(og.entries, [])) > 0 ? { for entry in try(og.entries, []) : entry.sequence_number => {
+      prefix        = try(entry.prefix, null)
+      prefix_length = try(tostring(entry.prefix_length), null)
+      prefix_mask   = try(entry.prefix_mask, null)
+    } } : null
+  } } : null
+  ipv6_address_object_groups = length(try(local.device_config[each.key].object_group.ipv6_addresses, [])) > 0 ? { for og in try(local.device_config[each.key].object_group.ipv6_addresses, []) : og.name => {
+    members = length(try(og.entries, [])) > 0 ? { for entry in try(og.entries, []) : entry.sequence_number => {
+      prefix        = try(entry.prefix, null)
+      prefix_length = try(tostring(entry.prefix_length), null)
+      prefix_mask   = try(entry.prefix_mask, null)
+    } } : null
+  } } : null
+  port_object_groups = length(try(local.device_config[each.key].object_group.ip_ports, [])) > 0 ? { for og in try(local.device_config[each.key].object_group.ip_ports, []) : og.name => {
+    members = length(try(og.entries, [])) > 0 ? { for entry in try(og.entries, []) : entry.sequence_number => {
+      port_operator = try(entry.port_operator, null)
+      port_1        = try(tostring(entry.port_1), null)
+      port_2        = try(tostring(entry.port_2), null)
     } } : null
   } } : null
   ingress_interfaces           = length(local.acl_ingress_interfaces_map[each.key]) > 0 ? local.acl_ingress_interfaces_map[each.key] : null
