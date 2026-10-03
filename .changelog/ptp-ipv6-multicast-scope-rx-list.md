@@ -1,0 +1,1 @@
+- BREAKING CHANGE: `ptp.ipv6_multicast_scope_rx`, `interfaces.ethernets.ptp.ipv6_multicast_scope_rx` and `interfaces.port_channels.ptp.ipv6_multicast_scope_rx` changed from integer to a structure with `ids` and `ranges` (`from`/`to`) of scope values (1-15)

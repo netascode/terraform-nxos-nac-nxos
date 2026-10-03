@@ -12,7 +12,7 @@ locals {
       delay_request_min_interval_value     = try(int.ptp.delay_request_minimum_interval, null)
       destination_mac                      = try(int.ptp.destination_mac, null) != null ? try({ "non-forwardable" = "non-forwardable" }[int.ptp.destination_mac], int.ptp.destination_mac) : null
       domain                               = try(int.ptp.domain, null)
-      ipv6_multicast_receive_scope         = try(int.ptp.ipv6_multicast_scope_rx, null)
+      ipv6_multicast_receive_scope         = try(provider::utils::normalize_vlans(try(int.ptp.ipv6_multicast_scope_rx), "string-nxos"), null)
       ipv6_multicast_transmit_scope        = try(int.ptp.ipv6_multicast_scope_tx, null)
       negotiation_schema                   = try(int.ptp.transmission_unicast_negotiation_schema, null)
       neighbor_propagation_delay_threshold = try(int.ptp.neighbor_propagation_delay_threshold, null)
@@ -78,7 +78,7 @@ resource "nxos_ptp" "ptp" {
   forward_version1                     = try(local.device_config[each.key].ptp.forward_version1, null) == null ? null : (try(local.device_config[each.key].ptp.forward_version1) ? "enabled" : "disabled")
   grandmaster_capable                  = try(local.device_config[each.key].ptp.grandmaster_capable, null) == null ? null : (try(local.device_config[each.key].ptp.grandmaster_capable) ? "enabled" : "disabled")
   grandmaster_capable_convergence_time = try(local.device_config[each.key].ptp.grandmaster_capable_convergence_time, null)
-  ipv6_multicast_receive_scope         = try(local.device_config[each.key].ptp.ipv6_multicast_scope_rx, null)
+  ipv6_multicast_receive_scope         = try(provider::utils::normalize_vlans(try(local.device_config[each.key].ptp.ipv6_multicast_scope_rx), "string-nxos"), null)
   ipv6_multicast_transmit_scope        = try(local.device_config[each.key].ptp.ipv6_multicast_scope_tx, null)
   management                           = try(local.device_config[each.key].ptp.management, null) == null ? null : (try(local.device_config[each.key].ptp.management) ? "enabled" : "disabled")
   mean_path_delay                      = try(local.device_config[each.key].ptp.mean_path_delay, null)
