@@ -83,7 +83,7 @@ locals {
       } if try(int.cdp, null) != null],
       [for int in try(local.device_config[device.name].interfaces.management, []) : {
         device       = device.name
-        interface_id = int.id
+        interface_id = "mgmt${int.id}"
         cdp          = try(int.cdp, null)
       } if try(int.cdp, null) != null],
     )
@@ -125,7 +125,7 @@ locals {
       try(int.lldp_dcbx_version, null) != null],
       [for int in try(local.device_config[device.name].interfaces.management, []) : {
         device                               = device.name
-        interface_id                         = int.id
+        interface_id                         = "mgmt${int.id}"
         lldp_receive                         = try(int.lldp_receive, null)
         lldp_transmit                        = try(int.lldp_transmit, null)
         lldp_tlv_set_management_address      = try(int.lldp_tlv_set_management_address, null)
@@ -489,7 +489,7 @@ resource "nxos_system" "system" {
   } } : null
 
   # mgmtMgmtIf nested map
-  management_interfaces = length(try(local.device_config[each.key].interfaces.management, [])) > 0 ? { for int in try(local.device_config[each.key].interfaces.management, []) : int.id => {
+  management_interfaces = length(try(local.device_config[each.key].interfaces.management, [])) > 0 ? { for int in try(local.device_config[each.key].interfaces.management, []) : "mgmt${int.id}" => {
     admin_state      = try(int.shutdown, null) == null ? null : (try(int.shutdown) ? "down" : "up")
     description      = try(int.description, null)
     duplex           = try(int.duplex, null)
