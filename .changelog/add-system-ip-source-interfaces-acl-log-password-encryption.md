@@ -1,0 +1,4 @@
+- Add `system.ip_ssh_source_interfaces` support (per-VRF SSH source interface)
+- Add `system.ip_ftp_source_interfaces` support (per-VRF FTP source interface)
+- Add `feature.password_encryption_aes` and `feature.password_encryption_aes_tam` support (`feature password encryption aes [tam]`)
+- Add `system.acllog_match_log_level` and `system.logging_ip_access_list` support (ACL logging match level, cache entries, interval, threshold, and detailed/MAC/SGT options)
