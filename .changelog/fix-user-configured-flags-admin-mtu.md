@@ -1,0 +1,1 @@
+- Fix perpetual plan diff on `interfaces.ethernets` and `interfaces.port_channels` (including vPC peer-link port-channels) when `mtu` is not declared; interfaces without `mtu` show a one-time diff on the first apply after upgrading

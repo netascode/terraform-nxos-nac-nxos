@@ -173,6 +173,7 @@ resource "nxos_physical_interface" "physical_interface" {
     uni_directional_ethernet           = try(int.uni_directional_ethernet, null)
     user_configured_flags = try(int.channel_group, null) != null ? null : join(",", sort(compact([
       "admin_layer",
+      # NX-OS always reports admin_mtu as user-configured (any MTU value counts, including the default), even when mtu is not declared
       "admin_mtu",
       try(int.mac_address, null) != null ? "admin_router_mac" : "",
       try(int.shutdown, null) != null || !try(int.switchport.enabled, true) ? "admin_state" : "",
