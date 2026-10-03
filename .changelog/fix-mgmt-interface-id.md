@@ -1,0 +1,1 @@
+- BREAKING CHANGE: `interfaces.management.id` changed from string (e.g., `mgmt0`) to integer (e.g., `0`) for consistency with other interface types; the `mgmt` prefix is now added by the module, so existing `mgmt0` values must be changed to `0`
