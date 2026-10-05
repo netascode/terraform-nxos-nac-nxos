@@ -74,13 +74,17 @@ resource "nxos_bfd" "bfd" {
   for_each = { for device in local.devices : device.name => device
     if try(local.device_config[device.name].bfd, null) != null ||
   length([for int in local.bfd_interfaces : int if int.device == device.name]) > 0 }
-  device               = each.key
-  admin_state          = null
-  instance_admin_state = null
-  echo_interface       = try(local.device_config[each.key].bfd.echo_interface_type, null) != null ? "${local.intf_prefix_map[try(local.device_config[each.key].bfd.echo_interface_type)]}${try(local.device_config[each.key].bfd.echo_interface_id, "")}" : null
-  hardware_offload     = try(local.device_config[each.key].bfd.hardware_offload, null) == null ? null : try(local.device_config[each.key].bfd.hardware_offload) ? "enable" : "disable"
-  slow_interval        = try(local.device_config[each.key].bfd.slow_timer, null)
-  startup_interval     = try(local.device_config[each.key].bfd.startup_timer, null)
+  device                = each.key
+  admin_state           = null
+  instance_admin_state  = null
+  echo_interface        = try(local.device_config[each.key].bfd.echo_interface_type, null) != null ? "${local.intf_prefix_map[try(local.device_config[each.key].bfd.echo_interface_type)]}${try(local.device_config[each.key].bfd.echo_interface_id, "")}" : null
+  hardware_offload      = try(local.device_config[each.key].bfd.hardware_offload, null) == null ? null : try(local.device_config[each.key].bfd.hardware_offload) ? "enable" : "disable"
+  slow_interval         = try(local.device_config[each.key].bfd.slow_timer, null)
+  startup_interval      = try(local.device_config[each.key].bfd.startup_timer, null)
+  detect_multiplier     = try(local.device_config[each.key].bfd.multiplier, null)
+  echo_receive_interval = try(local.device_config[each.key].bfd.echo_rx_interval, null)
+  min_receive_interval  = try(local.device_config[each.key].bfd.min_rx, null)
+  min_transmit_interval = try(local.device_config[each.key].bfd.interval, null)
 
   interfaces = length(local.bfd_interfaces_map[each.key]) > 0 ? local.bfd_interfaces_map[each.key] : null
 

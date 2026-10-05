@@ -1,0 +1,1 @@
+- Add global BFD timers support including `bfd.interval`, `bfd.min_rx`, `bfd.multiplier`, and `bfd.echo_rx_interval`
