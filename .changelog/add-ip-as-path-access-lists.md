@@ -1,0 +1,2 @@
+- Add `ip_as_path_access_lists` support including `entries` with `seq`, `action`, and `regex`
+- Add `route_maps.entries.match_as_path` and `route_maps.entries.match_as_number_as_path_list` support

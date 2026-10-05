@@ -17,7 +17,8 @@ resource "nxos_route_policy" "route_policy" {
     if length(try(local.device_config[device.name].ip_prefix_lists, [])) > 0 ||
     length(try(local.device_config[device.name].ipv6_prefix_lists, [])) > 0 ||
     length(try(local.device_config[device.name].route_maps, [])) > 0 ||
-  length(try(local.device_config[device.name].community_lists, [])) > 0 }
+    length(try(local.device_config[device.name].community_lists, [])) > 0 ||
+  length(try(local.device_config[device.name].ip_as_path_access_lists, [])) > 0 }
   device = each.key
 
   ipv4_prefix_lists = length(try(local.device_config[each.key].ip_prefix_lists, [])) > 0 ? { for pl in try(local.device_config[each.key].ip_prefix_lists, []) : pl.name => {
@@ -99,6 +100,14 @@ resource "nxos_route_policy" "route_policy" {
 
       match_tags = length(try(entry.match_tags, [])) > 0 ? { for tag in try(entry.match_tags, []) : tag => {} } : null
 
+      match_as_path_lists = length(try(entry.match_as_path, [])) > 0 ? {
+        for name in try(entry.match_as_path, []) : "sys/rpm/accesslist-[${name}]" => {}
+      } : null
+
+      match_as_number_as_path_lists = length(try(entry.match_as_number_as_path_list, [])) > 0 ? {
+        for name in try(entry.match_as_number_as_path_list, []) : "sys/rpm/accesslist-[${name}]" => {}
+      } : null
+
       set_metric                       = try(entry.set_metric, null)
       set_metric_delay                 = try(entry.set_metric_delay, null)
       set_metric_load                  = try(entry.set_metric_load, null)
@@ -144,6 +153,13 @@ resource "nxos_route_policy" "route_policy" {
           ) : community
         ) => {}
       } : null
+    } } : null
+  } } : null
+
+  as_path_access_lists = length(try(local.device_config[each.key].ip_as_path_access_lists, [])) > 0 ? { for al in try(local.device_config[each.key].ip_as_path_access_lists, []) : al.name => {
+    entries = length(try(al.entries, [])) > 0 ? { for entry in try(al.entries, []) : entry.seq => {
+      action = try(entry.action, null)
+      regex  = try(entry.regex, null)
     } } : null
   } } : null
 
