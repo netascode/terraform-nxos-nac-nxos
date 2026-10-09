@@ -222,5 +222,6 @@ resource "nxos_ipv6" "ipv6" {
     nxos_subinterface.subinterface,
     nxos_svi_interface.svi_interface,
     nxos_vrf.vrf,
+    nxos_track.track,
   ]
 }

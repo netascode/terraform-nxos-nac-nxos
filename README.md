@@ -41,7 +41,7 @@ module "nxos" {
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.9.0 |
 | <a name="requirement_local"></a> [local](#requirement\_local) | >= 2.7.0 |
-| <a name="requirement_nxos"></a> [nxos](#requirement\_nxos) | ~> 0.15.0 |
+| <a name="requirement_nxos"></a> [nxos](#requirement\_nxos) | ~> 0.16.0 |
 | <a name="requirement_utils"></a> [utils](#requirement\_utils) | >= 2.0.0 |
 ## Inputs
 
@@ -117,6 +117,7 @@ No outputs.
 | [nxos_svi_interface.svi_interface](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/svi_interface) | resource |
 | [nxos_system.system](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/system) | resource |
 | [nxos_telemetry.telemetry](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/telemetry) | resource |
+| [nxos_track.track](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/track) | resource |
 | [nxos_user_management.user_management](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/user_management) | resource |
 | [nxos_vpc.vpc](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/vpc) | resource |
 | [nxos_vrf.vrf](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/vrf) | resource |

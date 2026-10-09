@@ -244,5 +244,6 @@ resource "nxos_ipv4" "ipv4" {
     nxos_subinterface.subinterface,
     nxos_svi_interface.svi_interface,
     nxos_vrf.vrf,
+    nxos_track.track,
   ]
 }

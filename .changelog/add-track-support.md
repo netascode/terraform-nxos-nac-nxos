@@ -1,0 +1,2 @@
+- Add object tracking support (`tracks`) including interface, IP/IPv6 route, IP SLA and track list objects with up/down delays
+- Add HSRP group object tracking support (`hsrp.groups.tracks`) with priority `decrement`

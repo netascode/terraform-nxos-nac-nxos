@@ -33,6 +33,9 @@ locals {
         preempt_delay_reload                  = try(group.preempt_delay_reload, null)
         preempt_delay_sync                    = try(group.preempt_delay_sync, null)
         priority                              = try(group.priority, null)
+        tracked_objects = length(try(group.tracks, [])) > 0 ? { for track in try(group.tracks, []) : track.id => {
+          decrement_priority = try(track.decrement, null)
+        } } : null
       } } : null
     } if int.device == device.name }
   }
@@ -95,6 +98,7 @@ resource "nxos_hsrp" "hsrp" {
     nxos_physical_interface.physical_interface,
     nxos_svi_interface.svi_interface,
     nxos_port_channel_interface.port_channel_interface,
-    nxos_subinterface.subinterface
+    nxos_subinterface.subinterface,
+    nxos_track.track,
   ]
 }

@@ -220,6 +220,7 @@ resource "nxos_cli" "cli_0" {
     nxos_svi_interface.svi_interface,
     nxos_system.system,
     nxos_telemetry.telemetry,
+    nxos_track.track,
     nxos_user_management.user_management,
     nxos_vpc.vpc,
     nxos_vrf.vrf,

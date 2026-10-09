@@ -64,5 +64,6 @@ resource "nxos_vpc" "vpc" {
   depends_on = [
     nxos_feature.feature,
     nxos_port_channel_interface.port_channel_interface,
+    nxos_track.track,
   ]
 }
