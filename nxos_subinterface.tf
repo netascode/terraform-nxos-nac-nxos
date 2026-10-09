@@ -91,6 +91,8 @@ locals {
         isis_mesh_group_blocked                 = try(sub.isis.mesh_group_blocked, null)
         isis_n_flag_clear                       = try(sub.isis.prefix_attributes_n_flag_clear, null)
         isis_suppress_prefix                    = try(sub.isis.suppressed, null)
+        eigrp_instance_name                     = try(sub.eigrp.instance_name, null)
+        eigrp_address_families                  = concat(try(sub.eigrp.address_families, []), try(sub.eigrp.instance_name, null) != null && length(try(sub.eigrp.address_families, [])) == 0 ? [{ address_family = "ipv4-unicast" }] : [])
       }],
       [for sub in flatten([for int in try(local.device_config[device.name].interfaces.port_channels, []) : [
         for s in try(int.subinterfaces, []) : merge(s, { parent_type = "po", parent_id = int.id })
@@ -182,6 +184,8 @@ locals {
         isis_mesh_group_blocked                 = try(sub.isis.mesh_group_blocked, null)
         isis_n_flag_clear                       = try(sub.isis.prefix_attributes_n_flag_clear, null)
         isis_suppress_prefix                    = try(sub.isis.suppressed, null)
+        eigrp_instance_name                     = try(sub.eigrp.instance_name, null)
+        eigrp_address_families                  = concat(try(sub.eigrp.address_families, []), try(sub.eigrp.instance_name, null) != null && length(try(sub.eigrp.address_families, [])) == 0 ? [{ address_family = "ipv4-unicast" }] : [])
       }],
     )
   ])

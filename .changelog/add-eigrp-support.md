@@ -1,0 +1,3 @@
+- Add EIGRP support (`routing.eigrp_processes`) including per-VRF IPv4/IPv6 address families, metrics, stub, graceful restart, default-information, redistribution and maximum-prefix configuration
+- Add EIGRP interface support (`eigrp`) for ethernet, port-channel, SVI, loopback and subinterfaces including timers, metric components, BFD, authentication, distribute-lists, offset-lists and summary addresses
+- Add `eigrp` feature flag support

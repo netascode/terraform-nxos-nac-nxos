@@ -8,6 +8,7 @@ resource "nxos_feature" "feature" {
   bfd                  = try(local.device_config[each.key].feature.bfd, null) == null ? null : (try(local.device_config[each.key].feature.bfd) ? "enabled" : "disabled")
   bgp                  = try(local.device_config[each.key].feature.bgp, null) == null ? null : (try(local.device_config[each.key].feature.bgp) ? "enabled" : "disabled")
   dhcp                 = try(local.device_config[each.key].feature.dhcp, null) == null ? null : (try(local.device_config[each.key].feature.dhcp) ? "enabled" : "disabled")
+  eigrp                = try(local.device_config[each.key].feature.eigrp, null) == null ? null : (try(local.device_config[each.key].feature.eigrp) ? "enabled" : "disabled")
   evpn                 = try(local.device_config[each.key].feature.evpn, null) == null ? null : (try(local.device_config[each.key].feature.evpn) ? "enabled" : "disabled")
   grpc                 = try(local.device_config[each.key].feature.grpc, null) == null ? null : (try(local.device_config[each.key].feature.grpc) ? "enabled" : "disabled")
   hmm                  = try(local.device_config[each.key].feature.fabric_forwarding, null) == null ? null : (try(local.device_config[each.key].feature.fabric_forwarding) ? "enabled" : "disabled")

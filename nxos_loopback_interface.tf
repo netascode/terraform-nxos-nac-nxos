@@ -92,6 +92,8 @@ locals {
         isis_mesh_group_blocked                 = try(int.isis.mesh_group_blocked, null)
         isis_n_flag_clear                       = try(int.isis.prefix_attributes_n_flag_clear, null)
         isis_suppress_prefix                    = try(int.isis.suppressed, null)
+        eigrp_instance_name                     = try(int.eigrp.instance_name, null)
+        eigrp_address_families                  = concat(try(int.eigrp.address_families, []), try(int.eigrp.instance_name, null) != null && length(try(int.eigrp.address_families, [])) == 0 ? [{ address_family = "ipv4-unicast" }] : [])
       }
     ]
   ])
