@@ -69,6 +69,7 @@ resource "nxos_icmpv6" "icmpv6" {
 
   depends_on = [
     nxos_feature.feature,
+    nxos_ipv6.ipv6,
     nxos_loopback_interface.loopback_interface,
     nxos_physical_interface.physical_interface,
     nxos_port_channel_interface.port_channel_interface,

@@ -86,6 +86,7 @@ resource "nxos_icmpv4" "icmpv4" {
 
   depends_on = [
     nxos_feature.feature,
+    nxos_ipv4.ipv4,
     nxos_loopback_interface.loopback_interface,
     nxos_physical_interface.physical_interface,
     nxos_port_channel_interface.port_channel_interface,
