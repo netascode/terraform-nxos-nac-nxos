@@ -666,6 +666,7 @@ resource "nxos_system" "system" {
     nxos_port_channel_interface.port_channel_interface,
     nxos_subinterface.subinterface,
     nxos_svi_interface.svi_interface,
+    nxos_vpc.vpc,
     nxos_vrf.vrf,
   ]
 }
