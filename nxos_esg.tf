@@ -1,4 +1,28 @@
 locals {
+  # ESG class map filter entries use the uppercase DSCP names returned by DME; values without a name are plain numbers.
+  esg_dscp_int_to_string_map = {
+    8  = "CS1"
+    10 = "AF11"
+    12 = "AF12"
+    14 = "AF13"
+    16 = "CS2"
+    18 = "AF21"
+    20 = "AF22"
+    22 = "AF23"
+    24 = "CS3"
+    26 = "AF31"
+    28 = "AF32"
+    30 = "AF33"
+    32 = "CS4"
+    34 = "AF41"
+    36 = "AF42"
+    38 = "AF43"
+    40 = "CS5"
+    44 = "VA"
+    46 = "EF"
+    48 = "CS6"
+  }
+
   esg_domains_map = { for device in local.devices : device.name =>
     { for vrf in try(local.device_config[device.name].vrfs, []) : vrf.name => {
       default_action        = try(vrf.security_enforce_default, null)
@@ -30,7 +54,7 @@ resource "nxos_esg" "esg" {
       apply_to_fragment = try(fe.fragments, null)
       icmpv4_type       = try(fe.icmpv4_type, null)
       icmpv6_type       = try(fe.icmpv6_type, null)
-      match_dscp        = try(fe.dscp, null)
+      match_dscp        = try(tostring(fe.dscp), null) != null ? try(local.esg_dscp_int_to_string_map[fe.dscp], tostring(fe.dscp)) : null
     } } : null
   } } : null
 
