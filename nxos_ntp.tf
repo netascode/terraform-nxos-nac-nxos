@@ -25,6 +25,12 @@ resource "nxos_ntp" "ntp" {
   access_group_query_only = try(local.device_config[each.key].ntp.access_group_query_only, null)
   access_group_serve      = try(local.device_config[each.key].ntp.access_group_serve, null)
   access_group_serve_only = try(local.device_config[each.key].ntp.access_group_serve_only, null)
+  authentication_keys = length(try(local.device_config[each.key].ntp.authentication_keys, [])) > 0 ? { for key in try(local.device_config[each.key].ntp.authentication_keys, []) : key.id => {
+    authentication_type = try(key.type, null)
+    encryption_type     = try(key.key_encryption, null) != null ? "type${try(key.key_encryption)}" : null
+    key                 = try(key.key, null)
+    trusted             = try(key.trusted, null)
+  } } : null
   servers = length(try(local.ntp_servers[each.key], {})) > 0 ? { for name, server in try(local.ntp_servers[each.key], {}) : name => {
     vrf       = try(server.use_vrf, null)
     type      = server.type
