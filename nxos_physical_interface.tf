@@ -216,6 +216,19 @@ resource "nxos_physical_interface" "physical_interface" {
     priority_flow_control_watchdog_interval             = try(int.priority_flow_control_watch_dog_interval, null) == null ? null : (try(int.priority_flow_control_watch_dog_interval) ? "on" : "off")
     priority_flow_control_watchdog_disable_action       = try(int.priority_flow_control_watch_dog_disable_action, null)
     priority_flow_control_watchdog_interface_multiplier = try(int.priority_flow_control_watch_dog_interface_multiplier, null)
+    vlan_mapping_enable                                 = try(int.switchport.vlan_mapping.enable, null)
+    selective_qinq_all                                  = try(int.switchport.vlan_mapping.dot1q_tunnel_all, null)
+    selective_qinq_outer_vlan_id                        = try(int.switchport.vlan_mapping.dot1q_tunnel_all, false) && try(int.switchport.vlan_mapping.dot1q_tunnel, null) != null ? "vlan-${int.switchport.vlan_mapping.dot1q_tunnel}" : null
+    selective_qinq_mappings = !try(int.switchport.vlan_mapping.dot1q_tunnel_all, false) && try(int.switchport.vlan_mapping.dot1q_tunnel, null) != null && try(int.switchport.vlan_mapping.dot1q_tunnel_vlans, null) != null ? {
+      "vlan-${int.switchport.vlan_mapping.dot1q_tunnel}" = {
+        vlans = provider::utils::normalize_vlans(int.switchport.vlan_mapping.dot1q_tunnel_vlans, "string-nxos")
+      }
+    } : null
+    vlan_mappings = length(try(int.switchport.vlan_mapping.vlans, [])) > 0 ? { for mapping in try(int.switchport.vlan_mapping.vlans, []) : "vlan-${mapping.vlan}" => {
+      translated_vlan_id = try(mapping.translated_vlan, null) != null ? "vlan-${mapping.translated_vlan}" : null
+      inner_vlan_id      = try(mapping.inner_vlan, null) != null ? "vlan-${mapping.inner_vlan}" : "vlan-0"
+      rx_only            = try(mapping.rx, null)
+    } } : null
   } } : null
 
   depends_on = [

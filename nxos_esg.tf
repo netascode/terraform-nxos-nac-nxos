@@ -73,6 +73,7 @@ resource "nxos_esg" "esg" {
   security_groups = length(try(local.device_config[each.key].security_group.security_groups, [])) > 0 ? { for sg in try(local.device_config[each.key].security_group.security_groups, []) : sg.id => {
     name                              = try(sg.name, null)
     type_layer4_7                     = try(sg.type_layer4_7, null) == null ? null : (try(sg.type_layer4_7) ? "enabled" : "disabled")
+    intra_group_isolation             = try(sg.intra_group_isolation, null) == null ? null : (try(sg.intra_group_isolation) ? "enabled" : "disabled")
     selector_connected_endpoints_ipv4 = length(try(sg.match_connected_endpoints_ipv4, [])) > 0 ? { for ep in try(sg.match_connected_endpoints_ipv4, []) : "${ep.vrf};${ep.address}" => {} } : null
     selector_connected_endpoints_ipv6 = length(try(sg.match_connected_endpoints_ipv6, [])) > 0 ? { for ep in try(sg.match_connected_endpoints_ipv6, []) : "${ep.vrf};${ep.address}" => {} } : null
     # External subnet selectors are split by the presence of nexthop and encap-type into separate DME classes.

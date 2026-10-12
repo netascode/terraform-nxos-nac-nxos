@@ -3,19 +3,18 @@ locals {
     { for int in try(local.device_config[device.name].interfaces.vlans, []) : "vlan${int.id}" => {
       admin_state = null
       mode        = try(local.hmm_mode_map[try(int.fabric_forwarding_mode)], null)
-    } if try(int.fabric_forwarding_mode, null) != null }
+      proxy       = try(int.fabric_forwarding_mode_anycast_gateway_proxy, null)
+    } if try(int.fabric_forwarding_mode, null) != null || try(int.fabric_forwarding_mode_anycast_gateway_proxy, null) != null }
   }
   hmm_mode_map = {
-    "standard"   = "standard"
-    "anycast-gw" = "anycastGW"
-    "proxy-gw"   = "proxyGW"
+    "anycast-gateway" = "anycastGW"
   }
 }
 
 resource "nxos_hmm" "hmm" {
   for_each = { for device in local.devices : device.name => device
     if try(local.device_config[device.name].fabric_forwarding, null) != null ||
-  length([for int in try(local.device_config[device.name].interfaces.vlans, []) : int if try(int.fabric_forwarding_mode, null) != null]) > 0 }
+  length([for int in try(local.device_config[device.name].interfaces.vlans, []) : int if try(int.fabric_forwarding_mode, null) != null || try(int.fabric_forwarding_mode_anycast_gateway_proxy, null) != null]) > 0 }
   device                  = each.key
   admin_state             = null
   instance_admin_state    = null

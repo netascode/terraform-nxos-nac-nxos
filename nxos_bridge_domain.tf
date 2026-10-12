@@ -34,6 +34,7 @@ resource "nxos_bridge_domain" "bridge_domain" {
     mode                = try(local.bridge_domain_mode_map[try(vlan.mode)], null)
     vrf_name            = try(vlan.vrf, null)
     cross_connect       = try(vlan.cross_connect, null) == null ? null : try(vlan.cross_connect) ? "enable" : "disable"
+    isolate             = try(vlan.isolate, null)
   } } : null
   vlan_configurations = length(try(local.bridge_domain_vlans_with_config[each.key], [])) > 0 ? { for vlan in try(local.device_config[each.key].vlan.vlans, []) : "vlan-${vlan.id}" => {
     mac_learning = try(vlan.mac_learn, null) == null ? null : try(vlan.mac_learn) ? "enable" : "disable"

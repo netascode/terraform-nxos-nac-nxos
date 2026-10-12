@@ -1,0 +1,5 @@
+- Add `interfaces.ethernets.switchport.vlan_mapping` and `interfaces.port_channels.switchport.vlan_mapping` support including `enable`, `vlans` (VLAN translation with `vlan`, `inner_vlan`, `translated_vlan`, `rx`), and selective QinQ with `dot1q_tunnel`, `dot1q_tunnel_vlans`, and `dot1q_tunnel_all`
+- Add `security_group.security_groups.intra_group_isolation` support
+- Add `vlan.vlans.isolate` support
+- Add `interfaces.vlans.fabric_forwarding_mode_anycast_gateway_proxy` support
+- BREAKING CHANGE: Rename `interfaces.vlans.fabric_forwarding_mode` enum value `anycast-gw` to `anycast-gateway` and remove value `proxy-gw`
