@@ -201,6 +201,7 @@ resource "nxos_cli" "cli_0" {
     nxos_keychain.keychain,
     nxos_logging.logging,
     nxos_loopback_interface.loopback_interface,
+    nxos_macsec.macsec,
     nxos_netflow.netflow,
     nxos_network_qos.network_qos,
     nxos_ntp.ntp,

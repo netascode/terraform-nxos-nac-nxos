@@ -1,0 +1,3 @@
+- Add MACsec support (`macsec`) including global shutdown, pre-shared key no-show and MACsec policies
+- Add MACsec key chain support (`key_chains[].macsec`) including key octet strings and send lifetimes
+- Add MACsec interface configuration (`interfaces.ethernets[].macsec_keychain`, `macsec_policy`, `macsec_fallback_keychain`)
