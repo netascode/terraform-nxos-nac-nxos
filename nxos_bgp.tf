@@ -199,16 +199,16 @@ resource "nxos_bgp" "bgp" {
           remote_asn = try(pt.remote_as, null)
           asn_type   = try(pt.remote_as, null) != null ? "none" : null
 
-          description                   = try(pt.description, null)
-          peer_type                     = try(pt.peer_type, null)
-          source_interface              = try(pt.update_source_interface_type, null) != null ? "${local.intf_prefix_map[try(pt.update_source_interface_type)]}${try(pt.update_source_interface_id, "")}" : null
-          admin_state                   = try(pt.shutdown, null) == null ? null : (try(pt.shutdown) ? "disabled" : "enabled")
-          affinity_group                = try(pt.affinity_group, null)
-          bfd_type                      = try(pt.bfd_multihop, null) == null ? null : (try(pt.bfd_multihop) ? "multihop" : "singlehop")
-          bmp_server_1                  = try(pt.bmp_activate_server_1, null) == null ? null : (try(pt.bmp_activate_server_1) ? "enabled" : "disabled")
-          bmp_server_2                  = try(pt.bmp_activate_server_2, null) == null ? null : (try(pt.bmp_activate_server_2) ? "enabled" : "disabled")
-          capability_suppress_4_byte_as = try(pt.capability_suppress_4_byte_as, null) == null ? null : (try(pt.capability_suppress_4_byte_as) ? "enabled" : "disabled")
-          connection_mode               = try(pt.connection_mode, null)
+          description                    = try(pt.description, null)
+          peer_type                      = try(pt.peer_type, null)
+          source_interface               = try(pt.update_source_interface_type, null) != null ? "${local.intf_prefix_map[try(pt.update_source_interface_type)]}${try(pt.update_source_interface_id, "")}" : null
+          admin_state                    = try(pt.shutdown, null) == null ? null : (try(pt.shutdown) ? "disabled" : "enabled")
+          affinity_group                 = try(pt.affinity_group, null)
+          bfd_type                       = try(pt.bfd_multihop, null) == null ? null : (try(pt.bfd_multihop) ? "multihop" : "singlehop")
+          bmp_server_1                   = try(pt.bmp_activate_server_1, null) == null ? null : (try(pt.bmp_activate_server_1) ? "enabled" : "disabled")
+          bmp_server_2                   = try(pt.bmp_activate_server_2, null) == null ? null : (try(pt.bmp_activate_server_2) ? "enabled" : "disabled")
+          capability_suppress_4_byte_asn = try(pt.capability_suppress_4_byte_as, null) == null ? null : (try(pt.capability_suppress_4_byte_as) ? "enabled" : "disabled")
+          connection_mode                = try(pt.transport_connection_mode, null)
           peer_control = length(compact([
             try(pt.bfd, false) ? "bfd" : "",
             try(pt.dont_capability_negotiate, false) ? "cap-neg-off" : "",
@@ -276,6 +276,125 @@ resource "nxos_bgp" "bgp" {
             max_prefix_number       = try(af.maximum_prefix.number, null)
             max_prefix_restart_time = try(af.maximum_prefix.restart_time, null)
             max_prefix_threshold    = try(af.maximum_prefix.threshold, null)
+
+            route_controls = length(compact([try(af.route_map_in, null) != null ? "in" : "", try(af.route_map_out, null) != null ? "out" : ""])) > 0 ? { for direction in compact([try(af.route_map_in, null) != null ? "in" : "", try(af.route_map_out, null) != null ? "out" : ""]) : direction => {
+              route_map_name = direction == "in" ? af.route_map_in : af.route_map_out
+            } } : null
+
+            prefix_list_controls = length(compact([try(af.prefix_list_in, null) != null ? "in" : "", try(af.prefix_list_out, null) != null ? "out" : ""])) > 0 ? { for direction in compact([try(af.prefix_list_in, null) != null ? "in" : "", try(af.prefix_list_out, null) != null ? "out" : ""]) : direction => {
+              list = direction == "in" ? af.prefix_list_in : af.prefix_list_out
+            } } : null
+
+            inherit_peer_policies = length(try(af.inherit_peer_policies, [])) > 0 ? { for pol in try(af.inherit_peer_policies, []) : pol.name => {
+              sequence = try(pol.sequence, null)
+            } } : null
+          } } : null
+        } } : null
+
+        peer_session_templates = length(try(local.device_config[each.key].routing.bgp.peer_session_templates, [])) > 0 ? { for st in try(local.device_config[each.key].routing.bgp.peer_session_templates, []) : st.name => {
+          remote_asn = try(st.remote_as, null)
+          asn_type   = try(st.remote_as, null) != null ? "none" : null
+
+          description                    = try(st.description, null)
+          peer_type                      = try(st.peer_type, null)
+          source_interface               = try(st.update_source_interface_type, null) != null ? "${local.intf_prefix_map[try(st.update_source_interface_type)]}${try(st.update_source_interface_id, "")}" : null
+          admin_state                    = try(st.shutdown, null) == null ? null : (try(st.shutdown) ? "disabled" : "enabled")
+          affinity_group                 = try(st.affinity_group, null)
+          bfd_type                       = try(st.bfd_multihop, null) == null ? null : (try(st.bfd_multihop) ? "multihop" : "singlehop")
+          bmp_server_1                   = try(st.bmp_activate_server_1, null) == null ? null : (try(st.bmp_activate_server_1) ? "enabled" : "disabled")
+          bmp_server_2                   = try(st.bmp_activate_server_2, null) == null ? null : (try(st.bmp_activate_server_2) ? "enabled" : "disabled")
+          capability_suppress_4_byte_asn = try(st.capability_suppress_4_byte_as, null) == null ? null : (try(st.capability_suppress_4_byte_as) ? "enabled" : "disabled")
+          connection_mode                = try(st.transport_connection_mode, null)
+          peer_control = length(compact([
+            try(st.bfd, false) ? "bfd" : "",
+            try(st.dont_capability_negotiate, false) ? "cap-neg-off" : "",
+            try(st.disable_connected_check, false) ? "dis-conn-check" : "",
+            !try(st.dynamic_capability, true) ? "no-dyn-cap" : "",
+            ])) > 0 ? join(",", sort(compact([
+              try(st.bfd, false) ? "bfd" : "",
+              try(st.dont_capability_negotiate, false) ? "cap-neg-off" : "",
+              try(st.disable_connected_check, false) ? "dis-conn-check" : "",
+              !try(st.dynamic_capability, true) ? "no-dyn-cap" : "",
+          ]))) : null
+          dscp                  = try(tostring(st.dscp), null) != null ? try(local.dscp_int_to_string_map[st.dscp], tostring(st.dscp)) : null
+          keepalive_interval    = try(st.keepalive_interval, null)
+          hold_time             = try(st.hold_time, null)
+          internal_vpn_client   = try(st.internal_vpn_client, null) == null ? null : (try(st.internal_vpn_client) ? "enabled" : "disabled")
+          log_neighbor_changes  = try(st.log_neighbor_changes, null) == null ? null : (try(st.log_neighbor_changes) ? "enable" : "disable")
+          low_memory_exempt     = try(st.low_memory_exempt, null) == null ? null : (try(st.low_memory_exempt) ? "enabled" : "disabled")
+          max_peer_count        = try(st.maximum_peers, null)
+          password_type         = try(local.bgp_password_type_map[try(st.password_type)], try(st.password_type, null))
+          password              = try(st.password, null)
+          private_as_control    = try(local.remove_private_as_map[st.remove_private_as], null)
+          session_template      = try(st.inherit_peer_session, null)
+          ebgp_multihop_ttl     = try(st.ebgp_multihop_ttl, null)
+          ttl_security_hops     = try(st.ttl_security_hops, null)
+          local_asn             = try(st.local_as, null)
+          local_asn_propagation = try(st.local_as_propagation, null)
+        } } : null
+
+        peer_policy_templates = length(try(local.device_config[each.key].routing.bgp.peer_policy_templates, [])) > 0 ? { for pp in try(local.device_config[each.key].routing.bgp.peer_policy_templates, []) : pp.name => {
+          control = length(compact([
+            try(pp.advertisement_interval, null) != null ? "advertisement-interval" : "",
+            try(pp.allowas_in, false) ? "allow-self-as" : "",
+            try(pp.default_originate, false) ? "default-originate" : "",
+            try(pp.disable_peer_as_check, false) ? "dis-peer-as-check" : "",
+            try(pp.next_hop_self, false) ? "nh-self" : "",
+            try(pp.route_reflector_client, false) ? "rr-client" : "",
+            try(pp.suppress_inactive, false) ? "suppress-inactive" : "",
+            ])) > 0 ? join(",", sort(compact([
+              try(pp.advertisement_interval, null) != null ? "advertisement-interval" : "",
+              try(pp.allowas_in, false) ? "allow-self-as" : "",
+              try(pp.default_originate, false) ? "default-originate" : "",
+              try(pp.disable_peer_as_check, false) ? "dis-peer-as-check" : "",
+              try(pp.next_hop_self, false) ? "nh-self" : "",
+              try(pp.route_reflector_client, false) ? "rr-client" : "",
+              try(pp.suppress_inactive, false) ? "suppress-inactive" : "",
+          ]))) : null
+          capability_additional_paths = length(compact([
+            try(pp.capability_additional_paths_receive, null) == null ? "" : (try(pp.capability_additional_paths_receive) ? "recv" : "recv-disable"),
+            try(pp.capability_additional_paths_send, null) == null ? "" : (try(pp.capability_additional_paths_send) ? "send" : "send-disable"),
+            ])) > 0 ? join(",", compact([
+            try(pp.capability_additional_paths_receive, null) == null ? "" : (try(pp.capability_additional_paths_receive) ? "recv" : "recv-disable"),
+            try(pp.capability_additional_paths_send, null) == null ? "" : (try(pp.capability_additional_paths_send) ? "send" : "send-disable"),
+          ])) : null
+          next_hop_self_all             = try(pp.next_hop_self_all, null)
+          send_community_extended       = try(pp.send_community_extended, null) == null ? null : (try(pp.send_community_extended) ? "enabled" : "disabled")
+          send_community_standard       = try(pp.send_community_standard, null) == null ? null : (try(pp.send_community_standard) ? "enabled" : "disabled")
+          advertisement_interval        = try(pp.advertisement_interval, null)
+          advertise_local_labeled_route = try(pp.advertise_local_labeled_route, null) == null ? null : (try(pp.advertise_local_labeled_route) ? "enabled" : "disabled")
+          aigp                          = try(pp.aigp, null) == null ? null : (try(pp.aigp) ? "enabled" : "disabled")
+          allowed_self_as_count         = try(pp.allowas_in_count, null)
+          as_override                   = try(pp.as_override, null) == null ? null : (try(pp.as_override) ? "enabled" : "disabled")
+          default_originate             = try(pp.default_originate, null) == null ? null : (try(pp.default_originate) ? "enabled" : "disabled")
+          default_originate_route_map   = try(pp.default_originate_route_map, null)
+          dmz_link_bandwidth            = try(pp.dmz_link_bandwidth, null) == null ? null : (try(pp.dmz_link_bandwidth) ? "enabled" : "disabled")
+          link_bandwidth_cumulative     = try(pp.link_bandwidth_cumulative, null) == null ? null : (try(pp.link_bandwidth_cumulative) ? "enabled" : "disabled")
+          nexthop_thirdparty            = try(pp.next_hop_third_party, null) == null ? null : (try(pp.next_hop_third_party) ? "enabled" : "disabled")
+          soft_reconfiguration_backup   = try(local.soft_reconfiguration_inbound_map[pp.soft_reconfiguration_inbound], null)
+          site_of_origin                = try(pp.soo, null)
+          unsuppress_map                = try(pp.unsuppress_map, null)
+          weight                        = try(pp.weight, null)
+
+          max_prefix_action       = try(pp.maximum_prefix.action, null)
+          max_prefix_number       = try(pp.maximum_prefix.number, null)
+          max_prefix_restart_time = try(pp.maximum_prefix.restart_time, null)
+          max_prefix_threshold    = try(pp.maximum_prefix.threshold, null)
+
+          route_controls = length(compact([try(pp.route_map_in, null) != null ? "in" : "", try(pp.route_map_out, null) != null ? "out" : ""])) > 0 ? { for direction in compact([try(pp.route_map_in, null) != null ? "in" : "", try(pp.route_map_out, null) != null ? "out" : ""]) : direction => {
+            route_map_name = direction == "in" ? pp.route_map_in : pp.route_map_out
+          } } : null
+
+          prefix_list_controls = length(compact([try(pp.prefix_list_in, null) != null ? "in" : "", try(pp.prefix_list_out, null) != null ? "out" : ""])) > 0 ? { for direction in compact([try(pp.prefix_list_in, null) != null ? "in" : "", try(pp.prefix_list_out, null) != null ? "out" : ""]) : direction => {
+            list = direction == "in" ? pp.prefix_list_in : pp.prefix_list_out
+          } } : null
+
+          filter_list_controls = length(compact([try(pp.filter_list_in, null) != null ? "in" : "", try(pp.filter_list_out, null) != null ? "out" : ""])) > 0 ? { for direction in compact([try(pp.filter_list_in, null) != null ? "in" : "", try(pp.filter_list_out, null) != null ? "out" : ""]) : direction => {
+            list = direction == "in" ? pp.filter_list_in : pp.filter_list_out
+          } } : null
+
+          inherit_peer_policies = length(try(pp.inherit_peer_policies, [])) > 0 ? { for pol in try(pp.inherit_peer_policies, []) : pol.name => {
+            sequence = try(pol.sequence, null)
           } } : null
         } } : null
 
@@ -300,21 +419,21 @@ resource "nxos_bgp" "bgp" {
               try(nei.disable_connected_check, false) ? "dis-conn-check" : "",
               !try(nei.dynamic_capability, true) ? "no-dyn-cap" : "",
           ]))) : null
-          password_type                 = try(local.bgp_password_type_map[try(nei.password_type)], try(nei.password_type, null))
-          password                      = try(nei.password, null)
-          admin_state                   = try(nei.shutdown, null) == null ? null : (try(nei.shutdown) ? "disabled" : "enabled")
-          affinity_group                = try(nei.affinity_group, null)
-          bfd_type                      = try(nei.bfd_multihop, null) == null ? null : (try(nei.bfd_multihop) ? "multihop" : "singlehop")
-          bmp_server_1                  = try(nei.bmp_activate_server_1, null) == null ? null : (try(nei.bmp_activate_server_1) ? "enabled" : "disabled")
-          bmp_server_2                  = try(nei.bmp_activate_server_2, null) == null ? null : (try(nei.bmp_activate_server_2) ? "enabled" : "disabled")
-          capability_suppress_4_byte_as = try(nei.capability_suppress_4_byte_as, null) == null ? null : (try(nei.capability_suppress_4_byte_as) ? "enabled" : "disabled")
-          connection_mode               = try(nei.transport_connection_mode, null)
-          log_neighbor_changes          = try(nei.log_neighbor_changes, null) == null ? null : (try(nei.log_neighbor_changes) ? "enable" : "disable")
-          low_memory_exempt             = try(nei.low_memory_exempt, null) == null ? null : (try(nei.low_memory_exempt) ? "enabled" : "disabled")
-          max_peer_count                = try(nei.maximum_peers, null)
-          private_as_control            = try(local.remove_private_as_map[nei.remove_private_as], null)
-          session_template              = try(nei.inherit_peer_session, null)
-          ttl_security_hops             = try(nei.ttl_security_hops, null)
+          password_type                  = try(local.bgp_password_type_map[try(nei.password_type)], try(nei.password_type, null))
+          password                       = try(nei.password, null)
+          admin_state                    = try(nei.shutdown, null) == null ? null : (try(nei.shutdown) ? "disabled" : "enabled")
+          affinity_group                 = try(nei.affinity_group, null)
+          bfd_type                       = try(nei.bfd_multihop, null) == null ? null : (try(nei.bfd_multihop) ? "multihop" : "singlehop")
+          bmp_server_1                   = try(nei.bmp_activate_server_1, null) == null ? null : (try(nei.bmp_activate_server_1) ? "enabled" : "disabled")
+          bmp_server_2                   = try(nei.bmp_activate_server_2, null) == null ? null : (try(nei.bmp_activate_server_2) ? "enabled" : "disabled")
+          capability_suppress_4_byte_asn = try(nei.capability_suppress_4_byte_as, null) == null ? null : (try(nei.capability_suppress_4_byte_as) ? "enabled" : "disabled")
+          connection_mode                = try(nei.transport_connection_mode, null)
+          log_neighbor_changes           = try(nei.log_neighbor_changes, null) == null ? null : (try(nei.log_neighbor_changes) ? "enable" : "disable")
+          low_memory_exempt              = try(nei.low_memory_exempt, null) == null ? null : (try(nei.low_memory_exempt) ? "enabled" : "disabled")
+          max_peer_count                 = try(nei.maximum_peers, null)
+          private_as_control             = try(local.remove_private_as_map[nei.remove_private_as], null)
+          session_template               = try(nei.inherit_peer_session, null)
+          ttl_security_hops              = try(nei.ttl_security_hops, null)
 
           local_asn_propagation = try(nei.local_as_propagation, null)
           local_asn             = try(nei.local_as, null)
@@ -377,6 +496,10 @@ resource "nxos_bgp" "bgp" {
             prefix_list_controls = length(compact([try(af.prefix_list_in, null) != null ? "in" : "", try(af.prefix_list_out, null) != null ? "out" : ""])) > 0 ? { for direction in compact([try(af.prefix_list_in, null) != null ? "in" : "", try(af.prefix_list_out, null) != null ? "out" : ""]) : direction => {
               list = direction == "in" ? af.prefix_list_in : af.prefix_list_out
             } } : null
+
+            inherit_peer_policies = length(try(af.inherit_peer_policies, [])) > 0 ? { for pol in try(af.inherit_peer_policies, []) : pol.name => {
+              sequence = try(pol.sequence, null)
+            } } : null
           } } : null
         } if try(nei.interface_type, null) == null } : null
 
@@ -384,16 +507,16 @@ resource "nxos_bgp" "bgp" {
           remote_asn = try(nei.remote_as, null)
           asn_type   = try(nei.remote_as, null) != null ? "none" : null
 
-          description                   = try(nei.description, null)
-          peer_template                 = try(nei.inherit_peer, null)
-          peer_type                     = try(nei.peer_type, null)
-          admin_state                   = try(nei.shutdown, null) == null ? null : (try(nei.shutdown) ? "disabled" : "enabled")
-          affinity_group                = try(nei.affinity_group, null)
-          bfd_type                      = try(nei.bfd_multihop, null) == null ? null : (try(nei.bfd_multihop) ? "multihop" : "singlehop")
-          bmp_server_1                  = try(nei.bmp_activate_server_1, null) == null ? null : (try(nei.bmp_activate_server_1) ? "enabled" : "disabled")
-          bmp_server_2                  = try(nei.bmp_activate_server_2, null) == null ? null : (try(nei.bmp_activate_server_2) ? "enabled" : "disabled")
-          capability_suppress_4_byte_as = try(nei.capability_suppress_4_byte_as, null) == null ? null : (try(nei.capability_suppress_4_byte_as) ? "enabled" : "disabled")
-          connection_mode               = try(nei.transport_connection_mode, null)
+          description                    = try(nei.description, null)
+          peer_template                  = try(nei.inherit_peer, null)
+          peer_type                      = try(nei.peer_type, null)
+          admin_state                    = try(nei.shutdown, null) == null ? null : (try(nei.shutdown) ? "disabled" : "enabled")
+          affinity_group                 = try(nei.affinity_group, null)
+          bfd_type                       = try(nei.bfd_multihop, null) == null ? null : (try(nei.bfd_multihop) ? "multihop" : "singlehop")
+          bmp_server_1                   = try(nei.bmp_activate_server_1, null) == null ? null : (try(nei.bmp_activate_server_1) ? "enabled" : "disabled")
+          bmp_server_2                   = try(nei.bmp_activate_server_2, null) == null ? null : (try(nei.bmp_activate_server_2) ? "enabled" : "disabled")
+          capability_suppress_4_byte_asn = try(nei.capability_suppress_4_byte_as, null) == null ? null : (try(nei.capability_suppress_4_byte_as) ? "enabled" : "disabled")
+          connection_mode                = try(nei.transport_connection_mode, null)
           peer_control = length(compact([
             try(nei.bfd, false) ? "bfd" : "",
             try(nei.dont_capability_negotiate, false) ? "cap-neg-off" : "",
@@ -539,7 +662,9 @@ resource "nxos_bgp" "bgp" {
         } } : null
       } } : null
 
-      peer_templates = null
+      peer_templates         = null
+      peer_session_templates = null
+      peer_policy_templates  = null
 
       peers = length(try(local.bgp_peers_non_default_vrf_map[each.key][vrf.vrf], [])) > 0 ? { for nei in try(vrf.neighbors, []) : nei.ip => {
         remote_asn         = try(nei.remote_as, null)
@@ -562,21 +687,21 @@ resource "nxos_bgp" "bgp" {
             try(nei.disable_connected_check, false) ? "dis-conn-check" : "",
             !try(nei.dynamic_capability, true) ? "no-dyn-cap" : "",
         ]))) : null
-        password_type                 = try(local.bgp_password_type_map[try(nei.password_type)], try(nei.password_type, null))
-        password                      = try(nei.password, null)
-        admin_state                   = try(nei.shutdown, null) == null ? null : (try(nei.shutdown) ? "disabled" : "enabled")
-        affinity_group                = try(nei.affinity_group, null)
-        bfd_type                      = try(nei.bfd_multihop, null) == null ? null : (try(nei.bfd_multihop) ? "multihop" : "singlehop")
-        bmp_server_1                  = try(nei.bmp_activate_server_1, null) == null ? null : (try(nei.bmp_activate_server_1) ? "enabled" : "disabled")
-        bmp_server_2                  = try(nei.bmp_activate_server_2, null) == null ? null : (try(nei.bmp_activate_server_2) ? "enabled" : "disabled")
-        capability_suppress_4_byte_as = try(nei.capability_suppress_4_byte_as, null) == null ? null : (try(nei.capability_suppress_4_byte_as) ? "enabled" : "disabled")
-        connection_mode               = try(nei.transport_connection_mode, null)
-        log_neighbor_changes          = try(nei.log_neighbor_changes, null) == null ? null : (try(nei.log_neighbor_changes) ? "enable" : "disable")
-        low_memory_exempt             = try(nei.low_memory_exempt, null) == null ? null : (try(nei.low_memory_exempt) ? "enabled" : "disabled")
-        max_peer_count                = try(nei.maximum_peers, null)
-        private_as_control            = try(local.remove_private_as_map[nei.remove_private_as], null)
-        session_template              = try(nei.inherit_peer_session, null)
-        ttl_security_hops             = try(nei.ttl_security_hops, null)
+        password_type                  = try(local.bgp_password_type_map[try(nei.password_type)], try(nei.password_type, null))
+        password                       = try(nei.password, null)
+        admin_state                    = try(nei.shutdown, null) == null ? null : (try(nei.shutdown) ? "disabled" : "enabled")
+        affinity_group                 = try(nei.affinity_group, null)
+        bfd_type                       = try(nei.bfd_multihop, null) == null ? null : (try(nei.bfd_multihop) ? "multihop" : "singlehop")
+        bmp_server_1                   = try(nei.bmp_activate_server_1, null) == null ? null : (try(nei.bmp_activate_server_1) ? "enabled" : "disabled")
+        bmp_server_2                   = try(nei.bmp_activate_server_2, null) == null ? null : (try(nei.bmp_activate_server_2) ? "enabled" : "disabled")
+        capability_suppress_4_byte_asn = try(nei.capability_suppress_4_byte_as, null) == null ? null : (try(nei.capability_suppress_4_byte_as) ? "enabled" : "disabled")
+        connection_mode                = try(nei.transport_connection_mode, null)
+        log_neighbor_changes           = try(nei.log_neighbor_changes, null) == null ? null : (try(nei.log_neighbor_changes) ? "enable" : "disable")
+        low_memory_exempt              = try(nei.low_memory_exempt, null) == null ? null : (try(nei.low_memory_exempt) ? "enabled" : "disabled")
+        max_peer_count                 = try(nei.maximum_peers, null)
+        private_as_control             = try(local.remove_private_as_map[nei.remove_private_as], null)
+        session_template               = try(nei.inherit_peer_session, null)
+        ttl_security_hops              = try(nei.ttl_security_hops, null)
 
         local_asn_propagation = try(nei.local_as_propagation, null)
         local_asn             = try(nei.local_as, null)
@@ -639,6 +764,10 @@ resource "nxos_bgp" "bgp" {
           prefix_list_controls = length(compact([try(af.prefix_list_in, null) != null ? "in" : "", try(af.prefix_list_out, null) != null ? "out" : ""])) > 0 ? { for direction in compact([try(af.prefix_list_in, null) != null ? "in" : "", try(af.prefix_list_out, null) != null ? "out" : ""]) : direction => {
             list = direction == "in" ? af.prefix_list_in : af.prefix_list_out
           } } : null
+
+          inherit_peer_policies = length(try(af.inherit_peer_policies, [])) > 0 ? { for pol in try(af.inherit_peer_policies, []) : pol.name => {
+            sequence = try(pol.sequence, null)
+          } } : null
         } } : null
       } if try(nei.interface_type, null) == null } : null
 
@@ -646,16 +775,16 @@ resource "nxos_bgp" "bgp" {
         remote_asn = try(nei.remote_as, null)
         asn_type   = try(nei.remote_as, null) != null ? "none" : null
 
-        description                   = try(nei.description, null)
-        peer_template                 = try(nei.inherit_peer, null)
-        peer_type                     = try(nei.peer_type, null)
-        admin_state                   = try(nei.shutdown, null) == null ? null : (try(nei.shutdown) ? "disabled" : "enabled")
-        affinity_group                = try(nei.affinity_group, null)
-        bfd_type                      = try(nei.bfd_multihop, null) == null ? null : (try(nei.bfd_multihop) ? "multihop" : "singlehop")
-        bmp_server_1                  = try(nei.bmp_activate_server_1, null) == null ? null : (try(nei.bmp_activate_server_1) ? "enabled" : "disabled")
-        bmp_server_2                  = try(nei.bmp_activate_server_2, null) == null ? null : (try(nei.bmp_activate_server_2) ? "enabled" : "disabled")
-        capability_suppress_4_byte_as = try(nei.capability_suppress_4_byte_as, null) == null ? null : (try(nei.capability_suppress_4_byte_as) ? "enabled" : "disabled")
-        connection_mode               = try(nei.transport_connection_mode, null)
+        description                    = try(nei.description, null)
+        peer_template                  = try(nei.inherit_peer, null)
+        peer_type                      = try(nei.peer_type, null)
+        admin_state                    = try(nei.shutdown, null) == null ? null : (try(nei.shutdown) ? "disabled" : "enabled")
+        affinity_group                 = try(nei.affinity_group, null)
+        bfd_type                       = try(nei.bfd_multihop, null) == null ? null : (try(nei.bfd_multihop) ? "multihop" : "singlehop")
+        bmp_server_1                   = try(nei.bmp_activate_server_1, null) == null ? null : (try(nei.bmp_activate_server_1) ? "enabled" : "disabled")
+        bmp_server_2                   = try(nei.bmp_activate_server_2, null) == null ? null : (try(nei.bmp_activate_server_2) ? "enabled" : "disabled")
+        capability_suppress_4_byte_asn = try(nei.capability_suppress_4_byte_as, null) == null ? null : (try(nei.capability_suppress_4_byte_as) ? "enabled" : "disabled")
+        connection_mode                = try(nei.transport_connection_mode, null)
         peer_control = length(compact([
           try(nei.bfd, false) ? "bfd" : "",
           try(nei.dont_capability_negotiate, false) ? "cap-neg-off" : "",

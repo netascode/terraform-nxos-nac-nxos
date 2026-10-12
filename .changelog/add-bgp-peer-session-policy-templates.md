@@ -1,0 +1,6 @@
+- Add BGP peer-session templates support (`peer_session_templates`) including `local_as`, `local_as_propagation`, `dscp` and `internal_vpn_client`
+- Add BGP peer-policy templates support (`peer_policy_templates`) including route-map, prefix-list and filter-list in/out, `maximum_prefix`, `capability_additional_paths_send`, `capability_additional_paths_receive` and `inherit_peer_policies`
+- Add `inherit_peer_policies` support to BGP neighbor address families and peer template address families
+- Add `route_map_in`, `route_map_out`, `prefix_list_in` and `prefix_list_out` support to BGP peer template address families
+- BREAKING CHANGE: `routing.bgp.peer_templates[].connection_mode` renamed to `routing.bgp.peer_templates[].transport_connection_mode`
+- Fix BGP neighbor and peer template `capability_suppress_4_byte_as` not being applied
