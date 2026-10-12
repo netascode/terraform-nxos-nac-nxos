@@ -1,0 +1,1 @@
+- Add BGP bestpath support (`bestpath`) including `always_compare_med`, `compare_routerid`, `compare_neighborid`, `as_path_ignore`, `as_path_multipath_relax`, `aigp_ignore`, `cost_community_ignore`, `igp_metric_ignore`, `med_confed`, `med_missing_as_worst`, and `med_non_deterministic` for the default VRF and VRFs

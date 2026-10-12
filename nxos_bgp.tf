@@ -88,8 +88,8 @@ resource "nxos_bgp" "bgp" {
         alloc_index              = try(local.device_config[each.key].routing.bgp.allocate_index, null)
         bestpath_first_always    = try(local.device_config[each.key].routing.bgp.bestpath_limit_always, null) == null ? null : (try(local.device_config[each.key].routing.bgp.bestpath_limit_always) ? "enabled" : "disabled")
         bestpath_interval        = try(local.device_config[each.key].routing.bgp.bestpath_limit, null)
-        bandwidth_reference      = try(local.device_config[each.key].routing.bgp.bandwidth_reference, null)
-        bandwidth_reference_unit = try(local.device_config[each.key].routing.bgp.bandwidth_reference_unit, null)
+        bandwidth_reference      = try(local.device_config[each.key].routing.bgp.reference_bandwidth, null)
+        bandwidth_reference_unit = try(local.device_config[each.key].routing.bgp.reference_bandwidth_unit, null)
         cluster_id               = try(local.device_config[each.key].routing.bgp.cluster_id, null)
         hold_time                = try(local.device_config[each.key].routing.bgp.hold_time, null)
         keepalive_interval       = try(local.device_config[each.key].routing.bgp.keepalive_interval, null)
@@ -109,6 +109,18 @@ resource "nxos_bgp" "bgp" {
         graceful_restart_control        = try(local.device_config[each.key].routing.bgp.graceful_restart, null)
         graceful_restart_interval       = try(local.device_config[each.key].routing.bgp.graceful_restart_restart_time, null)
         graceful_restart_stale_interval = try(local.device_config[each.key].routing.bgp.graceful_restart_stalepath_time, null)
+
+        path_control_aigp_ignore             = try(local.device_config[each.key].routing.bgp.bestpath.aigp_ignore, null) == null ? null : (try(local.device_config[each.key].routing.bgp.bestpath.aigp_ignore) ? "enabled" : "disabled")
+        path_control_always_compare_med      = try(local.device_config[each.key].routing.bgp.bestpath.always_compare_med, null) == null ? null : (try(local.device_config[each.key].routing.bgp.bestpath.always_compare_med) ? "enabled" : "disabled")
+        path_control_as_path_ignore          = try(local.device_config[each.key].routing.bgp.bestpath.as_path_ignore, null) == null ? null : (try(local.device_config[each.key].routing.bgp.bestpath.as_path_ignore) ? "enabled" : "disabled")
+        path_control_as_path_multipath_relax = try(local.device_config[each.key].routing.bgp.bestpath.as_path_multipath_relax, null) == null ? null : (try(local.device_config[each.key].routing.bgp.bestpath.as_path_multipath_relax) ? "enabled" : "disabled")
+        path_control_compare_neighbor_id     = try(local.device_config[each.key].routing.bgp.bestpath.compare_neighborid, null) == null ? null : (try(local.device_config[each.key].routing.bgp.bestpath.compare_neighborid) ? "enabled" : "disabled")
+        path_control_compare_router_id       = try(local.device_config[each.key].routing.bgp.bestpath.compare_routerid, null) == null ? null : (try(local.device_config[each.key].routing.bgp.bestpath.compare_routerid) ? "enabled" : "disabled")
+        path_control_cost_community_ignore   = try(local.device_config[each.key].routing.bgp.bestpath.cost_community_ignore, null) == null ? null : (try(local.device_config[each.key].routing.bgp.bestpath.cost_community_ignore) ? "enabled" : "disabled")
+        path_control_igp_metric_ignore       = try(local.device_config[each.key].routing.bgp.bestpath.igp_metric_ignore, null) == null ? null : (try(local.device_config[each.key].routing.bgp.bestpath.igp_metric_ignore) ? "enabled" : "disabled")
+        path_control_med_confed              = try(local.device_config[each.key].routing.bgp.bestpath.med_confed, null) == null ? null : (try(local.device_config[each.key].routing.bgp.bestpath.med_confed) ? "enabled" : "disabled")
+        path_control_med_missing_as_worst    = try(local.device_config[each.key].routing.bgp.bestpath.med_missing_as_worst, null) == null ? null : (try(local.device_config[each.key].routing.bgp.bestpath.med_missing_as_worst) ? "enabled" : "disabled")
+        path_control_med_non_deterministic   = try(local.device_config[each.key].routing.bgp.bestpath.med_non_deterministic, null) == null ? null : (try(local.device_config[each.key].routing.bgp.bestpath.med_non_deterministic) ? "enabled" : "disabled")
 
         address_families = length(try(local.device_config[each.key].routing.bgp.address_families, [])) > 0 ? { for af in try(local.device_config[each.key].routing.bgp.address_families, []) : local.address_family_names_map[af.address_family] => {
           critical_nexthop_timeout                            = try(af.nexthop_trigger_delay_critical, null)
@@ -441,6 +453,18 @@ resource "nxos_bgp" "bgp" {
       graceful_restart_control        = try(vrf.graceful_restart, null)
       graceful_restart_interval       = try(vrf.graceful_restart_restart_time, null)
       graceful_restart_stale_interval = try(vrf.graceful_restart_stalepath_time, null)
+
+      path_control_aigp_ignore             = try(vrf.bestpath.aigp_ignore, null) == null ? null : (try(vrf.bestpath.aigp_ignore) ? "enabled" : "disabled")
+      path_control_always_compare_med      = try(vrf.bestpath.always_compare_med, null) == null ? null : (try(vrf.bestpath.always_compare_med) ? "enabled" : "disabled")
+      path_control_as_path_ignore          = try(vrf.bestpath.as_path_ignore, null) == null ? null : (try(vrf.bestpath.as_path_ignore) ? "enabled" : "disabled")
+      path_control_as_path_multipath_relax = try(vrf.bestpath.as_path_multipath_relax, null) == null ? null : (try(vrf.bestpath.as_path_multipath_relax) ? "enabled" : "disabled")
+      path_control_compare_neighbor_id     = try(vrf.bestpath.compare_neighborid, null) == null ? null : (try(vrf.bestpath.compare_neighborid) ? "enabled" : "disabled")
+      path_control_compare_router_id       = try(vrf.bestpath.compare_routerid, null) == null ? null : (try(vrf.bestpath.compare_routerid) ? "enabled" : "disabled")
+      path_control_cost_community_ignore   = try(vrf.bestpath.cost_community_ignore, null) == null ? null : (try(vrf.bestpath.cost_community_ignore) ? "enabled" : "disabled")
+      path_control_igp_metric_ignore       = try(vrf.bestpath.igp_metric_ignore, null) == null ? null : (try(vrf.bestpath.igp_metric_ignore) ? "enabled" : "disabled")
+      path_control_med_confed              = try(vrf.bestpath.med_confed, null) == null ? null : (try(vrf.bestpath.med_confed) ? "enabled" : "disabled")
+      path_control_med_missing_as_worst    = try(vrf.bestpath.med_missing_as_worst, null) == null ? null : (try(vrf.bestpath.med_missing_as_worst) ? "enabled" : "disabled")
+      path_control_med_non_deterministic   = try(vrf.bestpath.med_non_deterministic, null) == null ? null : (try(vrf.bestpath.med_non_deterministic) ? "enabled" : "disabled")
 
       address_families = length(try(vrf.address_families, [])) > 0 ? { for af in try(vrf.address_families, []) : local.address_family_names_map[af.address_family] => {
         critical_nexthop_timeout                            = try(af.nexthop_trigger_delay_critical, null)

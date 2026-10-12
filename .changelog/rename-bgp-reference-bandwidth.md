@@ -1,0 +1,1 @@
+- BREAKING CHANGE: Rename `routing.bgp.bandwidth_reference`, `routing.bgp.bandwidth_reference_unit` to `reference_bandwidth`, `reference_bandwidth_unit` to align with the CLI (`reference-bandwidth`) and the VRF-level attributes
