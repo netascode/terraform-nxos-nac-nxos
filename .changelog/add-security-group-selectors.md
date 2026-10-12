@@ -1,0 +1,3 @@
+- Add security group external subnet selectors including route injection, next-hop and MPLS VPN encapsulation (`security_group.security_groups[].match_external_subnets_ipv4`, `match_external_subnets_ipv6`)
+- Add security group interface, VLAN/MAC and VLAN/interface selectors (`security_group.security_groups[].match_interfaces`, `match_vlan_macs`, `match_vlan_interfaces`)
+- Add security group layer4-7 type configuration (`security_group.security_groups[].type_layer4_7`)

@@ -72,9 +72,25 @@ resource "nxos_esg" "esg" {
 
   security_groups = length(try(local.device_config[each.key].security_group.security_groups, [])) > 0 ? { for sg in try(local.device_config[each.key].security_group.security_groups, []) : sg.id => {
     name                              = try(sg.name, null)
+    type_layer4_7                     = try(sg.type_layer4_7, null) == null ? null : (try(sg.type_layer4_7) ? "enabled" : "disabled")
     selector_connected_endpoints_ipv4 = length(try(sg.match_connected_endpoints_ipv4, [])) > 0 ? { for ep in try(sg.match_connected_endpoints_ipv4, []) : "${ep.vrf};${ep.address}" => {} } : null
     selector_connected_endpoints_ipv6 = length(try(sg.match_connected_endpoints_ipv6, [])) > 0 ? { for ep in try(sg.match_connected_endpoints_ipv6, []) : "${ep.vrf};${ep.address}" => {} } : null
-    selector_match_vlans              = length(try(provider::utils::normalize_vlans(try(sg.match_vlans), "list"), [])) > 0 ? { for vlan_id in try(provider::utils::normalize_vlans(try(sg.match_vlans), "list"), []) : "vlan-${vlan_id}" => {} } : null
+    # External subnet selectors are split by the presence of nexthop and encap-type into separate DME classes.
+    selector_external_subnets_ipv4 = length([for es in try(sg.match_external_subnets_ipv4, []) : es if try(es.nexthop_ipv4, null) == null]) > 0 ? { for es in try(sg.match_external_subnets_ipv4, []) : "${es.vrf};${es.address}" => {
+      route_inject = try(es.route_inject, null) == null ? null : (try(es.route_inject) ? "enabled" : "disabled")
+    } if try(es.nexthop_ipv4, null) == null } : null
+    selector_external_subnets_nexthop_ipv4       = length([for es in try(sg.match_external_subnets_ipv4, []) : es if try(es.nexthop_ipv4, null) != null && try(es.encap_type, null) == null]) > 0 ? { for es in try(sg.match_external_subnets_ipv4, []) : "${es.vrf};${es.address};${es.nexthop_ipv4}" => {} if try(es.nexthop_ipv4, null) != null && try(es.encap_type, null) == null } : null
+    selector_external_subnets_nexthop_encap_ipv4 = length([for es in try(sg.match_external_subnets_ipv4, []) : es if try(es.nexthop_ipv4, null) != null && try(es.encap_type, null) != null]) > 0 ? { for es in try(sg.match_external_subnets_ipv4, []) : "${es.vrf};${es.address};${es.nexthop_ipv4};${es.encap_type}" => {} if try(es.nexthop_ipv4, null) != null && try(es.encap_type, null) != null } : null
+    selector_external_subnets_ipv6 = length([for es in try(sg.match_external_subnets_ipv6, []) : es if try(es.nexthop_ipv4, null) == null && try(es.nexthop_ipv6, null) == null]) > 0 ? { for es in try(sg.match_external_subnets_ipv6, []) : "${es.vrf};${es.address}" => {
+      route_inject = try(es.route_inject, null) == null ? null : (try(es.route_inject) ? "enabled" : "disabled")
+    } if try(es.nexthop_ipv4, null) == null && try(es.nexthop_ipv6, null) == null } : null
+    selector_external_subnets_nexthop_ipv6       = length([for es in try(sg.match_external_subnets_ipv6, []) : es if try(coalesce(try(es.nexthop_ipv6, null), try(es.nexthop_ipv4, null)), null) != null && try(es.encap_type, null) == null]) > 0 ? { for es in try(sg.match_external_subnets_ipv6, []) : "${es.vrf};${es.address};${coalesce(try(es.nexthop_ipv6, null), try(es.nexthop_ipv4, null))}" => {} if try(coalesce(try(es.nexthop_ipv6, null), try(es.nexthop_ipv4, null)), null) != null && try(es.encap_type, null) == null } : null
+    selector_external_subnets_nexthop_encap_ipv6 = length([for es in try(sg.match_external_subnets_ipv6, []) : es if try(coalesce(try(es.nexthop_ipv4, null), try(es.nexthop_ipv6, null)), null) != null && try(es.encap_type, null) != null]) > 0 ? { for es in try(sg.match_external_subnets_ipv6, []) : "${es.vrf};${es.address};${coalesce(try(es.nexthop_ipv4, null), try(es.nexthop_ipv6, null))};${es.encap_type}" => {} if try(coalesce(try(es.nexthop_ipv4, null), try(es.nexthop_ipv6, null)), null) != null && try(es.encap_type, null) != null } : null
+    selector_match_interfaces                    = length(try(sg.match_interfaces, [])) > 0 ? { for intf in try(sg.match_interfaces, []) : "${local.intf_prefix_map[intf.interface_type]}${intf.interface_id}" => {} } : null
+    selector_match_vlans                         = length(try(provider::utils::normalize_vlans(try(sg.match_vlans), "list"), [])) > 0 ? { for vlan_id in try(provider::utils::normalize_vlans(try(sg.match_vlans), "list"), []) : "vlan-${vlan_id}" => {} } : null
+    # DME stores MAC addresses as uppercase colon-separated octets (e.g. 00:1B:63:84:45:E6).
+    selector_match_vlan_macs       = length(try(sg.match_vlan_macs, [])) > 0 ? { for vm in try(sg.match_vlan_macs, []) : "vlan-${vm.vlan};${upper(join(":", regexall("[0-9A-Fa-f]{2}", replace(vm.mac, "/[^0-9A-Fa-f]/", ""))))}" => {} } : null
+    selector_match_vlan_interfaces = length(try(sg.match_vlan_interfaces, [])) > 0 ? { for vi in try(sg.match_vlan_interfaces, []) : "vlan-${vi.vlan};${local.intf_prefix_map[vi.interface_type]}${vi.interface_id}" => {} } : null
   } } : null
 
   class_maps = length(try(local.device_config[each.key].security_group.class_maps, [])) > 0 ? { for cm in try(local.device_config[each.key].security_group.class_maps, []) : cm.name => {
