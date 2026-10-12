@@ -1,0 +1,2 @@
+- Add security group contract support (`vrfs[].security_contracts`) including source and destination security groups, policy map and unidirectional contracts
+- Add security group class map filter entry ether type, protocol, stateful, source/destination port range and TCP session rule configuration (`security_group.class_maps[].filter_entries[].ether_type`, `protocol`, `stateful`, `sport`, `sport_to`, `dport`, `dport_to`, `session_rule`)

@@ -23,11 +23,40 @@ locals {
     48 = "CS6"
   }
 
+  # ESG class map filter entries use the protocol names returned by DME; protocols without a name are plain numbers.
+  esg_protocol_int_to_string_map = {
+    1   = "icmp"
+    2   = "igmp"
+    6   = "tcp"
+    8   = "egp"
+    9   = "igp"
+    17  = "udp"
+    58  = "icmpv6"
+    88  = "eigrp"
+    89  = "ospfigp"
+    103 = "pim"
+    115 = "l2tp"
+  }
+
+  # ESG class map filter entries use the port names returned by DME; ports without a name are plain numbers.
+  esg_port_int_to_string_map = {
+    20  = "ftpData"
+    25  = "smtp"
+    53  = "dns"
+    80  = "http"
+    110 = "pop3"
+    443 = "https"
+    554 = "rtsp"
+  }
+
   esg_domains_map = { for device in local.devices : device.name =>
     { for vrf in try(local.device_config[device.name].vrfs, []) : vrf.name => {
       default_action        = try(vrf.security_enforce_default, null)
       policy_classifier_tag = try(vrf.security_enforce_tag, null)
-    } if try(vrf.security_enforce_tag, null) != null || try(vrf.security_enforce_default, null) != null }
+      contracts = length(try(vrf.security_contracts, [])) > 0 ? { for contract in try(vrf.security_contracts, []) : "${contract.source};${contract.destination};${contract.policy}" => {
+        direction = try(contract.unidir, null) == null ? null : (try(contract.unidir) ? "uni-dir" : "bi-dir")
+      } } : null
+    } if try(vrf.security_enforce_tag, null) != null || try(vrf.security_enforce_default, null) != null || length(try(vrf.security_contracts, [])) > 0 }
   }
 }
 
@@ -37,7 +66,7 @@ resource "nxos_esg" "esg" {
     length(try(local.device_config[device.name].security_group.security_groups, [])) > 0 ||
     length(try(local.device_config[device.name].security_group.class_maps, [])) > 0 ||
     length(try(local.device_config[device.name].security_group.policy_maps, [])) > 0 ||
-  length([for vrf in try(local.device_config[device.name].vrfs, []) : vrf if try(vrf.security_enforce_tag, null) != null || try(vrf.security_enforce_default, null) != null]) > 0 }
+  length([for vrf in try(local.device_config[device.name].vrfs, []) : vrf if try(vrf.security_enforce_tag, null) != null || try(vrf.security_enforce_default, null) != null || length(try(vrf.security_contracts, [])) > 0]) > 0 }
   device           = each.key
   mac_segmentation = try(local.device_config[each.key].security_group.mac_segmentation, null)
 
@@ -51,10 +80,18 @@ resource "nxos_esg" "esg" {
   class_maps = length(try(local.device_config[each.key].security_group.class_maps, [])) > 0 ? { for cm in try(local.device_config[each.key].security_group.class_maps, []) : cm.name => {
     description = try(cm.description, null)
     filter_entries = length(try(cm.filter_entries, [])) > 0 ? { for fe in try(cm.filter_entries, []) : fe.name => {
-      apply_to_fragment = try(fe.fragments, null)
-      icmpv4_type       = try(fe.icmpv4_type, null)
-      icmpv6_type       = try(fe.icmpv6_type, null)
-      match_dscp        = try(tostring(fe.dscp), null) != null ? try(local.esg_dscp_int_to_string_map[fe.dscp], tostring(fe.dscp)) : null
+      apply_to_fragment     = try(fe.fragments, null)
+      destination_port_from = try(tostring(fe.dport), null) != null ? try(local.esg_port_int_to_string_map[fe.dport], tostring(fe.dport)) : null
+      destination_port_to   = try(tostring(try(fe.dport_to, fe.dport)), null) != null ? try(local.esg_port_int_to_string_map[try(fe.dport_to, fe.dport)], tostring(try(fe.dport_to, fe.dport))) : null
+      ether_type            = try(fe.ether_type, null)
+      icmpv4_type           = try(fe.icmpv4_type, null)
+      icmpv6_type           = try(fe.icmpv6_type, null)
+      match_dscp            = try(tostring(fe.dscp), null) != null ? try(local.esg_dscp_int_to_string_map[fe.dscp], tostring(fe.dscp)) : null
+      protocol              = try(tostring(fe.protocol), null) != null ? try(local.esg_protocol_int_to_string_map[fe.protocol], tostring(fe.protocol)) : null
+      source_port_from      = try(tostring(fe.sport), null) != null ? try(local.esg_port_int_to_string_map[fe.sport], tostring(fe.sport)) : null
+      source_port_to        = try(tostring(try(fe.sport_to, fe.sport)), null) != null ? try(local.esg_port_int_to_string_map[try(fe.sport_to, fe.sport)], tostring(try(fe.sport_to, fe.sport))) : null
+      stateful              = try(fe.stateful, null)
+      tcp_rules             = length(try(fe.session_rule, [])) > 0 ? join(",", sort(fe.session_rule)) : null
     } } : null
   } } : null
 
