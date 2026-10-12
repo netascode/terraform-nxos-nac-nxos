@@ -10,6 +10,31 @@ locals {
     "no-advertise" = "regular:wk-nn2:no-advertise"
     "local-AS"     = "regular:wk-nn2:no-export-subconfed"
   }
+
+  rp_route_type_map = {
+    "internal"             = "internal"
+    "external"             = "external"
+    "local"                = "local"
+    "type-1"               = "ospf-type1"
+    "type-2"               = "ospf-type2"
+    "nssa-external"        = "ospf-nssa-external"
+    "level-1"              = "isis-l1"
+    "level-2"              = "isis-l2"
+    "inter-area"           = "ospf-inter-area"
+    "intra-area"           = "ospf-intra-area"
+    "redistributed-direct" = "redistributed-direct"
+  }
+
+  rp_evpn_route_type_map = {
+    "1"          = "R1"
+    "2"          = "R2_ALL"
+    "2-mac-only" = "mac-only"
+    "2-mac-ip"   = "mac-ip"
+    "3"          = "R3"
+    "4"          = "R4"
+    "5"          = "R5"
+    "6"          = "R6"
+  }
 }
 
 resource "nxos_route_policy" "route_policy" {
@@ -75,14 +100,9 @@ resource "nxos_route_policy" "route_policy" {
         } : {},
       ) : null
 
-      match_route_access_lists = anytrue([try(entry.match_ip_address_access_list, null) != null, try(entry.match_ip_address, null) != null]) ? merge(
-        try(entry.match_ip_address_access_list, null) != null ? {
-          "sys/acl/ipv4/name-[${try(entry.match_ip_address_access_list)}]" = {}
-        } : {},
-        try(entry.match_ip_address, null) != null ? {
-          "sys/rpm/accesslist-[${try(entry.match_ip_address)}]" = {}
-        } : {},
-      ) : null
+      match_route_access_lists = try(entry.match_ip_address, null) != null ? {
+        "sys/rpm/accesslist-[${try(entry.match_ip_address)}]" = {}
+      } : null
 
       set_regular_community_additive     = try(entry.set_community, null) != null ? (try(entry.set_community_additive, null) != null ? (try(entry.set_community_additive) ? "enabled" : "disabled") : "disabled") : null
       set_regular_community_no_community = try(entry.set_community, null) != null ? (try(entry.set_community_none, null) != null ? (try(entry.set_community_none) ? "enabled" : "disabled") : "disabled") : null
@@ -98,7 +118,33 @@ resource "nxos_route_policy" "route_policy" {
         ) => {}
       } : null
 
+      set_community_list_name     = try(entry.set_comm_list, null)
+      set_community_list_delete   = try(entry.set_comm_list, null) != null ? "enabled" : null
+      set_community_list_criteria = try(entry.set_comm_list, null) != null ? "none" : null
+
+      set_extended_community_route_target_additive = length(try(entry.set_extcommunity_rt, [])) > 0 ? (try(entry.set_extcommunity_rt_additive, null) != null ? (try(entry.set_extcommunity_rt_additive) ? "enabled" : "disabled") : "disabled") : null
+      set_extended_community_route_target_criteria = length(try(entry.set_extcommunity_rt, [])) > 0 ? "none" : null
+
+      set_extended_community_route_target_items = length(try(entry.set_extcommunity_rt, [])) > 0 ? {
+        for rt in try(entry.set_extcommunity_rt, []) :
+        "transitive;${can(regex("\\.", rt)) ? "route-target:ipv4-nn2:${rt}" : (tonumber(split(":", rt)[0]) <= 65535 ? "route-target:as2-nn2:${rt}" : "route-target:as4-nn2:${rt}")}" => {}
+      } : null
+
+      set_as_path_prepend         = length(try(entry.set_as_path_prepend, [])) > 0 ? join(" ", [for asn in try(entry.set_as_path_prepend, []) : tostring(asn)]) : null
+      set_as_path_prepend_last_as = try(entry.set_as_path_prepend_last_as, null)
+      set_origin                  = try(entry.set_origin, null)
+      set_origin_asn              = try(entry.set_origin_egp_asn, null)
+      set_tag                     = try(entry.set_tag, null)
+      set_weight                  = try(entry.set_weight, null)
+
       match_tags = length(try(entry.match_tags, [])) > 0 ? { for tag in try(entry.match_tags, []) : tag => {} } : null
+
+      match_interfaces = length(try(entry.match_interfaces, [])) > 0 ? { for intf in try(entry.match_interfaces, []) : "${local.intf_prefix_map[intf.interface_type]}${intf.interface_id}" => {} } : null
+
+      match_route_types = length(concat(try(entry.match_route_types, []), try(entry.match_evpn_route_types, []))) > 0 ? merge(
+        { for rt in try(entry.match_route_types, []) : local.rp_route_type_map[rt] => {} },
+        { for rt in try(entry.match_evpn_route_types, []) : local.rp_evpn_route_type_map[tostring(rt)] => {} },
+      ) : null
 
       match_as_path_lists = length(try(entry.match_as_path, [])) > 0 ? {
         for name in try(entry.match_as_path, []) : "sys/rpm/accesslist-[${name}]" => {}
@@ -121,7 +167,7 @@ resource "nxos_route_policy" "route_policy" {
       set_next_hop_v6_unchanged        = try(entry.set_ipv6_next_hop_unchanged, null) != null ? (try(entry.set_ipv6_next_hop_unchanged) ? "enabled" : "disabled") : null
       set_next_hop_v6_redist_unchanged = try(entry.set_ipv6_next_hop_redist_unchanged, null) != null ? (try(entry.set_ipv6_next_hop_redist_unchanged) ? "enabled" : "disabled") : null
       set_local_preference             = try(entry.set_local_preference, null)
-      set_policy_tag                   = try(entry.set_policy_tag, null)
+      set_policy_tag                   = try(entry.set_pctag, null)
       set_path_selection_advertise     = try(entry.set_path_selection_advertise, null) != null ? { "unspecified" = "unspecified", "all" = "ps-all", "backup" = "ps-bestplus", "best2" = "ps-best2", "multipaths" = "ps-mpath" }[try(entry.set_path_selection_advertise)] : null
       set_evpn_gateway_ip              = try(entry.set_evpn_gateway_ip, null)
       set_evpn_gateway_type            = try(entry.set_evpn_gateway_ip_type, null)

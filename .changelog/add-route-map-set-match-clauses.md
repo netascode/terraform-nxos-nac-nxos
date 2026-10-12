@@ -1,0 +1,4 @@
+- BREAKING CHANGE: Rename `route_maps.entries.match_ip_address_access_list` to `match_ip_address` to align with the CLI (`match ip address <acl>`), and fix it not being applied due to an invalid access-list DN
+- BREAKING CHANGE: Rename `route_maps.entries.set_policy_tag` to `set_pctag` to align with the CLI (`set pctag`)
+- Add route map set clauses `set_as_path_prepend`, `set_as_path_prepend_last_as`, `set_tag`, `set_weight`, `set_origin`, `set_origin_egp_asn`, `set_extcommunity_rt`, `set_extcommunity_rt_additive` and `set_comm_list`
+- Add route map match clauses `match_interfaces`, `match_route_types` and `match_evpn_route_types`
