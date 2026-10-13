@@ -1,0 +1,6 @@
+- Add OSPF default-information originate (`default_information_originate`, `default_information_originate_always`, `default_information_originate_route_map`), graceful restart (`graceful_restart`, `graceful_restart_grace_period`, `graceful_restart_helper_disable`, `graceful_restart_planned_only`), SPF/LSA timers (`timers_throttle_spf_*`, `timers_throttle_lsa_*`, `timers_lsa_arrival`, `timers_lsa_group_pacing`) and `summary_addresses` support for the default VRF and VRFs
+- Add OSPF area range (`areas.ranges`) support
+- Add OSPFv3 graceful restart and LSA timer support for the default VRF and VRFs
+- Add OSPFv3 address family default-information originate, `timers_throttle_spf_*`, `redistributions`, `summary_addresses` and area (`areas` with `default_cost` and `ranges`) support
+- Add IS-IS per-level SPF interval (`spf_interval_level_*`), LSP generation interval (`lsp_gen_interval_level_*`) and graceful restart (`graceful_restart`, `graceful_restart_t3_manual`) support for the default VRF and VRFs
+- Add IS-IS address family `redistributions`, `summary_addresses` and inter-level route distribution (`distributions`) support

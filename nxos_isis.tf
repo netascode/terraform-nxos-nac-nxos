@@ -84,6 +84,27 @@ resource "nxos_isis" "isis" {
           overload_bgp_as_number   = try(inst.set_overload_bit_wait_for_bgp, null)
           overload_suppress        = try(inst.set_overload_bit_suppress, null)
 
+          graceful_restart_admin_state = try(inst.graceful_restart, null) == null ? null : (try(inst.graceful_restart) ? "enabled" : "disabled")
+          graceful_restart_t3_interval = try(inst.graceful_restart_t3_manual, null)
+          levels = anytrue([try(inst.spf_interval_level_1_max_wait, null) != null, try(inst.spf_interval_level_1_initial_wait, null) != null, try(inst.spf_interval_level_1_second_wait, null) != null, try(inst.lsp_gen_interval_level_1_max_wait, null) != null, try(inst.lsp_gen_interval_level_1_initial_wait, null) != null, try(inst.lsp_gen_interval_level_1_second_wait, null) != null, try(inst.spf_interval_level_2_max_wait, null) != null, try(inst.spf_interval_level_2_initial_wait, null) != null, try(inst.spf_interval_level_2_second_wait, null) != null, try(inst.lsp_gen_interval_level_2_max_wait, null) != null, try(inst.lsp_gen_interval_level_2_initial_wait, null) != null, try(inst.lsp_gen_interval_level_2_second_wait, null) != null]) ? merge(
+            anytrue([try(inst.spf_interval_level_1_max_wait, null) != null, try(inst.spf_interval_level_1_initial_wait, null) != null, try(inst.spf_interval_level_1_second_wait, null) != null, try(inst.lsp_gen_interval_level_1_max_wait, null) != null, try(inst.lsp_gen_interval_level_1_initial_wait, null) != null, try(inst.lsp_gen_interval_level_1_second_wait, null) != null]) ? { "l1" = {
+              spf_max_interval                = try(inst.spf_interval_level_1_max_wait, null)
+              spf_initial_interval            = try(inst.spf_interval_level_1_initial_wait, null)
+              spf_second_interval             = try(inst.spf_interval_level_1_second_wait, null)
+              lsp_generation_max_interval     = try(inst.lsp_gen_interval_level_1_max_wait, null)
+              lsp_generation_initial_interval = try(inst.lsp_gen_interval_level_1_initial_wait, null)
+              lsp_generation_second_interval  = try(inst.lsp_gen_interval_level_1_second_wait, null)
+            } } : {},
+            anytrue([try(inst.spf_interval_level_2_max_wait, null) != null, try(inst.spf_interval_level_2_initial_wait, null) != null, try(inst.spf_interval_level_2_second_wait, null) != null, try(inst.lsp_gen_interval_level_2_max_wait, null) != null, try(inst.lsp_gen_interval_level_2_initial_wait, null) != null, try(inst.lsp_gen_interval_level_2_second_wait, null) != null]) ? { "l2" = {
+              spf_max_interval                = try(inst.spf_interval_level_2_max_wait, null)
+              spf_initial_interval            = try(inst.spf_interval_level_2_initial_wait, null)
+              spf_second_interval             = try(inst.spf_interval_level_2_second_wait, null)
+              lsp_generation_max_interval     = try(inst.lsp_gen_interval_level_2_max_wait, null)
+              lsp_generation_initial_interval = try(inst.lsp_gen_interval_level_2_initial_wait, null)
+              lsp_generation_second_interval  = try(inst.lsp_gen_interval_level_2_second_wait, null)
+            } } : {},
+          ) : null
+
           address_families = length(try(inst.address_families, [])) > 0 ? { for af in try(inst.address_families, []) : replace(replace(af.address_family, "ipv4-unicast", "v4"), "ipv6-unicast", "v6") => {
             segment_routing_mpls                    = try(af.segment_routing_mpls, null)
             enable_bfd                              = try(af.bfd, null)
@@ -99,6 +120,20 @@ resource "nxos_isis" "isis" {
             router_id_ip_address                    = try(af.router_id_ip_address, null)
             table_map                               = try(af.table_map, null)
             table_map_filter                        = try(af.table_map_filter, null) != null ? (try(af.table_map_filter) ? "enabled" : "disabled") : null
+
+            redistributions = length(try(af.redistributions, [])) > 0 ? { for redist in try(af.redistributions, []) : "${redist.protocol};${try(redist.protocol_instance, "none")};${try(redist.asn, "none")}" => {
+              route_map = try(redist.route_map, null)
+            } } : null
+
+            summary_addresses = length(try(af.summary_addresses, [])) > 0 ? { for sum in try(af.summary_addresses, []) : sum.prefix => {
+              level = try({ "level-1" = "l1", "level-2" = "l2", "level-1-2" = "l12" }[sum.level], null)
+            } } : null
+
+            distributions = length(try(af.distributions, [])) > 0 ? { for dist in try(af.distributions, []) : { "level-1" = "l1", "level-2" = "l2", "level-1-2" = "l12" }[dist.source_level] => {
+              destination_level = try({ "level-1" = "l1", "level-2" = "l2", "level-1-2" = "l12" }[dist.destination_level], null)
+              route_map         = try(dist.route_map, null)
+              all               = try(dist.all, null)
+            } } : null
           } } : null
         }
       },
@@ -126,6 +161,27 @@ resource "nxos_isis" "isis" {
         overload_bgp_as_number   = try(vrf.set_overload_bit_wait_for_bgp, null)
         overload_suppress        = try(vrf.set_overload_bit_suppress, null)
 
+        graceful_restart_admin_state = try(vrf.graceful_restart, null) == null ? null : (try(vrf.graceful_restart) ? "enabled" : "disabled")
+        graceful_restart_t3_interval = try(vrf.graceful_restart_t3_manual, null)
+        levels = anytrue([try(vrf.spf_interval_level_1_max_wait, null) != null, try(vrf.spf_interval_level_1_initial_wait, null) != null, try(vrf.spf_interval_level_1_second_wait, null) != null, try(vrf.lsp_gen_interval_level_1_max_wait, null) != null, try(vrf.lsp_gen_interval_level_1_initial_wait, null) != null, try(vrf.lsp_gen_interval_level_1_second_wait, null) != null, try(vrf.spf_interval_level_2_max_wait, null) != null, try(vrf.spf_interval_level_2_initial_wait, null) != null, try(vrf.spf_interval_level_2_second_wait, null) != null, try(vrf.lsp_gen_interval_level_2_max_wait, null) != null, try(vrf.lsp_gen_interval_level_2_initial_wait, null) != null, try(vrf.lsp_gen_interval_level_2_second_wait, null) != null]) ? merge(
+          anytrue([try(vrf.spf_interval_level_1_max_wait, null) != null, try(vrf.spf_interval_level_1_initial_wait, null) != null, try(vrf.spf_interval_level_1_second_wait, null) != null, try(vrf.lsp_gen_interval_level_1_max_wait, null) != null, try(vrf.lsp_gen_interval_level_1_initial_wait, null) != null, try(vrf.lsp_gen_interval_level_1_second_wait, null) != null]) ? { "l1" = {
+            spf_max_interval                = try(vrf.spf_interval_level_1_max_wait, null)
+            spf_initial_interval            = try(vrf.spf_interval_level_1_initial_wait, null)
+            spf_second_interval             = try(vrf.spf_interval_level_1_second_wait, null)
+            lsp_generation_max_interval     = try(vrf.lsp_gen_interval_level_1_max_wait, null)
+            lsp_generation_initial_interval = try(vrf.lsp_gen_interval_level_1_initial_wait, null)
+            lsp_generation_second_interval  = try(vrf.lsp_gen_interval_level_1_second_wait, null)
+          } } : {},
+          anytrue([try(vrf.spf_interval_level_2_max_wait, null) != null, try(vrf.spf_interval_level_2_initial_wait, null) != null, try(vrf.spf_interval_level_2_second_wait, null) != null, try(vrf.lsp_gen_interval_level_2_max_wait, null) != null, try(vrf.lsp_gen_interval_level_2_initial_wait, null) != null, try(vrf.lsp_gen_interval_level_2_second_wait, null) != null]) ? { "l2" = {
+            spf_max_interval                = try(vrf.spf_interval_level_2_max_wait, null)
+            spf_initial_interval            = try(vrf.spf_interval_level_2_initial_wait, null)
+            spf_second_interval             = try(vrf.spf_interval_level_2_second_wait, null)
+            lsp_generation_max_interval     = try(vrf.lsp_gen_interval_level_2_max_wait, null)
+            lsp_generation_initial_interval = try(vrf.lsp_gen_interval_level_2_initial_wait, null)
+            lsp_generation_second_interval  = try(vrf.lsp_gen_interval_level_2_second_wait, null)
+          } } : {},
+        ) : null
+
         address_families = length(try(vrf.address_families, [])) > 0 ? { for af in try(vrf.address_families, []) : replace(replace(af.address_family, "ipv4-unicast", "v4"), "ipv6-unicast", "v6") => {
           segment_routing_mpls                    = try(af.segment_routing_mpls, null)
           enable_bfd                              = try(af.bfd, null)
@@ -141,6 +197,20 @@ resource "nxos_isis" "isis" {
           router_id_ip_address                    = try(af.router_id_ip_address, null)
           table_map                               = try(af.table_map, null)
           table_map_filter                        = try(af.table_map_filter, null) != null ? (try(af.table_map_filter) ? "enabled" : "disabled") : null
+
+          redistributions = length(try(af.redistributions, [])) > 0 ? { for redist in try(af.redistributions, []) : "${redist.protocol};${try(redist.protocol_instance, "none")};${try(redist.asn, "none")}" => {
+            route_map = try(redist.route_map, null)
+          } } : null
+
+          summary_addresses = length(try(af.summary_addresses, [])) > 0 ? { for sum in try(af.summary_addresses, []) : sum.prefix => {
+            level = try({ "level-1" = "l1", "level-2" = "l2", "level-1-2" = "l12" }[sum.level], null)
+          } } : null
+
+          distributions = length(try(af.distributions, [])) > 0 ? { for dist in try(af.distributions, []) : { "level-1" = "l1", "level-2" = "l2", "level-1-2" = "l12" }[dist.source_level] => {
+            destination_level = try({ "level-1" = "l1", "level-2" = "l2", "level-1-2" = "l12" }[dist.destination_level], null)
+            route_map         = try(dist.route_map, null)
+            all               = try(dist.all, null)
+          } } : null
         } } : null
       } }
     )

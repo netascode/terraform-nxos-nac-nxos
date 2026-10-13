@@ -76,6 +76,20 @@ resource "nxos_ospf" "ospf" {
           rfc1583_compatible    = try(proc.rfc1583compatibility, null)
           router_id             = try(proc.router_id, null)
 
+          default_information_originate_always    = try(proc.default_information_originate_always, null) != null ? (try(proc.default_information_originate_always) ? "yes" : "no") : (try(proc.default_information_originate, false) ? "no" : null)
+          default_information_originate_route_map = try(proc.default_information_originate_route_map, null)
+          spf_throttle_initial_interval           = try(proc.timers_throttle_spf_start_time, null)
+          spf_throttle_hold_interval              = try(proc.timers_throttle_spf_hold_time, null)
+          spf_throttle_max_interval               = try(proc.timers_throttle_spf_max_time, null)
+          lsa_throttle_start_interval             = try(proc.timers_throttle_lsa_start_time, null)
+          lsa_throttle_hold_interval              = try(proc.timers_throttle_lsa_hold_time, null)
+          lsa_throttle_max_interval               = try(proc.timers_throttle_lsa_max_time, null)
+          lsa_arrival_interval                    = try(proc.timers_lsa_arrival, null)
+          lsa_group_pacing_interval               = try(proc.timers_lsa_group_pacing, null)
+          graceful_restart_control                = try(proc.graceful_restart, null) == false ? "disabled" : (try(proc.graceful_restart_planned_only, false) ? "planned-only" : (try(proc.graceful_restart, null) == true ? "complete" : null))
+          graceful_restart_period                 = try(proc.graceful_restart_grace_period, null)
+          graceful_restart_helper                 = try(proc.graceful_restart_helper_disable, null) == null ? null : !try(proc.graceful_restart_helper_disable)
+
           max_metric_await_convergence_bgp_asn = try(proc.max_metric_router_lsa.on_startup_wait_for_bgp, null)
           max_metric_control = length(compact([
             try(proc.max_metric_router_lsa.external_lsa, false) ? "external-lsa" : "",
@@ -107,10 +121,19 @@ resource "nxos_ospf" "ospf" {
             nssa_translator_role = try(area.nssa_translate_type7, null)
             segment_routing_mpls = try(area.segment_routing_mpls, null) == null ? null : (try(area.segment_routing_mpls) ? "mpls" : "unspecified")
             type                 = try(area.type, null)
+            ranges = length(try(area.ranges, [])) > 0 ? { for range in try(area.ranges, []) : range.prefix => {
+              control = try(range.not_advertise, null) == null ? null : (try(range.not_advertise) ? "no-advertise" : "unspecified")
+              cost    = try(range.cost, null) == null ? null : tostring(range.cost)
+            } } : null
           } } : null
 
           redistributions = length(try(proc.redistributions, [])) > 0 ? { for redist in try(proc.redistributions, []) : "${redist.protocol};${try(redist.protocol_instance, "none")};${try(redist.asn, "none")}" => {
             route_map = try(redist.route_map, null)
+          } } : null
+
+          summary_addresses = length(try(proc.summary_addresses, [])) > 0 ? { for sum in try(proc.summary_addresses, []) : sum.prefix => {
+            control = try(sum.not_advertise, null) == null ? null : (try(sum.not_advertise) ? "no-advertise" : "unspecified")
+            tag     = try(sum.tag, null)
           } } : null
 
           interfaces = length(try(local.ospf_interfaces_map[each.key]["${proc.name}/default"], {})) > 0 ? local.ospf_interfaces_map[each.key]["${proc.name}/default"] : null
@@ -148,6 +171,20 @@ resource "nxos_ospf" "ospf" {
         rfc1583_compatible    = try(vrf.rfc1583compatibility, null)
         router_id             = try(vrf.router_id, null)
 
+        default_information_originate_always    = try(vrf.default_information_originate_always, null) != null ? (try(vrf.default_information_originate_always) ? "yes" : "no") : (try(vrf.default_information_originate, false) ? "no" : null)
+        default_information_originate_route_map = try(vrf.default_information_originate_route_map, null)
+        spf_throttle_initial_interval           = try(vrf.timers_throttle_spf_start_time, null)
+        spf_throttle_hold_interval              = try(vrf.timers_throttle_spf_hold_time, null)
+        spf_throttle_max_interval               = try(vrf.timers_throttle_spf_max_time, null)
+        lsa_throttle_start_interval             = try(vrf.timers_throttle_lsa_start_time, null)
+        lsa_throttle_hold_interval              = try(vrf.timers_throttle_lsa_hold_time, null)
+        lsa_throttle_max_interval               = try(vrf.timers_throttle_lsa_max_time, null)
+        lsa_arrival_interval                    = try(vrf.timers_lsa_arrival, null)
+        lsa_group_pacing_interval               = try(vrf.timers_lsa_group_pacing, null)
+        graceful_restart_control                = try(vrf.graceful_restart, null) == false ? "disabled" : (try(vrf.graceful_restart_planned_only, false) ? "planned-only" : (try(vrf.graceful_restart, null) == true ? "complete" : null))
+        graceful_restart_period                 = try(vrf.graceful_restart_grace_period, null)
+        graceful_restart_helper                 = try(vrf.graceful_restart_helper_disable, null) == null ? null : !try(vrf.graceful_restart_helper_disable)
+
         max_metric_await_convergence_bgp_asn = try(vrf.max_metric_router_lsa.on_startup_wait_for_bgp, null)
         max_metric_control = length(compact([
           try(vrf.max_metric_router_lsa.external_lsa, false) ? "external-lsa" : "",
@@ -179,10 +216,19 @@ resource "nxos_ospf" "ospf" {
           nssa_translator_role = try(area.nssa_translate_type7, null)
           segment_routing_mpls = try(area.segment_routing_mpls, null) == null ? null : (try(area.segment_routing_mpls) ? "mpls" : "unspecified")
           type                 = try(area.type, null)
+          ranges = length(try(area.ranges, [])) > 0 ? { for range in try(area.ranges, []) : range.prefix => {
+            control = try(range.not_advertise, null) == null ? null : (try(range.not_advertise) ? "no-advertise" : "unspecified")
+            cost    = try(range.cost, null) == null ? null : tostring(range.cost)
+          } } : null
         } } : null
 
         redistributions = length(try(vrf.redistributions, [])) > 0 ? { for redist in try(vrf.redistributions, []) : "${redist.protocol};${try(redist.protocol_instance, "none")};${try(redist.asn, "none")}" => {
           route_map = try(redist.route_map, null)
+        } } : null
+
+        summary_addresses = length(try(vrf.summary_addresses, [])) > 0 ? { for sum in try(vrf.summary_addresses, []) : sum.prefix => {
+          control = try(sum.not_advertise, null) == null ? null : (try(sum.not_advertise) ? "no-advertise" : "unspecified")
+          tag     = try(sum.tag, null)
         } } : null
 
         interfaces = length(try(local.ospf_interfaces_map[each.key]["${proc.name}/${vrf.vrf}"], {})) > 0 ? local.ospf_interfaces_map[each.key]["${proc.name}/${vrf.vrf}"] : null

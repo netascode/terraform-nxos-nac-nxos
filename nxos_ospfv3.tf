@@ -22,6 +22,34 @@ locals {
   ospfv3_address_family_map = {
     "ipv6-unicast" = "ipv6-ucast"
   }
+
+  # Router-level areas (`area <id> ...`) and address family areas (`address-family ipv6 unicast` > `area <id> ...`) both map to the provider areas map
+  ospfv3_vrfs = flatten([for device in local.devices : [for proc in try(local.device_config[device.name].routing.ospfv3_processes, []) : [
+    for vrf_name, vrf in merge({ "default" = proc }, { for v in try(proc.vrfs, []) : v.vrf => v }) : {
+      key          = "${device.name}/${proc.name}/${vrf_name}"
+      router_areas = { for area in try(vrf.areas, []) : (can(tonumber(area.id)) ? format("%d.%d.%d.%d", floor(tonumber(area.id) / 16777216) % 256, floor(tonumber(area.id) / 65536) % 256, floor(tonumber(area.id) / 256) % 256, tonumber(area.id) % 256) : tostring(area.id)) => area }
+      af_areas = { for af in try(vrf.address_families, []) : local.ospfv3_address_family_map[af.address_family] => {
+        for area in try(af.areas, []) : (can(tonumber(area.id)) ? format("%d.%d.%d.%d", floor(tonumber(area.id) / 16777216) % 256, floor(tonumber(area.id) / 65536) % 256, floor(tonumber(area.id) / 256) % 256, tonumber(area.id) % 256) : tostring(area.id)) => area
+      } }
+    }
+  ]]])
+
+  ospfv3_areas_map = { for v in local.ospfv3_vrfs : v.key => {
+    for area_id in distinct(concat(keys(v.router_areas), flatten([for af, areas in v.af_areas : keys(areas)]))) : area_id => {
+      type                     = try(v.router_areas[area_id].type, null)
+      redistribute             = try(v.router_areas[area_id].redistribute, null)
+      nssa_translator_role     = try(v.router_areas[area_id].nssa_translate_type7, null)
+      summary                  = try(v.router_areas[area_id].summary, null)
+      suppress_forward_address = try(v.router_areas[area_id].nssa_translate_type7_suppress_fa, null)
+      address_families = length([for af, areas in v.af_areas : af if contains(keys(areas), area_id)]) > 0 ? { for af, areas in v.af_areas : af => {
+        cost = try(areas[area_id].default_cost, null) == null ? null : tostring(areas[area_id].default_cost)
+        ranges = length(try(areas[area_id].ranges, [])) > 0 ? { for range in try(areas[area_id].ranges, []) : range.prefix => {
+          control = try(range.not_advertise, null) == null ? null : (try(range.not_advertise) ? "no-advertise" : "unspecified")
+          cost    = try(range.cost, null) == null ? null : tostring(range.cost)
+        } } : null
+      } if contains(keys(areas), area_id) } : null
+    }
+  } }
 }
 
 resource "nxos_ospfv3" "ospfv3" {
@@ -48,19 +76,38 @@ resource "nxos_ospfv3" "ospfv3" {
           name_lookup               = try(proc.name_lookup, null)
           passive_interface_default = try(proc.passive_interface_default, null)
 
-          areas = length(try(proc.areas, [])) > 0 ? { for area in try(proc.areas, []) : (can(tonumber(area.id)) ? format("%d.%d.%d.%d", floor(tonumber(area.id) / 16777216) % 256, floor(tonumber(area.id) / 65536) % 256, floor(tonumber(area.id) / 256) % 256, tonumber(area.id) % 256) : tostring(area.id)) => {
-            type                     = try(area.type, null)
-            redistribute             = try(area.redistribute, null)
-            nssa_translator_role     = try(area.nssa_translate_type7, null)
-            summary                  = try(area.summary, null)
-            suppress_forward_address = try(area.nssa_translate_type7_suppress_fa, null)
-          } } : null
+          lsa_throttle_start_interval = try(proc.timers_throttle_lsa_start_time, null)
+          lsa_throttle_hold_interval  = try(proc.timers_throttle_lsa_hold_time, null)
+          lsa_throttle_max_interval   = try(proc.timers_throttle_lsa_max_time, null)
+          lsa_arrival_interval        = try(proc.timers_lsa_arrival, null)
+          lsa_group_pacing_interval   = try(proc.timers_lsa_group_pacing, null)
+          graceful_restart_control    = try(proc.graceful_restart, null) == false ? "disabled" : (try(proc.graceful_restart_planned_only, false) ? "planned-only" : (try(proc.graceful_restart, null) == true ? "complete" : null))
+          graceful_restart_period     = try(proc.graceful_restart_grace_period, null)
+          graceful_restart_helper     = try(proc.graceful_restart_helper_disable, null) == null ? null : !try(proc.graceful_restart_helper_disable)
+
+          areas = length(try(local.ospfv3_areas_map["${each.key}/${proc.name}/default"], {})) > 0 ? local.ospfv3_areas_map["${each.key}/${proc.name}/default"] : null
 
           address_families = length(try(proc.address_families, [])) > 0 ? { for af in try(proc.address_families, []) : local.ospfv3_address_family_map[af.address_family] => {
             administrative_distance       = try(af.distance, null)
             default_metric                = try(af.default_metric, null)
             default_route_nssa_pbit_clear = try(af.default_route_nssa_abr_pbit_clear, null)
             max_ecmp_cost                 = try(af.maximum_paths, null)
+
+            default_information_originate_always    = try(af.default_information_originate_always, null) != null ? try(af.default_information_originate_always) : (try(af.default_information_originate, false) ? false : null)
+            default_information_originate_route_map = try(af.default_information_originate_route_map, null)
+            spf_throttle_initial_interval           = try(af.timers_throttle_spf_start_time, null)
+            spf_throttle_hold_interval              = try(af.timers_throttle_spf_hold_time, null)
+            spf_throttle_max_interval               = try(af.timers_throttle_spf_max_time, null)
+
+            redistributions = length(try(af.redistributions, [])) > 0 ? { for redist in try(af.redistributions, []) : "${redist.protocol};${try(redist.protocol_instance, "none")};${try(redist.asn, "none")}" => {
+              route_map        = try(redist.route_map, null)
+              srv6_prefix_type = redist.protocol == "srv6" ? "locator" : null
+            } } : null
+
+            summary_addresses = length(try(af.summary_addresses, [])) > 0 ? { for sum in try(af.summary_addresses, []) : sum.prefix => {
+              control = try(sum.not_advertise, null) == null ? null : (try(sum.not_advertise) ? "no-advertise" : "unspecified")
+              tag     = try(sum.tag, null)
+            } } : null
           } } : null
         }
       },
@@ -77,19 +124,38 @@ resource "nxos_ospfv3" "ospfv3" {
         name_lookup               = try(vrf.name_lookup, null)
         passive_interface_default = try(vrf.passive_interface_default, null)
 
-        areas = length(try(vrf.areas, [])) > 0 ? { for area in try(vrf.areas, []) : (can(tonumber(area.id)) ? format("%d.%d.%d.%d", floor(tonumber(area.id) / 16777216) % 256, floor(tonumber(area.id) / 65536) % 256, floor(tonumber(area.id) / 256) % 256, tonumber(area.id) % 256) : tostring(area.id)) => {
-          type                     = try(area.type, null)
-          redistribute             = try(area.redistribute, null)
-          nssa_translator_role     = try(area.nssa_translate_type7, null)
-          summary                  = try(area.summary, null)
-          suppress_forward_address = try(area.nssa_translate_type7_suppress_fa, null)
-        } } : null
+        lsa_throttle_start_interval = try(vrf.timers_throttle_lsa_start_time, null)
+        lsa_throttle_hold_interval  = try(vrf.timers_throttle_lsa_hold_time, null)
+        lsa_throttle_max_interval   = try(vrf.timers_throttle_lsa_max_time, null)
+        lsa_arrival_interval        = try(vrf.timers_lsa_arrival, null)
+        lsa_group_pacing_interval   = try(vrf.timers_lsa_group_pacing, null)
+        graceful_restart_control    = try(vrf.graceful_restart, null) == false ? "disabled" : (try(vrf.graceful_restart_planned_only, false) ? "planned-only" : (try(vrf.graceful_restart, null) == true ? "complete" : null))
+        graceful_restart_period     = try(vrf.graceful_restart_grace_period, null)
+        graceful_restart_helper     = try(vrf.graceful_restart_helper_disable, null) == null ? null : !try(vrf.graceful_restart_helper_disable)
+
+        areas = length(try(local.ospfv3_areas_map["${each.key}/${proc.name}/${vrf.vrf}"], {})) > 0 ? local.ospfv3_areas_map["${each.key}/${proc.name}/${vrf.vrf}"] : null
 
         address_families = length(try(vrf.address_families, [])) > 0 ? { for af in try(vrf.address_families, []) : local.ospfv3_address_family_map[af.address_family] => {
           administrative_distance       = try(af.distance, null)
           default_metric                = try(af.default_metric, null)
           default_route_nssa_pbit_clear = try(af.default_route_nssa_abr_pbit_clear, null)
           max_ecmp_cost                 = try(af.maximum_paths, null)
+
+          default_information_originate_always    = try(af.default_information_originate_always, null) != null ? try(af.default_information_originate_always) : (try(af.default_information_originate, false) ? false : null)
+          default_information_originate_route_map = try(af.default_information_originate_route_map, null)
+          spf_throttle_initial_interval           = try(af.timers_throttle_spf_start_time, null)
+          spf_throttle_hold_interval              = try(af.timers_throttle_spf_hold_time, null)
+          spf_throttle_max_interval               = try(af.timers_throttle_spf_max_time, null)
+
+          redistributions = length(try(af.redistributions, [])) > 0 ? { for redist in try(af.redistributions, []) : "${redist.protocol};${try(redist.protocol_instance, "none")};${try(redist.asn, "none")}" => {
+            route_map        = try(redist.route_map, null)
+            srv6_prefix_type = redist.protocol == "srv6" ? "locator" : null
+          } } : null
+
+          summary_addresses = length(try(af.summary_addresses, [])) > 0 ? { for sum in try(af.summary_addresses, []) : sum.prefix => {
+            control = try(sum.not_advertise, null) == null ? null : (try(sum.not_advertise) ? "no-advertise" : "unspecified")
+            tag     = try(sum.tag, null)
+          } } : null
         } } : null
       } }
     )
