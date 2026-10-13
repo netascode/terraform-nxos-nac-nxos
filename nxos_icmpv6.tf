@@ -68,6 +68,7 @@ resource "nxos_icmpv6" "icmpv6" {
   interfaces = length(local.icmpv6_interfaces_map[each.key]) > 0 ? local.icmpv6_interfaces_map[each.key] : null
 
   depends_on = [
+    nxos_cli.cli_pre_9,
     nxos_feature.feature,
     nxos_ipv6.ipv6,
     nxos_loopback_interface.loopback_interface,

@@ -235,6 +235,7 @@ resource "nxos_physical_interface" "physical_interface" {
   } } : null
 
   depends_on = [
+    nxos_cli.cli_pre_9,
     nxos_vrf.vrf,
   ]
 }

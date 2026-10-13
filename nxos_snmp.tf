@@ -139,6 +139,7 @@ resource "nxos_snmp" "snmp" {
   } } : null
 
   depends_on = [
+    nxos_cli.cli_pre_9,
     nxos_feature.feature,
   ]
 }

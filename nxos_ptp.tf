@@ -120,6 +120,7 @@ resource "nxos_ptp" "ptp" {
   interfaces = length(local.ptp_interfaces_map[each.key]) > 0 ? local.ptp_interfaces_map[each.key] : null
 
   depends_on = [
+    nxos_cli.cli_pre_9,
     nxos_feature.feature,
     nxos_physical_interface.physical_interface,
     nxos_port_channel_interface.port_channel_interface,

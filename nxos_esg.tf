@@ -125,6 +125,7 @@ resource "nxos_esg" "esg" {
   domains = length(local.esg_domains_map[each.key]) > 0 ? local.esg_domains_map[each.key] : null
 
   depends_on = [
+    nxos_cli.cli_pre_9,
     nxos_feature.feature,
     nxos_vrf.vrf,
   ]

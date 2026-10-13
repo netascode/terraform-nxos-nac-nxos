@@ -42,7 +42,7 @@ module "nxos" {
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.9.0 |
 | <a name="requirement_local"></a> [local](#requirement\_local) | >= 2.7.0, < 3.0.0 |
 | <a name="requirement_nxos"></a> [nxos](#requirement\_nxos) | ~> 0.17.2 |
-| <a name="requirement_utils"></a> [utils](#requirement\_utils) | >= 2.0.3, < 3.0.0 |
+| <a name="requirement_utils"></a> [utils](#requirement\_utils) | = 2.1.0-beta1 |
 ## Inputs
 
 | Name | Description | Type | Default | Required |
@@ -79,6 +79,16 @@ No outputs.
 | [nxos_cli.cli_7](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/cli) | resource |
 | [nxos_cli.cli_8](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/cli) | resource |
 | [nxos_cli.cli_9](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/cli) | resource |
+| [nxos_cli.cli_pre_0](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/cli) | resource |
+| [nxos_cli.cli_pre_1](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/cli) | resource |
+| [nxos_cli.cli_pre_2](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/cli) | resource |
+| [nxos_cli.cli_pre_3](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/cli) | resource |
+| [nxos_cli.cli_pre_4](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/cli) | resource |
+| [nxos_cli.cli_pre_5](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/cli) | resource |
+| [nxos_cli.cli_pre_6](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/cli) | resource |
+| [nxos_cli.cli_pre_7](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/cli) | resource |
+| [nxos_cli.cli_pre_8](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/cli) | resource |
+| [nxos_cli.cli_pre_9](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/cli) | resource |
 | [nxos_default_qos.default_qos](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/default_qos) | resource |
 | [nxos_dhcp.dhcp](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/dhcp) | resource |
 | [nxos_eigrp.eigrp](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/eigrp) | resource |

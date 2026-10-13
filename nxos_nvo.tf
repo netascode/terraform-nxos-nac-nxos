@@ -59,6 +59,7 @@ resource "nxos_nvo" "nvo" {
   } } : null
 
   depends_on = [
+    nxos_cli.cli_pre_9,
     nxos_bridge_domain.bridge_domain,
     nxos_evpn.evpn,
     nxos_feature.feature,

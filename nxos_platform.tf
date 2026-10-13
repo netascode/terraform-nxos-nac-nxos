@@ -305,5 +305,8 @@ resource "nxos_platform" "platform" {
   tcam_region_extended_redirect_v4_size                        = try(local.device_config[each.key].system.hardware_access_list_tcam_region.redirect_size, null)
   tcam_region_extended_span_size                               = try(local.device_config[each.key].system.hardware_access_list_tcam_region.span_size, null)
 
-  depends_on = [nxos_feature.feature]
+  depends_on = [
+    nxos_cli.cli_pre_9,
+    nxos_feature.feature,
+  ]
 }

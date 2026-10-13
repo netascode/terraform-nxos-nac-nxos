@@ -52,4 +52,8 @@ resource "nxos_logging" "logging" {
   # syslogOriginid
   origin_id_type  = try(local.device_config[each.key].logging.origin_id_type, null)
   origin_id_value = try(local.device_config[each.key].logging.origin_id_value, null)
+
+  depends_on = [
+    nxos_cli.cli_pre_9,
+  ]
 }

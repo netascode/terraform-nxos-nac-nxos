@@ -20,6 +20,7 @@ resource "nxos_hardware_telemetry" "hardware_telemetry" {
   } : null
 
   depends_on = [
+    nxos_cli.cli_pre_9,
     nxos_feature.feature,
   ]
 }

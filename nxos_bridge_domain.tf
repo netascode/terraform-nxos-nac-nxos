@@ -41,6 +41,7 @@ resource "nxos_bridge_domain" "bridge_domain" {
   } if try(vlan.mac_learn, null) != null } : null
 
   depends_on = [
+    nxos_cli.cli_pre_9,
     nxos_feature.feature,
     nxos_vrf.vrf,
     nxos_spanning_tree.spanning_tree,

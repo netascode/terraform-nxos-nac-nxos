@@ -235,6 +235,7 @@ resource "nxos_subinterface" "subinterface" {
   subinterfaces = length(local.subinterfaces_map[each.key]) > 0 ? local.subinterfaces_map[each.key] : null
 
   depends_on = [
+    nxos_cli.cli_pre_9,
     nxos_physical_interface.physical_interface,
     nxos_port_channel_interface.port_channel_interface,
     nxos_vrf.vrf,

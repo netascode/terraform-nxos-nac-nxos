@@ -25,6 +25,7 @@ resource "nxos_hmm" "hmm" {
   interfaces              = length(local.hmm_interfaces_map[each.key]) > 0 ? local.hmm_interfaces_map[each.key] : null
 
   depends_on = [
+    nxos_cli.cli_pre_9,
     nxos_feature.feature,
     nxos_svi_interface.svi_interface
   ]

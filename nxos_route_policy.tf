@@ -209,5 +209,8 @@ resource "nxos_route_policy" "route_policy" {
     } } : null
   } } : null
 
-  depends_on = [nxos_access_list.access_list]
+  depends_on = [
+    nxos_cli.cli_pre_9,
+    nxos_access_list.access_list,
+  ]
 }

@@ -1,0 +1,1 @@
+- Add `stage` attribute to CLI templates (`nxos.templates[].stage`, `nxos.devices[].cli_templates[].stage`) to apply CLI templates before (`pre`) or after (`post`, default) the modeled configuration

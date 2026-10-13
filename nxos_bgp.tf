@@ -819,6 +819,7 @@ resource "nxos_bgp" "bgp" {
   )
 
   depends_on = [
+    nxos_cli.cli_pre_9,
     nxos_feature.feature,
     nxos_route_policy.route_policy,
     nxos_vrf.vrf,

@@ -191,6 +191,7 @@ resource "nxos_user_management" "user_management" {
   default_accounting_provider_group_8 = try(local.device_config[each.key].aaa.accounting.groups[7], null)
 
   depends_on = [
+    nxos_cli.cli_pre_9,
     nxos_feature.feature,
   ]
 }

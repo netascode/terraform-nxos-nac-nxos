@@ -155,6 +155,7 @@ resource "nxos_vrf" "vrf" {
   vrfs = length(local.vrf_vrfs_map[each.key]) > 0 ? local.vrf_vrfs_map[each.key] : null
 
   depends_on = [
+    nxos_cli.cli_pre_9,
     nxos_feature.feature,
   ]
 }

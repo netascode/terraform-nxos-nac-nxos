@@ -45,4 +45,8 @@ resource "nxos_feature" "feature" {
     try(local.device_config[each.key].feature_set.mpls, null) == null ? {} : { "mpls" = { admin_state = try(local.device_config[each.key].feature_set.mpls) ? "enabled" : "disabled" } },
     try(local.device_config[each.key].feature_set.virtualization, null) == null ? {} : { "virtualization" = { admin_state = try(local.device_config[each.key].feature_set.virtualization) ? "enabled" : "disabled" } },
   ) : null
+
+  depends_on = [
+    nxos_cli.cli_pre_9,
+  ]
 }

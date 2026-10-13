@@ -111,6 +111,7 @@ resource "nxos_loopback_interface" "loopback_interface" {
   } } : null
 
   depends_on = [
+    nxos_cli.cli_pre_9,
     nxos_vrf.vrf,
   ]
 }

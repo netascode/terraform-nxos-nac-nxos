@@ -82,6 +82,7 @@ resource "nxos_icmpv4" "icmpv4" {
   vrfs                 = length(local.icmpv4_vrfs_map[each.key]) > 0 ? local.icmpv4_vrfs_map[each.key] : null
 
   depends_on = [
+    nxos_cli.cli_pre_9,
     nxos_feature.feature,
     nxos_ipv4.ipv4,
     nxos_loopback_interface.loopback_interface,

@@ -112,6 +112,7 @@ resource "nxos_evpn" "evpn" {
   } } : null
 
   depends_on = [
+    nxos_cli.cli_pre_9,
     nxos_bgp.bgp,
     nxos_bridge_domain.bridge_domain,
     nxos_feature.feature,

@@ -101,6 +101,7 @@ resource "nxos_analytics" "analytics" {
   }
 
   depends_on = [
+    nxos_cli.cli_pre_9,
     nxos_feature.feature,
   ]
 }

@@ -33,4 +33,8 @@ resource "nxos_network_qos" "network_qos" {
       pause_resume_offset    = try(cls.pause_resume_offset, null)
     } } : null
   } } : null
+
+  depends_on = [
+    nxos_cli.cli_pre_9,
+  ]
 }

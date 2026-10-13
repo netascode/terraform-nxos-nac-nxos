@@ -12,4 +12,8 @@ resource "nxos_queuing_qos" "queuing_qos" {
       remaining_bandwidth = try(cls.bandwidth_remaining_percent, null)
     } } : null
   } } : null
+
+  depends_on = [
+    nxos_cli.cli_pre_9,
+  ]
 }

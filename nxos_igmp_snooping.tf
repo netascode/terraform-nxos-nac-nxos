@@ -8,6 +8,7 @@ resource "nxos_igmp_snooping" "igmp_snooping" {
   global_vlan_vxlan_umc_drop_vlan            = try(local.device_config[each.key].igmp_snooping.vxlan_umc_drop_vlan, null) != null ? try(provider::utils::normalize_vlans(try(local.device_config[each.key].igmp_snooping.vxlan_umc_drop_vlan), "string-nxos"), null) : null
 
   depends_on = [
+    nxos_cli.cli_pre_9,
     nxos_feature.feature,
   ]
 }

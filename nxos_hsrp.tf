@@ -94,6 +94,7 @@ resource "nxos_hsrp" "hsrp" {
   interfaces = length(local.hsrp_interfaces_map[each.key]) > 0 ? local.hsrp_interfaces_map[each.key] : null
 
   depends_on = [
+    nxos_cli.cli_pre_9,
     nxos_feature.feature,
     nxos_physical_interface.physical_interface,
     nxos_svi_interface.svi_interface,

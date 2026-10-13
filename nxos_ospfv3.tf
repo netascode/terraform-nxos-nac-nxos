@@ -164,6 +164,7 @@ resource "nxos_ospfv3" "ospfv3" {
   interfaces = length(local.ospfv3_interfaces_map[each.key]) > 0 ? local.ospfv3_interfaces_map[each.key] : null
 
   depends_on = [
+    nxos_cli.cli_pre_9,
     nxos_feature.feature,
     nxos_loopback_interface.loopback_interface,
     nxos_physical_interface.physical_interface,

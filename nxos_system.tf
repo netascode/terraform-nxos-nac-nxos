@@ -747,6 +747,7 @@ resource "nxos_system" "system" {
   acl_log_threshold       = try(local.device_config[each.key].system.logging_ip_access_list.cache_threshold, null)
 
   depends_on = [
+    nxos_cli.cli_pre_9,
     nxos_feature.feature,
     nxos_loopback_interface.loopback_interface,
     nxos_physical_interface.physical_interface,

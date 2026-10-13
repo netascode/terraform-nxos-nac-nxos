@@ -54,6 +54,7 @@ resource "nxos_keychain" "keychain" {
   macsec_psk_no_show = try(local.device_config[each.key].macsec.key_chain_macsec_psk_no_show, null) == null ? null : (try(local.device_config[each.key].macsec.key_chain_macsec_psk_no_show) ? "enabled" : "disabled")
 
   depends_on = [
+    nxos_cli.cli_pre_9,
     nxos_feature.feature,
   ]
 }

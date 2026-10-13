@@ -83,6 +83,7 @@ resource "nxos_netflow" "netflow" {
   } } : null
 
   depends_on = [
+    nxos_cli.cli_pre_9,
     nxos_feature.feature,
   ]
 }
