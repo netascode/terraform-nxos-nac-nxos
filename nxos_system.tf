@@ -568,9 +568,30 @@ resource "nxos_system" "system" {
 
   # dnsEntity attributes
   dns_admin_state = try(local.device_config[each.key].dns.domain_lookup, null) == null ? null : (try(local.device_config[each.key].dns.domain_lookup) ? "enabled" : "disabled")
-  dns_profiles = try(local.device_config[each.key].dns.domain_name, null) != null ? {
+  dns_profiles = anytrue([
+    try(local.device_config[each.key].dns.domain_name, null) != null,
+    length(try(local.device_config[each.key].dns.domain_lists, [])) > 0,
+    length(try(local.device_config[each.key].dns.name_servers, [])) > 0,
+    length(try(local.device_config[each.key].dns.hosts, [])) > 0,
+    length(try(local.device_config[each.key].dns.vrfs, [])) > 0,
+    ]) ? {
     "default" = {
       domain_name = try(local.device_config[each.key].dns.domain_name, null)
+      providers = length(try(local.device_config[each.key].dns.name_servers, [])) > 0 ? { for ns in try(local.device_config[each.key].dns.name_servers, []) : ns.ip => {
+        source_interface = try(ns.source_interface_type, null) != null ? "${local.intf_prefix_map[try(ns.source_interface_type)]}${try(ns.source_interface_id, "")}" : null
+      } } : null
+      domain_lists = length(try(local.device_config[each.key].dns.domain_lists, [])) > 0 ? { for dl in try(local.device_config[each.key].dns.domain_lists, []) : dl => {} } : null
+      hosts = length(try(local.device_config[each.key].dns.hosts, [])) > 0 ? { for host in try(local.device_config[each.key].dns.hosts, []) : host.name => {
+        ipv4_address = try(host.ip_address, null)
+        ipv6_address = try(host.ipv6_address, null)
+      } } : null
+      vrfs = length(try(local.device_config[each.key].dns.vrfs, [])) > 0 ? { for vrf in try(local.device_config[each.key].dns.vrfs, []) : vrf.vrf => {
+        domain_name = try(vrf.domain_name, null)
+        providers = length(try(vrf.name_servers, [])) > 0 ? { for ns in try(vrf.name_servers, []) : ns.ip => {
+          source_interface = try(ns.source_interface_type, null) != null ? "${local.intf_prefix_map[try(ns.source_interface_type)]}${try(ns.source_interface_id, "")}" : null
+        } } : null
+        domain_lists = length(try(vrf.domain_lists, [])) > 0 ? { for dl in try(vrf.domain_lists, []) : dl => {} } : null
+      } } : null
     }
   } : null
 
