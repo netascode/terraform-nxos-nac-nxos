@@ -22,6 +22,25 @@ locals {
     "serial-number" = "serialNum"
     "system-name"   = "sysName"
   }
+  errdisable_cause_event_map = {
+    "bpduguard"          = "event-bpduguard"
+    "dcbx_no_ack"        = "event-dcbx-no-ack"
+    "failed_port_state"  = "event-set-port-state-failed"
+    "link_flap"          = "event-link-flap"
+    "loopback"           = "event-loopback"
+    "pause_rate_limit"   = "event-pause-rate-limit"
+    "psecure_violation"  = "event-psec-violation"
+    "security_violation" = "event-sec-violation"
+    "storm_control"      = "event-storm-ctrl"
+    "udld"               = "event-udld"
+    "vpc_peerlink"       = "event-stp-inconsist-vpc-peerlink"
+  }
+  errdisable_events_by_device = { for device in local.devices : device.name => {
+    for cause, event in local.errdisable_cause_event_map : event => {
+      detect  = try(local.device_config[device.name].system.errdisable.detect_cause[cause], null)
+      recover = try(local.device_config[device.name].system.errdisable.recovery_cause[cause], null)
+    } if try(local.device_config[device.name].system.errdisable.detect_cause[cause], null) != null || try(local.device_config[device.name].system.errdisable.recovery_cause[cause], null) != null
+  } }
   nd_interfaces = flatten([
     for device in local.devices : concat(
       [for int in try(local.device_config[device.name].interfaces.vlans, []) : {
@@ -279,6 +298,7 @@ resource "nxos_system" "system" {
     if try(local.device_config[device.name].system.hostname, null) != null ||
     try(local.device_config[device.name].system.mtu, null) != null ||
     try(local.device_config[device.name].system.ethernet, null) != null ||
+    try(local.device_config[device.name].system.errdisable, null) != null ||
     try(local.device_config[device.name].system.boot, null) != null ||
     try(local.device_config[device.name].system.cfs_distribute, null) != null ||
     try(local.device_config[device.name].system.cfs_eth_distribute, null) != null ||
@@ -350,6 +370,10 @@ resource "nxos_system" "system" {
   ethernet_system_link_failure_laser_on         = try(local.device_config[each.key].system.ethernet.link_failure_laser_on, null)
   ethernet_system_storm_control_multi_threshold = try(local.device_config[each.key].system.ethernet.storm_control_multicast, null)
   ethernet_vlan_tag_native                      = try(local.device_config[each.key].system.ethernet.dot1q_tag_native, null)
+
+  # ethpmErrDisRecover / ethpmEvent attributes (errdisable)
+  errdisable_recovery_interval = try(local.device_config[each.key].system.errdisable.recovery_interval, null)
+  errdisable_events            = length(try(local.errdisable_events_by_device[each.key], {})) > 0 ? local.errdisable_events_by_device[each.key] : null
 
   # arpEntity / arpInst attributes
   arp_admin_state                         = null
