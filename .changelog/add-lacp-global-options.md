@@ -1,0 +1,2 @@
+- Add global LACP support (`lacp.system_priority`, `lacp.system_mac`, `lacp.system_mac_role`, `lacp.port_number_front_panel`)
+- Add Ethernet interface `lacp_port_priority` and `lacp_rate` support

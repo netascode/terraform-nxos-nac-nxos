@@ -157,6 +157,20 @@ locals {
 
   udld_interfaces_by_device = { for entry in local.udld_interfaces : entry.device => entry... }
 
+  lacp_interfaces = flatten([
+    for device in local.devices : [
+      for int in try(local.device_config[device.name].interfaces.ethernets, []) : {
+        device             = device.name
+        interface_id       = "eth${int.id}"
+        lacp_port_priority = try(int.lacp_port_priority, null)
+        lacp_rate          = try(int.lacp_rate, null)
+      } if try(int.lacp_port_priority, null) != null ||
+      try(int.lacp_rate, null) != null
+    ]
+  ])
+
+  lacp_interfaces_by_device = { for entry in local.lacp_interfaces : entry.device => entry... }
+
   ttag_interfaces = flatten([
     for device in local.devices : concat(
       [for int in try(local.device_config[device.name].interfaces.ethernets, []) : {
@@ -292,6 +306,7 @@ resource "nxos_system" "system" {
     try(local.device_config[device.name].dns, null) != null ||
     try(local.device_config[device.name].lldp, null) != null ||
     try(local.device_config[device.name].udld, null) != null ||
+    try(local.device_config[device.name].lacp, null) != null ||
     try(local.device_config[device.name].vpc.ip_arp_synchronize, null) != null ||
     try(local.device_config[device.name].vpc.ipv6_nd_synchronize, null) != null ||
     try(local.device_config[device.name].system.nxapi, null) != null ||
@@ -301,6 +316,7 @@ resource "nxos_system" "system" {
     length(try(local.cdp_interfaces_by_device[device.name], [])) > 0 ||
     length(try(local.lldp_interfaces_by_device[device.name], [])) > 0 ||
     length(try(local.udld_interfaces_by_device[device.name], [])) > 0 ||
+    length(try(local.lacp_interfaces_by_device[device.name], [])) > 0 ||
     try(local.device_config[device.name].system.erspan_origin_ip_address, null) != null ||
     try(local.device_config[device.name].system.erspan_origin_ipv6_address, null) != null ||
     try(local.device_config[device.name].system.ttag_marker_interval, null) != null ||
@@ -547,6 +563,18 @@ resource "nxos_system" "system" {
   udld_interfaces = length(try(local.udld_interfaces_by_device[each.key], [])) > 0 ? { for entry in try(local.udld_interfaces_by_device[each.key], []) : entry.interface_id => {
     admin_state = try(entry.udld, null) == null ? null : (entry.udld ? "port-enabled" : "port-default")
     aggressive  = try(entry.udld_aggressive, null) == null ? null : (entry.udld_aggressive ? "enabled" : "disabled")
+  } } : null
+
+  # lacpInst attributes
+  lacp_front_panel_port_numbering = try(local.device_config[each.key].lacp.port_number_front_panel, null) == null ? null : (try(local.device_config[each.key].lacp.port_number_front_panel) ? "enable" : "disable")
+  lacp_system_priority            = try(local.device_config[each.key].lacp.system_priority, null)
+  lacp_system_role                = try(local.device_config[each.key].lacp.system_mac_role, null)
+  lacp_system_mac                 = try(local.device_config[each.key].lacp.system_mac, null) == null ? null : upper(join(":", regexall("[0-9A-Fa-f]{2}", replace(local.device_config[each.key].lacp.system_mac, "/[^0-9A-Fa-f]/", ""))))
+
+  # lacpIf nested map
+  lacp_interfaces = length(try(local.lacp_interfaces_by_device[each.key], [])) > 0 ? { for entry in try(local.lacp_interfaces_by_device[each.key], []) : entry.interface_id => {
+    priority      = try(entry.lacp_port_priority, null)
+    transmit_rate = try(entry.lacp_rate, null)
   } } : null
 
   # nxapiInst attributes
