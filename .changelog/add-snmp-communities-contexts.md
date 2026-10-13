@@ -1,0 +1,2 @@
+- Add SNMP community (`snmp.communities`), context (`snmp.contexts`) and informs source interface (`snmp.source_interface_informs_type`, `snmp.source_interface_informs_id`) support
+- Add SNMP host source interface (`snmp.hosts.source_interface_type`, `snmp.hosts.source_interface_id`) and filter VRF (`snmp.hosts.filter_vrf`) support

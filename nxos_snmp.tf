@@ -19,6 +19,7 @@ resource "nxos_snmp" "snmp" {
   disable_aaa_sync                                      = try(local.device_config[each.key].snmp.disable_snmp_aaa_sync, null) == null ? null : (try(local.device_config[each.key].snmp.disable_snmp_aaa_sync) ? "yes" : "no")
   tcp_session_authentication                            = try(local.device_config[each.key].snmp.tcp_session_auth, null) == null ? null : (try(local.device_config[each.key].snmp.tcp_session_auth) ? "tcpSessAuth" : "no")
   source_interface_traps                                = try(local.device_config[each.key].snmp.source_interface_type, null) != null ? "${local.intf_prefix_map[try(local.device_config[each.key].snmp.source_interface_type)]}${try(local.device_config[each.key].snmp.source_interface_id, "")}" : null
+  source_interface_informs                              = try(local.device_config[each.key].snmp.source_interface_informs_type, null) != null ? "${local.intf_prefix_map[try(local.device_config[each.key].snmp.source_interface_informs_type)]}${try(local.device_config[each.key].snmp.source_interface_informs_id, "")}" : null
   enable_all                                            = try(local.device_config[each.key].snmp.enable_traps, null) == null ? null : (try(local.device_config[each.key].snmp.enable_traps) ? "yes" : "no")
   aaa_server_state_change_trap_status                   = try(local.device_config[each.key].snmp.traps.aaa_server_state_change, null) == null ? null : (try(local.device_config[each.key].snmp.traps.aaa_server_state_change) ? "enable" : "disable")
   bfd_session_down_trap_status                          = try(local.device_config[each.key].snmp.traps.bfd_session_down, null) == null ? null : (try(local.device_config[each.key].snmp.traps.bfd_session_down) ? "enable" : "disable")
@@ -96,6 +97,18 @@ resource "nxos_snmp" "snmp" {
   vtp_notifs_trap_status                                = try(local.device_config[each.key].snmp.traps.vtp_notifs, null) == null ? null : (try(local.device_config[each.key].snmp.traps.vtp_notifs) ? "enable" : "disable")
   vtp_vlan_create_trap_status                           = try(local.device_config[each.key].snmp.traps.vtp_vlan_create, null) == null ? null : (try(local.device_config[each.key].snmp.traps.vtp_vlan_create) ? "enable" : "disable")
   vtp_vlan_delete_trap_status                           = try(local.device_config[each.key].snmp.traps.vtp_vlan_delete, null) == null ? null : (try(local.device_config[each.key].snmp.traps.vtp_vlan_delete) ? "enable" : "disable")
+  contexts = length(try(local.device_config[each.key].snmp.contexts, [])) > 0 ? { for context in try(local.device_config[each.key].snmp.contexts, []) : context.name => {
+    instance = try(context.instance, null)
+    topology = try(context.topology, null)
+    vrf      = try(context.vrf, null)
+  } } : null
+  communities = length(try(local.device_config[each.key].snmp.communities, [])) > 0 ? { for community in try(local.device_config[each.key].snmp.communities, []) : community.name => {
+    context       = try(community.context, null)
+    group         = try(community.group, null)
+    acl_name      = try(community.use_acl, null)
+    ipv4_acl_name = try(community.use_ipv4acl, null)
+    ipv6_acl_name = try(community.use_ipv6acl, null)
+  } } : null
   local_users = length(try(local.device_config[each.key].snmp.users, [])) > 0 ? { for user in try(local.device_config[each.key].snmp.users, []) : user.name => {
     authentication_password = try(user.auth_password, null)
     authentication_type     = try(user.auth_type, null)
@@ -115,6 +128,8 @@ resource "nxos_snmp" "snmp" {
     security_level    = try(host.security_level, null)
     version           = try(host.version, null)
     vrfs              = try(host.vrf, null) != null ? { (host.vrf) = {} } : null
+    source_interface  = try(host.source_interface_type, null) != null ? "${local.intf_prefix_map[try(host.source_interface_type)]}${try(host.source_interface_id, "")}" : null
+    filter_vrfs       = try(host.filter_vrf, null) != null ? { (host.filter_vrf) = {} } : null
   } } : null
   rmon_events = length(try(local.device_config[each.key].snmp.rmon_events, [])) > 0 ? { for event in try(local.device_config[each.key].snmp.rmon_events, []) : event.number => {
     description = try(event.description, null)
