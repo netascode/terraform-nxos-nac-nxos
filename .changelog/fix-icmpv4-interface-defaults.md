@@ -1,0 +1,1 @@
+- Fix `ip.redirects: false` (and other disabled ICMPv4 interface options) not being applied, and unset ICMPv4 interface options disabling NX-OS defaults (`redirects`, `port_unreachable`)

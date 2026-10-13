@@ -62,15 +62,12 @@ locals {
   icmpv4_interfaces_map = { for device in local.devices : device.name => {
     for vrf in distinct([for int in local.icmpv4_interfaces : int.vrf if int.device == device.name]) : vrf =>
     { for int in local.icmpv4_interfaces : int.id => {
-      control = length(compact([
-        try(int.ip_port_unreachable, false) == true ? "port-unreachable" : "",
-        try(int.ip_redirects, false) == true && !int.is_svi_with_vpc ? "redirect" : "",
+      # Unset options fall back to the NX-OS defaults (redirects and port-unreachable enabled) because ctrl always sets all three
+      control = join(",", sort(compact([
+        try(int.ip_port_unreachable, null) != false ? "port-unreachable" : "",
+        try(int.ip_redirects, null) != false && !int.is_svi_with_vpc ? "redirect" : "",
         try(int.ip_unreachables, false) == true ? "unreachable" : "",
-        ])) > 0 ? join(",", sort(compact([
-          try(int.ip_port_unreachable, false) == true ? "port-unreachable" : "",
-          try(int.ip_redirects, false) == true && !int.is_svi_with_vpc ? "redirect" : "",
-          try(int.ip_unreachables, false) == true ? "unreachable" : "",
-      ]))) : null
+      ])))
     } if int.device == device.name && int.vrf == vrf }
   } }
 }
