@@ -9,6 +9,7 @@ resource "nxos_user_management" "user_management" {
   for_each = { for device in local.devices : device.name => device
     if try(local.device_config[device.name].aaa.users, null) != null ||
     try(local.device_config[device.name].banner, null) != null ||
+    try(local.device_config[device.name].aaa.radius, null) != null ||
     try(local.device_config[device.name].aaa.tacacs, null) != null ||
     try(local.device_config[device.name].aaa.authentication, null) != null ||
     length(try(local.device_config[device.name].aaa.authorization, [])) > 0 ||
@@ -74,11 +75,57 @@ resource "nxos_user_management" "user_management" {
   tacacs_provider_groups = length(try(local.device_config[each.key].aaa.tacacs.server_groups, [])) > 0 ? { for group in try(local.device_config[each.key].aaa.tacacs.server_groups, []) : group.name => {
     deadtime         = try(group.deadtime, null)
     source_interface = try(group.source_interface_type, null) != null ? "${local.intf_prefix_map[try(group.source_interface_type)]}${try(group.source_interface_id, "")}" : null
-    vrf              = try(group.vrf, null)
+    vrf              = try(group.use_vrf, null)
 
     # TACACS+ provider group server members (aaaProviderRef) — data model path: tacacs.server_groups.servers
     servers = length(try(group.servers, [])) > 0 ? { for server in try(group.servers, []) : server.host => {
       order = try(server.order, null)
+    } } : null
+  } } : null
+
+  # RADIUS (aaaRadiusEp) — data model path: aaa.radius
+  radius_deadtime         = try(local.device_config[each.key].aaa.radius.deadtime, null)
+  radius_key              = try(local.device_config[each.key].aaa.radius.key, null)
+  radius_key_encryption   = try(local.device_config[each.key].aaa.radius.key_encryption, null)
+  radius_retries          = try(local.device_config[each.key].aaa.radius.retransmit, null)
+  radius_secure_mode      = try(local.device_config[each.key].aaa.radius.secure, null)
+  radius_source_interface = try(local.device_config[each.key].aaa.radius.source_interface_type, null) != null ? "${local.intf_prefix_map[try(local.device_config[each.key].aaa.radius.source_interface_type)]}${try(local.device_config[each.key].aaa.radius.source_interface_id, "")}" : null
+  radius_timeout          = try(local.device_config[each.key].aaa.radius.timeout, null)
+
+  # RADIUS server monitoring (aaaRadiusServerMonitor) — data model path: aaa.radius.test_*
+  radius_monitoring_idle_time     = try(local.device_config[each.key].aaa.radius.test_idle_time, null)
+  radius_monitoring_password      = try(local.device_config[each.key].aaa.radius.test_password, null)
+  radius_monitoring_password_type = try(local.device_config[each.key].aaa.radius.test_password_type, null)
+  radius_monitoring_user          = try(local.device_config[each.key].aaa.radius.test_username, null)
+
+  # RADIUS providers (aaaRadiusProvider) — data model path: aaa.radius.servers
+  radius_providers = length(try(local.device_config[each.key].aaa.radius.servers, [])) > 0 ? { for server in try(local.device_config[each.key].aaa.radius.servers, []) : server.host => {
+    accounting_port          = try(server.acct_port, null)
+    authentication_port      = try(server.auth_port, null)
+    dtls_client_trustpoint   = try(server.dtls_client_trustpoint, null)
+    dtls_idle_timeout        = try(server.dtls_idle_timeout, null)
+    key                      = try(server.key, null)
+    key_encryption           = try(server.key_encryption, null)
+    monitoring_idle_time     = try(server.test_idle_time, null)
+    monitoring_password      = try(server.test_password, null)
+    monitoring_password_type = try(server.test_password_type, null)
+    monitoring_user          = try(server.test_username, null)
+    retries                  = try(server.retransmit, null)
+    timeout                  = try(server.timeout, null)
+    tls_client_trustpoint    = try(server.tls_client_trustpoint, null)
+    tls_idle_timeout         = try(server.tls_idle_timeout, null)
+    # CLI "authentication" -> Auth, "accounting" -> Acc, both or neither -> All
+    use_type = try(server.authentication, null) == null && try(server.accounting, null) == null ? null : (try(server.authentication, false) == try(server.accounting, false) ? "All" : (try(server.authentication, false) ? "Auth" : "Acc"))
+  } } : null
+
+  # RADIUS provider groups (aaaRadiusProviderGroup) — data model path: aaa.radius.server_groups
+  radius_provider_groups = length(try(local.device_config[each.key].aaa.radius.server_groups, [])) > 0 ? { for group in try(local.device_config[each.key].aaa.radius.server_groups, []) : group.name => {
+    deadtime         = try(group.deadtime, null)
+    source_interface = try(group.source_interface_type, null) != null ? "${local.intf_prefix_map[try(group.source_interface_type)]}${try(group.source_interface_id, "")}" : null
+    vrf              = try(group.use_vrf, null)
+
+    # RADIUS provider group server members (aaaProviderRef) — data model path: aaa.radius.server_groups.servers
+    servers = length(try(group.servers, [])) > 0 ? { for server in try(group.servers, []) : server.host => {
     } } : null
   } } : null
 

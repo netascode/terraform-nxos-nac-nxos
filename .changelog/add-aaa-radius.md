@@ -1,0 +1,2 @@
+- Add RADIUS configuration (`aaa.radius`), including global settings, server monitoring, servers and server groups
+- BREAKING CHANGE: Rename `aaa.tacacs.server_groups.vrf` to `use_vrf` to align with the CLI (`use-vrf`)
