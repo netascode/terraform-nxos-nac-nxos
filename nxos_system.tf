@@ -299,6 +299,7 @@ resource "nxos_system" "system" {
     try(local.device_config[device.name].system.mtu, null) != null ||
     try(local.device_config[device.name].system.ethernet, null) != null ||
     try(local.device_config[device.name].system.errdisable, null) != null ||
+    try(local.device_config[device.name].system.mac_address_table, null) != null ||
     try(local.device_config[device.name].system.boot, null) != null ||
     try(local.device_config[device.name].system.cfs_distribute, null) != null ||
     try(local.device_config[device.name].system.cfs_eth_distribute, null) != null ||
@@ -374,6 +375,19 @@ resource "nxos_system" "system" {
   # ethpmErrDisRecover / ethpmEvent attributes (errdisable)
   errdisable_recovery_interval = try(local.device_config[each.key].system.errdisable.recovery_interval, null)
   errdisable_events            = length(try(local.errdisable_events_by_device[each.key], {})) > 0 ? local.errdisable_events_by_device[each.key] : null
+
+  # l2Macs / l2StaticEntry attributes (mac address-table)
+  mac_address_table_aging_time            = try(local.device_config[each.key].system.mac_address_table.aging_time, null)
+  mac_address_table_system_limit          = try(local.device_config[each.key].system.mac_address_table.limit_system, null)
+  mac_address_table_user_defined_limit    = try(local.device_config[each.key].system.mac_address_table.limit_user_defined, null)
+  mac_address_table_notification_mac_move = try(local.device_config[each.key].system.mac_address_table.notification_mac_move, null)
+  mac_address_table_threshold_limit       = try(local.device_config[each.key].system.mac_address_table.notification_threshold_limit, null)
+  mac_address_table_threshold_interval    = try(local.device_config[each.key].system.mac_address_table.notification_threshold_interval, null)
+  mac_address_table_static_clear          = try(local.device_config[each.key].system.mac_address_table.static_clear, null)
+  mac_address_table_static_entries = length(try(local.device_config[each.key].system.mac_address_table.statics, [])) > 0 ? { for st in try(local.device_config[each.key].system.mac_address_table.statics, []) : "vlan-${st.vlan};${upper(join(":", regexall("[0-9A-Fa-f]{2}", replace(st.mac, "/[^0-9A-Fa-f]/", ""))))}" => {
+    interface_id = try(st.interface_type, null) != null ? "${local.intf_prefix_map[try(st.interface_type)]}${try(st.interface_id, "")}" : null
+    drop         = try(st.drop, null)
+  } } : null
 
   # arpEntity / arpInst attributes
   arp_admin_state                         = null

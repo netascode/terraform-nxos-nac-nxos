@@ -1,0 +1,1 @@
+- Add MAC address table support (`system.mac_address_table.aging_time`, `limit_system`, `limit_user_defined`, `notification_mac_move`, `notification_threshold_limit`, `notification_threshold_interval`, `static_clear`, `statics`)
