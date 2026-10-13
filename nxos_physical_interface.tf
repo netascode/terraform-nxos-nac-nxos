@@ -206,6 +206,9 @@ resource "nxos_physical_interface" "physical_interface" {
     storm_control_unicast_level_1                       = try(format("%f", int.storm_control.unicast_level[1]), null)
     storm_control_unicast_level_2                       = try(format("%f", int.storm_control.unicast_level[2]), null)
     storm_control_unicast_packets_per_second            = try(int.storm_control.unicast_pps, null)
+    load_interval_counter_1                             = try(int.load_interval_counter_1, null)
+    load_interval_counter_2                             = try(int.load_interval_counter_2, null)
+    load_interval_counter_3                             = try(int.load_interval_counter_3, null)
     switchport_block                                    = try(int.switchport.block, null) != null ? join(",", sort(try(int.switchport.block, []))) : null
     switchport_isolated                                 = try(int.switchport.isolated, null) == null ? null : (try(int.switchport.isolated) ? "enable" : "disable")
     switchport_mac_learn                                = try(int.switchport.mac_learning, null) == null ? null : (try(int.switchport.mac_learning) ? "enable" : "disable")

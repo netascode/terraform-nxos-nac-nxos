@@ -1,4 +1,26 @@
 locals {
+  platform_pc_lb_direction_map = {
+    "src-dst" = "srcDst"
+    "src"     = "src"
+    "dst"     = "dst"
+  }
+  platform_pc_lb_fields_map = {
+    "ip"             = "Ip"
+    "ip-gre"         = "IpGre"
+    "ip-l4port"      = "IpL4Port"
+    "ip-l4port-vlan" = "IpL4PortVlan"
+    "ip-vlan"        = "IpVlan"
+    "l4port"         = "L4Port"
+    "mac"            = "Mac"
+    "inner-header"   = "Innerheader"
+    "gtpu"           = "Gtpu"
+  }
+  platform_pc_lb_encapsulation_map = {
+    "gre"             = "gre"
+    "gtp"             = "gtp"
+    "mpls-label-ip"   = "mpls"
+    "mpls-label-only" = "mpls"
+  }
   platform_pc_lb_algo_map = {
     "dlb"             = "PC_LB_ALGO_DLB"
     "rtag7"           = "PC_LB_ALGO_RTAG7"
@@ -90,6 +112,14 @@ resource "nxos_platform" "platform" {
   port_channel_mpls_load_balance_label_ip   = try(local.device_config[each.key].system.port_channel.load_balance_mpls_label_ip, null) == null ? null : (try(local.device_config[each.key].system.port_channel.load_balance_mpls_label_ip) ? "LABEL_IP" : "DEFAULT")
   port_channel_mpls_load_balance_label_only = try(local.device_config[each.key].system.port_channel.load_balance_mpls_label_only, null) == null ? null : (try(local.device_config[each.key].system.port_channel.load_balance_mpls_label_only) ? "LABEL_ONLY" : "DEFAULT")
   port_channel_scale_fanout                 = try(local.device_config[each.key].system.port_channel.scale_fanout, null) == null ? null : (try(local.device_config[each.key].system.port_channel.scale_fanout) ? "enable" : "disable")
+  port_channel_load_balance_fields          = try(local.device_config[each.key].system.port_channel.load_balance_direction, null) == null && try(local.device_config[each.key].system.port_channel.load_balance_fields, null) == null ? null : "${local.platform_pc_lb_direction_map[try(local.device_config[each.key].system.port_channel.load_balance_direction, "src-dst")]}${local.platform_pc_lb_fields_map[try(local.device_config[each.key].system.port_channel.load_balance_fields, "ip-l4port")]}"
+  port_channel_load_balance_encapsulation   = try(local.platform_pc_lb_encapsulation_map[try(local.device_config[each.key].system.port_channel.load_balance_encapsulation)], null)
+  port_channel_load_balance_mpls_label_ip   = try(local.device_config[each.key].system.port_channel.load_balance_encapsulation, null) == null ? null : (try(local.device_config[each.key].system.port_channel.load_balance_encapsulation) == "mpls-label-ip" ? "enable" : "disable")
+  port_channel_load_balance_mpls_label_only = try(local.device_config[each.key].system.port_channel.load_balance_encapsulation, null) == null ? null : (try(local.device_config[each.key].system.port_channel.load_balance_encapsulation) == "mpls-label-only" ? "enable" : "disable")
+  port_channel_load_balance_rotate          = try(local.device_config[each.key].system.port_channel.load_balance_rotate, null)
+  port_channel_load_balance_concatenation   = try(local.device_config[each.key].system.port_channel.load_balance_concatenation, null) == null ? null : (try(local.device_config[each.key].system.port_channel.load_balance_concatenation) ? "enable" : "disable")
+  port_channel_load_balance_fex             = try(local.device_config[each.key].system.port_channel.load_balance_fex_all, null)
+  port_channel_load_balance_symmetry        = try(local.device_config[each.key].system.port_channel.load_balance_symmetric, null) == null ? null : (try(local.device_config[each.key].system.port_channel.load_balance_symmetric) ? "enable" : "disable")
   profile_front_port_mode                   = try(local.device_config[each.key].system.hardware_profile.front_portmode, null)
   profile_mode                              = try(local.device_config[each.key].system.hardware_profile.forwarding_mode, null)
   profile_tuple                             = try(local.device_config[each.key].system.hardware_profile.portmode_tuple, null) == null ? null : (try(local.device_config[each.key].system.hardware_profile.portmode_tuple) ? "Enable" : "Disable")

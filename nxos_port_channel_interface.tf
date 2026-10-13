@@ -173,6 +173,9 @@ resource "nxos_port_channel_interface" "port_channel_interface" {
     storm_control_unicast_level_1                       = try(format("%f", int.storm_control.unicast_level[1]), null)
     storm_control_unicast_level_2                       = try(format("%f", int.storm_control.unicast_level[2]), null)
     storm_control_unicast_packets_per_second            = try(int.storm_control.unicast_pps, null)
+    load_interval_counter_1                             = try(int.load_interval_counter_1, null)
+    load_interval_counter_2                             = try(int.load_interval_counter_2, null)
+    load_interval_counter_3                             = try(int.load_interval_counter_3, null)
     multisite_interface_tracking                        = try(int.evpn_multisite_dci_tracking, null) == true ? "dci" : try(int.evpn_multisite_fabric_tracking, null) == true ? "fabric" : null
     port_type_fabric                                    = try(int.port_type_fabric, null) == null ? null : (try(int.port_type_fabric) ? "yes" : "no")
     priority_flow_control_mode                          = try(int.priority_flow_control_mode, null)

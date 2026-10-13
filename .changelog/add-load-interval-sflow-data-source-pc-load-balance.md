@@ -1,0 +1,3 @@
+- Add Ethernet and port-channel interface load interval counters (`interfaces.ethernets[].load_interval_counter_*`, `interfaces.port_channels[].load_interval_counter_*`)
+- Add sFlow data source interfaces (`sflow.data_source_interfaces`)
+- Add port-channel load-balance hash options (`system.port_channel.load_balance_direction`, `load_balance_fields`, `load_balance_encapsulation`, `load_balance_rotate`, `load_balance_concatenation`, `load_balance_fex_all`, `load_balance_symmetric`)

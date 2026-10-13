@@ -15,6 +15,9 @@ resource "nxos_hardware_telemetry" "hardware_telemetry" {
       source_address = try(collector.source_address, null)
     }
   }, null)
+  data_sources = length(try(local.device_config[each.key].sflow.data_source_interfaces, [])) > 0 ? { for ds in try(local.device_config[each.key].sflow.data_source_interfaces, []) :
+    "${local.intf_prefix_map[ds.interface_type]}${ds.interface_id}" => {}
+  } : null
 
   depends_on = [
     nxos_feature.feature,
