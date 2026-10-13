@@ -6,6 +6,31 @@ locals {
     "rx-allow-vni-hosts" = "strict-allow-vni-hosts"
   }
 
+  ip_load_sharing_address_map = {
+    "source"                                              = "source"
+    "destination-port"                                    = "destPort"
+    "source-destination"                                  = "srcDest"
+    "source-destination-gre"                              = "srcDestGre"
+    "source-destination-gre-outer"                        = "srcDest"
+    "source-destination-gtpu"                             = "srcDestGTPU"
+    "source-destination-ipv6-flowlabel"                   = "srcDestIPv6FlowLabel"
+    "source-destination-ttl"                              = "srcDestTTL"
+    "source-destination-udf"                              = "srcDestUDF"
+    "source-destination-port"                             = "srcDestPort"
+    "source-destination-port-symmetric"                   = "srcDestSymmetric"
+    "source-destination-port-inner-all"                   = "srcDestInnerAll"
+    "source-destination-port-inner-all-infra-mode"        = "srcDestInnerAllInfra"
+    "source-destination-port-inner-greheader"             = "srcDestInnerGre"
+    "source-destination-port-inner-greheader-symmetric"   = "srcDestInnerGreSymmetric"
+    "source-destination-port-rocev2-opcode"               = "srcDestPortRocev2Opcode"
+    "source-destination-port-rocev2-queuepair"            = "srcDestPortRocev2Queuepair"
+    "source-destination-port-rocev2-psn"                  = "srcDestPortRocev2Psn"
+    "source-destination-port-rocev2-opcode-queuepair"     = "srcDestPortRocev2OpcodeQueuepair"
+    "source-destination-port-rocev2-opcode-psn"           = "srcDestPortRocev2OpcodePsn"
+    "source-destination-port-rocev2-queuepair-psn"        = "srcDestPortRocev2QueuepairPsn"
+    "source-destination-port-rocev2-opcode-queuepair-psn" = "srcDestPortRocev2OpcodeQueuepairPsn"
+  }
+
   # Group routes by device/vrf for the nxos_ipv4 vrfs nested map
   ip_routes_by_device_vrf = {
     for entry in flatten([
@@ -152,6 +177,7 @@ resource "nxos_ipv4" "ipv4" {
     try(local.device_config[device.name].system.ip_redirect_syslog, null) != null ||
     try(local.device_config[device.name].system.ip_redirect_syslog_interval, null) != null ||
     try(local.device_config[device.name].system.ip_source_route, null) != null ||
+    try(local.device_config[device.name].system.ip_load_sharing, null) != null ||
     length(try(local.device_config[device.name].vrfs, [])) > 0 ||
     length(try(local.device_config[device.name].routing.ip_routes, [])) > 0 ||
   length([for int in local.ip_interfaces : int if int.device == device.name]) > 0 }
@@ -166,6 +192,16 @@ resource "nxos_ipv4" "ipv4" {
   redirect_syslog                         = try(local.device_config[each.key].system.ip_redirect_syslog, null) != null ? (try(local.device_config[each.key].system.ip_redirect_syslog) ? "enabled" : "disabled") : null
   redirect_syslog_interval                = try(local.device_config[each.key].system.ip_redirect_syslog_interval, null)
   source_route                            = try(local.device_config[each.key].system.ip_source_route, null) != null ? (try(local.device_config[each.key].system.ip_source_route) ? "enabled" : "disabled") : null
+  load_sharing_mode                       = try(local.ip_load_sharing_address_map[local.device_config[each.key].system.ip_load_sharing.address], null)
+  load_sharing_gre_outer_hash             = try(local.device_config[each.key].system.ip_load_sharing.address, null) != null ? (try(local.device_config[each.key].system.ip_load_sharing.address) == "source-destination-gre-outer" ? "enabled" : "disabled") : null
+  load_sharing_udf_offset                 = try(local.device_config[each.key].system.ip_load_sharing.udf_offset, null)
+  load_sharing_udf_length                 = try(local.device_config[each.key].system.ip_load_sharing.udf_length, null)
+  load_sharing_exclude_l3_protocol        = try(local.device_config[each.key].system.ip_load_sharing.exclude_l3_proto, null) != null ? (try(local.device_config[each.key].system.ip_load_sharing.exclude_l3_proto) ? "enabled" : "disabled") : null
+  load_sharing_rotate                     = try(local.device_config[each.key].system.ip_load_sharing.rotate, null)
+  load_sharing_concatenation              = try(local.device_config[each.key].system.ip_load_sharing.concatenation, null) != null ? (try(local.device_config[each.key].system.ip_load_sharing.concatenation) ? "enabled" : "disabled") : null
+  load_sharing_universal_id               = try(local.device_config[each.key].system.ip_load_sharing.universal_id, null)
+  load_sharing_keyshift                   = try(local.device_config[each.key].system.ip_load_sharing.hardware_lb_keyshift, null)
+  load_sharing_second_hierarchy_keyshift  = try(local.device_config[each.key].system.ip_load_sharing.hardware_lb_2nd_hier_keyshift, null)
 
   vrfs = merge(
     # "default" VRF
