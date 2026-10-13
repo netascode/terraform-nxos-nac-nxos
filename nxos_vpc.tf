@@ -4,6 +4,14 @@ locals {
       port_channel_interface_dn = "sys/intf/aggr-[po${int.id}]"
     } if try(int.vpc_id, null) != null }
   }
+  vpc_orphan_ports_map = { for device in local.devices : device.name => merge(
+    { for int in try(local.device_config[device.name].interfaces.ethernets, []) : "eth${int.id}" => {
+      admin_state = "enabled"
+    } if try(int.vpc_orphan_port_suspend, false) },
+    { for int in try(local.device_config[device.name].interfaces.port_channels, []) : "po${int.id}" => {
+      admin_state = "enabled"
+    } if try(int.vpc_orphan_port_suspend, false) },
+  ) }
   vpc_keepalive = { for device in local.devices : device.name => {
     precedence_is_string = try(local.device_config[device.name].vpc.keepalive.precedence, null) != null ? can(tonumber(try(local.device_config[device.name].vpc.keepalive.precedence))) == false : false
     precedence_is_number = try(local.device_config[device.name].vpc.keepalive.precedence, null) != null ? can(tonumber(try(local.device_config[device.name].vpc.keepalive.precedence))) : false
@@ -60,9 +68,11 @@ resource "nxos_vpc" "vpc" {
   keepalive_vrf                                = try(local.device_config[each.key].vpc.keepalive.vrf, null)
   peerlink_interface_id                        = try(local.device_config[each.key].vpc.peer_link_port_channel, null) != null ? "po${try(local.device_config[each.key].vpc.peer_link_port_channel)}" : null
   interfaces                                   = length(local.vpc_interfaces_map[each.key]) > 0 ? local.vpc_interfaces_map[each.key] : null
+  orphan_ports                                 = length(local.vpc_orphan_ports_map[each.key]) > 0 ? local.vpc_orphan_ports_map[each.key] : null
 
   depends_on = [
     nxos_feature.feature,
+    nxos_physical_interface.physical_interface,
     nxos_port_channel_interface.port_channel_interface,
     nxos_track.track,
   ]

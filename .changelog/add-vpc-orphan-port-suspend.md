@@ -1,0 +1,1 @@
+- Add `vpc_orphan_port_suspend` support for ethernet and port-channel interfaces
