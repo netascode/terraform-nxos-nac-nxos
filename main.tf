@@ -342,6 +342,7 @@ resource "nxos_cli" "cli_0" {
     nxos_user_management.user_management,
     nxos_vpc.vpc,
     nxos_vrf.vrf,
+    nxos_vtp.vtp,
   ]
 }
 

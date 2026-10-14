@@ -1,0 +1,1 @@
+- Add VTP support (`vtp`, `feature.vtp`, `interfaces.ethernets.vtp`, `interfaces.port_channels.vtp`)

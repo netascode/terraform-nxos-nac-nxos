@@ -41,7 +41,7 @@ module "nxos" {
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.9.0 |
 | <a name="requirement_local"></a> [local](#requirement\_local) | >= 2.7.0, < 3.0.0 |
-| <a name="requirement_nxos"></a> [nxos](#requirement\_nxos) | ~> 0.17.2 |
+| <a name="requirement_nxos"></a> [nxos](#requirement\_nxos) | ~> 0.18.1 |
 | <a name="requirement_utils"></a> [utils](#requirement\_utils) | = 2.1.0-beta1 |
 ## Inputs
 
@@ -133,6 +133,7 @@ No outputs.
 | [nxos_user_management.user_management](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/user_management) | resource |
 | [nxos_vpc.vpc](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/vpc) | resource |
 | [nxos_vrf.vrf](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/vrf) | resource |
+| [nxos_vtp.vtp](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/vtp) | resource |
 ## Modules
 
 No modules.

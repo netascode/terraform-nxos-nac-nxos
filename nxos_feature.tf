@@ -40,6 +40,7 @@ resource "nxos_feature" "feature" {
   udld                 = try(local.device_config[each.key].feature.udld, null) == null ? null : (try(local.device_config[each.key].feature.udld) ? "enabled" : "disabled")
   vn_segment           = try(local.device_config[each.key].feature.vn_segment_vlan_based, null) == null ? null : (try(local.device_config[each.key].feature.vn_segment_vlan_based) ? "enabled" : "disabled")
   vpc                  = try(local.device_config[each.key].feature.vpc, null) == null ? null : (try(local.device_config[each.key].feature.vpc) ? "enabled" : "disabled")
+  vtp                  = try(local.device_config[each.key].feature.vtp, null) == null ? null : (try(local.device_config[each.key].feature.vtp) ? "enabled" : "disabled")
   feature_sets = anytrue([try(local.device_config[each.key].feature_set.fex, null) != null, try(local.device_config[each.key].feature_set.mpls, null) != null, try(local.device_config[each.key].feature_set.virtualization, null) != null]) ? merge(
     try(local.device_config[each.key].feature_set.fex, null) == null ? {} : { "fex" = { admin_state = try(local.device_config[each.key].feature_set.fex) ? "enabled" : "disabled" } },
     try(local.device_config[each.key].feature_set.mpls, null) == null ? {} : { "mpls" = { admin_state = try(local.device_config[each.key].feature_set.mpls) ? "enabled" : "disabled" } },
