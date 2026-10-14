@@ -1,0 +1,1 @@
+- Add PoE support (`feature.poe`, `system.logging_level_poed`, `interfaces.ethernets.power_inline`, `interfaces.ethernets.power_inline_max`, `interfaces.ethernets.power_inline_default_consumption`, `interfaces.ethernets.power_inline_police_action`, `interfaces.ethernets.power_inline_port_priority`)

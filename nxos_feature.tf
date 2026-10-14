@@ -26,6 +26,7 @@ resource "nxos_feature" "feature" {
   ospf                 = try(local.device_config[each.key].feature.ospf, null) == null ? null : (try(local.device_config[each.key].feature.ospf) ? "enabled" : "disabled")
   ospfv3               = try(local.device_config[each.key].feature.ospfv3, null) == null ? null : (try(local.device_config[each.key].feature.ospfv3) ? "enabled" : "disabled")
   pim                  = try(local.device_config[each.key].feature.pim, null) == null ? null : (try(local.device_config[each.key].feature.pim) ? "enabled" : "disabled")
+  poe                  = try(local.device_config[each.key].feature.poe, null) == null ? null : (try(local.device_config[each.key].feature.poe) ? "enabled" : "disabled")
   ptp                  = try(local.device_config[each.key].feature.ptp, null) == null ? null : (try(local.device_config[each.key].feature.ptp) ? "enabled" : "disabled")
   pvlan                = try(local.device_config[each.key].feature.private_vlan, null) == null ? null : (try(local.device_config[each.key].feature.private_vlan) ? "enabled" : "disabled")
   scp_server           = try(local.device_config[each.key].feature.scp_server, null) == null ? null : (try(local.device_config[each.key].feature.scp_server) ? "enabled" : "disabled")

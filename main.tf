@@ -328,6 +328,7 @@ resource "nxos_cli" "cli_0" {
     nxos_pim.pim,
     nxos_platform.platform,
     nxos_port_channel_interface.port_channel_interface,
+    nxos_poe.poe,
     nxos_ptp.ptp,
     nxos_queuing_qos.queuing_qos,
     nxos_route_policy.route_policy,
