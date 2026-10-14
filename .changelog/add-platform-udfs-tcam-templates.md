@@ -1,0 +1,3 @@
+- Add `system.udfs` support for user-defined field (UDF) configuration including offset, NetFlow RTP, MPLS stack, and TCAM region qualifiers
+- Add `system.hardware_profile.tcam_resource_templates` support for user-defined TCAM resource templates with UDF qualifiers
+- Add `system.dot1q_tunnel_transit_vlans` support

@@ -58,6 +58,13 @@ locals {
     "template-l2-scale"                           = "TEMPLATE_L2_SCALE"
     "template-security-groups"                    = "TEMPLATE_SECURITY_GROUPS"
   }
+  platform_udf_offset_base_map = {
+    "packet-start"    = "packet-start"
+    "header-outer-l3" = "outer-header-l3"
+    "header-outer-l4" = "outer-header-l4"
+    "header-inner-l3" = "inner-header-l3"
+    "header-inner-l4" = "inner-header-l4"
+  }
 }
 
 resource "nxos_platform" "platform" {
@@ -71,12 +78,15 @@ resource "nxos_platform" "platform" {
     try(local.device_config[device.name].system.nve_ipmc_index_size, null) != null ||
     try(local.device_config[device.name].system.nve_overlay_vlans, null) != null ||
     length(try(local.device_config[device.name].system.nve_infra_vlans, [])) > 0 ||
+    try(local.device_config[device.name].system.dot1q_tunnel_transit_vlans, null) != null ||
+    length(try(local.device_config[device.name].system.udfs, [])) > 0 ||
   try(local.device_config[device.name].system.routing, null) != null }
   device = each.key
 
   # platformEntity attributes
   access_list_match_inner_header            = try(local.device_config[each.key].system.hardware_profile.access_list_match_inner_header, null) == null ? null : (try(local.device_config[each.key].system.hardware_profile.access_list_match_inner_header) ? "enable" : "disable")
   acl_tap_aggregation                       = try(local.device_config[each.key].system.hardware_profile.acl_tap_aggregation, null) == null ? null : (try(local.device_config[each.key].system.hardware_profile.acl_tap_aggregation) ? "enable" : "disable")
+  dot1q_tunnel_transit_range                = try(provider::utils::normalize_vlans(try(local.device_config[each.key].system.dot1q_tunnel_transit_vlans), "string-nxos"), null)
   disable_parse_error                       = try(local.device_config[each.key].system.hardware_profile.disable_parse_error, null) == null ? null : (try(local.device_config[each.key].system.hardware_profile.disable_parse_error) ? "enable" : "disable")
   global_tx_span                            = try(local.device_config[each.key].system.hardware_profile.global_tx_span, null) == null ? null : (try(local.device_config[each.key].system.hardware_profile.global_tx_span) ? "enable" : "disable")
   high_multicast_priority                   = try(local.device_config[each.key].system.hardware_profile.high_multicast_priority, null) == null ? null : (try(local.device_config[each.key].system.hardware_profile.high_multicast_priority) ? "enabled" : "disabled")
@@ -198,6 +208,34 @@ resource "nxos_platform" "platform" {
       }]...) : null
     }
   } : null
+
+  # platformTcamTemplate / platformUdfTcamTemplate nested maps
+  tcam_templates = length(try(local.device_config[each.key].system.hardware_profile.tcam_resource_templates, [])) > 0 ? { for template in try(local.device_config[each.key].system.hardware_profile.tcam_resource_templates, []) : template.name => {
+    reference_template = try(template.ref_template, null)
+    udfs = length(flatten([for region in try(template.regions, []) : try(region.qualify_udfs, [])])) > 0 ? merge([for region in try(template.regions, []) : {
+      for udf in try(region.qualify_udfs, []) : "${region.name};${udf}" => {}
+    }]...) : null
+  } } : null
+
+  # platformUdfEntity / platformUdf nested map
+  udfs = length(try(local.device_config[each.key].system.udfs, [])) > 0 ? { for udf in try(local.device_config[each.key].system.udfs, []) : udf.name => {
+    mpls_stack_1 = try(udf.mpls, null) == null ? null : try(udf.mpls) == "stack1"
+    mpls_stack_2 = try(udf.mpls, null) == null ? null : try(udf.mpls) == "stack2"
+    # NX-OS has no negated "udf <name> netflow-rtp" form, and sending netflowRtp at all (even "no") renders "udf <name> netflow-rtp"
+    netflow_rtp        = try(udf.netflow_rtp, false) ? true : null
+    offset_base        = try(local.platform_udf_offset_base_map[try(udf.offset_base)], null)
+    offset_length      = try(udf.length, null)
+    offset_position    = try(udf.offset, null)
+    qualify_ifacl      = try(udf.qualify_ifacl, null)
+    qualify_ipv6_racl  = try(udf.qualify_ipv6_racl, null)
+    qualify_racl       = try(udf.qualify_racl, null)
+    qualify_racl_all   = try(udf.qualify_racl_all, null)
+    qualify_span       = try(udf.qualify_span, null)
+    qualify_span_all   = try(udf.qualify_span_all, null)
+    qualify_span_v6    = try(udf.qualify_spanv6, null)
+    qualify_span_v6_l2 = try(udf.qualify_spanv6_l2, null)
+    qualify_vacl       = try(udf.qualify_vacl, null)
+  } } : null
 
   # platformTcamRegion attributes
   tcam_region_arp_acl_size               = try(local.device_config[each.key].system.hardware_access_list_tcam_region.arp_acl_size, null)
