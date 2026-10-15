@@ -1,0 +1,1 @@
+- Fix `ip.access_group_in` and `ip.access_group_out` being ignored on management interfaces

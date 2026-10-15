@@ -1,7 +1,7 @@
 locals {
   acl_interfaces = { for device in local.devices : device.name => concat(
     flatten([
-      for intf_type, intf_prefix in { "ethernets" = "eth", "port_channels" = "po", "vlans" = "vlan", "loopbacks" = "lo" } : [
+      for intf_type, intf_prefix in { "ethernets" = "eth", "port_channels" = "po", "vlans" = "vlan", "loopbacks" = "lo", "management" = "mgmt" } : [
         for int in try(local.device_config[device.name].interfaces[intf_type], []) : { id = "${intf_prefix}${int.id}", ip = try(int.ip, null) }
       ]
     ]),
@@ -197,5 +197,6 @@ resource "nxos_access_list" "access_list" {
     nxos_loopback_interface.loopback_interface,
     nxos_port_channel_interface.port_channel_interface,
     nxos_subinterface.subinterface,
+    nxos_system.system,
   ]
 }
