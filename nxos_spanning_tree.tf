@@ -16,7 +16,7 @@ locals {
         priority                  = try(int.spanning_tree.port_priority, null)
         prestandard_configuration = try(int.spanning_tree.mst_pre_standard, null) == null ? null : (try(int.spanning_tree.mst_pre_standard) ? "enabled" : "disabled")
         simulate_pvst             = try(int.spanning_tree.mst_simulate_pvst, null) == null ? null : (try(int.spanning_tree.mst_simulate_pvst) ? "enabled" : "disabled")
-      } if try(int.spanning_tree, null) != null && try(int.switchport.enabled, true) },
+      } if try(int.spanning_tree, null) != null && try(int.switchport.enabled, local.default_switchport_enabled[device.name]) },
       { for int in try(local.device_config[device.name].interfaces.port_channels, []) : "po${int.id}" => {
         bpdu_filter               = try(int.spanning_tree.bpdufilter, null) == null ? null : (try(int.spanning_tree.bpdufilter) ? "enable" : "disable")
         bpdu_guard                = try(int.spanning_tree.bpduguard, null) == null ? null : (try(int.spanning_tree.bpduguard) ? "enable" : "disable")
@@ -27,7 +27,7 @@ locals {
         priority                  = try(int.spanning_tree.port_priority, null)
         prestandard_configuration = try(int.spanning_tree.mst_pre_standard, null) == null ? null : (try(int.spanning_tree.mst_pre_standard) ? "enabled" : "disabled")
         simulate_pvst             = try(int.spanning_tree.mst_simulate_pvst, null) == null ? null : (try(int.spanning_tree.mst_simulate_pvst) ? "enabled" : "disabled")
-      } if try(int.spanning_tree, null) != null && try(int.switchport.enabled, true) },
+      } if try(int.spanning_tree, null) != null && try(int.switchport.enabled, local.default_switchport_enabled[device.name]) },
     )
   }
 }

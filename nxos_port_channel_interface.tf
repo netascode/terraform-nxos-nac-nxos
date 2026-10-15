@@ -113,21 +113,21 @@ resource "nxos_port_channel_interface" "port_channel_interface" {
     minimum_links        = try(int.lacp_min_links, null)
     maximum_links        = try(int.lacp_max_bundle, null)
     suspend_individual   = try(int.lacp_suspend_individual, null) != null ? (try(int.lacp_suspend_individual) ? "enable" : "disable") : null
-    access_vlan          = !try(int.switchport.enabled, true) ? "unknown" : try(int.switchport.access_vlan, null) != null ? "vlan-${int.switchport.access_vlan}" : null
+    access_vlan          = !try(int.switchport.enabled, local.default_switchport_enabled[each.key]) ? "unknown" : try(int.switchport.access_vlan, null) != null ? "vlan-${int.switchport.access_vlan}" : null
     admin_state          = try(int.shutdown, null) != null ? (try(int.shutdown) ? "down" : "up") : "up"
     auto_negotiation     = try(local.interface_negotiate_auto_map[try(int.negotiate_auto)], try(int.negotiate_auto, null))
     bandwidth            = try(int.bandwidth, null)
     delay                = try(int.delay, null)
     description          = try(int.description, null)
     duplex               = try(int.duplex, null)
-    layer                = !try(int.switchport.enabled, true) ? "Layer3" : "Layer2"
+    layer                = !try(int.switchport.enabled, local.default_switchport_enabled[each.key]) ? "Layer3" : "Layer2"
     link_logging         = try(int.logging_event_port_link_status, null) != null ? (try(int.logging_event_port_link_status) ? "enable" : "disable") : null
     medium               = try(int.medium, null)
     mode                 = try(local.switchport_mode_map[try(int.switchport.mode)], try(int.switchport.mode, null))
     mtu                  = try(int.mtu, null)
-    native_vlan          = !try(int.switchport.enabled, true) ? "unknown" : try(int.switchport.trunk_native_vlan, null) != null ? "vlan-${int.switchport.trunk_native_vlan}" : null
+    native_vlan          = !try(int.switchport.enabled, local.default_switchport_enabled[each.key]) ? "unknown" : try(int.switchport.trunk_native_vlan, null) != null ? "vlan-${int.switchport.trunk_native_vlan}" : null
     speed                = try(local.interface_speed_map[try(int.speed)], try(int.speed, null))
-    trunk_vlans          = !try(int.switchport.enabled, true) ? "1-4094" : try(provider::utils::normalize_vlans(try(int.switchport.trunk_allowed_vlans), "string-nxos"), null)
+    trunk_vlans          = !try(int.switchport.enabled, local.default_switchport_enabled[each.key]) ? "1-4094" : try(provider::utils::normalize_vlans(try(int.switchport.trunk_allowed_vlans), "string-nxos"), null)
     dot1q_ethertype      = try(int.dot1q_ethertype, null)
     graceful_convergence = try(int.lacp_graceful_convergence, null) != null ? (try(int.lacp_graceful_convergence) ? "enable" : "disable") : null
     hash_distribution    = try(int.port_channel_hash_distribution, null)
@@ -151,9 +151,9 @@ resource "nxos_port_channel_interface" "port_channel_interface" {
       # NX-OS always reports admin_mtu as user-configured (any MTU value counts, including the default), even when mtu is not declared; this includes vPC peer-links, which reject MTU config
       "admin_mtu",
       try(int.mac_address, null) != null ? "admin_router_mac" : "",
-      try(int.shutdown, null) != null || !try(int.switchport.enabled, true) ? "admin_state" : "",
+      try(int.shutdown, null) != null || !try(int.switchport.enabled, local.default_switchport_enabled[each.key]) ? "admin_state" : "",
     ])))
-    vrf_dn                                              = !try(int.switchport.enabled, true) ? "sys/inst-${try(int.vrf, "default")}" : null
+    vrf_dn                                              = !try(int.switchport.enabled, local.default_switchport_enabled[each.key]) ? "sys/inst-${try(int.vrf, "default")}" : null
     buffer_boost                                        = try(int.buffer_boost, null) == null ? null : (try(int.buffer_boost) ? "enable" : "disable")
     flow_control_receive                                = try(int.flowcontrol_receive, null)
     flow_control_send                                   = try(int.flowcontrol_send, null)

@@ -37,6 +37,9 @@ locals {
   devices       = try(local.nxos.devices, [])
   device_config = { for device in local.devices : device.name => try(device.configuration, {}) }
 
+  # Switchport state of ethernet and port-channel interfaces without switchport.enabled, following system.ethernet.default_switchport
+  default_switchport_enabled = { for device in local.devices : device.name => try(local.device_config[device.name].system.ethernet.default_switchport, "layer2") != "layer3" }
+
   intf_prefix_map = {
     "ethernet"     = "eth"
     "loopback"     = "lo"

@@ -28,7 +28,7 @@ locals {
         ipv6_verify_unicast_source_reachable_via = try(int.ipv6.verify_unicast_source_reachable_via, null)
         ipv6_address_link_local                  = try(int.ipv6.address_link_local, null)
         ipv6_addresses                           = try(int.ipv6.addresses, [])
-        } if !try(int.switchport.enabled, true) && try(int.channel_group, null) == null
+        } if !try(int.switchport.enabled, local.default_switchport_enabled[device.name]) && try(int.channel_group, null) == null
       ],
       # Loopbacks
       [for int in try(local.device_config[device.name].interfaces.loopbacks, []) : {
@@ -71,7 +71,7 @@ locals {
         ipv6_verify_unicast_source_reachable_via = try(int.ipv6.verify_unicast_source_reachable_via, null)
         ipv6_address_link_local                  = try(int.ipv6.address_link_local, null)
         ipv6_addresses                           = try(int.ipv6.addresses, [])
-        } if !try(int.switchport.enabled, true)
+        } if !try(int.switchport.enabled, local.default_switchport_enabled[device.name])
       ],
       # Subinterfaces (ethernets)
       flatten([for int in try(local.device_config[device.name].interfaces.ethernets, []) :

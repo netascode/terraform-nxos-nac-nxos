@@ -61,7 +61,7 @@ locals {
         ip_address                             = try(int.ip.address, null)
         ip_tag                                 = try(int.ip.tag, null)
         ip_secondary_addresses                 = try(int.ip.secondary_addresses, [])
-        } if !try(int.switchport.enabled, true) && try(int.channel_group, null) == null
+        } if !try(int.switchport.enabled, local.default_switchport_enabled[device.name]) && try(int.channel_group, null) == null
       ],
       # Loopbacks
       [for int in try(local.device_config[device.name].interfaces.loopbacks, []) : {
@@ -107,7 +107,7 @@ locals {
         ip_address                             = try(int.ip.address, null)
         ip_tag                                 = try(int.ip.tag, null)
         ip_secondary_addresses                 = try(int.ip.secondary_addresses, [])
-        } if !try(int.switchport.enabled, true)
+        } if !try(int.switchport.enabled, local.default_switchport_enabled[device.name])
       ],
       # Subinterfaces (ethernets)
       flatten([for int in try(local.device_config[device.name].interfaces.ethernets, []) :

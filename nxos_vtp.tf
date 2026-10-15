@@ -3,10 +3,10 @@ locals {
     merge(
       { for int in try(local.device_config[device.name].interfaces.ethernets, []) : "eth${int.id}" => {
         admin_state = try(int.vtp) ? "enabled" : "disabled"
-      } if try(int.vtp, null) != null && try(int.switchport.enabled, true) },
+      } if try(int.vtp, null) != null && try(int.switchport.enabled, local.default_switchport_enabled[device.name]) },
       { for int in try(local.device_config[device.name].interfaces.port_channels, []) : "po${int.id}" => {
         admin_state = try(int.vtp) ? "enabled" : "disabled"
-      } if try(int.vtp, null) != null && try(int.switchport.enabled, true) },
+      } if try(int.vtp, null) != null && try(int.switchport.enabled, local.default_switchport_enabled[device.name]) },
     )
   }
 }
