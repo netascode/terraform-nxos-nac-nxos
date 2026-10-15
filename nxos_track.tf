@@ -30,6 +30,7 @@ resource "nxos_track" "track" {
   depends_on = [
     nxos_cli.cli_pre_9,
     nxos_vrf.vrf,
+    nxos_sla.sla,
     nxos_physical_interface.physical_interface,
     nxos_loopback_interface.loopback_interface,
     nxos_port_channel_interface.port_channel_interface,

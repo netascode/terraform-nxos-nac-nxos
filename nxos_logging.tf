@@ -2,19 +2,37 @@ locals {
   logging_facility_name_map = {
     "pltfm-config" = "pltfm_config"
   }
+
+  logging_severity_level_map = {
+    0 = "emergencies"
+    1 = "alerts"
+    2 = "critical"
+    3 = "errors"
+    4 = "warnings"
+    5 = "notifications"
+    6 = "information"
+    7 = "debugging"
+  }
+
+  # 'logging level ip sla sender|responder|twamp-server' is stored as a logging facility
+  logging_sla_facilities_map = { for device in local.devices : device.name => merge(
+    try(local.device_config[device.name].ip_sla.logging_level_sender, null) == null ? {} : { "sla_sender" = { level = local.logging_severity_level_map[try(local.device_config[device.name].ip_sla.logging_level_sender)] } },
+    try(local.device_config[device.name].ip_sla.logging_level_responder, null) == null ? {} : { "sla_responder" = { level = local.logging_severity_level_map[try(local.device_config[device.name].ip_sla.logging_level_responder)] } },
+    try(local.device_config[device.name].ip_sla.logging_level_twamp_server, null) == null ? {} : { "sla_twamp" = { level = local.logging_severity_level_map[try(local.device_config[device.name].ip_sla.logging_level_twamp_server)] } },
+  ) }
 }
 
 resource "nxos_logging" "logging" {
   for_each = { for device in local.devices : device.name => device
-  if try(local.device_config[device.name].logging, null) != null }
+  if try(local.device_config[device.name].logging, null) != null || length(local.logging_sla_facilities_map[device.name]) > 0 }
   device = each.key
 
   # loggingLogLevel
   all   = try(local.device_config[each.key].logging.logging, null) == null ? null : (try(local.device_config[each.key].logging.logging) ? "enableall" : "disableall")
   level = try(local.device_config[each.key].logging.level, null)
-  facilities = length(try(local.device_config[each.key].logging.facilities, [])) > 0 ? { for facility in try(local.device_config[each.key].logging.facilities, []) : try(local.logging_facility_name_map[facility.name], facility.name) => {
+  facilities = length(try(local.device_config[each.key].logging.facilities, [])) + length(local.logging_sla_facilities_map[each.key]) > 0 ? merge({ for facility in try(local.device_config[each.key].logging.facilities, []) : try(local.logging_facility_name_map[facility.name], facility.name) => {
     level = try(facility.level, null)
-  } } : null
+  } }, local.logging_sla_facilities_map[each.key]) : null
 
   # syslogFile
   file_admin_state          = try(local.device_config[each.key].logging.logfile_name, null) != null ? "enabled" : null
@@ -55,5 +73,6 @@ resource "nxos_logging" "logging" {
 
   depends_on = [
     nxos_cli.cli_pre_9,
+    nxos_feature.feature,
   ]
 }

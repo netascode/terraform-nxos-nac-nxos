@@ -123,6 +123,7 @@ No outputs.
 | [nxos_queuing_qos.queuing_qos](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/queuing_qos) | resource |
 | [nxos_route_policy.route_policy](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/route_policy) | resource |
 | [nxos_save_config.save_config](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/save_config) | resource |
+| [nxos_sla.sla](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/sla) | resource |
 | [nxos_snmp.snmp](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/snmp) | resource |
 | [nxos_span.span](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/span) | resource |
 | [nxos_spanning_tree.spanning_tree](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/spanning_tree) | resource |
