@@ -1,0 +1,2 @@
+- Add DHCP relay support (`ip.dhcp_relay_*` and `ipv6.dhcp_*`) to Ethernet and port-channel subinterfaces
+- Fix DHCP relay addresses without a `vrf` being configured as `use-vrf none`; they are now configured without `use-vrf`. Existing deployments will see these relay addresses replaced on the next apply

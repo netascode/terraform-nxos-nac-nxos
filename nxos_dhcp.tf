@@ -10,8 +10,8 @@ locals {
       source_interface      = try(item.ip_dhcp_relay_source_interface_type, null) != null ? "${local.intf_prefix_map[try(item.ip_dhcp_relay_source_interface_type)]}${try(item.ip_dhcp_relay_source_interface_id, "")}" : null
       ipv6_source_interface = try(item.ipv6_dhcp_relay_source_interface_type, null) != null ? "${local.intf_prefix_map[try(item.ipv6_dhcp_relay_source_interface_type)]}${try(item.ipv6_dhcp_relay_source_interface_id, "")}" : null
       addresses = (length(try(item.ip_dhcp_relay_addresses, [])) > 0 || length(try(item.ipv6_dhcp_relay_addresses, [])) > 0) ? merge(
-        { for addr in try(item.ip_dhcp_relay_addresses, []) : "${try(addr.vrf, null) != null && try(addr.vrf, "") != "" ? addr.vrf : "!unspecified"};${addr.address}" => {} },
-        { for addr in try(item.ipv6_dhcp_relay_addresses, []) : "${try(addr.vrf, null) != null && try(addr.vrf, "") != "" ? addr.vrf : "!unspecified"};${addr.address}" => {} }
+        { for addr in try(item.ip_dhcp_relay_addresses, []) : "${try(addr.vrf, "!unspecified")};${addr.address}" => {} },
+        { for addr in try(item.ipv6_dhcp_relay_addresses, []) : "${try(addr.vrf, "!unspecified")};${addr.address}" => {} }
       ) : null
     } if item.device == device.name }
   }
