@@ -1,0 +1,1 @@
+- Add policy-based routing (PBR) support: `feature.pbr`, route map entries `match_ipv6_address`, `set_ip_next_hops`, `set_ipv6_next_hops` and `set_interface_null0`, and interface `ip.policy_route_map` / `ipv6.policy_route_map`

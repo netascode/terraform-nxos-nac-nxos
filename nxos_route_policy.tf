@@ -35,6 +35,31 @@ locals {
     "5"          = "R5"
     "6"          = "R6"
   }
+
+  rp_policy_interfaces = { for device in local.devices : device.name => concat(
+    flatten([
+      for intf_type, intf_prefix in { "ethernets" = "eth", "port_channels" = "po", "vlans" = "vlan", "loopbacks" = "lo" } : [
+        for int in try(local.device_config[device.name].interfaces[intf_type], []) : { id = "${intf_prefix}${int.id}", ip = try(int.ip, null), ipv6 = try(int.ipv6, null) }
+      ]
+    ]),
+    flatten([
+      for intf_type, intf_prefix in { "ethernets" = "eth", "port_channels" = "po" } : [
+        for int in try(local.device_config[device.name].interfaces[intf_type], []) : [
+          for sub in try(int.subinterfaces, []) : { id = "${intf_prefix}${int.id}.${sub.id}", ip = try(sub.ip, null), ipv6 = try(sub.ipv6, null) }
+        ]
+      ]
+    ])
+  ) }
+  rp_ipv4_policy_interfaces_map = { for device in local.devices : device.name => {
+    for int in local.rp_policy_interfaces[device.name] : int.id => {
+      route_map_name = int.ip.policy_route_map
+    } if try(int.ip.policy_route_map, null) != null
+  } }
+  rp_ipv6_policy_interfaces_map = { for device in local.devices : device.name => {
+    for int in local.rp_policy_interfaces[device.name] : int.id => {
+      route_map_name = int.ipv6.policy_route_map
+    } if try(int.ipv6.policy_route_map, null) != null
+  } }
 }
 
 resource "nxos_route_policy" "route_policy" {
@@ -43,7 +68,9 @@ resource "nxos_route_policy" "route_policy" {
     length(try(local.device_config[device.name].ipv6_prefix_lists, [])) > 0 ||
     length(try(local.device_config[device.name].route_maps, [])) > 0 ||
     length(try(local.device_config[device.name].community_lists, [])) > 0 ||
-  length(try(local.device_config[device.name].ip_as_path_access_lists, [])) > 0 }
+    length(try(local.device_config[device.name].ip_as_path_access_lists, [])) > 0 ||
+    length(local.rp_ipv4_policy_interfaces_map[device.name]) > 0 ||
+  length(local.rp_ipv6_policy_interfaces_map[device.name]) > 0 }
   device = each.key
 
   ipv4_prefix_lists = length(try(local.device_config[each.key].ip_prefix_lists, [])) > 0 ? { for pl in try(local.device_config[each.key].ip_prefix_lists, []) : pl.name => {
@@ -102,6 +129,10 @@ resource "nxos_route_policy" "route_policy" {
 
       match_route_access_lists = try(entry.match_ip_address, null) != null ? {
         "sys/rpm/accesslist-[${try(entry.match_ip_address)}]" = {}
+      } : null
+
+      match_route_ipv6_access_lists = try(entry.match_ipv6_address, null) != null ? {
+        "sys/rpm/accesslist-[${try(entry.match_ipv6_address)}]" = {}
       } : null
 
       set_regular_community_additive     = try(entry.set_community, null) != null ? (try(entry.set_community_additive, null) != null ? (try(entry.set_community_additive) ? "enabled" : "disabled") : "disabled") : null
@@ -172,6 +203,13 @@ resource "nxos_route_policy" "route_policy" {
       set_evpn_gateway_ip              = try(entry.set_evpn_gateway_ip, null)
       set_evpn_gateway_type            = try(entry.set_evpn_gateway_ip_type, null)
 
+      set_next_hops = length(concat(try(entry.set_ip_next_hops, []), try(entry.set_ipv6_next_hops, []))) > 0 ? { for nh in concat(try(entry.set_ip_next_hops, []), try(entry.set_ipv6_next_hops, [])) : nh.address => {
+        track_id = try(nh.track, null)
+        vrf      = try(nh.vrf, null)
+      } } : null
+
+      set_interfaces = try(entry.set_interface_null0, false) ? { "null0" = {} } : null
+
       match_next_hop_prefix_lists = try(entry.match_ip_next_hop_prefix_list, null) != null ? {
         "sys/rpm/pfxlistv4-[${try(entry.match_ip_next_hop_prefix_list)}]" = {}
       } : null
@@ -209,8 +247,19 @@ resource "nxos_route_policy" "route_policy" {
     } } : null
   } } : null
 
+  ipv4_policy_interfaces = length(local.rp_ipv4_policy_interfaces_map[each.key]) > 0 ? local.rp_ipv4_policy_interfaces_map[each.key] : null
+  ipv6_policy_interfaces = length(local.rp_ipv6_policy_interfaces_map[each.key]) > 0 ? local.rp_ipv6_policy_interfaces_map[each.key] : null
+
   depends_on = [
     nxos_cli.cli_pre_9,
+    nxos_feature.feature,
+    nxos_vrf.vrf,
+    nxos_track.track,
     nxos_access_list.access_list,
+    nxos_physical_interface.physical_interface,
+    nxos_port_channel_interface.port_channel_interface,
+    nxos_svi_interface.svi_interface,
+    nxos_loopback_interface.loopback_interface,
+    nxos_subinterface.subinterface,
   ]
 }

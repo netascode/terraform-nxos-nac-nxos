@@ -25,6 +25,7 @@ resource "nxos_feature" "feature" {
   nxapi                = try(local.device_config[each.key].feature.nxapi, null) == null ? null : (try(local.device_config[each.key].feature.nxapi) ? "enabled" : "disabled")
   ospf                 = try(local.device_config[each.key].feature.ospf, null) == null ? null : (try(local.device_config[each.key].feature.ospf) ? "enabled" : "disabled")
   ospfv3               = try(local.device_config[each.key].feature.ospfv3, null) == null ? null : (try(local.device_config[each.key].feature.ospfv3) ? "enabled" : "disabled")
+  pbr                  = try(local.device_config[each.key].feature.pbr, null) == null ? null : (try(local.device_config[each.key].feature.pbr) ? "enabled" : "disabled")
   pim                  = try(local.device_config[each.key].feature.pim, null) == null ? null : (try(local.device_config[each.key].feature.pim) ? "enabled" : "disabled")
   poe                  = try(local.device_config[each.key].feature.poe, null) == null ? null : (try(local.device_config[each.key].feature.poe) ? "enabled" : "disabled")
   ptp                  = try(local.device_config[each.key].feature.ptp, null) == null ? null : (try(local.device_config[each.key].feature.ptp) ? "enabled" : "disabled")
