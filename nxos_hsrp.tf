@@ -61,17 +61,17 @@ locals {
       } if try(int.hsrp, null) != null],
       flatten([for eth in try(local.device_config[device.name].interfaces.ethernets, []) :
         [for sub in try(eth.subinterfaces, []) : {
-          key    = format("%s/%s", device.name, sub.id)
+          key    = format("%s/eth%s.%s", device.name, eth.id, sub.id)
           device = device.name
-          id     = sub.id
+          id     = "eth${eth.id}.${sub.id}"
           hsrp   = try(sub.hsrp, null)
         } if try(sub.hsrp, null) != null]
       ]),
       flatten([for pc in try(local.device_config[device.name].interfaces.port_channels, []) :
         [for sub in try(pc.subinterfaces, []) : {
-          key    = format("%s/%s", device.name, sub.id)
+          key    = format("%s/po%s.%s", device.name, pc.id, sub.id)
           device = device.name
-          id     = sub.id
+          id     = "po${pc.id}.${sub.id}"
           hsrp   = try(sub.hsrp, null)
         } if try(sub.hsrp, null) != null]
       ]),
@@ -96,6 +96,7 @@ resource "nxos_hsrp" "hsrp" {
   depends_on = [
     nxos_cli.cli_pre_9,
     nxos_feature.feature,
+    nxos_keychain.keychain,
     nxos_physical_interface.physical_interface,
     nxos_svi_interface.svi_interface,
     nxos_port_channel_interface.port_channel_interface,

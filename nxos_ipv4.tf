@@ -248,7 +248,7 @@ resource "nxos_ipv4" "ipv4" {
         preference = try(route.route.preference, null)
         tag        = try(route.route.tag, null)
 
-        next_hops = length(try(route.route.next_hops, [])) > 0 ? { for nh in try(route.route.next_hops, []) : "${try(nh.interface_type, null) != null ? "${local.intf_prefix_map[try(nh.interface_type)]}${try(nh.interface_id, "")}" : "unspecified"};${try(nh.address, "0.0.0.0")};${try(nh.vrf, "default")}" => {
+        next_hops = length(try(route.route.next_hops, [])) > 0 ? { for nh in try(route.route.next_hops, []) : "${try(nh.interface_type, null) != null ? "${local.intf_prefix_map[try(nh.interface_type)]}${try(nh.interface_id, "")}" : "unspecified"};${try(nh.address, "0.0.0.0")};${try(nh.vrf, vrf.name)}" => {
           object     = try(nh.track, null)
           preference = try(nh.preference, null)
           tag        = try(nh.tag, null)

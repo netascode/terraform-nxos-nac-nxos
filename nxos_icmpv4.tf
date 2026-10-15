@@ -13,6 +13,20 @@ locals {
         try(int.ip.unreachables, null) != null ||
         try(int.ip.port_unreachable, null) != null
       ],
+      flatten([for int in try(local.device_config[device.name].interfaces.ethernets, []) :
+        [for sub in try(int.subinterfaces, []) : {
+          device              = device.name
+          vrf                 = try(sub.vrf, "default")
+          id                  = "eth${int.id}.${sub.id}"
+          ip_redirects        = try(sub.ip.redirects, null)
+          ip_unreachables     = try(sub.ip.unreachables, null)
+          ip_port_unreachable = try(sub.ip.port_unreachable, null)
+          is_svi_with_vpc     = false
+          } if try(sub.ip.redirects, null) != null ||
+          try(sub.ip.unreachables, null) != null ||
+          try(sub.ip.port_unreachable, null) != null
+        ]
+      ]),
       [for int in try(local.device_config[device.name].interfaces.loopbacks, []) : {
         device              = device.name
         vrf                 = try(int.vrf, "default")
@@ -49,6 +63,20 @@ locals {
         try(int.ip.unreachables, null) != null ||
         try(int.ip.port_unreachable, null) != null
       ],
+      flatten([for int in try(local.device_config[device.name].interfaces.port_channels, []) :
+        [for sub in try(int.subinterfaces, []) : {
+          device              = device.name
+          vrf                 = try(sub.vrf, "default")
+          id                  = "po${int.id}.${sub.id}"
+          ip_redirects        = try(sub.ip.redirects, null)
+          ip_unreachables     = try(sub.ip.unreachables, null)
+          ip_port_unreachable = try(sub.ip.port_unreachable, null)
+          is_svi_with_vpc     = false
+          } if try(sub.ip.redirects, null) != null ||
+          try(sub.ip.unreachables, null) != null ||
+          try(sub.ip.port_unreachable, null) != null
+        ]
+      ]),
     )
   ])
   icmpv4_vrfs = { for entry in distinct([for int in local.icmpv4_interfaces : { device = int.device, vrf = int.vrf }]) :
@@ -88,6 +116,7 @@ resource "nxos_icmpv4" "icmpv4" {
     nxos_loopback_interface.loopback_interface,
     nxos_physical_interface.physical_interface,
     nxos_port_channel_interface.port_channel_interface,
+    nxos_subinterface.subinterface,
     nxos_svi_interface.svi_interface,
     nxos_vrf.vrf,
   ]

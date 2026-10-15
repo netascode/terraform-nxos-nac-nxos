@@ -1,0 +1,5 @@
+- Fix `ip.redirects`, `ip.unreachables`, `ip.port_unreachable`, `ipv6.redirects` and `ipv6.unreachables` being ignored on Ethernet and port-channel subinterfaces
+- Fix `ip.access_group_in` and `ip.access_group_out` being ignored on Ethernet and port-channel subinterfaces
+- Fix static route next hops in a non-default VRF without a `vrf` being configured as `vrf default`; they now default to the route's VRF. Existing deployments will see these next hops replaced on the next apply
+- Fix HSRP on Ethernet and port-channel subinterfaces being configured on an invalid interface ID (the subinterface number only, e.g. `10` instead of `eth1/1.10`)
+- Fix OSPF and IS-IS configuration not depending on route maps and prefix lists, and OSPF, IS-IS, HSRP and interface configuration not depending on key chains, which allowed them to be created before, or deleted after, the objects they reference

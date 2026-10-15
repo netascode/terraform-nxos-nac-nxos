@@ -239,9 +239,11 @@ resource "nxos_ospf" "ospf" {
   depends_on = [
     nxos_cli.cli_pre_9,
     nxos_feature.feature,
+    nxos_keychain.keychain,
     nxos_loopback_interface.loopback_interface,
     nxos_physical_interface.physical_interface,
     nxos_port_channel_interface.port_channel_interface,
+    nxos_route_policy.route_policy,
     nxos_subinterface.subinterface,
     nxos_svi_interface.svi_interface,
     nxos_vrf.vrf,

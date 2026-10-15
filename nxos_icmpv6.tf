@@ -20,6 +20,16 @@ locals {
         } if try(int.ipv6.redirects, null) != null ||
         try(int.ipv6.unreachables, null) != null
       ],
+      flatten([for int in try(local.device_config[device.name].interfaces.ethernets, []) :
+        [for sub in try(int.subinterfaces, []) : {
+          device       = device.name
+          id           = "eth${int.id}.${sub.id}"
+          redirects    = try(sub.ipv6.redirects, null)
+          unreachables = try(sub.ipv6.unreachables, null)
+          } if try(sub.ipv6.redirects, null) != null ||
+          try(sub.ipv6.unreachables, null) != null
+        ]
+      ]),
       [for int in try(local.device_config[device.name].interfaces.loopbacks, []) : {
         device       = device.name
         id           = "lo${int.id}"
@@ -44,6 +54,16 @@ locals {
         } if try(int.ipv6.redirects, null) != null ||
         try(int.ipv6.unreachables, null) != null
       ],
+      flatten([for int in try(local.device_config[device.name].interfaces.port_channels, []) :
+        [for sub in try(int.subinterfaces, []) : {
+          device       = device.name
+          id           = "po${int.id}.${sub.id}"
+          redirects    = try(sub.ipv6.redirects, null)
+          unreachables = try(sub.ipv6.unreachables, null)
+          } if try(sub.ipv6.redirects, null) != null ||
+          try(sub.ipv6.unreachables, null) != null
+        ]
+      ]),
     )
   ])
 }
@@ -74,6 +94,7 @@ resource "nxos_icmpv6" "icmpv6" {
     nxos_loopback_interface.loopback_interface,
     nxos_physical_interface.physical_interface,
     nxos_port_channel_interface.port_channel_interface,
+    nxos_subinterface.subinterface,
     nxos_svi_interface.svi_interface,
     nxos_vrf.vrf,
   ]

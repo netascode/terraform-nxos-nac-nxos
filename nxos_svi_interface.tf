@@ -133,6 +133,7 @@ resource "nxos_svi_interface" "svi_interface" {
     nxos_cli.cli_pre_9,
     nxos_feature.feature,
     nxos_bridge_domain.bridge_domain,
+    nxos_keychain.keychain,
     nxos_vrf.vrf,
   ]
 }

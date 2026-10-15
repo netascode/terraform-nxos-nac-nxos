@@ -202,6 +202,7 @@ resource "nxos_port_channel_interface" "port_channel_interface" {
   depends_on = [
     nxos_cli.cli_pre_9,
     nxos_feature.feature,
+    nxos_keychain.keychain,
     nxos_physical_interface.physical_interface,
     nxos_vrf.vrf,
   ]

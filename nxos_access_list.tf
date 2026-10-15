@@ -1,24 +1,34 @@
 locals {
+  acl_interfaces = { for device in local.devices : device.name => concat(
+    flatten([
+      for intf_type, intf_prefix in { "ethernets" = "eth", "port_channels" = "po", "vlans" = "vlan", "loopbacks" = "lo" } : [
+        for int in try(local.device_config[device.name].interfaces[intf_type], []) : { id = "${intf_prefix}${int.id}", ip = try(int.ip, null) }
+      ]
+    ]),
+    flatten([
+      for intf_type, intf_prefix in { "ethernets" = "eth", "port_channels" = "po" } : [
+        for int in try(local.device_config[device.name].interfaces[intf_type], []) : [
+          for sub in try(int.subinterfaces, []) : { id = "${intf_prefix}${int.id}.${sub.id}", ip = try(sub.ip, null) }
+        ]
+      ]
+    ])
+  ) }
   acl_ingress_interfaces_map = { for device in local.devices : device.name =>
     merge([
-      for acl in try(local.device_config[device.name].ip_access_lists, []) : merge([
-        for intf_type, intf_prefix in { "ethernets" = "eth", "port_channels" = "po", "vlans" = "vlan", "loopbacks" = "lo" } : {
-          for int in try(local.device_config[device.name].interfaces[intf_type], []) : "${intf_prefix}${int.id}" => {
-            access_list_name = acl.name
-          } if try(int.ip.access_group_in, null) == acl.name
-        }
-      ]...)
+      for acl in try(local.device_config[device.name].ip_access_lists, []) : {
+        for int in local.acl_interfaces[device.name] : int.id => {
+          access_list_name = acl.name
+        } if try(int.ip.access_group_in, null) == acl.name
+      }
     ]...)
   }
   acl_egress_interfaces_map = { for device in local.devices : device.name =>
     merge([
-      for acl in try(local.device_config[device.name].ip_access_lists, []) : merge([
-        for intf_type, intf_prefix in { "ethernets" = "eth", "port_channels" = "po", "vlans" = "vlan", "loopbacks" = "lo" } : {
-          for int in try(local.device_config[device.name].interfaces[intf_type], []) : "${intf_prefix}${int.id}" => {
-            access_list_name = acl.name
-          } if try(int.ip.access_group_out, null) == acl.name
-        }
-      ]...)
+      for acl in try(local.device_config[device.name].ip_access_lists, []) : {
+        for int in local.acl_interfaces[device.name] : int.id => {
+          access_list_name = acl.name
+        } if try(int.ip.access_group_out, null) == acl.name
+      }
     ]...)
   }
 }
@@ -186,5 +196,6 @@ resource "nxos_access_list" "access_list" {
     nxos_svi_interface.svi_interface,
     nxos_loopback_interface.loopback_interface,
     nxos_port_channel_interface.port_channel_interface,
+    nxos_subinterface.subinterface,
   ]
 }
