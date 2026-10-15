@@ -1,0 +1,1 @@
+- Fix destroying or changing `macsec.shutdown` failing with "Frequent invocation of command" errors when done within 30 seconds of a previous MACsec status change
