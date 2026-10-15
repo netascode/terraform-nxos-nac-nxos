@@ -316,6 +316,7 @@ resource "nxos_cli" "cli_0" {
     nxos_ipv4.ipv4,
     nxos_ipv6.ipv6,
     nxos_eigrp.eigrp,
+    nxos_epbr.epbr,
     nxos_isis.isis,
     nxos_keychain.keychain,
     nxos_logging.logging,
