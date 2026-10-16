@@ -1,0 +1,2 @@
+- Add negated DSCP, CoS, IP precedence and access list match criteria (`match_not_dscp_values`, `match_cos_values`, `match_not_cos_values`, `match_precedence_values`, `match_not_precedence_values`, `match_access_group_names`) to `qos.class_maps[]`
+- Add DSCP, CoS and IP precedence marking (`set_dscp`, `set_cos`, `set_precedence`, `set_precedence_tunnel`) to `qos.policy_maps[].classes[]`

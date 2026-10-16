@@ -27,11 +27,27 @@ resource "nxos_default_qos" "default_qos" {
     match_type = try(cm.match_type, null)
     dscp_values = length(try(cm.match_dscp_values, [])) > 0 ? { for dscp in try(cm.match_dscp_values, []) : try(local.dscp_int_to_string_map[dscp], tostring(dscp)) => {
     } } : null
+    not_dscp_values = length(try(cm.match_not_dscp_values, [])) > 0 ? { for dscp in try(cm.match_not_dscp_values, []) : try(local.dscp_int_to_string_map[dscp], tostring(dscp)) => {
+    } } : null
+    cos_values = length(try(cm.match_cos_values, [])) > 0 ? { for cos in try(cm.match_cos_values, []) : tostring(cos) => {
+    } } : null
+    not_cos_values = length(try(cm.match_not_cos_values, [])) > 0 ? { for cos in try(cm.match_not_cos_values, []) : tostring(cos) => {
+    } } : null
+    precedence_values = length(try(cm.match_precedence_values, [])) > 0 ? { for prec in try(cm.match_precedence_values, []) : prec => {
+    } } : null
+    not_precedence_values = length(try(cm.match_not_precedence_values, [])) > 0 ? { for prec in try(cm.match_not_precedence_values, []) : prec => {
+    } } : null
+    access_groups = length(try(cm.match_access_group_names, [])) > 0 ? { for acl in try(cm.match_access_group_names, []) : acl => {
+    } } : null
   } } : null
   policy_maps = length(try(local.device_config[each.key].qos.policy_maps, [])) > 0 ? { for pm in try(local.device_config[each.key].qos.policy_maps, []) : pm.name => {
     match_type = try(pm.match_type, null)
     match_class_maps = length(try(pm.classes, [])) > 0 ? { for cls in try(pm.classes, []) : cls.name => {
       set_qos_group_id              = try(cls.set_qos_group, null)
+      set_dscp_value                = try(tostring(cls.set_dscp), null) != null ? try(local.dscp_int_to_string_map[cls.set_dscp], tostring(cls.set_dscp)) : null
+      set_cos_value                 = try(tostring(cls.set_cos), null)
+      set_precedence_value          = try(cls.set_precedence, null)
+      set_precedence_tunnel         = try(cls.set_precedence_tunnel, null)
       police_cir_rate               = try(cls.police.cir_rate, null)
       police_cir_unit               = try(local.police_unit_map[try(cls.police.cir_unit)], try(cls.police.cir_unit, null))
       police_bc_rate                = try(cls.police.bc_rate, null)
@@ -60,6 +76,7 @@ resource "nxos_default_qos" "default_qos" {
   policy_interface_in = length(local.qos_policy_interface_in_map[each.key]) > 0 ? local.qos_policy_interface_in_map[each.key] : null
   depends_on = [
     nxos_cli.cli_pre_9,
+    nxos_access_list.access_list,
     nxos_physical_interface.physical_interface,
     nxos_svi_interface.svi_interface,
     nxos_port_channel_interface.port_channel_interface,
