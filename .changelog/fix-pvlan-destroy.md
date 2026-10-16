@@ -1,0 +1,1 @@
+- Fix destroy hanging the NX-OS private VLAN process when private VLANs are configured, which left features and configuration behind on the device (requires provider `0.19.0`)
