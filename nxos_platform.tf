@@ -74,6 +74,7 @@ resource "nxos_platform" "platform" {
     try(local.device_config[device.name].system.switch_mode, null) != null ||
     try(local.device_config[device.name].system.fabric_mode, null) != null ||
     try(local.device_config[device.name].system.hardware, null) != null ||
+    try(local.device_config[device.name].system.hardware_qos, null) != null ||
     try(local.device_config[device.name].system.hardware_access_list_tcam_region, null) != null ||
     try(local.device_config[device.name].system.nve_ipmc_index_size, null) != null ||
     try(local.device_config[device.name].system.nve_overlay_vlans, null) != null ||
@@ -202,6 +203,58 @@ resource "nxos_platform" "platform" {
   pfc_watchdog_interval                      = try(local.device_config[each.key].qos.priority_flow_control.watch_dog_interval_value, null)
   pfc_watchdog_mode                          = try(local.device_config[each.key].qos.priority_flow_control.watch_dog_interval, null) == null ? null : (try(local.device_config[each.key].qos.priority_flow_control.watch_dog_interval) ? "on" : "off")
   pfc_watchdog_shutdown_multiplier           = try(local.device_config[each.key].qos.priority_flow_control.watch_dog_shutdown_multiplier, null)
+
+  # platformQos attributes
+  qos_buffer_peak_monitor_counter0_class0 = try(local.device_config[each.key].system.hardware_qos.buffer_peak_monitor_counter0_classes, null) == null ? null : (contains(try(local.device_config[each.key].system.hardware_qos.buffer_peak_monitor_counter0_classes), 0) ? "configure" : "unconfigure")
+  qos_buffer_peak_monitor_counter0_class1 = try(local.device_config[each.key].system.hardware_qos.buffer_peak_monitor_counter0_classes, null) == null ? null : (contains(try(local.device_config[each.key].system.hardware_qos.buffer_peak_monitor_counter0_classes), 1) ? "configure" : "unconfigure")
+  qos_buffer_peak_monitor_counter0_class2 = try(local.device_config[each.key].system.hardware_qos.buffer_peak_monitor_counter0_classes, null) == null ? null : (contains(try(local.device_config[each.key].system.hardware_qos.buffer_peak_monitor_counter0_classes), 2) ? "configure" : "unconfigure")
+  qos_buffer_peak_monitor_counter0_class3 = try(local.device_config[each.key].system.hardware_qos.buffer_peak_monitor_counter0_classes, null) == null ? null : (contains(try(local.device_config[each.key].system.hardware_qos.buffer_peak_monitor_counter0_classes), 3) ? "configure" : "unconfigure")
+  qos_buffer_peak_monitor_counter0_class4 = try(local.device_config[each.key].system.hardware_qos.buffer_peak_monitor_counter0_classes, null) == null ? null : (contains(try(local.device_config[each.key].system.hardware_qos.buffer_peak_monitor_counter0_classes), 4) ? "configure" : "unconfigure")
+  qos_buffer_peak_monitor_counter0_class5 = try(local.device_config[each.key].system.hardware_qos.buffer_peak_monitor_counter0_classes, null) == null ? null : (contains(try(local.device_config[each.key].system.hardware_qos.buffer_peak_monitor_counter0_classes), 5) ? "configure" : "unconfigure")
+  qos_buffer_peak_monitor_counter0_class6 = try(local.device_config[each.key].system.hardware_qos.buffer_peak_monitor_counter0_classes, null) == null ? null : (contains(try(local.device_config[each.key].system.hardware_qos.buffer_peak_monitor_counter0_classes), 6) ? "configure" : "unconfigure")
+  qos_buffer_peak_monitor_counter0_class7 = try(local.device_config[each.key].system.hardware_qos.buffer_peak_monitor_counter0_classes, null) == null ? null : (contains(try(local.device_config[each.key].system.hardware_qos.buffer_peak_monitor_counter0_classes), 7) ? "configure" : "unconfigure")
+  qos_burst_detect_fall_threshold_unit    = try(local.device_config[each.key].system.hardware_qos.burst_detect_fall_threshold_unit, null) == null ? null : (try(local.device_config[each.key].system.hardware_qos.burst_detect_fall_threshold_unit) == "percent" ? "percentage" : try(local.device_config[each.key].system.hardware_qos.burst_detect_fall_threshold_unit))
+  qos_burst_detect_fall_threshold         = try(local.device_config[each.key].system.hardware_qos.burst_detect_fall_threshold, null)
+  qos_burst_detect_max_records            = try(local.device_config[each.key].system.hardware_qos.burst_detect_max_records, null)
+  qos_burst_detect_rise_threshold_unit    = try(local.device_config[each.key].system.hardware_qos.burst_detect_rise_threshold_unit, null) == null ? null : (try(local.device_config[each.key].system.hardware_qos.burst_detect_rise_threshold_unit) == "percent" ? "percentage" : try(local.device_config[each.key].system.hardware_qos.burst_detect_rise_threshold_unit))
+  qos_burst_detect_rise_threshold         = try(local.device_config[each.key].system.hardware_qos.burst_detect_rise_threshold, null)
+  qos_classify_ns_only                    = try(local.device_config[each.key].system.hardware_qos.classify_ns_only, null) == null ? null : (try(local.device_config[each.key].system.hardware_qos.classify_ns_only) ? "Enabled" : "Disabled")
+  qos_cpu_size                            = try(local.device_config[each.key].system.hardware_qos.cpu_pg_size, null)
+  qos_dpp_age_period                      = try(local.device_config[each.key].system.hardware_qos.dynamic_packet_prioritization_age_period, null)
+  qos_dpp_max_packets                     = try(local.device_config[each.key].system.hardware_qos.dynamic_packet_prioritization_max_num_pkts, null)
+  qos_drop_pool_size                      = try(local.device_config[each.key].system.hardware_qos.pool_drop_size, null)
+  qos_eoq_stats_class                     = try(local.device_config[each.key].system.hardware_qos.eoq_stats_class_qos_group, null) == null ? null : tostring(try(local.device_config[each.key].system.hardware_qos.eoq_stats_class_qos_group))
+  qos_etrap_age_period                    = try(local.device_config[each.key].system.hardware_qos.etrap_age_period, null)
+  qos_etrap_bandwidth_threshold           = try(local.device_config[each.key].system.hardware_qos.etrap_bandwidth_threshold, null)
+  qos_etrap_byte_count                    = try(local.device_config[each.key].system.hardware_qos.etrap_byte_count, null)
+  qos_headroom_size                       = try(local.device_config[each.key].system.hardware_qos.pool_headroom_size, null)
+  qos_input_buffer_peak                   = try(local.device_config[each.key].system.hardware_qos.buffer_input_peak, null)
+  qos_include_ipg                         = try(local.device_config[each.key].system.hardware_qos.include_ipg, null) == null ? null : (try(local.device_config[each.key].system.hardware_qos.include_ipg) ? "Enabled" : "Disabled")
+  qos_lcpu_size                           = try(local.device_config[each.key].system.hardware_qos.lcpu_pg_size, null)
+  qos_mac_ipg                             = try(local.device_config[each.key].system.hardware_qos.mac_ipg, null)
+  qos_multicast_qos_group3_traffic        = try(local.device_config[each.key].system.hardware_qos.ns_mcq3_alias_qos_group, null) == null ? null : tostring(try(local.device_config[each.key].system.hardware_qos.ns_mcq3_alias_qos_group))
+  qos_nodrop_dynamic_queue_limit          = try(local.device_config[each.key].system.hardware_qos.nodrop_pause_dynamic_q_limit, null)
+  qos_nodrop_resume_offset                = try(local.device_config[each.key].system.hardware_qos.nodrop_pause_resume_offset, null)
+  qos_nodrop_pg_green_threshold           = try(local.device_config[each.key].system.hardware_qos.nodrop_pg_thresholds_green_threshold, null)
+  qos_nodrop_pg_red_threshold             = try(local.device_config[each.key].system.hardware_qos.nodrop_pg_thresholds_red_threshold, null)
+  qos_nodrop_pg_size                      = try(local.device_config[each.key].system.hardware_qos.nodrop_pg_thresholds_pg_size, null)
+  qos_nodrop_pg_size_fx                   = try(local.device_config[each.key].system.hardware_qos.nodrop_pg_thresholds_fx_pg_size, null)
+  qos_nodrop_pg_yellow_threshold          = try(local.device_config[each.key].system.hardware_qos.nodrop_pg_thresholds_yellow_threshold, null)
+  qos_nodrop_pool_size                    = try(local.device_config[each.key].system.hardware_qos.pool_nodrop_size, null)
+  qos_nodrop_queue_green_threshold        = try(local.device_config[each.key].system.hardware_qos.nodrop_queue_thresholds_queue_green, null)
+  qos_nodrop_queue_green_threshold_fx     = try(local.device_config[each.key].system.hardware_qos.nodrop_queue_thresholds_fx_queue_green, null)
+  qos_nodrop_queue_yellow_threshold       = try(local.device_config[each.key].system.hardware_qos.nodrop_queue_thresholds_queue_yellow, null)
+  qos_ns_buffer_profile                   = try(local.device_config[each.key].system.hardware_qos.ns_buffer_profile, null)
+  qos_output_queue_drops_type             = try(local.device_config[each.key].system.hardware_qos.oq_drops_type, null)
+  qos_pfc_multicast_drop                  = try(local.device_config[each.key].system.hardware_qos.pfc_mc_drop, null) == null ? null : (try(local.device_config[each.key].system.hardware_qos.pfc_mc_drop) ? "Enabled" : "Disabled")
+  qos_pfc_static                          = try(local.device_config[each.key].system.hardware_qos.pfc_static, null) == null ? null : (try(local.device_config[each.key].system.hardware_qos.pfc_static) ? "Enabled" : "Disabled")
+  qos_pg_headroom_reserve                 = try(local.device_config[each.key].system.hardware_qos.ing_pg_hdrm_reserve_percent, null)
+  qos_pg_min_value                        = try(local.device_config[each.key].system.hardware_qos.ing_pg_no_min_pgmin, null)
+  qos_pg_no_min                           = try(local.device_config[each.key].system.hardware_qos.ing_pg_no_min, null)
+  qos_pg_share                            = try(local.device_config[each.key].system.hardware_qos.ing_pg_share, null) == null ? null : (try(local.device_config[each.key].system.hardware_qos.ing_pg_share) ? "Enabled" : "Disabled")
+  qos_queue_noise_percent                 = try(local.device_config[each.key].system.hardware_qos.q_noise_percent, null)
+  qos_afd_profile                         = try(local.device_config[each.key].system.hardware_qos.afd_profile, null)
+  qos_span_size                           = try(local.device_config[each.key].system.hardware_qos.span_pg_size, null)
 
   # platformNVE / platformInfraVlan nested maps
   nve_interfaces = (try(local.device_config[each.key].system.nve_ipmc_index_size, null) != null ||

@@ -1,0 +1,1 @@
+- Add global hardware QoS support (`system.hardware_qos`), including ingress priority-group buffer tuning, no-drop thresholds and pool sizes, burst detection, AFD profile, ETRAP and dynamic packet prioritization settings
