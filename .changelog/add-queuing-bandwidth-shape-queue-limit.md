@@ -1,0 +1,1 @@
+- Add bandwidth percent (`bandwidth_percent`), shaping (`shape_min`, `shape_min_unit`, `shape_max`, `shape_max_unit`) and queue limit (`queue_limit`, `queue_limit_unit`, `queue_limit_dynamic`) to queuing policy map classes

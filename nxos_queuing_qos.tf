@@ -14,6 +14,15 @@ locals {
     "burst-optimized" = "burst"
     "mesh-optimized"  = "mesh"
   }
+
+  queuing_shape_unit_map = {
+    "bps"     = "bps"
+    "kbps"    = "kbps"
+    "mbps"    = "mbps"
+    "gbps"    = "gbps"
+    "pps"     = "pps"
+    "percent" = "pct"
+  }
 }
 
 resource "nxos_queuing_qos" "queuing_qos" {
@@ -28,7 +37,15 @@ resource "nxos_queuing_qos" "queuing_qos" {
     match_type = try(pm.match_type, null)
     match_class_maps = length(try(pm.classes, [])) > 0 ? { for cls in try(pm.classes, []) : cls.name => {
       priority            = try(cls.priority_level, null)
+      bandwidth           = try(cls.bandwidth_percent, null)
       remaining_bandwidth = try(cls.bandwidth_remaining_percent, null)
+      shape_min_rate      = try(cls.shape_min, null)
+      shape_min_rate_unit = try(local.queuing_shape_unit_map[cls.shape_min_unit], null)
+      shape_max_rate      = try(cls.shape_max, null)
+      shape_max_rate_unit = try(local.queuing_shape_unit_map[cls.shape_max_unit], null)
+      queue_limit         = try(cls.queue_limit, null)
+      queue_limit_unit    = try(cls.queue_limit_unit, null)
+      queue_limit_dynamic = try(cls.queue_limit_dynamic, null)
       min_threshold       = try(cls.random_detect.minimum_threshold, null)
       min_threshold_unit  = try(cls.random_detect.minimum_threshold_unit, null)
       max_threshold       = try(cls.random_detect.maximum_threshold, null)
