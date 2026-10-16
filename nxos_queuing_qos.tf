@@ -1,4 +1,15 @@
 locals {
+  queuing_policy_interface_out_map = { for device in local.devices : device.name =>
+    merge([
+      for intf_type, intf_prefix in { "ethernets" = "eth", "port_channels" = "po" } : {
+        for int in try(local.device_config[device.name].interfaces[intf_type], []) : "${intf_prefix}${int.id}" => {
+          policy_map_name       = try(int.service_policy_type_queuing_output)
+          policy_map_statistics = try(int.service_policy_type_queuing_output_statistics, null)
+        } if try(int.service_policy_type_queuing_output, null) != null
+      }
+    ]...)
+  }
+
   queuing_random_detect_threshold_map = {
     "burst-optimized" = "burst"
     "mesh-optimized"  = "mesh"
@@ -8,7 +19,8 @@ locals {
 resource "nxos_queuing_qos" "queuing_qos" {
   for_each = { for device in local.devices : device.name => device
     if try(local.device_config[device.name].qos.system_service_policy_queuing_output, null) != null ||
-  length(try(local.device_config[device.name].qos.queuing_policy_maps, [])) > 0 }
+    length(try(local.device_config[device.name].qos.queuing_policy_maps, [])) > 0 ||
+  length(local.queuing_policy_interface_out_map[device.name]) > 0 }
   device                     = each.key
   system_out_policy_map_name = try(local.device_config[each.key].qos.system_service_policy_queuing_output, null)
   policy_map_statistics      = try(local.device_config[each.key].qos.system_service_policy_queuing_output_statistics, null)
@@ -31,8 +43,11 @@ resource "nxos_queuing_qos" "queuing_qos" {
       afd_ecn             = try(cls.afd.ecn, null)
     } } : null
   } } : null
+  policy_interface_out = length(local.queuing_policy_interface_out_map[each.key]) > 0 ? local.queuing_policy_interface_out_map[each.key] : null
 
   depends_on = [
     nxos_cli.cli_pre_9,
+    nxos_physical_interface.physical_interface,
+    nxos_port_channel_interface.port_channel_interface,
   ]
 }

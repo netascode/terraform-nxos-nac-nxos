@@ -21,7 +21,8 @@ resource "nxos_default_qos" "default_qos" {
     length(try(local.device_config[device.name].qos.policy_maps, [])) > 0 ||
     length([for int in try(local.device_config[device.name].interfaces.ethernets, []) : int if try(int.service_policy_type_qos_input, null) != null]) > 0 ||
     length([for int in try(local.device_config[device.name].interfaces.vlans, []) : int if try(int.service_policy_type_qos_input, null) != null]) > 0 ||
-  length([for int in try(local.device_config[device.name].interfaces.port_channels, []) : int if try(int.service_policy_type_qos_input, null) != null]) > 0 }
+    length([for int in try(local.device_config[device.name].interfaces.port_channels, []) : int if try(int.service_policy_type_qos_input, null) != null]) > 0 ||
+  try(local.device_config[device.name].interfaces.nve.service_policy_type_qos_input, null) != null }
   device = each.key
   class_maps = length(try(local.device_config[each.key].qos.class_maps, [])) > 0 ? { for cm in try(local.device_config[each.key].qos.class_maps, []) : cm.name => {
     match_type = try(cm.match_type, null)
@@ -74,11 +75,18 @@ resource "nxos_default_qos" "default_qos" {
     } } : null
   } } : null
   policy_interface_in = length(local.qos_policy_interface_in_map[each.key]) > 0 ? local.qos_policy_interface_in_map[each.key] : null
+  policy_nve_interface_in = try(local.device_config[each.key].interfaces.nve.service_policy_type_qos_input, null) != null ? {
+    "1" = {
+      policy_map_name       = try(local.device_config[each.key].interfaces.nve.service_policy_type_qos_input)
+      policy_map_statistics = try(local.device_config[each.key].interfaces.nve.service_policy_type_qos_input_statistics, null)
+    }
+  } : null
   depends_on = [
     nxos_cli.cli_pre_9,
     nxos_access_list.access_list,
     nxos_physical_interface.physical_interface,
     nxos_svi_interface.svi_interface,
     nxos_port_channel_interface.port_channel_interface,
+    nxos_nvo.nvo,
   ]
 }
