@@ -311,6 +311,10 @@ resource "nxos_system" "system" {
     length(try(local.device_config[device.name].system.cli_aliases, [])) > 0 ||
     try(local.device_config[device.name].system.copp_profile, null) != null ||
     try(local.device_config[device.name].system.copp_rate_limit, null) != null ||
+    try(local.device_config[device.name].system.hardware_qos.dynamic_buffer_sharing, null) != null ||
+    try(local.device_config[device.name].system.default_reset_dei, null) != null ||
+    try(local.device_config[device.name].qos.statistics, null) != null ||
+    try(local.device_config[device.name].qos.qos_policies_statistics, null) != null ||
     try(local.device_config[device.name].system.clock, null) != null ||
     try(local.device_config[device.name].system.icam_monitor_interval, null) != null ||
     try(local.device_config[device.name].system.icam_monitor_history, null) != null ||
@@ -507,6 +511,12 @@ resource "nxos_system" "system" {
   # coppEntity / coppProfile attributes
   copp_rate_limiter = try(local.device_config[each.key].system.copp_rate_limit, null)
   copp_profile_type = try(local.device_config[each.key].system.copp_profile, null)
+
+  # ipqosEntity attributes
+  qos_dynamic_buffer_sharing = try(local.device_config[each.key].system.hardware_qos.dynamic_buffer_sharing, null)
+  qos_policies_statistics    = try(local.device_config[each.key].qos.qos_policies_statistics, null) == null ? null : (try(local.device_config[each.key].qos.qos_policies_statistics) ? "enabled" : "disabled")
+  qos_reset_dei              = try(local.device_config[each.key].system.default_reset_dei, null)
+  qos_statistics             = try(local.device_config[each.key].qos.statistics, null) == null ? null : (try(local.device_config[each.key].qos.statistics) ? "enabled" : "disabled")
 
   # vshdCliAlias nested map
   cli_aliases = length(try(local.device_config[each.key].system.cli_aliases, [])) > 0 ? { for alias in try(local.device_config[each.key].system.cli_aliases, []) : alias.name => {

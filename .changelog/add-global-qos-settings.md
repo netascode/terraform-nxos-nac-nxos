@@ -1,0 +1,1 @@
+- Add global QoS settings (`qos.statistics`, `qos.qos_policies_statistics`, `system.default_reset_dei` and `system.hardware_qos.dynamic_buffer_sharing`)
