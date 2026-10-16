@@ -80,6 +80,7 @@ resource "nxos_platform" "platform" {
     length(try(local.device_config[device.name].system.nve_infra_vlans, [])) > 0 ||
     try(local.device_config[device.name].system.dot1q_tunnel_transit_vlans, null) != null ||
     length(try(local.device_config[device.name].system.udfs, [])) > 0 ||
+    try(local.device_config[device.name].qos.priority_flow_control, null) != null ||
   try(local.device_config[device.name].system.routing, null) != null }
   device = each.key
 
@@ -192,6 +193,15 @@ resource "nxos_platform" "platform" {
   extended_storm_control_priority              = try(local.device_config[each.key].system.hardware.storm_control_priority, null)
   extended_tcam_default_result                 = try(local.device_config[each.key].system.hardware.access_list_update_default_result, null) == null ? null : (try(local.device_config[each.key].system.hardware.access_list_update_default_result) ? "enable" : "disable")
   extended_vrf_aware_nat_enable                = try(local.device_config[each.key].system.hardware.vrf_aware_nat_enable, null) == null ? null : (try(local.device_config[each.key].system.hardware.vrf_aware_nat_enable) ? "enabled" : "disabled")
+
+  # platformPriorFlowCtrlWd attributes
+  pfc_watchdog_auto_restore_multiplier       = try(local.device_config[each.key].qos.priority_flow_control.auto_restore_multiplier, null)
+  pfc_watchdog_fixed_restore_multiplier      = try(local.device_config[each.key].qos.priority_flow_control.fixed_restore_multiplier, null)
+  pfc_watchdog_forced_on                     = try(local.device_config[each.key].qos.priority_flow_control.watch_dog_forced, null) == null ? null : (try(local.device_config[each.key].qos.priority_flow_control.watch_dog_forced) ? "on" : "off")
+  pfc_watchdog_internal_interface_multiplier = try(local.device_config[each.key].qos.priority_flow_control.watch_dog_internal_interface_multiplier, null)
+  pfc_watchdog_interval                      = try(local.device_config[each.key].qos.priority_flow_control.watch_dog_interval_value, null)
+  pfc_watchdog_mode                          = try(local.device_config[each.key].qos.priority_flow_control.watch_dog_interval, null) == null ? null : (try(local.device_config[each.key].qos.priority_flow_control.watch_dog_interval) ? "on" : "off")
+  pfc_watchdog_shutdown_multiplier           = try(local.device_config[each.key].qos.priority_flow_control.watch_dog_shutdown_multiplier, null)
 
   # platformNVE / platformInfraVlan nested maps
   nve_interfaces = (try(local.device_config[each.key].system.nve_ipmc_index_size, null) != null ||

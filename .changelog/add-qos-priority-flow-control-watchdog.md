@@ -1,0 +1,1 @@
+- Add global PFC watchdog support (`qos.priority_flow_control`)
