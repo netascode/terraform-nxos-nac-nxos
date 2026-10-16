@@ -49,6 +49,7 @@ resource "nxos_default_qos" "default_qos" {
       set_cos_value                 = try(tostring(cls.set_cos), null)
       set_precedence_value          = try(cls.set_precedence, null)
       set_precedence_tunnel         = try(cls.set_precedence_tunnel, null)
+      set_dlb_mode                  = try(cls.set_dlb_mode, null)
       police_cir_rate               = try(cls.police.cir_rate, null)
       police_cir_unit               = try(local.police_unit_map[try(cls.police.cir_unit)], try(cls.police.cir_unit, null))
       police_bc_rate                = try(cls.police.bc_rate, null)

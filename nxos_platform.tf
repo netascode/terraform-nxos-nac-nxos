@@ -58,6 +58,15 @@ locals {
     "template-l2-scale"                           = "TEMPLATE_L2_SCALE"
     "template-security-groups"                    = "TEMPLATE_SECURITY_GROUPS"
   }
+  platform_dlb_mode_map = {
+    "flowlet"                                = "FLOWLET"
+    "per-packet"                             = "PER_PACKET"
+    "policy-driven-flowlet"                  = "POLICY_DRIVEN_FLOWLET"
+    "policy-driven-per-packet"               = "POLICY_DRIVEN_PER_PACKET"
+    "policy-driven-mixed-default-flowlet"    = "POLICY_DRIVEN_MIXED_DEFAULT_FLOWLET"
+    "policy-driven-mixed-default-per-packet" = "POLICY_DRIVEN_MIXED_DEFAULT_PER_PACKET"
+    "policy-driven-mixed-default-ecmp"       = "POLICY_DRIVEN_MIXED_DEFAULT_ECMP"
+  }
   platform_udf_offset_base_map = {
     "packet-start"    = "packet-start"
     "header-outer-l3" = "outer-header-l3"
@@ -194,6 +203,28 @@ resource "nxos_platform" "platform" {
   extended_storm_control_priority              = try(local.device_config[each.key].system.hardware.storm_control_priority, null)
   extended_tcam_default_result                 = try(local.device_config[each.key].system.hardware.access_list_update_default_result, null) == null ? null : (try(local.device_config[each.key].system.hardware.access_list_update_default_result) ? "enable" : "disable")
   extended_vrf_aware_nat_enable                = try(local.device_config[each.key].system.hardware.vrf_aware_nat_enable, null) == null ? null : (try(local.device_config[each.key].system.hardware.vrf_aware_nat_enable) ? "enabled" : "disabled")
+
+  # platformDlbEntity attributes
+  dlb_allow_all_interfaces  = try(local.device_config[each.key].system.hardware_profile.dlb.dlb_interface_all, null)
+  dlb_decay_factor          = try(local.device_config[each.key].system.hardware_profile.dlb.decay_factor, null)
+  dlb_dre_threshold_level_1 = try(local.device_config[each.key].system.hardware_profile.dlb.dre_thresholds_level_1, null)
+  dlb_dre_threshold_level_2 = try(local.device_config[each.key].system.hardware_profile.dlb.dre_thresholds_level_2, null)
+  dlb_dre_threshold_level_3 = try(local.device_config[each.key].system.hardware_profile.dlb.dre_thresholds_level_3, null)
+  dlb_dre_threshold_level_4 = try(local.device_config[each.key].system.hardware_profile.dlb.dre_thresholds_level_4, null)
+  dlb_dre_threshold_level_5 = try(local.device_config[each.key].system.hardware_profile.dlb.dre_thresholds_level_5, null)
+  dlb_dre_threshold_level_6 = try(local.device_config[each.key].system.hardware_profile.dlb.dre_thresholds_level_6, null)
+  dlb_dre_threshold_level_7 = try(local.device_config[each.key].system.hardware_profile.dlb.dre_thresholds_level_7, null)
+  dlb_enabled               = try(local.device_config[each.key].system.hardware_profile.dlb.enabled, null)
+  dlb_flowlet_aging         = try(local.device_config[each.key].system.hardware_profile.dlb.flowlet_aging, null)
+  dlb_interfaces            = length(try(local.device_config[each.key].system.hardware_profile.dlb.dlb_interfaces, [])) > 0 ? join(",", [for intf in try(local.device_config[each.key].system.hardware_profile.dlb.dlb_interfaces, []) : "${local.intf_prefix_map[intf.interface_type]}${intf.interface_id}"]) : null
+  dlb_load_awareness        = try(local.device_config[each.key].system.hardware_profile.dlb.load_awareness, null)
+  dlb_mac_address           = try(local.device_config[each.key].system.hardware_profile.dlb.mac_address, null) != null ? upper(join(":", regexall("[0-9A-Fa-f]{2}", replace(try(local.device_config[each.key].system.hardware_profile.dlb.mac_address), "/[^0-9A-Fa-f]/", "")))) : null
+  dlb_mode                  = try(local.platform_dlb_mode_map[try(local.device_config[each.key].system.hardware_profile.dlb.mode)], null)
+  dlb_sampling_interval     = try(local.device_config[each.key].system.hardware_profile.dlb.sampling_interval, null)
+  dlb_static_pinning        = try(local.device_config[each.key].system.hardware_profile.dlb.static_pinning, null)
+  dlb_static_pinnings = length(try(local.device_config[each.key].system.hardware_profile.dlb.static_pinnings, [])) > 0 ? { for pin in try(local.device_config[each.key].system.hardware_profile.dlb.static_pinnings, []) : "${local.intf_prefix_map[pin.source_interface_type]}${pin.source_interface_id}" => {
+    destination_interface = "${local.intf_prefix_map[pin.destination_interface_type]}${pin.destination_interface_id}"
+  } } : null
 
   # platformPriorFlowCtrlWd attributes
   pfc_watchdog_auto_restore_multiplier       = try(local.device_config[each.key].qos.priority_flow_control.auto_restore_multiplier, null)

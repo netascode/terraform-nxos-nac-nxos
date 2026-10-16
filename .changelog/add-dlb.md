@@ -1,0 +1,2 @@
+- Add dynamic load balancing (DLB) configuration (`system.hardware_profile.dlb`), including DLB interfaces, mode, flowlet aging, DRE thresholds, port load tuning and static pinning
+- Add `set_dlb_mode` to `qos.policy_maps.classes`
