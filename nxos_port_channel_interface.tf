@@ -177,6 +177,7 @@ resource "nxos_port_channel_interface" "port_channel_interface" {
     load_interval_counter_2                             = try(int.load_interval_counter_2, null)
     load_interval_counter_3                             = try(int.load_interval_counter_3, null)
     multisite_interface_tracking                        = try(int.evpn_multisite_dci_tracking, null) == true ? "dci" : try(int.evpn_multisite_fabric_tracking, null) == true ? "fabric" : null
+    evpn_multihoming_core_tracking                      = try(int.evpn_multihoming_core_tracking, null) == null ? null : (try(int.evpn_multihoming_core_tracking) ? "enabled" : "disabled")
     port_type_fabric                                    = try(int.port_type_fabric, null) == null ? null : (try(int.port_type_fabric) ? "yes" : "no")
     priority_flow_control_mode                          = try(int.priority_flow_control_mode, null)
     priority_flow_control_send_tlv                      = try(int.priority_flow_control_send_tlv, null)
@@ -203,7 +204,34 @@ resource "nxos_port_channel_interface" "port_channel_interface" {
     nxos_cli.cli_pre_9,
     nxos_feature.feature,
     nxos_keychain.keychain,
+    nxos_nvo.evpn_multihoming,
     nxos_physical_interface.physical_interface,
     nxos_vrf.vrf,
+  ]
+}
+
+# A vPC ethernet segment requires the port-channel to be a vPC port-channel, which nxos_vpc configures after the
+# port-channels. Every port-channel is listed, as removing an entry from the map deletes the port-channel, and the
+# reset deletion policy keeps destroying this instance from deleting the port-channels created by the main instance.
+resource "nxos_port_channel_interface" "ethernet_segment" {
+  for_each = { for device in local.devices : device.name => device
+  if length(try(local.device_config[device.name].interfaces.port_channels, [])) > 0 }
+  device          = each.key
+  deletion_policy = "reset"
+  port_channel_interfaces = { for int in try(local.device_config[each.key].interfaces.port_channels, []) : "po${int.id}" => {
+    ethernet_segment_type                     = try(int.ethernet_segment, null) == null ? null : (try(int.ethernet_segment.vpc, false) == true ? "vpc" : "native")
+    ethernet_segment_identifier               = try(int.ethernet_segment.esi, null)
+    ethernet_segment_system_mac               = try(int.ethernet_segment.esi_system_mac_address, null) == null ? null : upper(join(":", regexall("[0-9A-Fa-f]{2}", replace(int.ethernet_segment.esi_system_mac_address, "/[^0-9A-Fa-f]/", ""))))
+    ethernet_segment_system_mac_inherit       = (try(int.ethernet_segment.esi_system_mac, null) == true || try(int.ethernet_segment.esi_system_mac_address, null) != null || try(int.ethernet_segment.esi_system_mac_local_identifier, null) != null) ? try(int.ethernet_segment.esi_system_mac_address, null) == null : null
+    ethernet_segment_local_identifier         = try(int.ethernet_segment.esi_system_mac_local_identifier, null)
+    ethernet_segment_local_identifier_inherit = (try(int.ethernet_segment.esi_system_mac, null) == true || try(int.ethernet_segment.esi_system_mac_address, null) != null || try(int.ethernet_segment.esi_system_mac_local_identifier, null) != null) ? try(int.ethernet_segment.esi_system_mac_local_identifier, null) == null : null
+    ethernet_segment_tag                      = try(int.ethernet_segment.esi_tag, null)
+  } }
+
+  depends_on = [
+    nxos_cli.cli_pre_9,
+    nxos_nvo.evpn_multihoming,
+    nxos_port_channel_interface.port_channel_interface,
+    nxos_vpc.vpc,
   ]
 }

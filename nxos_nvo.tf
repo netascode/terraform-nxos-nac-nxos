@@ -6,6 +6,10 @@ locals {
     "flood-and-learn" = "Flood-and-learn"
     "openflow-ir"     = "openflowIR"
   }
+  evpn_multihoming_df_election_mode_map = {
+    "per-flow" = "perFlow"
+    "modulo"   = "modulo"
+  }
 }
 
 resource "nxos_nvo" "nvo" {
@@ -13,6 +17,7 @@ resource "nxos_nvo" "nvo" {
     if try(local.device_config[device.name].system.nv_overlay_vxlan_udp_port, null) != null ||
     try(local.device_config[device.name].system.nv_overlay_vxlan_udp_source_port_mode, null) != null ||
     try(local.device_config[device.name].evpn.multisite_border_gateway, null) != null ||
+    try(local.device_config[device.name].evpn.multihoming, null) != null ||
     try(local.device_config[device.name].system.advertise_evpn_multicast, null) != null ||
   try(local.device_config[device.name].interfaces.nve, null) != null }
   device                     = each.key
@@ -67,5 +72,27 @@ resource "nxos_nvo" "nvo" {
     nxos_evpn.evpn,
     nxos_feature.feature,
     nxos_loopback_interface.loopback_interface,
+  ]
+}
+
+# EVPN multihoming must be enabled before interfaces use core tracking, while the main instance depends on the interfaces.
+# The reset deletion policy keeps this instance from deleting the other sys/eps child objects on destroy.
+resource "nxos_nvo" "evpn_multihoming" {
+  for_each = { for device in local.devices : device.name => device
+  if try(local.device_config[device.name].evpn.multihoming, null) != null }
+  device          = each.key
+  deletion_policy = "reset"
+
+  evpn_multihoming_state                 = try(local.device_config[each.key].evpn.multihoming.enabled, null) == null ? null : (try(local.device_config[each.key].evpn.multihoming.enabled) ? "enabled" : "disabled")
+  evpn_multihoming_system_mac            = try(local.device_config[each.key].evpn.multihoming.system_mac, null) == null ? null : upper(join(":", regexall("[0-9A-Fa-f]{2}", replace(local.device_config[each.key].evpn.multihoming.system_mac, "/[^0-9A-Fa-f]/", ""))))
+  evpn_multihoming_df_election_mode      = try(local.evpn_multihoming_df_election_mode_map[local.device_config[each.key].evpn.multihoming.df_election_mode], null)
+  evpn_multihoming_df_election_time      = try(local.device_config[each.key].evpn.multihoming.df_election_time, null) == null ? null : format("%f", local.device_config[each.key].evpn.multihoming.df_election_time)
+  evpn_multihoming_ead_evi_route         = try(local.device_config[each.key].evpn.multihoming.ead_evi_route, null)
+  evpn_multihoming_delay_restore_time    = try(local.device_config[each.key].evpn.multihoming.ethernet_segment_delay_restore_time, null)
+  evpn_multihoming_frr_anycast_source_ip = try(local.device_config[each.key].evpn.multihoming.frr_anycast_source_ip, null)
+
+  depends_on = [
+    nxos_cli.cli_pre_9,
+    nxos_feature.feature,
   ]
 }

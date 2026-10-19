@@ -111,22 +111,23 @@ resource "nxos_svi_interface" "svi_interface" {
   if length(try(local.device_config[device.name].interfaces.vlans, [])) > 0 }
   device = each.key
   svi_interfaces = length(try(local.device_config[each.key].interfaces.vlans, [])) > 0 ? { for int in try(local.device_config[each.key].interfaces.vlans, []) : "vlan${int.id}" => {
-    admin_state                  = try(int.shutdown, null) != null ? (try(int.shutdown) ? "down" : "up") : "up"
-    bandwidth                    = try(int.bandwidth, null)
-    delay                        = try(int.delay, null)
-    description                  = try(int.description, null)
-    medium                       = try(int.medium, null) == "broadcast" ? "bcast" : try(int.medium, null)
-    mtu                          = try(int.mtu, null)
-    vrf_dn                       = "sys/inst-${try(int.vrf, "default")}"
-    multisite_interface_tracking = try(int.evpn_multisite_dci_tracking, null) == true ? "dci" : try(int.evpn_multisite_fabric_tracking, null) == true ? "fabric" : null
-    autostate                    = try(int.autostate, null)
-    carrier_delay                = try(int.carrier_delay, null)
-    inband_management            = try(int.management, null)
-    load_interval_counter_1      = try(int.load_interval_counter_1, null)
-    load_interval_counter_2      = try(int.load_interval_counter_2, null)
-    load_interval_counter_3      = try(int.load_interval_counter_3, null)
-    mac_address                  = try(int.mac_address, null)
-    snmp_trap_link_status        = try(int.snmp_trap_link_status, null)
+    admin_state                    = try(int.shutdown, null) != null ? (try(int.shutdown) ? "down" : "up") : "up"
+    bandwidth                      = try(int.bandwidth, null)
+    delay                          = try(int.delay, null)
+    description                    = try(int.description, null)
+    medium                         = try(int.medium, null) == "broadcast" ? "bcast" : try(int.medium, null)
+    mtu                            = try(int.mtu, null)
+    vrf_dn                         = "sys/inst-${try(int.vrf, "default")}"
+    multisite_interface_tracking   = try(int.evpn_multisite_dci_tracking, null) == true ? "dci" : try(int.evpn_multisite_fabric_tracking, null) == true ? "fabric" : null
+    evpn_multihoming_core_tracking = try(int.evpn_multihoming_core_tracking, null) == null ? null : (try(int.evpn_multihoming_core_tracking) ? "enabled" : "disabled")
+    autostate                      = try(int.autostate, null)
+    carrier_delay                  = try(int.carrier_delay, null)
+    inband_management              = try(int.management, null)
+    load_interval_counter_1        = try(int.load_interval_counter_1, null)
+    load_interval_counter_2        = try(int.load_interval_counter_2, null)
+    load_interval_counter_3        = try(int.load_interval_counter_3, null)
+    mac_address                    = try(int.mac_address, null)
+    snmp_trap_link_status          = try(int.snmp_trap_link_status, null)
   } } : null
 
   depends_on = [
@@ -134,6 +135,7 @@ resource "nxos_svi_interface" "svi_interface" {
     nxos_feature.feature,
     nxos_bridge_domain.bridge_domain,
     nxos_keychain.keychain,
+    nxos_nvo.evpn_multihoming,
     nxos_vrf.vrf,
   ]
 }

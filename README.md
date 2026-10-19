@@ -41,7 +41,7 @@ module "nxos" {
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.9.0 |
 | <a name="requirement_local"></a> [local](#requirement\_local) | >= 2.7.0, < 3.0.0 |
-| <a name="requirement_nxos"></a> [nxos](#requirement\_nxos) | ~> 0.20.0 |
+| <a name="requirement_nxos"></a> [nxos](#requirement\_nxos) | ~> 0.20.1 |
 | <a name="requirement_utils"></a> [utils](#requirement\_utils) | = 2.1.0-beta1 |
 ## Inputs
 
@@ -112,6 +112,7 @@ No outputs.
 | [nxos_netflow.netflow](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/netflow) | resource |
 | [nxos_network_qos.network_qos](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/network_qos) | resource |
 | [nxos_ntp.ntp](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/ntp) | resource |
+| [nxos_nvo.evpn_multihoming](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/nvo) | resource |
 | [nxos_nvo.nvo](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/nvo) | resource |
 | [nxos_ospf.ospf](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/ospf) | resource |
 | [nxos_ospfv3.ospfv3](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/ospfv3) | resource |
@@ -119,6 +120,7 @@ No outputs.
 | [nxos_pim.pim](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/pim) | resource |
 | [nxos_platform.platform](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/platform) | resource |
 | [nxos_poe.poe](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/poe) | resource |
+| [nxos_port_channel_interface.ethernet_segment](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/port_channel_interface) | resource |
 | [nxos_port_channel_interface.port_channel_interface](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/port_channel_interface) | resource |
 | [nxos_ptp.ptp](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/ptp) | resource |
 | [nxos_queuing_qos.queuing_qos](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/queuing_qos) | resource |

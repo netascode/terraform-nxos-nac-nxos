@@ -212,6 +212,7 @@ resource "nxos_physical_interface" "physical_interface" {
     switchport_isolated                                 = try(int.switchport.isolated, null) == null ? null : (try(int.switchport.isolated) ? "enable" : "disable")
     switchport_mac_learn                                = try(int.switchport.mac_learning, null) == null ? null : (try(int.switchport.mac_learning) ? "enable" : "disable")
     multisite_interface_tracking                        = try(int.evpn_multisite_dci_tracking, null) == true ? "dci" : try(int.evpn_multisite_fabric_tracking, null) == true ? "fabric" : null
+    evpn_multihoming_core_tracking                      = try(int.evpn_multihoming_core_tracking, null) == null ? null : (try(int.evpn_multihoming_core_tracking) ? "enabled" : "disabled")
     port_type_fabric                                    = try(int.port_type_fabric, null) == null ? null : (try(int.port_type_fabric) ? "yes" : "no")
     priority_flow_control_mode                          = try(int.priority_flow_control_mode, null)
     priority_flow_control_send_tlv                      = try(int.priority_flow_control_send_tlv, null)
@@ -236,6 +237,7 @@ resource "nxos_physical_interface" "physical_interface" {
   depends_on = [
     nxos_cli.cli_pre_9,
     nxos_keychain.keychain,
+    nxos_nvo.evpn_multihoming,
     nxos_vrf.vrf,
   ]
 }
