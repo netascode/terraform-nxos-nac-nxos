@@ -1,0 +1,6 @@
+- BREAKING CHANGE: Rename `routing.pim.rps` and `routing.pim.vrfs.rps` to `rp_addresses` to align with the CLI (`ip pim rp-address`)
+- Add PIM static RP route-map and prefix-list group ranges (`rp_addresses[].route_map`, `rp_addresses[].prefix_list`)
+- Add PIM ASM configuration (`pre_build_spt`, `pre_build_spt_force`, `pre_build_spt_route_map`, `pre_build_spt_prefix_list`, `spt_threshold_infinity_group_list`, `use_shared_tree_only_group_list`, `sg_expiry_timer`, `sg_expiry_timer_sg_list`, `register_policy`, `register_source_interface_type`/`register_source_interface_id` and corresponding prefix-list variants) to `routing.pim` and `routing.pim.vrfs`
+- Add PIM BSR (`routing.pim.bsr`) and Auto-RP (`routing.pim.auto_rp`) configuration, including candidate BSR, candidate RP, mapping agent and filter policies, also per VRF
+- Add PIM interface hello configuration (`interfaces.*.pim.hello_interval`, `hello_authentication_ah_md5`, `hello_authentication_keychain`)
+- Fix `routing.pim.register_rate_limit` and `routing.pim.vrfs.register_rate_limit` to configure `ip pim register-rate-limit`
