@@ -103,7 +103,28 @@ locals {
               can(regex("\\.", rt)) ? "route-target:ipv4-nn2:${rt}" : (
                 can(regex(":", rt)) ? (tonumber(split(":", rt)[0]) <= 65535 ? "route-target:as2-nn2:${rt}" : "route-target:as4-nn2:${rt}") : "unexpected_rt_format"
             ))
-          }]
+          }],
+          # Same AF import/export policies without route targets (route-maps, default VRF leaking)
+          [for dir in ["import", "export"] : {
+            key            = format("%s/%s/%s/%s/%s", device.name, vrf.name, local.vrf_address_family_names_map[af.address_family], local.vrf_address_family_names_map[af.address_family], dir)
+            device         = device.name
+            vrf            = vrf.name
+            address_family = local.vrf_address_family_names_map[af.address_family]
+            rt_af          = local.vrf_address_family_names_map[af.address_family]
+            direction      = dir
+            rt_raw         = null
+            rt_dme         = null
+            } if anytrue(dir == "import" ? [
+              try(af.import_map, null) != null,
+              try(af.import_vrf_default_map, null) != null,
+              try(af.import_vrf_default_prefix_limit, null) != null,
+              try(af.import_vrf_default_advertise_vpn, null) != null,
+              ] : [
+              try(af.export_map, null) != null,
+              try(af.export_vrf_default_map, null) != null,
+              try(af.export_vrf_default_prefix_limit, null) != null,
+              try(af.export_vrf_default_allow_vpn, null) != null,
+          ])]
         )
       ]
     ]
@@ -137,7 +158,11 @@ locals {
                 route_map = rt_af == local.vrf_address_family_names_map[af.address_family] ? (
                   dir == "import" ? try(af.import_map, null) : try(af.export_map, null)
                 ) : null
-                route_targets = { for entry in dir_entries : entry.rt_dme => {} }
+                default_vrf_route_map    = rt_af == local.vrf_address_family_names_map[af.address_family] ? (dir == "import" ? try(af.import_vrf_default_map, null) : try(af.export_vrf_default_map, null)) : null
+                default_vrf_prefix_limit = rt_af == local.vrf_address_family_names_map[af.address_family] ? (dir == "import" ? try(af.import_vrf_default_prefix_limit, null) : try(af.export_vrf_default_prefix_limit, null)) : null
+                advertise_vpn            = rt_af == local.vrf_address_family_names_map[af.address_family] && dir == "import" ? try(af.import_vrf_default_advertise_vpn, null) : null
+                allow_vpn                = rt_af == local.vrf_address_family_names_map[af.address_family] && dir == "export" ? try(af.export_vrf_default_allow_vpn, null) : null
+                route_targets            = length([for entry in dir_entries : entry if entry.rt_dme != null]) > 0 ? { for entry in dir_entries : entry.rt_dme => {} if entry.rt_dme != null } : null
               }
             }
           }

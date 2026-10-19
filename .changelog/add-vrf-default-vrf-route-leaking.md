@@ -1,0 +1,2 @@
+- Add VRF address family default VRF route leaking support including `import_vrf_default_map`, `import_vrf_default_prefix_limit`, `import_vrf_default_advertise_vpn`, `export_vrf_default_map`, `export_vrf_default_prefix_limit`, and `export_vrf_default_allow_vpn`
+- Fix VRF address family `import_map` and `export_map` being ignored when no route targets are configured for the same direction
