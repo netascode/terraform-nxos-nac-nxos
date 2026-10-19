@@ -368,6 +368,7 @@ resource "nxos_system" "system" {
     length(try(local.device_config[device.name].system.ip_ssh_source_interfaces, [])) > 0 ||
     length(try(local.device_config[device.name].system.ip_ftp_source_interfaces, [])) > 0 ||
     try(local.ngmvpn_configured[device.name], false) ||
+    try(local.device_config[device.name].system.l2rib, null) != null ||
   length(try(local.device_config[device.name].interfaces.management, [])) > 0 }
   device = each.key
 
@@ -779,6 +780,12 @@ resource "nxos_system" "system" {
     mdt_v4_vxlan = try(vrf.mdt_v4_vxlan, null)
     mdt_v6_vxlan = try(vrf.mdt_v6_vxlan, null)
   } } : null
+
+  # l2ribEvpnMACmob attributes (CLI: l2rib dup-host-mac-detection, l2rib dup-host-mac-recovery)
+  l2rib_duplicate_mac_detection_moves      = try(local.device_config[each.key].system.l2rib.dup_host_mac_detection_moves, null)
+  l2rib_duplicate_mac_detection_duration   = try(local.device_config[each.key].system.l2rib.dup_host_mac_detection_duration, null)
+  l2rib_duplicate_mac_recovery_timeout     = try(local.device_config[each.key].system.l2rib.dup_host_mac_recovery_timeout, null)
+  l2rib_duplicate_mac_recovery_retry_count = try(local.device_config[each.key].system.l2rib.dup_host_mac_recovery_retry_count, null)
 
   depends_on = [
     nxos_cli.cli_pre_9,

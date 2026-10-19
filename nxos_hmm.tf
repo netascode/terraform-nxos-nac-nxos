@@ -15,14 +15,18 @@ resource "nxos_hmm" "hmm" {
   for_each = { for device in local.devices : device.name => device
     if try(local.device_config[device.name].fabric_forwarding, null) != null ||
   length([for int in try(local.device_config[device.name].interfaces.vlans, []) : int if try(int.fabric_forwarding_mode, null) != null || try(int.fabric_forwarding_mode_anycast_gateway_proxy, null) != null]) > 0 }
-  device                  = each.key
-  admin_state             = null
-  instance_admin_state    = null
-  anycast_mac             = try(local.device_config[each.key].fabric_forwarding.anycast_gateway_mac, null)
-  administrative_distance = try(local.device_config[each.key].fabric_forwarding.distance, null)
-  limit_vlan_mac          = try(local.device_config[each.key].fabric_forwarding.limit_vlan_mac, null)
-  selective_host_probe    = try(local.device_config[each.key].fabric_forwarding.selective_host_probe, null) == null ? null : (try(local.device_config[each.key].fabric_forwarding.selective_host_probe) ? "yes" : "no")
-  interfaces              = length(local.hmm_interfaces_map[each.key]) > 0 ? local.hmm_interfaces_map[each.key] : null
+  device                           = each.key
+  admin_state                      = null
+  instance_admin_state             = null
+  anycast_mac                      = try(local.device_config[each.key].fabric_forwarding.anycast_gateway_mac, null)
+  administrative_distance          = try(local.device_config[each.key].fabric_forwarding.distance, null)
+  limit_vlan_mac                   = try(local.device_config[each.key].fabric_forwarding.limit_vlan_mac, null)
+  selective_host_probe             = try(local.device_config[each.key].fabric_forwarding.selective_host_probe, null) == null ? null : (try(local.device_config[each.key].fabric_forwarding.selective_host_probe) ? "yes" : "no")
+  duplicate_host_detection_moves   = try(local.device_config[each.key].fabric_forwarding.dup_host_ip_addr_detection_moves, null)
+  duplicate_host_detection_seconds = try(local.device_config[each.key].fabric_forwarding.dup_host_ip_addr_detection_seconds, null)
+  duplicate_host_recovery_timeout  = try(local.device_config[each.key].fabric_forwarding.dup_host_recovery_timer_timeout, null)
+  duplicate_host_recovery_count    = try(local.device_config[each.key].fabric_forwarding.dup_host_recovery_timer_recover_count, null)
+  interfaces                       = length(local.hmm_interfaces_map[each.key]) > 0 ? local.hmm_interfaces_map[each.key] : null
 
   depends_on = [
     nxos_cli.cli_pre_9,

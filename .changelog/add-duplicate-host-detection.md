@@ -1,0 +1,2 @@
+- Add duplicate host IP address detection and recovery support (`fabric_forwarding.dup_host_ip_addr_detection_moves`, `dup_host_ip_addr_detection_seconds`, `dup_host_recovery_timer_timeout`, `dup_host_recovery_timer_recover_count`)
+- Add L2RIB duplicate MAC address detection and recovery support (`system.l2rib.dup_host_mac_detection_moves`, `dup_host_mac_detection_duration`, `dup_host_mac_recovery_timeout`, `dup_host_mac_recovery_retry_count`)
