@@ -62,9 +62,9 @@ locals {
     "${int.device}/${int.vrf}" => int...
   }
 
-  # SSM translations per device and VRF: `igmp.ssm_translates` for the default VRF, `vrfs[].igmp_ssm_translates` otherwise
+  # SSM translations per device and VRF: `igmp.ssm_translates` for the default VRF, `igmp.vrfs[].ssm_translates` otherwise
   igmp_ssm_translates_by_device_vrf = { for device in local.devices : device.name => merge(
-    { for vrf in try(local.device_config[device.name].vrfs, []) : vrf.name => vrf.igmp_ssm_translates if length(try(vrf.igmp_ssm_translates, [])) > 0 },
+    { for vrf in try(local.device_config[device.name].igmp.vrfs, []) : vrf.vrf => vrf.ssm_translates if length(try(vrf.ssm_translates, [])) > 0 },
     length(try(local.device_config[device.name].igmp.ssm_translates, [])) > 0 ? { "default" = local.device_config[device.name].igmp.ssm_translates } : {},
   ) }
 

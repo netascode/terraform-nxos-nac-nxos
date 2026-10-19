@@ -1,0 +1,2 @@
+- Add MSDP support (`routing.msdp` and `routing.msdp.vrfs`) including originator ID, reconnect and SA intervals, flush routes, redistribution, group limits and peers (connect source, remote AS, description, shutdown, keepalive, password, key chain, mesh group, SA limit and SA policies)
+- Add `feature.msdp` feature flag support

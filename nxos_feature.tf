@@ -19,6 +19,7 @@ resource "nxos_feature" "feature" {
   lacp                 = try(local.device_config[each.key].feature.lacp, null) == null ? null : (try(local.device_config[each.key].feature.lacp) ? "enabled" : "disabled")
   lldp                 = try(local.device_config[each.key].feature.lldp, null) == null ? null : (try(local.device_config[each.key].feature.lldp) ? "enabled" : "disabled")
   macsec               = try(local.device_config[each.key].feature.macsec, null) == null ? null : (try(local.device_config[each.key].feature.macsec) ? "enabled" : "disabled")
+  msdp                 = try(local.device_config[each.key].feature.msdp, null) == null ? null : (try(local.device_config[each.key].feature.msdp) ? "enabled" : "disabled")
   netflow              = try(local.device_config[each.key].feature.netflow, null) == null ? null : (try(local.device_config[each.key].feature.netflow) ? "enabled" : "disabled")
   ngmvpn               = try(local.device_config[each.key].feature.ngmvpn, null) == null ? null : (try(local.device_config[each.key].feature.ngmvpn) ? "enabled" : "disabled")
   ngoam                = try(local.device_config[each.key].feature.ngoam, null) == null ? null : (try(local.device_config[each.key].feature.ngoam) ? "enabled" : "disabled")
