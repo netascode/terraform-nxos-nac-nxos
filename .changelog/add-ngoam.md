@@ -1,0 +1,1 @@
+- Add NGOAM (VXLAN OAM) install ACL and loop detection support (`system.ngoam.install_acl`, `loop_detection`, `loop_detection_periodic_probe_interval`, `loop_detection_port_recovery_interval`)

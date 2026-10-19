@@ -369,6 +369,7 @@ resource "nxos_system" "system" {
     length(try(local.device_config[device.name].system.ip_ftp_source_interfaces, [])) > 0 ||
     try(local.ngmvpn_configured[device.name], false) ||
     try(local.device_config[device.name].system.l2rib, null) != null ||
+    try(local.device_config[device.name].system.ngoam, null) != null ||
   length(try(local.device_config[device.name].interfaces.management, [])) > 0 }
   device = each.key
 
@@ -786,6 +787,12 @@ resource "nxos_system" "system" {
   l2rib_duplicate_mac_detection_duration   = try(local.device_config[each.key].system.l2rib.dup_host_mac_detection_duration, null)
   l2rib_duplicate_mac_recovery_timeout     = try(local.device_config[each.key].system.l2rib.dup_host_mac_recovery_timeout, null)
   l2rib_duplicate_mac_recovery_retry_count = try(local.device_config[each.key].system.l2rib.dup_host_mac_recovery_retry_count, null)
+
+  # ngoamInstallAcl / ngoamLoopDetection attributes (CLI: ngoam install acl, ngoam loop-detection)
+  ngoam_install_acl                            = try(local.device_config[each.key].system.ngoam.install_acl, null)
+  ngoam_loop_detection                         = try(local.device_config[each.key].system.ngoam.loop_detection, null)
+  ngoam_loop_detection_periodic_probe_interval = try(local.device_config[each.key].system.ngoam.loop_detection_periodic_probe_interval, null)
+  ngoam_loop_detection_port_recovery_interval  = try(local.device_config[each.key].system.ngoam.loop_detection_port_recovery_interval, null)
 
   depends_on = [
     nxos_cli.cli_pre_9,
