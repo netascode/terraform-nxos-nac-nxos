@@ -1,0 +1,1 @@
+- Add IGMP support including global `igmp` settings, `igmp.ssm_translates`, `vrfs[].igmp_ssm_translates` and interface-level `igmp` configuration (version, querier timers, report policies, state limits, join groups, static groups and static OIFs)

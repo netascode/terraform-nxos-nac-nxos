@@ -41,7 +41,7 @@ module "nxos" {
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.9.0 |
 | <a name="requirement_local"></a> [local](#requirement\_local) | >= 2.7.0, < 3.0.0 |
-| <a name="requirement_nxos"></a> [nxos](#requirement\_nxos) | ~> 0.20.2 |
+| <a name="requirement_nxos"></a> [nxos](#requirement\_nxos) | ~> 0.20.3 |
 | <a name="requirement_utils"></a> [utils](#requirement\_utils) | = 2.1.0-beta1 |
 ## Inputs
 
@@ -101,6 +101,7 @@ No outputs.
 | [nxos_hsrp.hsrp](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/hsrp) | resource |
 | [nxos_icmpv4.icmpv4](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/icmpv4) | resource |
 | [nxos_icmpv6.icmpv6](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/icmpv6) | resource |
+| [nxos_igmp.igmp](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/igmp) | resource |
 | [nxos_igmp_snooping.igmp_snooping](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/igmp_snooping) | resource |
 | [nxos_ipv4.ipv4](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/ipv4) | resource |
 | [nxos_ipv6.ipv6](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/ipv6) | resource |
