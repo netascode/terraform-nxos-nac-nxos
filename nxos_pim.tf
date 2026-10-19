@@ -113,6 +113,7 @@ resource "nxos_pim" "pim" {
   instance_admin_state = null
   evpn_border_leaf     = try(local.device_config[each.key].routing.pim.evpn_border_leaf, null)
   extra_net            = try(local.device_config[each.key].routing.pim.extranet, null)
+  isolate              = try(local.device_config[each.key].routing.pim.isolate, null)
 
   vrfs = merge(
     # Synthetic "default" VRF from process-level attributes

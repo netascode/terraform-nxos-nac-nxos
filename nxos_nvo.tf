@@ -10,6 +10,11 @@ locals {
     "per-flow" = "perFlow"
     "modulo"   = "modulo"
   }
+  evpn_storm_control_name_map = {
+    "broadcast_level" = "bcast"
+    "multicast_level" = "mcast"
+    "unicast_level"   = "ucast"
+  }
 }
 
 resource "nxos_nvo" "nvo" {
@@ -17,6 +22,7 @@ resource "nxos_nvo" "nvo" {
     if try(local.device_config[device.name].system.nv_overlay_vxlan_udp_port, null) != null ||
     try(local.device_config[device.name].system.nv_overlay_vxlan_udp_source_port_mode, null) != null ||
     try(local.device_config[device.name].evpn.multisite_border_gateway, null) != null ||
+    try(local.device_config[device.name].evpn.storm_control, null) != null ||
     try(local.device_config[device.name].evpn.multihoming, null) != null ||
     try(local.device_config[device.name].system.advertise_evpn_multicast, null) != null ||
   try(local.device_config[device.name].interfaces.nve, null) != null }
@@ -33,6 +39,12 @@ resource "nxos_nvo" "nvo" {
   evpn_multisite_border_gateway_df_election_time       = try(local.device_config[each.key].evpn.multisite_border_gateway.df_election_time, null) == null ? null : format("%f", local.device_config[each.key].evpn.multisite_border_gateway.df_election_time)
   evpn_multisite_border_gateway_fabric_advertise_pip   = try(local.device_config[each.key].evpn.multisite_border_gateway.fabric_advertise_pip, null) == null ? null : (try(local.device_config[each.key].evpn.multisite_border_gateway.fabric_advertise_pip) ? "enableL3" : "disable")
   evpn_multisite_border_gateway_split_horizon_per_site = try(local.device_config[each.key].evpn.multisite_border_gateway.split_horizon_per_site, null) == null ? null : (try(local.device_config[each.key].evpn.multisite_border_gateway.split_horizon_per_site) ? "enable" : "disable")
+
+  evpn_storm_controls = anytrue([for attr, name in local.evpn_storm_control_name_map : try(local.device_config[each.key].evpn.storm_control[attr], null) != null]) ? {
+    for attr, name in local.evpn_storm_control_name_map : name => {
+      level = format("%f", local.device_config[each.key].evpn.storm_control[attr])
+    } if try(local.device_config[each.key].evpn.storm_control[attr], null) != null
+  } : null
 
   nve_interfaces = try(local.device_config[each.key].interfaces.nve, null) != null ? { for nve_id in ["1"] : nve_id => {
     admin_state                        = try(local.device_config[each.key].interfaces.nve.shutdown, null) == null ? "enabled" : (try(local.device_config[each.key].interfaces.nve.shutdown) ? "disabled" : "enabled")
