@@ -13,10 +13,13 @@ resource "nxos_nvo" "nvo" {
     if try(local.device_config[device.name].system.nv_overlay_vxlan_udp_port, null) != null ||
     try(local.device_config[device.name].system.nv_overlay_vxlan_udp_source_port_mode, null) != null ||
     try(local.device_config[device.name].evpn.multisite_border_gateway, null) != null ||
+    try(local.device_config[device.name].system.advertise_evpn_multicast, null) != null ||
   try(local.device_config[device.name].interfaces.nve, null) != null }
   device                     = each.key
   vxlan_udp_port             = try(local.device_config[each.key].system.nv_overlay_vxlan_udp_port, null)
   vxlan_udp_source_port_mode = try(local.device_config[each.key].system.nv_overlay_vxlan_udp_source_port_mode, null)
+
+  advertise_evpn_multicast_state = try(local.device_config[each.key].system.advertise_evpn_multicast, null) == true ? "enabled" : null
 
   evpn_multisite_border_gateway_site_id                = try(local.device_config[each.key].evpn.multisite_border_gateway.site_id, null)
   evpn_multisite_border_gateway_state                  = try(local.device_config[each.key].evpn.multisite_border_gateway.site_id, null) != null ? "enabled" : null

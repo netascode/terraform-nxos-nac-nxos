@@ -76,6 +76,7 @@ resource "nxos_bgp" "bgp" {
   isolate                                  = try(local.device_config[each.key].routing.bgp.isolate, null)
   isolate_route_map                        = try(local.device_config[each.key].routing.bgp.isolate_route_map, null)
   med_dampening_interval                   = try(local.device_config[each.key].routing.bgp.med_dampening_interval, null)
+  mvpn_vri_id                              = try(local.device_config[each.key].routing.bgp.mvpn_vri_id, null)
   nexthop_suppress_default_resolution      = try(local.device_config[each.key].routing.bgp.nexthop_suppress_default_resolution, null) == null ? null : (try(local.device_config[each.key].routing.bgp.nexthop_suppress_default_resolution) ? "enabled" : "disabled")
   rd_dual                                  = try(local.device_config[each.key].routing.bgp.rd_dual, null) == null ? null : (try(local.device_config[each.key].routing.bgp.rd_dual) ? "enabled" : "disabled")
   rd_dual_id                               = try(local.device_config[each.key].routing.bgp.rd_dual_id, null)

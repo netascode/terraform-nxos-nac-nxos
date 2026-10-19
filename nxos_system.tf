@@ -291,6 +291,17 @@ locals {
   ])
 
   pvlan_svis_by_device = { for entry in local.pvlan_svis : entry.device => entry... }
+
+  ngmvpn_vrfs_by_device = { for device in local.devices : device.name => [
+    for vrf in try(local.device_config[device.name].vrfs, []) : vrf
+    if try(vrf.mdt_v4_vxlan, null) != null || try(vrf.mdt_v6_vxlan, null) != null
+  ] }
+
+  ngmvpn_configured = { for device in local.devices : device.name =>
+    try(local.device_config[device.name].system.ip_multicast_overlay_distributed_dr, null) != null ||
+    try(local.device_config[device.name].system.ip_multicast_overlay_spt_only, null) != null ||
+    length(try(local.ngmvpn_vrfs_by_device[device.name], [])) > 0
+  }
 }
 
 resource "nxos_system" "system" {
@@ -356,6 +367,7 @@ resource "nxos_system" "system" {
     try(local.device_config[device.name].system.logging_ip_access_list, null) != null ||
     length(try(local.device_config[device.name].system.ip_ssh_source_interfaces, [])) > 0 ||
     length(try(local.device_config[device.name].system.ip_ftp_source_interfaces, [])) > 0 ||
+    try(local.ngmvpn_configured[device.name], false) ||
   length(try(local.device_config[device.name].interfaces.management, [])) > 0 }
   device = each.key
 
@@ -755,6 +767,18 @@ resource "nxos_system" "system" {
   acl_log_interval        = try(local.device_config[each.key].system.logging_ip_access_list.cache_interval, null)
   acl_log_match_log_level = try(local.device_config[each.key].system.acllog_match_log_level, null)
   acl_log_threshold       = try(local.device_config[each.key].system.logging_ip_access_list.cache_threshold, null)
+
+  # ngmvpnEntity/ngmvpnInst attributes (CLI: ip multicast overlay-spt-only, ip multicast overlay-distributed-dr)
+  ngmvpn_admin_state            = try(local.ngmvpn_configured[each.key], false) ? "enabled" : null
+  ngmvpn_instance_admin_state   = try(local.ngmvpn_configured[each.key], false) ? "enabled" : null
+  ngmvpn_overlay_distributed_dr = try(local.device_config[each.key].system.ip_multicast_overlay_distributed_dr, null)
+  ngmvpn_overlay_spt_only       = try(local.device_config[each.key].system.ip_multicast_overlay_spt_only, null)
+
+  # ngmvpnDom nested map (CLI: vrf context <vrf> > vni <vni> l3 > mdt v4|v6 vxlan)
+  ngmvpn_vrfs = length(try(local.ngmvpn_vrfs_by_device[each.key], [])) > 0 ? { for vrf in try(local.ngmvpn_vrfs_by_device[each.key], []) : vrf.name => {
+    mdt_v4_vxlan = try(vrf.mdt_v4_vxlan, null)
+    mdt_v6_vxlan = try(vrf.mdt_v6_vxlan, null)
+  } } : null
 
   depends_on = [
     nxos_cli.cli_pre_9,
