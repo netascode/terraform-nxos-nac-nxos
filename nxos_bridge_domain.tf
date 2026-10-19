@@ -3,17 +3,13 @@ locals {
     "ce"         = "CE"
     "fabricpath" = "FabricPath"
   }
-
-  bridge_domain_vlans_with_config = { for device in local.devices : device.name => [
-    for vlan in try(local.device_config[device.name].vlan.vlans, []) : true
-    if try(vlan.mac_learn, null) != null
-  ] }
 }
 
 resource "nxos_bridge_domain" "bridge_domain" {
   for_each = { for device in local.devices : device.name => device
     if try(local.device_config[device.name].system.interface_vlan_autostate, null) != null ||
-  length(try(local.device_config[device.name].vlan.vlans, [])) > 0 }
+    length(try(local.device_config[device.name].vlan.vlans, [])) > 0 ||
+  length(try(local.device_config[device.name].vlan.configurations, [])) > 0 }
   device        = each.key
   svi_autostate = try(local.device_config[each.key].system.interface_vlan_autostate, null) == null ? null : try(local.device_config[each.key].system.interface_vlan_autostate) ? "enable" : "disable"
   bridge_domains = length(try(local.device_config[each.key].vlan.vlans, [])) > 0 ? { for vlan in try(local.device_config[each.key].vlan.vlans, []) : "vlan-${vlan.id}" => {
@@ -36,9 +32,10 @@ resource "nxos_bridge_domain" "bridge_domain" {
     cross_connect       = try(vlan.cross_connect, null) == null ? null : try(vlan.cross_connect) ? "enable" : "disable"
     isolate             = try(vlan.isolate, null)
   } } : null
-  vlan_configurations = length(try(local.bridge_domain_vlans_with_config[each.key], [])) > 0 ? { for vlan in try(local.device_config[each.key].vlan.vlans, []) : "vlan-${vlan.id}" => {
-    mac_learning = try(vlan.mac_learn, null) == null ? null : try(vlan.mac_learn) ? "enable" : "disable"
-  } if try(vlan.mac_learn, null) != null } : null
+  # Every VLAN configuration is created here, as nxos_igmp_snooping requires the vlan configuration to exist
+  vlan_configurations = length(try(local.device_config[each.key].vlan.configurations, [])) > 0 ? { for config in try(local.device_config[each.key].vlan.configurations, []) : "vlan-${config.id}" => {
+    mac_learning = try(config.mac_learn, null) == null ? null : try(config.mac_learn) ? "enable" : "disable"
+  } } : null
 
   depends_on = [
     nxos_cli.cli_pre_9,
