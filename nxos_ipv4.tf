@@ -276,6 +276,7 @@ resource "nxos_ipv4" "ipv4" {
     nxos_cli.cli_pre_9,
     nxos_feature.feature,
     nxos_loopback_interface.loopback_interface,
+    nxos_management_interface.management_interface,
     nxos_physical_interface.physical_interface,
     nxos_port_channel_interface.port_channel_interface,
     nxos_subinterface.subinterface,

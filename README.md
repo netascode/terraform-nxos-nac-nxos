@@ -110,6 +110,7 @@ No outputs.
 | [nxos_logging.logging](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/logging) | resource |
 | [nxos_loopback_interface.loopback_interface](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/loopback_interface) | resource |
 | [nxos_macsec.macsec](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/macsec) | resource |
+| [nxos_management_interface.management_interface](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/management_interface) | resource |
 | [nxos_msdp.msdp](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/msdp) | resource |
 | [nxos_netflow.netflow](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/netflow) | resource |
 | [nxos_network_qos.network_qos](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/network_qos) | resource |

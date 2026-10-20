@@ -369,8 +369,7 @@ resource "nxos_system" "system" {
     length(try(local.device_config[device.name].system.ip_ftp_source_interfaces, [])) > 0 ||
     try(local.ngmvpn_configured[device.name], false) ||
     try(local.device_config[device.name].system.l2rib, null) != null ||
-    try(local.device_config[device.name].system.ngoam, null) != null ||
-  length(try(local.device_config[device.name].interfaces.management, [])) > 0 }
+  try(local.device_config[device.name].system.ngoam, null) != null }
   device = each.key
 
   # topSystem attributes
@@ -564,18 +563,6 @@ resource "nxos_system" "system" {
       vrf_maximum          = try(vdc.resource_limits.vrf_maximum, null)
       vrf_minimum          = try(vdc.resource_limits.vrf_minimum, null)
     }
-  } } : null
-
-  # mgmtMgmtIf nested map
-  management_interfaces = length(try(local.device_config[each.key].interfaces.management, [])) > 0 ? { for int in try(local.device_config[each.key].interfaces.management, []) : "mgmt${int.id}" => {
-    admin_state      = try(int.shutdown, null) == null ? null : (try(int.shutdown) ? "down" : "up")
-    description      = try(int.description, null)
-    duplex           = try(int.duplex, null)
-    mtu              = try(int.mtu, null)
-    speed            = try(int.speed, null)
-    auto_negotiation = try(int.negotiate_auto, null)
-    snmp_trap_state  = try(int.snmp_trap_link_status, null) == null ? null : (try(int.snmp_trap_link_status) ? "enable" : "disable")
-    vrf_dn           = try(int.vrf, null) != null ? "sys/inst-${try(int.vrf)}" : null
   } } : null
 
   # cdpInst attributes
