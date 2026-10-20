@@ -348,6 +348,7 @@ resource "nxos_system" "system" {
     try(local.device_config[device.name].system.nxapi, null) != null ||
     try(local.device_config[device.name].system.hypershield, null) != null ||
     try(local.device_config[device.name].system.ssh, null) != null ||
+    try(local.device_config[device.name].system.grpc, null) != null ||
     length(try(local.nd_interfaces_by_device[device.name], [])) > 0 ||
     length(try(local.cdp_interfaces_by_device[device.name], [])) > 0 ||
     length(try(local.lldp_interfaces_by_device[device.name], [])) > 0 ||
@@ -703,6 +704,21 @@ resource "nxos_system" "system" {
   ssh_keys = length(try(local.device_config[each.key].system.ssh.keys, [])) > 0 ? { for key in try(local.device_config[each.key].system.ssh.keys, []) : key.type => {
     key_length = try(key.key_length, null)
   } } : null
+
+  # grpcInst attributes (CLI: grpc ...)
+  grpc_certificate             = try(local.device_config[each.key].system.grpc.certificate, null)
+  grpc_client_root_certificate = try(local.device_config[each.key].system.grpc.client_root_certificate, null)
+  grpc_port                    = try(local.device_config[each.key].system.grpc.port, null)
+  grpc_vrf                     = try(local.device_config[each.key].system.grpc.use_vrf, null)
+
+  # grpcGnmi attributes (CLI: grpc gnmi ...)
+  grpc_gnmi_filter_file                  = try(local.device_config[each.key].system.grpc.gnmi_subscription_filter_file, null)
+  grpc_gnmi_filter_md5_hash              = try(local.device_config[each.key].system.grpc.gnmi_subscription_filter_file_md5, null)
+  grpc_gnmi_keepalive_timeout            = try(local.device_config[each.key].system.grpc.gnmi_keepalive_timeout, null)
+  grpc_gnmi_max_concurrent_calls         = try(local.device_config[each.key].system.grpc.gnmi_max_concurrent_calls, null)
+  grpc_gnmi_merge_subscriptions          = try(local.device_config[each.key].system.grpc.gnmi_subscription_merge, null)
+  grpc_gnmi_min_sample_interval          = try(local.device_config[each.key].system.grpc.gnmi_subscription_target_defined_min_interval, null)
+  grpc_gnmi_subscription_query_condition = try(local.device_config[each.key].system.grpc.gnmi_subscription_query_condition, null)
 
   # pvlanPrivateVlan attributes
   pvlan_fex_trunk = try(local.device_config[each.key].system.private_vlan_fex_trunk, null) == null ? null : (try(local.device_config[each.key].system.private_vlan_fex_trunk) ? "enabled" : "disabled")

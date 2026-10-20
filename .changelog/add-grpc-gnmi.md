@@ -1,0 +1,2 @@
+- Add gRPC agent and gNMI support (`system.grpc`) including certificate, client root certificate, port, VRF, keepalive timeout, maximum concurrent calls, subscription filter file, merge, query condition and target-defined minimum interval
+- Add `feature.netconf`, `feature.openconfig` and `feature.restconf` feature flag support
