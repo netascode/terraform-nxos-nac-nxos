@@ -15,7 +15,6 @@ resource "nxos_management_interface" "management_interface" {
 
   depends_on = [
     nxos_cli.cli_pre_9,
-    nxos_system.system,
     nxos_vrf.vrf,
   ]
 }

@@ -197,6 +197,6 @@ resource "nxos_access_list" "access_list" {
     nxos_loopback_interface.loopback_interface,
     nxos_port_channel_interface.port_channel_interface,
     nxos_subinterface.subinterface,
-    nxos_system.system,
+    nxos_management_interface.management_interface,
   ]
 }

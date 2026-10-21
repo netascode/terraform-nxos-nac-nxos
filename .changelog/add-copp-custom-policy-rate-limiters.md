@@ -1,0 +1,2 @@
+- Add custom CoPP support (`qos.control_plane_class_maps`, `qos.control_plane_policy_maps` and `system.control_plane_service_policy_input`), including ACL, exception, redirect and protocol matches, policers, set CoS/DSCP and drop logging
+- Add hardware rate-limiter support (`system.hardware.rate_limiter`), globally and per module

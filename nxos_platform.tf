@@ -1,4 +1,9 @@
 locals {
+  hardware_rate_limiter_global = { for device in local.devices : device.name => anytrue([
+    for attr in ["span_egress", "access_list_log", "bfd", "fex", "layer_3_glean", "layer_3_multicast_local_groups", "sflow", "span", "burst"] :
+    try(local.device_config[device.name].system.hardware.rate_limiter[attr], null) != null
+  ]) }
+
   platform_pc_lb_direction_map = {
     "src-dst" = "srcDst"
     "src"     = "src"
@@ -302,6 +307,52 @@ resource "nxos_platform" "platform" {
       }]...) : null
     }
   } : null
+
+  # platformHwRateLimiter attributes
+  hardware_rate_limiter_arp_rate               = try(local.device_config[each.key].system.hardware.rate_limiter.arp, null)
+  hardware_rate_limiter_arp_burst              = try(local.device_config[each.key].system.hardware.rate_limiter.arp_burst, null)
+  hardware_rate_limiter_bpdu_rate              = try(local.device_config[each.key].system.hardware.rate_limiter.bpdu, null)
+  hardware_rate_limiter_bpdu_burst             = try(local.device_config[each.key].system.hardware.rate_limiter.bpdu_burst, null)
+  hardware_rate_limiter_errors_rate            = try(local.device_config[each.key].system.hardware.rate_limiter.errors, null)
+  hardware_rate_limiter_errors_burst           = try(local.device_config[each.key].system.hardware.rate_limiter.errors_burst, null)
+  hardware_rate_limiter_forward_miss_rate      = try(local.device_config[each.key].system.hardware.rate_limiter.fwd_miss, null)
+  hardware_rate_limiter_forward_miss_burst     = try(local.device_config[each.key].system.hardware.rate_limiter.fwd_miss_burst, null)
+  hardware_rate_limiter_ip_local_rate          = try(local.device_config[each.key].system.hardware.rate_limiter.ip_local, null)
+  hardware_rate_limiter_ip_local_burst         = try(local.device_config[each.key].system.hardware.rate_limiter.ip_local_burst, null)
+  hardware_rate_limiter_mac_learn_rate         = try(local.device_config[each.key].system.hardware.rate_limiter.mac_learned, null)
+  hardware_rate_limiter_mac_learn_burst        = try(local.device_config[each.key].system.hardware.rate_limiter.mac_learned_burst, null)
+  hardware_rate_limiter_mac_local_rate         = try(local.device_config[each.key].system.hardware.rate_limiter.mac_local, null)
+  hardware_rate_limiter_mac_local_burst        = try(local.device_config[each.key].system.hardware.rate_limiter.mac_local_burst, null)
+  hardware_rate_limiter_software_forward_rate  = try(local.device_config[each.key].system.hardware.rate_limiter.sw_fwd, null)
+  hardware_rate_limiter_software_forward_burst = try(local.device_config[each.key].system.hardware.rate_limiter.sw_fwd_burst, null)
+
+  # platformRateLimiterMod nested map, module 0 holds the global rate-limiters
+  hardware_rate_limiters = local.hardware_rate_limiter_global[each.key] || length(try(local.device_config[each.key].system.hardware.rate_limiter.modules, [])) > 0 ? merge(
+    local.hardware_rate_limiter_global[each.key] ? { "0" = {
+      span_egress                    = try(local.device_config[each.key].system.hardware.rate_limiter.span_egress, null)
+      access_list_log                = try(local.device_config[each.key].system.hardware.rate_limiter.access_list_log, null)
+      bfd                            = try(local.device_config[each.key].system.hardware.rate_limiter.bfd, null)
+      fex                            = try(local.device_config[each.key].system.hardware.rate_limiter.fex, null)
+      layer_3_glean                  = try(local.device_config[each.key].system.hardware.rate_limiter.layer_3_glean, null)
+      layer_3_multicast_local_groups = try(local.device_config[each.key].system.hardware.rate_limiter.layer_3_multicast_local_groups, null)
+      sflow                          = try(local.device_config[each.key].system.hardware.rate_limiter.sflow, null)
+      span                           = try(local.device_config[each.key].system.hardware.rate_limiter.span, null)
+      burst                          = try(local.device_config[each.key].system.hardware.rate_limiter.burst, null)
+    } } : {},
+    { for module in try(local.device_config[each.key].system.hardware.rate_limiter.modules, []) : tostring(module.module) => {
+      span_egress                    = try(module.span_egress, null)
+      access_list_log                = try(module.access_list_log, null)
+      bfd                            = try(module.bfd, null)
+      fex                            = try(module.fex, null)
+      layer_3_glean                  = try(module.layer_3_glean, null)
+      layer_3_multicast_local_groups = try(module.layer_3_multicast_local_groups, null)
+      sflow                          = try(module.sflow, null)
+      span                           = try(module.span, null)
+      burst                          = try(module.burst, null)
+      port_start                     = try(module.port_start, null)
+      port_end                       = try(module.port_end, null)
+    } },
+  ) : null
 
   # platformTcamTemplate / platformUdfTcamTemplate nested maps
   tcam_templates = length(try(local.device_config[each.key].system.hardware_profile.tcam_resource_templates, [])) > 0 ? { for template in try(local.device_config[each.key].system.hardware_profile.tcam_resource_templates, []) : template.name => {

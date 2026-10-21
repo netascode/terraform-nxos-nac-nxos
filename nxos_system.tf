@@ -1,4 +1,9 @@
 locals {
+  copp_match_type_map = {
+    "match-any" = "MatchAny"
+    "match-all" = "MatchAll"
+  }
+
   log_event_map = {
     "link-status-default"  = "linkStatusDefault"
     "link-status-enable"   = "linkStatusEnable"
@@ -322,6 +327,9 @@ resource "nxos_system" "system" {
     length(try(local.device_config[device.name].system.cli_aliases, [])) > 0 ||
     try(local.device_config[device.name].system.copp_profile, null) != null ||
     try(local.device_config[device.name].system.copp_rate_limit, null) != null ||
+    try(local.device_config[device.name].system.control_plane_service_policy_input, null) != null ||
+    length(try(local.device_config[device.name].qos.control_plane_class_maps, [])) > 0 ||
+    length(try(local.device_config[device.name].qos.control_plane_policy_maps, [])) > 0 ||
     try(local.device_config[device.name].system.hardware_qos.dynamic_buffer_sharing, null) != null ||
     try(local.device_config[device.name].system.default_reset_dei, null) != null ||
     try(local.device_config[device.name].qos.statistics, null) != null ||
@@ -525,6 +533,69 @@ resource "nxos_system" "system" {
   # coppEntity / coppProfile attributes
   copp_rate_limiter = try(local.device_config[each.key].system.copp_rate_limit, null)
   copp_profile_type = try(local.device_config[each.key].system.copp_profile, null)
+
+  # coppClass nested map
+  copp_class_maps = length(try(local.device_config[each.key].qos.control_plane_class_maps, [])) > 0 ? { for cm in try(local.device_config[each.key].qos.control_plane_class_maps, []) : cm.name => {
+    match_type            = try(local.copp_match_type_map[try(cm.match_type)], null)
+    access_groups         = length(try(cm.match_access_group_names, [])) > 0 ? { for acl in try(cm.match_access_group_names, []) : acl => {} } : null
+    exceptions            = length(try(cm.match_exceptions, [])) > 0 ? { for option in try(cm.match_exceptions, []) : option => {} } : null
+    exception_ip_option   = try(cm.match_exception_ip_option, null)
+    exception_ipv6_option = try(cm.match_exception_ipv6_option, null)
+    exception_ip_icmp     = length(try(cm.match_exception_ip_icmp, [])) > 0 ? { for option in try(cm.match_exception_ip_icmp, []) : option => {} } : null
+    exception_ipv6_icmp   = length(try(cm.match_exception_ipv6_icmp, [])) > 0 ? { for option in try(cm.match_exception_ipv6_icmp, []) : option => {} } : null
+    exception_multicast   = length(try(cm.match_exception_multicast, [])) > 0 ? { for option in try(cm.match_exception_multicast, []) : option => {} } : null
+    protocols = anytrue([
+      try(cm.match_protocol_arp, false),
+      try(cm.match_protocol_mpls, false),
+      try(cm.match_protocol_mpls_router_alert, false),
+      try(cm.match_protocol_mpls_exp, null) != null,
+      ]) ? merge(
+      try(cm.match_protocol_arp, false) ? { "arp" = {} } : {},
+      try(cm.match_protocol_mpls, false) || (try(cm.match_protocol_mpls_exp, null) != null && try(cm.match_protocol_mpls_exp, null) != 6) ? { "mpls" = {
+        mpls_exp = try(cm.match_protocol_mpls_exp, null) != 6 ? try(cm.match_protocol_mpls_exp, null) : null
+      } } : {},
+      try(cm.match_protocol_mpls_router_alert, false) ? { "mplsralert" = {} } : {},
+      try(cm.match_protocol_mpls_exp, null) == 6 ? { "mplsexp6" = {} } : {},
+    ) : null
+    redirect = try(cm.match_redirect, null)
+  } } : null
+
+  # coppPolicy nested map
+  copp_policy_maps = length(try(local.device_config[each.key].qos.control_plane_policy_maps, [])) > 0 ? { for pm in try(local.device_config[each.key].qos.control_plane_policy_maps, []) : pm.name => {
+    classes = length(try(pm.classes, [])) > 0 ? { for class in try(pm.classes, []) : class.name => {
+      insert_before = try(class.insert_before, null)
+      police = try(class.police.cir_rate, null) != null && try(class.police.pir_rate, null) == null ? {
+        "${class.police.cir_rate};${try(class.police.cir_unit, "pps")};${try(class.police.bc_rate, 16)};${try(class.police.bc_unit, "packets")}" = {
+          conform_action = try(class.police.conform_action, null)
+          violate_action = try(class.police.violate_action, null)
+        }
+      } : null
+      two_rate_police_cir_rate       = try(class.police.pir_rate, null) != null ? try(class.police.cir_rate, null) : null
+      two_rate_police_bc_rate        = try(class.police.pir_rate, null) != null ? try(class.police.bc_rate, null) : null
+      two_rate_police_bc_unit        = try(class.police.pir_rate, null) != null ? try(class.police.bc_unit, null) : null
+      two_rate_police_pir_rate       = try(class.police.pir_rate, null)
+      two_rate_police_be_rate        = try(class.police.pir_rate, null) != null ? try(class.police.be_rate, null) : null
+      two_rate_police_be_unit        = try(class.police.pir_rate, null) != null ? try(class.police.be_unit, null) : null
+      two_rate_police_conform_action = try(class.police.pir_rate, null) != null ? try(class.police.conform_action, null) : null
+      two_rate_police_exceed_action  = try(class.police.pir_rate, null) != null ? try(class.police.exceed_action, null) : null
+      two_rate_police_violate_action = try(class.police.pir_rate, null) != null ? try(class.police.violate_action, null) : null
+      set_cos = try(class.set_cos, null) != null ? {
+        (tostring(class.set_cos)) = {
+          inner = try(class.set_cos_inner, null)
+        }
+      } : null
+      set_dscp        = try(class.set_dscp, null)
+      set_dscp_tunnel = try(class.set_dscp_tunnel, null)
+      logging_drop = try(class.logging_drop_threshold, null) != null ? {
+        "${class.logging_drop_threshold};${try(class.logging_drop_level, 1)}" = {}
+      } : null
+    } } : null
+  } } : null
+
+  # coppService nested map
+  copp_service_policies = try(local.device_config[each.key].system.control_plane_service_policy_input, null) != null ? {
+    (try(local.device_config[each.key].system.control_plane_service_policy_input)) = {}
+  } : null
 
   # ipqosEntity attributes
   qos_dynamic_buffer_sharing = try(local.device_config[each.key].system.hardware_qos.dynamic_buffer_sharing, null)
@@ -799,6 +870,7 @@ resource "nxos_system" "system" {
 
   depends_on = [
     nxos_cli.cli_pre_9,
+    nxos_access_list.access_list,
     nxos_feature.feature,
     nxos_loopback_interface.loopback_interface,
     nxos_physical_interface.physical_interface,

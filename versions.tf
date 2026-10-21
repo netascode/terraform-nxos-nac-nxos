@@ -4,7 +4,7 @@ terraform {
   required_providers {
     nxos = {
       source  = "CiscoDevNet/nxos"
-      version = "~> 0.21.1"
+      version = "~> 0.21.2"
     }
     utils = {
       source  = "netascode/utils"
