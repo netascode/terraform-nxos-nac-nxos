@@ -1,0 +1,1 @@
+- Add crypto key pairs (`crypto.keys`) and CA trustpoints (`crypto.ca_trustpoints`)

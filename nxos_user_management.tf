@@ -3,6 +3,11 @@ locals {
     "config-commands" = "config"
     "commands"        = "exec"
   }
+
+  crypto_key_type_map = {
+    "rsa" = "Type_RSA"
+    "ecc" = "Type_ECC"
+  }
 }
 
 resource "nxos_user_management" "user_management" {
@@ -13,7 +18,9 @@ resource "nxos_user_management" "user_management" {
     try(local.device_config[device.name].aaa.tacacs, null) != null ||
     try(local.device_config[device.name].aaa.authentication, null) != null ||
     length(try(local.device_config[device.name].aaa.authorization, [])) > 0 ||
-  try(local.device_config[device.name].aaa.accounting, null) != null }
+    try(local.device_config[device.name].aaa.accounting, null) != null ||
+    length(try(local.device_config[device.name].crypto.keys, [])) > 0 ||
+  length(try(local.device_config[device.name].crypto.ca_trustpoints, [])) > 0 }
   device = each.key
 
   # Top-level attributes (aaaUserEp) — data model path: users
@@ -189,6 +196,23 @@ resource "nxos_user_management" "user_management" {
   default_accounting_provider_group_6 = try(local.device_config[each.key].aaa.accounting.groups[5], null)
   default_accounting_provider_group_7 = try(local.device_config[each.key].aaa.accounting.groups[6], null)
   default_accounting_provider_group_8 = try(local.device_config[each.key].aaa.accounting.groups[7], null)
+
+  # PKI key pairs (pkiKeyRing) — data model path: crypto.keys
+  pki_key_pairs = length(try(local.device_config[each.key].crypto.keys, [])) > 0 ? { for key in try(local.device_config[each.key].crypto.keys, []) : key.label => {
+    key_type   = try(local.crypto_key_type_map[key.type], null)
+    modulus    = try(key.modulus, null) != null ? "mod${key.modulus}" : null
+    exportable = try(key.exportable, null)
+  } } : null
+
+  # PKI trustpoints (pkiTP) — data model path: crypto.ca_trustpoints
+  pki_trustpoints = length(try(local.device_config[each.key].crypto.ca_trustpoints, [])) > 0 ? { for tp in try(local.device_config[each.key].crypto.ca_trustpoints, []) : tp.name => {
+    enrollment_type  = try(tp.enrollment_terminal, null) == null ? null : (try(tp.enrollment_terminal) ? "terminal" : "none")
+    key_pair         = try(tp.rsakeypair, null) != null ? tp.rsakeypair : try(tp.ecckeypair, null)
+    key_type         = try(tp.rsakeypair, null) != null ? "Type_RSA" : try(tp.ecckeypair, null) != null ? "Type_ECC" : null
+    ca_bundle        = try(tp.cabundle, null)
+    revocation_check = length(try(tp.revocation_check, [])) > 0 ? join("-", tp.revocation_check) : null
+    ocsp_url         = try(tp.ocsp_url, null)
+  } } : null
 
   depends_on = [
     nxos_cli.cli_pre_9,
