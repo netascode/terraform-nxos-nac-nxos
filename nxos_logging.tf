@@ -76,6 +76,9 @@ resource "nxos_logging" "logging" {
   origin_id_type  = try(local.device_config[each.key].logging.origin_id_type, null)
   origin_id_value = try(local.device_config[each.key].logging.origin_id_value, null)
 
+  # syslogLoggingRateLimit
+  rate_limit = try(local.device_config[each.key].logging.rate_limit, null) == null ? null : (try(local.device_config[each.key].logging.rate_limit) ? "enabled" : "disabled")
+
   depends_on = [
     nxos_cli.cli_pre_9,
     nxos_feature.feature,

@@ -1,0 +1,2 @@
+- Add `logging.rate_limit` support
+- Allow any facility name in `logging.facilities`
