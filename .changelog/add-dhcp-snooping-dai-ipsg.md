@@ -1,0 +1,2 @@
+- Add DHCP snooping VLANs (`dhcp.ip_dhcp_snooping.vlans`), IP Source Guard excluded VLANs (`dhcp.ip_dhcp_snooping.ipsg_excluded_vlans`), static IP source bindings (`dhcp.ip_source_bindings`) and Dynamic ARP Inspection VLANs (`arp.inspection.vlans`)
+- Add DHCP snooping trust, Dynamic ARP Inspection trust and IP Source Guard configuration to Ethernet and port-channel interfaces (`interfaces.*.ip.dhcp_snooping_trust`, `interfaces.*.ip.arp_inspection_trust`, `interfaces.*.ip.verify_source_dhcp_snooping_vlan`)

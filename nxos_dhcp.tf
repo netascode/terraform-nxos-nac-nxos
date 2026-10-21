@@ -13,6 +13,40 @@ locals {
       ipv6_addresses        = length(try(item.ipv6_dhcp_relay_addresses, [])) > 0 ? { for addr in item.ipv6_dhcp_relay_addresses : "${try(addr.vrf, "!unspecified")};${addr.address};unspecified" => {} } : null
     } if item.device == device.name }
   }
+  dhcp_l2_interfaces = { for device in local.devices : device.name => concat(
+    [for int in try(local.device_config[device.name].interfaces.ethernets, []) : {
+      interface_id                     = "eth${int.id}"
+      dhcp_snooping_trust              = try(int.ip.dhcp_snooping_trust, null)
+      arp_inspection_trust             = try(int.ip.arp_inspection_trust, null)
+      verify_source_dhcp_snooping_vlan = try(int.ip.verify_source_dhcp_snooping_vlan, null)
+    }],
+    [for int in try(local.device_config[device.name].interfaces.port_channels, []) : {
+      interface_id                     = "po${int.id}"
+      dhcp_snooping_trust              = try(int.ip.dhcp_snooping_trust, null)
+      arp_inspection_trust             = try(int.ip.arp_inspection_trust, null)
+      verify_source_dhcp_snooping_vlan = try(int.ip.verify_source_dhcp_snooping_vlan, null)
+    }],
+  ) }
+  dhcp_snooping_interfaces_map = { for device in local.devices : device.name =>
+    { for int in local.dhcp_l2_interfaces[device.name] : int.interface_id => {
+      trust = int.dhcp_snooping_trust
+    } if int.dhcp_snooping_trust != null }
+  }
+  dhcp_dai_interfaces_map = { for device in local.devices : device.name =>
+    { for int in local.dhcp_l2_interfaces[device.name] : int.interface_id => {
+      trust = int.arp_inspection_trust
+    } if int.arp_inspection_trust != null }
+  }
+  dhcp_ip_source_guard_interfaces_map = { for device in local.devices : device.name =>
+    { for int in local.dhcp_l2_interfaces[device.name] : int.interface_id => {
+      ip_source_guard = int.verify_source_dhcp_snooping_vlan
+    } if int.verify_source_dhcp_snooping_vlan != null }
+  }
+  dai_log_type_map = {
+    "permit" = "permit"
+    "all"    = "all"
+    "none"   = "inone"
+  }
   dhcp_relay_interfaces = flatten([
     for device in local.devices : concat(
       [for int in try(local.device_config[device.name].interfaces.ethernets, []) : {
@@ -123,7 +157,10 @@ resource "nxos_dhcp" "dhcp" {
   for_each = { for device in local.devices : device.name => device
     if try(local.device_config[device.name].dhcp, null) != null ||
     try(local.device_config[device.name].arp.inspection, null) != null ||
-  length(local.dhcp_relay_interfaces_map[device.name]) > 0 }
+    length(local.dhcp_relay_interfaces_map[device.name]) > 0 ||
+    length(local.dhcp_snooping_interfaces_map[device.name]) > 0 ||
+    length(local.dhcp_dai_interfaces_map[device.name]) > 0 ||
+  length(local.dhcp_ip_source_guard_interfaces_map[device.name]) > 0 }
   device                                      = each.key
   admin_state                                 = null
   relay_information_option                    = try(local.device_config[each.key].dhcp.ip_dhcp_relay.information_option, null)
@@ -158,6 +195,27 @@ resource "nxos_dhcp" "dhcp" {
   dai_validate_ip                             = try(local.device_config[each.key].arp.inspection.validate_ip, null)
   dai_validate_source                         = try(local.device_config[each.key].arp.inspection.validate_src_mac, null)
   relay_interfaces                            = length(local.dhcp_relay_interfaces_map[each.key]) > 0 ? local.dhcp_relay_interfaces_map[each.key] : null
+  snooping_vlans = length(try(local.device_config[each.key].dhcp.ip_dhcp_snooping.vlans, [])) > 0 ? merge([for group in try(local.device_config[each.key].dhcp.ip_dhcp_snooping.vlans, []) : {
+    for vlan_id in try(provider::utils::normalize_vlans(group.vlans, "list"), []) :
+    tostring(vlan_id) => {
+      evpn = try(group.evpn, null)
+    }
+  }]...) : null
+  snooping_interfaces = length(local.dhcp_snooping_interfaces_map[each.key]) > 0 ? local.dhcp_snooping_interfaces_map[each.key] : null
+  dai_vlans = length(try(local.device_config[each.key].arp.inspection.vlans, [])) > 0 ? merge([for group in try(local.device_config[each.key].arp.inspection.vlans, []) : {
+    for vlan_id in try(provider::utils::normalize_vlans(group.vlans, "list"), []) :
+    tostring(vlan_id) => {
+      log_type = try(local.dai_log_type_map[group.logging_dhcp_bindings], null)
+    }
+  }]...) : null
+  dai_interfaces             = length(local.dhcp_dai_interfaces_map[each.key]) > 0 ? local.dhcp_dai_interfaces_map[each.key] : null
+  ip_source_guard_interfaces = length(local.dhcp_ip_source_guard_interfaces_map[each.key]) > 0 ? local.dhcp_ip_source_guard_interfaces_map[each.key] : null
+  ip_source_guard_excluded_vlans = length(try(provider::utils::normalize_vlans(local.device_config[each.key].dhcp.ip_dhcp_snooping.ipsg_excluded_vlans, "list"), [])) > 0 ? {
+    for vlan_id in provider::utils::normalize_vlans(local.device_config[each.key].dhcp.ip_dhcp_snooping.ipsg_excluded_vlans, "list") : tostring(vlan_id) => {}
+  } : null
+  ip_source_bindings = length(try(local.device_config[each.key].dhcp.ip_source_bindings, [])) > 0 ? { for binding in try(local.device_config[each.key].dhcp.ip_source_bindings, []) :
+    "${binding.ip};${binding.vlan};${upper(join(":", regexall("[0-9A-Fa-f]{2}", replace(binding.mac, "/[^0-9A-Fa-f]/", ""))))};${local.intf_prefix_map[binding.interface_type]}${binding.interface_id}" => {}
+  } : null
 
   depends_on = [
     nxos_cli.cli_pre_9,
