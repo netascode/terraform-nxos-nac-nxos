@@ -1,0 +1,1 @@
+- Add RBAC roles (`aaa.roles`) with rules and VLAN, interface and VRF policies, and role feature groups (`aaa.role_feature_groups`)

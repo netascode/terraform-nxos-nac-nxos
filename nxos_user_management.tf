@@ -55,6 +55,44 @@ resource "nxos_user_management" "user_management" {
     } } : null
   } } : null
 
+  # Role feature groups (aaaRoleFeatureGroup) — data model path: aaa.role_feature_groups
+  role_feature_groups = length(try(local.device_config[each.key].aaa.role_feature_groups, [])) > 0 ? { for group in try(local.device_config[each.key].aaa.role_feature_groups, []) : group.name => {
+    # Features (aaaFeatureName) — data model path: aaa.role_feature_groups.features
+    features = length(try(group.features, [])) > 0 ? { for feature in try(group.features, []) : feature => {
+    } } : null
+  } } : null
+
+  # Roles (aaaRole) — data model path: aaa.roles
+  roles = length(try(local.device_config[each.key].aaa.roles, [])) > 0 ? { for role in try(local.device_config[each.key].aaa.roles, []) : role.name => {
+    description    = try(role.description, null)
+    deny_interface = try(role.interface_policy.deny, null) == null ? null : (try(role.interface_policy.deny) ? "yes" : "no")
+    deny_vlan      = try(role.vlan_policy.deny, null) == null ? null : (try(role.vlan_policy.deny) ? "yes" : "no")
+    deny_vrf       = try(role.vrf_policy.deny, null) == null ? null : (try(role.vrf_policy.deny) ? "yes" : "no")
+
+    # Role rules (aaaRoleRule) — data model path: aaa.roles.rules
+    rules = length(try(role.rules, [])) > 0 ? { for rule in try(role.rules, []) : rule.number => {
+      permission = try(rule.action, null)
+      access     = try(rule.command, null) != null ? "command" : try(rule.permission, null)
+      command    = try(rule.command, null)
+      scope      = try(rule.feature, null) != null ? "feature" : try(rule.feature_group, null) != null ? "feature-group" : try(rule.oid, null) != null ? "oid" : null
+      scope_name = try(rule.feature, null) != null ? rule.feature : try(rule.feature_group, null) != null ? rule.feature_group : try(rule.oid, null)
+    } } : null
+
+    # Permitted VLANs (aaaPermitVlan) — data model path: aaa.roles.vlan_policy.permit_vlans, one object per VLAN
+    permitted_vlans = length(try(role.vlan_policy.permit_vlans.ids, [])) > 0 || length(try(role.vlan_policy.permit_vlans.ranges, [])) > 0 ? { for vlan in distinct(concat(
+      try(role.vlan_policy.permit_vlans.ids, []),
+      flatten([for range in try(role.vlan_policy.permit_vlans.ranges, []) : range(range.from, range.to + 1)]),
+    )) : "vlan-${vlan}" => {} } : null
+
+    # Permitted interfaces (aaaPermitIntf) — data model path: aaa.roles.interface_policy.permit_interfaces
+    permitted_interfaces = length(try(role.interface_policy.permit_interfaces, [])) > 0 ? { for intf in try(role.interface_policy.permit_interfaces, []) : "${local.intf_prefix_map[intf.interface_type]}${intf.interface_id}" => {
+    } } : null
+
+    # Permitted VRFs (aaaPermitVrf) — data model path: aaa.roles.vrf_policy.permit_vrfs
+    permitted_vrfs = length(try(role.vrf_policy.permit_vrfs, [])) > 0 ? { for vrf in try(role.vrf_policy.permit_vrfs, []) : vrf => {
+    } } : null
+  } } : null
+
   # TACACS+ (aaaTacacsPlusEp) — data model path: tacacs
   tacacs_deadtime         = try(local.device_config[each.key].aaa.tacacs.deadtime, null)
   tacacs_key              = try(local.device_config[each.key].aaa.tacacs.key, null)
