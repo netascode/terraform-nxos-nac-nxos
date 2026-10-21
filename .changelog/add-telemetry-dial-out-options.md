@@ -1,0 +1,2 @@
+- Add telemetry certificate, destination profile compression, source interface, retry size, node ID and gRPC deadline (`telemetry.certificate_*`, `telemetry.destination_profile_*`)
+- Add telemetry destination group certificate, VRF, compression, source interface, chunking size and maximum message size (`telemetry.destination_groups`)
