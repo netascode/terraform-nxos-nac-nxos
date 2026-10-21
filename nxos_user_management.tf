@@ -49,6 +49,7 @@ resource "nxos_user_management" "user_management" {
     password                 = try(user.password, null)
     password_encryption_type = try(user.password_encryption_type, null)
     shell_type               = try(user.shelltype, null) == null ? null : (try(user.shelltype) == "bash" ? "shellbash" : "shellvsh")
+    ssh_key                  = try(user.sshkey, null)
 
     # User roles (aaaUserRole via aaaUserDomain) — data model path: users.accounts.roles
     roles = length(try(user.roles, [])) > 0 ? { for role in try(user.roles, []) : role.name => {
