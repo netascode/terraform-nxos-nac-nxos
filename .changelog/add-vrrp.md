@@ -1,0 +1,4 @@
+- Add VRRP support (`interfaces.*.vrrp_groups`) including primary and secondary addresses, priority with forwarding thresholds, preemption, advertisement interval, text authentication, BFD, and interface and object tracking
+- Add VRRPv3 support (`interfaces.*.vrrpv3_groups`) for IPv4 and IPv6 including primary and secondary addresses, priority, preemption with delay, advertisement timers, VRRPv2 compatibility, address matching, object tracking and VRRS leaders
+- Add VRRS pathways (`interfaces.*.vrrs_pathways`) and FHRP interface delays (`interfaces.*.fhrp_delay_minimum`, `interfaces.*.fhrp_delay_reload`)
+- Add `feature.vrrp` and `feature.vrrpv3` feature flag support

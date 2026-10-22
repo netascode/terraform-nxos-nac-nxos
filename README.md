@@ -141,6 +141,8 @@ No outputs.
 | [nxos_user_management.user_management](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/user_management) | resource |
 | [nxos_vpc.vpc](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/vpc) | resource |
 | [nxos_vrf.vrf](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/vrf) | resource |
+| [nxos_vrrp.vrrp](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/vrrp) | resource |
+| [nxos_vrrpv3.vrrpv3](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/vrrpv3) | resource |
 | [nxos_vtp.vtp](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/vtp) | resource |
 ## Modules
 
