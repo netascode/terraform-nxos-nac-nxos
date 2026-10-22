@@ -1,0 +1,1 @@
+- Add `feature.dot1x`, `feature.nat`, `feature.port_security`, `feature.scheduler` and `feature.tunnel` feature flag support
