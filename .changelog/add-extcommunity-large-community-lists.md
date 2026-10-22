@@ -1,0 +1,5 @@
+- BREAKING CHANGE: Rename `community_lists` to `ip_community_lists` to align with the CLI (`ip community-list`)
+- Add IP extcommunity lists (`ip_extcommunity_lists`) with route target, site-of-origin, 4-byte AS generic and RMAC entries
+- Add IP large community lists (`ip_large_community_lists`)
+- Add route map match clauses `match_extcommunities`, `match_extcommunity_exact_match`, `match_large_communities` and `match_large_community_exact_match`
+- Add route map set clauses for 4-byte AS generic extended communities, extended community cost, color, bandwidth and EVPN RMAC (`set_extcommunity_*`), `set_extcomm_list`, large communities (`set_large_communities`, `set_large_community_additive`, `set_large_community_none`) and `set_large_community_list`

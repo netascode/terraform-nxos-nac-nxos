@@ -67,7 +67,9 @@ resource "nxos_route_policy" "route_policy" {
     if length(try(local.device_config[device.name].ip_prefix_lists, [])) > 0 ||
     length(try(local.device_config[device.name].ipv6_prefix_lists, [])) > 0 ||
     length(try(local.device_config[device.name].route_maps, [])) > 0 ||
-    length(try(local.device_config[device.name].community_lists, [])) > 0 ||
+    length(try(local.device_config[device.name].ip_community_lists, [])) > 0 ||
+    length(try(local.device_config[device.name].ip_extcommunity_lists, [])) > 0 ||
+    length(try(local.device_config[device.name].ip_large_community_lists, [])) > 0 ||
     length(try(local.device_config[device.name].ip_as_path_access_lists, [])) > 0 ||
     length(local.rp_ipv4_policy_interfaces_map[device.name]) > 0 ||
   length(local.rp_ipv6_policy_interfaces_map[device.name]) > 0 }
@@ -161,6 +163,40 @@ resource "nxos_route_policy" "route_policy" {
         "transitive;${can(regex("\\.", rt)) ? "route-target:ipv4-nn2:${rt}" : (tonumber(split(":", rt)[0]) <= 65535 ? "route-target:as2-nn2:${rt}" : "route-target:as4-nn2:${rt}")}" => {}
       } : null
 
+      set_extended_community_additive     = anytrue([length(try(entry.set_extcommunity_4byteas_generic_transitives, [])) > 0, length(try(entry.set_extcommunity_4byteas_generic_non_transitives, [])) > 0, try(entry.set_extcommunity_4byteas_generic_additive, null) != null, try(entry.set_extcommunity_4byteas_generic_none, null) != null]) ? (try(entry.set_extcommunity_4byteas_generic_additive, false) ? "enabled" : "disabled") : null
+      set_extended_community_no_community = anytrue([length(try(entry.set_extcommunity_4byteas_generic_transitives, [])) > 0, length(try(entry.set_extcommunity_4byteas_generic_non_transitives, [])) > 0, try(entry.set_extcommunity_4byteas_generic_additive, null) != null, try(entry.set_extcommunity_4byteas_generic_none, null) != null]) ? (try(entry.set_extcommunity_4byteas_generic_none, false) ? "enabled" : "disabled") : null
+      set_extended_community_scope        = anytrue([length(try(entry.set_extcommunity_4byteas_generic_transitives, [])) > 0, length(try(entry.set_extcommunity_4byteas_generic_non_transitives, [])) > 0, try(entry.set_extcommunity_4byteas_generic_additive, null) != null, try(entry.set_extcommunity_4byteas_generic_none, null) != null]) ? "transitive" : null
+      set_extended_community_criteria     = anytrue([length(try(entry.set_extcommunity_4byteas_generic_transitives, [])) > 0, length(try(entry.set_extcommunity_4byteas_generic_non_transitives, [])) > 0, try(entry.set_extcommunity_4byteas_generic_additive, null) != null, try(entry.set_extcommunity_4byteas_generic_none, null) != null]) ? "none" : null
+
+      set_extended_community_items = length(concat(try(entry.set_extcommunity_4byteas_generic_transitives, []), try(entry.set_extcommunity_4byteas_generic_non_transitives, []))) > 0 ? merge(
+        { for c in try(entry.set_extcommunity_4byteas_generic_transitives, []) : "transitive;${can(regex("^[0-9]+:[0-9]+$", c)) ? (tonumber(split(":", c)[0]) <= 65535 ? "extended:as2-nn2:${c}" : "extended:as4-nn2:${c}") : c}" => {} },
+        { for c in try(entry.set_extcommunity_4byteas_generic_non_transitives, []) : "non-transitive;${can(regex("^[0-9]+:[0-9]+$", c)) ? (tonumber(split(":", c)[0]) <= 65535 ? "extended:as2-nn2:${c}" : "extended:as4-nn2:${c}") : c}" => {} },
+      ) : null
+
+      set_extended_community_costs = length(try(entry.set_extcommunity_costs, [])) > 0 ? { for cost in try(entry.set_extcommunity_costs, []) : "${try(cost.pre_bestpath, false) ? "pre-bestpath" : "igp"};${cost.community_id}" => {
+        cost     = try(cost.cost, null)
+        criteria = "none"
+      } } : null
+
+      set_extended_community_color           = try(entry.set_extcommunity_color, null)
+      set_extended_community_color_only_flag = try(entry.set_extcommunity_color, null) != null ? try(entry.set_extcommunity_color_co_flag, null) : null
+      set_extended_community_bandwidth       = try(entry.set_extcommunity_bandwidth, null)
+      set_extended_community_rmac            = try(entry.set_extcommunity_evpn_rmac, null) != null ? join(":", regexall("..", lower(replace(try(entry.set_extcommunity_evpn_rmac), "/[.:-]/", "")))) : null
+
+      set_extended_community_list_name     = try(entry.set_extcomm_list, null)
+      set_extended_community_list_delete   = try(entry.set_extcomm_list, null) != null ? "enabled" : null
+      set_extended_community_list_criteria = try(entry.set_extcomm_list, null) != null ? "none" : null
+
+      set_large_community_additive     = anytrue([length(try(entry.set_large_communities, [])) > 0, try(entry.set_large_community_additive, null) != null, try(entry.set_large_community_none, null) != null]) ? (try(entry.set_large_community_additive, false) ? "enabled" : "disabled") : null
+      set_large_community_no_community = anytrue([length(try(entry.set_large_communities, [])) > 0, try(entry.set_large_community_additive, null) != null, try(entry.set_large_community_none, null) != null]) ? (try(entry.set_large_community_none, false) ? "enabled" : "disabled") : null
+
+      set_large_community_items = length(try(entry.set_large_communities, [])) > 0 ? {
+        for c in try(entry.set_large_communities, []) : can(regex("^[0-9]+:[0-9]+:[0-9]+$", c)) ? "large:xx-yy-zz:${c}" : c => {}
+      } : null
+
+      set_large_community_list_name   = try(entry.set_large_community_list, null)
+      set_large_community_list_delete = try(entry.set_large_community_list, null) != null ? "enabled" : null
+
       set_as_path_prepend         = length(try(entry.set_as_path_prepend, [])) > 0 ? join(" ", [for asn in try(entry.set_as_path_prepend, []) : tostring(asn)]) : null
       set_as_path_prepend_last_as = try(entry.set_as_path_prepend_last_as, null)
       set_origin                  = try(entry.set_origin, null)
@@ -220,10 +256,22 @@ resource "nxos_route_policy" "route_policy" {
       match_regular_community_lists = try(entry.match_community, null) != null ? {
         "sys/rpm/rtregcom-[${try(entry.match_community)}]" = {}
       } : null
+
+      match_extended_community_criteria = length(try(entry.match_extcommunities, [])) > 0 ? (try(entry.match_extcommunity_exact_match, false) ? "exact" : "sub-group") : null
+
+      match_extended_community_lists = length(try(entry.match_extcommunities, [])) > 0 ? {
+        for name in try(entry.match_extcommunities, []) : "sys/rpm/rtextcom-[${name}]" => {}
+      } : null
+
+      match_large_community_criteria = length(try(entry.match_large_communities, [])) > 0 ? (try(entry.match_large_community_exact_match, false) ? "exact" : "sub-group") : null
+
+      match_large_community_lists = length(try(entry.match_large_communities, [])) > 0 ? {
+        for name in try(entry.match_large_communities, []) : "sys/rpm/rtlargecom-[${name}]" => {}
+      } : null
     } } : null
   } } : null
 
-  community_lists = length(try(local.device_config[each.key].community_lists, [])) > 0 ? { for cl in try(local.device_config[each.key].community_lists, []) : cl.name => {
+  community_lists = length(try(local.device_config[each.key].ip_community_lists, [])) > 0 ? { for cl in try(local.device_config[each.key].ip_community_lists, []) : cl.name => {
     mode = try(local.community_list_mode_map[try(cl.mode)], null)
 
     entries = length(try(cl.entries, [])) > 0 ? { for entry in try(cl.entries, []) : entry.seq => {
@@ -237,6 +285,35 @@ resource "nxos_route_policy" "route_policy" {
             tonumber(split(":", community)[0]) <= 65535 ? "regular:as2-nn2:${community}" : "regular:as4-nn2:${community}"
           ) : community
         ) => {}
+      } : null
+    } } : null
+  } } : null
+
+  extended_community_lists = length(try(local.device_config[each.key].ip_extcommunity_lists, [])) > 0 ? { for cl in try(local.device_config[each.key].ip_extcommunity_lists, []) : cl.name => {
+    mode = try(local.community_list_mode_map[try(cl.mode)], null)
+
+    entries = length(try(cl.entries, [])) > 0 ? { for entry in try(cl.entries, []) : entry.seq => {
+      action = try(entry.action, null)
+      regex  = try(entry.regex, null)
+
+      items = length(concat(try(entry.rts, []), try(entry.soos, []), try(entry["4byteas_generic_transitives"], []), try(entry["4byteas_generic_non_transitives"], []))) > 0 ? merge(
+        { for c in try(entry.rts, []) : "transitive;${can(regex("^[0-9]+:[0-9]+$", c)) ? (tonumber(split(":", c)[0]) <= 65535 ? "route-target:as2-nn2:${c}" : "route-target:as4-nn2:${c}") : (can(regex("^[0-9.]+:[0-9]+$", c)) ? "route-target:ipv4-nn2:${c}" : c)}" => { type = "rttarget" } },
+        { for c in try(entry.soos, []) : "transitive;${can(regex("^[0-9]+:[0-9]+$", c)) ? (tonumber(split(":", c)[0]) <= 65535 ? "soo:as2-nn2:${c}" : "soo:as4-nn2:${c}") : (can(regex("^[0-9.]+:[0-9]+$", c)) ? "soo:ipv4-nn2:${c}" : c)}" => { type = "soo" } },
+        { for c in try(entry["4byteas_generic_transitives"], []) : "transitive;${can(regex("^[0-9]+:[0-9]+$", c)) ? (tonumber(split(":", c)[0]) <= 65535 ? "extended:as2-nn2:${c}" : "extended:as4-nn2:${c}") : c}" => { type = "generic" } },
+        { for c in try(entry["4byteas_generic_non_transitives"], []) : "non-transitive;${can(regex("^[0-9]+:[0-9]+$", c)) ? (tonumber(split(":", c)[0]) <= 65535 ? "extended:as2-nn2:${c}" : "extended:as4-nn2:${c}") : c}" => { type = "generic" } },
+      ) : null
+
+      rmacs = length(try(entry.rmacs, [])) > 0 ? { for m in try(entry.rmacs, []) : join(":", regexall("..", lower(replace(m, "/[.:-]/", "")))) => {} } : null
+    } } : null
+  } } : null
+
+  large_community_lists = length(try(local.device_config[each.key].ip_large_community_lists, [])) > 0 ? { for cl in try(local.device_config[each.key].ip_large_community_lists, []) : cl.name => {
+    entries = length(try(cl.entries, [])) > 0 ? { for entry in try(cl.entries, []) : entry.seq => {
+      action = try(entry.action, null)
+      regex  = try(entry.regex, null)
+
+      items = length(try(entry.communities, [])) > 0 ? {
+        for c in try(entry.communities, []) : can(regex("^[0-9]+:[0-9]+:[0-9]+$", c)) ? "large:xx-yy-zz:${c}" : c => {}
       } : null
     } } : null
   } } : null
