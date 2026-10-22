@@ -209,6 +209,7 @@ resource "nxos_route_policy" "route_policy" {
       } } : null
 
       set_interfaces = try(entry.set_interface_null0, false) ? { "null0" = {} } : null
+      set_vrf        = try(entry.set_vrf, null)
 
       match_next_hop_prefix_lists = try(entry.match_ip_next_hop_prefix_list, null) != null ? {
         "sys/rpm/pfxlistv4-[${try(entry.match_ip_next_hop_prefix_list)}]" = {}
