@@ -1,0 +1,2 @@
+- Add MST spanning tree support (`spanning_tree.mst`) including region configuration (name, revision and instance VLAN mapping), timers, maximum hops, PVST simulation and per-instance priority and root bridge settings
+- Add per-interface MST instance cost and port priority (`interfaces.*.spanning_tree.mst_instances`)
