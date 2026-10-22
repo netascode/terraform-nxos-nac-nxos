@@ -1,0 +1,2 @@
+- Add global BFD multihop timers support including `bfd.multihop_interval`, `bfd.multihop_min_rx`, and `bfd.multihop_multiplier`
+- Add static route BFD sessions (`routing.ip_route_static_bfds`, `routing.ipv6_route_static_bfds`)

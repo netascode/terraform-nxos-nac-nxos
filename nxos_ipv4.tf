@@ -44,6 +44,19 @@ locals {
     ]) : "${entry.device}/${entry.vrf}" => entry...
   }
 
+  # Group static route BFD sessions by device/vrf for the nxos_ipv4 vrfs nested map
+  ip_route_static_bfds_by_device_vrf = {
+    for entry in flatten([
+      for device in local.devices : [
+        for bfd in try(local.device_config[device.name].routing.ip_route_static_bfds, []) : {
+          device = device.name
+          vrf    = try(bfd.vrf, "default")
+          bfd    = bfd
+        }
+      ]
+    ]) : "${entry.device}/${entry.vrf}" => entry...
+  }
+
   # Collect all IPv4 interfaces across all interface types as a flat list
   ip_interfaces = flatten([
     for device in local.devices : concat(
@@ -180,6 +193,7 @@ resource "nxos_ipv4" "ipv4" {
     try(local.device_config[device.name].system.ip_load_sharing, null) != null ||
     length(try(local.device_config[device.name].vrfs, [])) > 0 ||
     length(try(local.device_config[device.name].routing.ip_routes, [])) > 0 ||
+    length(try(local.device_config[device.name].routing.ip_route_static_bfds, [])) > 0 ||
   length([for int in local.ip_interfaces : int if int.device == device.name]) > 0 }
   device = each.key
 
@@ -223,6 +237,8 @@ resource "nxos_ipv4" "ipv4" {
           } } : null
         } } : null
 
+        static_route_bfd_sessions = length(try(local.ip_route_static_bfds_by_device_vrf["${each.key}/default"], [])) > 0 ? { for entry in try(local.ip_route_static_bfds_by_device_vrf["${each.key}/default"], []) : "${local.intf_prefix_map[entry.bfd.interface_type]}${entry.bfd.interface_id};${entry.bfd.next_hop}" => {} } : null
+
         interfaces = length(try(local.ip_interfaces_by_device_vrf["${each.key}/default"], [])) > 0 ? { for int in local.ip_interfaces_by_device_vrf["${each.key}/default"] : int.id => {
           drop_glean             = int.drop_glean
           forward                = int.forward
@@ -255,6 +271,8 @@ resource "nxos_ipv4" "ipv4" {
           name       = try(nh.name, null)
         } } : null
       } } : null
+
+      static_route_bfd_sessions = length(try(local.ip_route_static_bfds_by_device_vrf["${each.key}/${vrf.name}"], [])) > 0 ? { for entry in try(local.ip_route_static_bfds_by_device_vrf["${each.key}/${vrf.name}"], []) : "${local.intf_prefix_map[entry.bfd.interface_type]}${entry.bfd.interface_id};${entry.bfd.next_hop}" => {} } : null
 
       interfaces = length(try(local.ip_interfaces_by_device_vrf["${each.key}/${vrf.name}"], [])) > 0 ? { for int in local.ip_interfaces_by_device_vrf["${each.key}/${vrf.name}"] : int.id => {
         drop_glean             = int.drop_glean

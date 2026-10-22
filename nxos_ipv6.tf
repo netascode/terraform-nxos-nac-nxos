@@ -12,6 +12,19 @@ locals {
     ]) : "${entry.device}/${entry.vrf}" => entry...
   }
 
+  # Group static route BFD sessions by device/vrf for the nxos_ipv6 vrfs nested map
+  ipv6_route_static_bfds_by_device_vrf = {
+    for entry in flatten([
+      for device in local.devices : [
+        for bfd in try(local.device_config[device.name].routing.ipv6_route_static_bfds, []) : {
+          device = device.name
+          vrf    = try(bfd.vrf, "default")
+          bfd    = bfd
+        }
+      ]
+    ]) : "${entry.device}/${entry.vrf}" => entry...
+  }
+
   # Collect all IPv6 interfaces across all interface types as a flat list
   ipv6_interfaces = flatten([
     for device in local.devices : concat(
@@ -137,6 +150,7 @@ resource "nxos_ipv6" "ipv6" {
     try(local.device_config[device.name].nd.switch_packets, null) != null ||
     length(try(local.device_config[device.name].vrfs, [])) > 0 ||
     length(try(local.device_config[device.name].routing.ipv6_routes, [])) > 0 ||
+    length(try(local.device_config[device.name].routing.ipv6_route_static_bfds, [])) > 0 ||
   length([for int in local.ipv6_interfaces : int if int.device == device.name]) > 0 }
   device = each.key
 
@@ -162,6 +176,8 @@ resource "nxos_ipv6" "ipv6" {
             name       = try(nh.name, null)
           } } : null
         } } : null
+
+        static_route_bfd_sessions = length(try(local.ipv6_route_static_bfds_by_device_vrf["${each.key}/default"], [])) > 0 ? { for entry in try(local.ipv6_route_static_bfds_by_device_vrf["${each.key}/default"], []) : "${local.intf_prefix_map[entry.bfd.interface_type]}${entry.bfd.interface_id};${entry.bfd.next_hop}" => {} } : null
 
         interfaces = length(try(local.ipv6_interfaces_by_device_vrf["${each.key}/default"], [])) > 0 ? { for int in local.ipv6_interfaces_by_device_vrf["${each.key}/default"] : int.id => {
           auto_configuration         = int.ipv6_address_autoconfig != null ? (int.ipv6_address_autoconfig ? "enabled" : "disabled") : null
@@ -194,6 +210,8 @@ resource "nxos_ipv6" "ipv6" {
           name       = try(nh.name, null)
         } } : null
       } } : null
+
+      static_route_bfd_sessions = length(try(local.ipv6_route_static_bfds_by_device_vrf["${each.key}/${vrf.name}"], [])) > 0 ? { for entry in try(local.ipv6_route_static_bfds_by_device_vrf["${each.key}/${vrf.name}"], []) : "${local.intf_prefix_map[entry.bfd.interface_type]}${entry.bfd.interface_id};${entry.bfd.next_hop}" => {} } : null
 
       interfaces = length(try(local.ipv6_interfaces_by_device_vrf["${each.key}/${vrf.name}"], [])) > 0 ? { for int in local.ipv6_interfaces_by_device_vrf["${each.key}/${vrf.name}"] : int.id => {
         auto_configuration         = int.ipv6_address_autoconfig != null ? (int.ipv6_address_autoconfig ? "enabled" : "disabled") : null
