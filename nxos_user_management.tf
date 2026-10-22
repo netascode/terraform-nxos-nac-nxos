@@ -14,6 +14,10 @@ resource "nxos_user_management" "user_management" {
   for_each = { for device in local.devices : device.name => device
     if try(local.device_config[device.name].aaa.users, null) != null ||
     try(local.device_config[device.name].banner, null) != null ||
+    try(local.device_config[device.name].system.login_block_for, null) != null ||
+    try(local.device_config[device.name].system.login_block_for_attempts, null) != null ||
+    try(local.device_config[device.name].system.login_block_for_within, null) != null ||
+    try(local.device_config[device.name].system.login_quiet_mode_access_class, null) != null ||
     try(local.device_config[device.name].aaa.radius, null) != null ||
     try(local.device_config[device.name].aaa.tacacs, null) != null ||
     try(local.device_config[device.name].aaa.authentication, null) != null ||
@@ -41,6 +45,12 @@ resource "nxos_user_management" "user_management" {
 
   # Post-login banner (aaaPostLoginBanner) — data model path: banner.exec
   post_login_banner_message = try(local.device_config[each.key].banner.exec, null)
+
+  # Login protection (aaaLoginProtection) — data model path: system.login_*
+  login_block_time      = try(local.device_config[each.key].system.login_block_for, null)
+  login_attempts        = try(local.device_config[each.key].system.login_block_for_attempts, null)
+  login_attempts_window = try(local.device_config[each.key].system.login_block_for_within, null)
+  login_access_list     = try(local.device_config[each.key].system.login_quiet_mode_access_class, null)
 
   # Users (aaaUser) — data model path: users.accounts
   users = length(try(local.device_config[each.key].aaa.users.accounts, [])) > 0 ? { for user in try(local.device_config[each.key].aaa.users.accounts, []) : user.username => {
@@ -256,5 +266,6 @@ resource "nxos_user_management" "user_management" {
   depends_on = [
     nxos_cli.cli_pre_9,
     nxos_feature.feature,
+    nxos_access_list.access_list,
   ]
 }

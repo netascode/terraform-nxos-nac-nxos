@@ -1,0 +1,1 @@
+- Add login protection (`system.login_block_for`, `system.login_block_for_attempts`, `system.login_block_for_within` and `system.login_quiet_mode_access_class`)
