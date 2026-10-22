@@ -28,9 +28,31 @@ resource "nxos_keychain" "keychain" {
   device = each.key
   keychains = length(try(local.keychain_classic_map[each.key], [])) > 0 ? { for keychain in try(local.device_config[each.key].key_chains, []) : keychain.name => {
     keys = length(try(keychain.keys, [])) > 0 ? { for key in try(keychain.keys, []) : key.id => {
-      cryptographic_algorithm = try(local.keychain_crypto_algorithm_map[try(key.cryptographic_algorithm)], null)
-      encryption_type         = try(key.encryption_type, null)
-      key_string              = try(key.key_string, null)
+      cryptographic_algorithm     = try(local.keychain_crypto_algorithm_map[try(key.cryptographic_algorithm)], null)
+      encryption_type             = try(key.encryption_type, null)
+      key_string                  = try(key.key_string, null)
+      accept_lifetime_duration    = try(key.accept_lifetime.duration, null)
+      accept_lifetime_end_day     = try(key.accept_lifetime.end_day, null)
+      accept_lifetime_end_month   = try(key.accept_lifetime.end_month, null)
+      accept_lifetime_end_time    = try(key.accept_lifetime.end_time, null)
+      accept_lifetime_end_year    = try(key.accept_lifetime.end_year, null)
+      accept_lifetime_infinite    = try(key.accept_lifetime.infinite, null) == null ? null : (try(key.accept_lifetime.infinite) ? "enabled" : "disabled")
+      accept_lifetime_local       = try(key.accept_lifetime.local, null) == null ? null : (try(key.accept_lifetime.local) ? "local" : "unspecified")
+      accept_lifetime_start_day   = try(key.accept_lifetime.start_day, null)
+      accept_lifetime_start_month = try(key.accept_lifetime.start_month, null)
+      accept_lifetime_start_time  = try(key.accept_lifetime.start_time, null)
+      accept_lifetime_start_year  = try(key.accept_lifetime.start_year, null)
+      send_lifetime_duration      = try(key.send_lifetime.duration, null)
+      send_lifetime_end_day       = try(key.send_lifetime.end_day, null)
+      send_lifetime_end_month     = try(key.send_lifetime.end_month, null)
+      send_lifetime_end_time      = try(key.send_lifetime.end_time, null)
+      send_lifetime_end_year      = try(key.send_lifetime.end_year, null)
+      send_lifetime_infinite      = try(key.send_lifetime.infinite, null) == null ? null : (try(key.send_lifetime.infinite) ? "enabled" : "disabled")
+      send_lifetime_local         = try(key.send_lifetime.local, null) == null ? null : (try(key.send_lifetime.local) ? "local" : "unspecified")
+      send_lifetime_start_day     = try(key.send_lifetime.start_day, null)
+      send_lifetime_start_month   = try(key.send_lifetime.start_month, null)
+      send_lifetime_start_time    = try(key.send_lifetime.start_time, null)
+      send_lifetime_start_year    = try(key.send_lifetime.start_year, null)
     } } : null
   } if !try(keychain.macsec, false) } : null
   macsec_keychains = length(try(local.keychain_macsec_map[each.key], [])) > 0 ? { for keychain in try(local.device_config[each.key].key_chains, []) : keychain.name => {
