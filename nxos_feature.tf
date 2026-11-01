@@ -20,6 +20,8 @@ resource "nxos_feature" "feature" {
   lacp                 = try(local.device_config[each.key].feature.lacp, null) == null ? null : (try(local.device_config[each.key].feature.lacp) ? "enabled" : "disabled")
   lldp                 = try(local.device_config[each.key].feature.lldp, null) == null ? null : (try(local.device_config[each.key].feature.lldp) ? "enabled" : "disabled")
   macsec               = try(local.device_config[each.key].feature.macsec, null) == null ? null : (try(local.device_config[each.key].feature.macsec) ? "enabled" : "disabled")
+  mpls_l3vpn           = try(local.device_config[each.key].feature.mpls_l3vpn, null) == null ? null : (try(local.device_config[each.key].feature.mpls_l3vpn) ? "enabled" : "disabled")
+  mpls_segment_routing = try(local.device_config[each.key].feature.mpls_segment_routing, null) == null ? null : (try(local.device_config[each.key].feature.mpls_segment_routing) ? "enabled" : "disabled")
   msdp                 = try(local.device_config[each.key].feature.msdp, null) == null ? null : (try(local.device_config[each.key].feature.msdp) ? "enabled" : "disabled")
   nat                  = try(local.device_config[each.key].feature.nat, null) == null ? null : (try(local.device_config[each.key].feature.nat) ? "enabled" : "disabled")
   netconf              = try(local.device_config[each.key].feature.netconf, null) == null ? null : (try(local.device_config[each.key].feature.netconf) ? "enabled" : "disabled")
