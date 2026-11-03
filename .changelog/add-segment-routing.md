@@ -1,0 +1,2 @@
+- Add `routing.segment_routing` to configure segment routing, including the SR-MPLS global block, SRGB timers and connected prefix SID map, SRv6 encapsulation source address and locators, and SR-TE encapsulation, liveness detection, PCC, affinity map, interfaces, segment lists, on-demand colors and policies
+- Add `feature.mpls_segment_routing_traffic_engineering` and `feature.srv6`

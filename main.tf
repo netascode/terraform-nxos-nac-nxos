@@ -341,6 +341,7 @@ resource "nxos_cli" "cli_0" {
     nxos_ptp.ptp,
     nxos_queuing_qos.queuing_qos,
     nxos_route_policy.route_policy,
+    nxos_segment_routing.segment_routing,
     nxos_sla.sla,
     nxos_snmp.snmp,
     nxos_span.span,
