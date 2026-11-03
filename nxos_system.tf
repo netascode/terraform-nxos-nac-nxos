@@ -307,6 +307,19 @@ locals {
     try(local.device_config[device.name].system.ip_multicast_overlay_spt_only, null) != null ||
     length(try(local.ngmvpn_vrfs_by_device[device.name], [])) > 0
   }
+
+  mpls_interfaces = flatten([
+    for device in local.devices : [
+      for intf_type, intf_prefix in { "ethernets" = "eth", "port_channels" = "po", "vlans" = "vlan" } : [
+        for int in try(local.device_config[device.name].interfaces[intf_type], []) : {
+          device       = device.name
+          interface_id = "${intf_prefix}${int.id}"
+        } if try(int.mpls_ip_forwarding, false)
+      ]
+    ]
+  ])
+
+  mpls_interfaces_by_device = { for entry in local.mpls_interfaces : entry.device => entry... }
 }
 
 resource "nxos_system" "system" {
@@ -378,7 +391,8 @@ resource "nxos_system" "system" {
     length(try(local.device_config[device.name].system.ip_ftp_source_interfaces, [])) > 0 ||
     try(local.ngmvpn_configured[device.name], false) ||
     try(local.device_config[device.name].system.l2rib, null) != null ||
-  try(local.device_config[device.name].system.ngoam, null) != null }
+    try(local.device_config[device.name].system.ngoam, null) != null ||
+  length(try(local.mpls_interfaces_by_device[device.name], [])) > 0 }
   device = each.key
 
   # topSystem attributes
@@ -867,6 +881,9 @@ resource "nxos_system" "system" {
   ngoam_loop_detection                         = try(local.device_config[each.key].system.ngoam.loop_detection, null)
   ngoam_loop_detection_periodic_probe_interval = try(local.device_config[each.key].system.ngoam.loop_detection_periodic_probe_interval, null)
   ngoam_loop_detection_port_recovery_interval  = try(local.device_config[each.key].system.ngoam.loop_detection_port_recovery_interval, null)
+
+  # mplsIf nested map (CLI: mpls ip forwarding)
+  mpls_interfaces = length(try(local.mpls_interfaces_by_device[each.key], [])) > 0 ? { for entry in try(local.mpls_interfaces_by_device[each.key], []) : entry.interface_id => {} } : null
 
   depends_on = [
     nxos_cli.cli_pre_9,

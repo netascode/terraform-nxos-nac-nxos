@@ -1,0 +1,1 @@
+- Add `mpls_ip_forwarding` to Ethernet, port-channel and VLAN interfaces to configure `mpls ip forwarding`
