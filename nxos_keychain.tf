@@ -29,7 +29,7 @@ resource "nxos_keychain" "keychain" {
   keychains = length(try(local.keychain_classic_map[each.key], [])) > 0 ? { for keychain in try(local.device_config[each.key].key_chains, []) : keychain.name => {
     keys = length(try(keychain.keys, [])) > 0 ? { for key in try(keychain.keys, []) : key.id => {
       cryptographic_algorithm     = try(local.keychain_crypto_algorithm_map[try(key.cryptographic_algorithm)], null)
-      encryption_type             = try(key.encryption_type, null)
+      encryption_type             = try(key.encryption_type, try(key.key_string, null) != null ? "unencrypted" : null)
       key_string                  = try(key.key_string, null)
       accept_lifetime_duration    = try(key.accept_lifetime.duration, null)
       accept_lifetime_end_day     = try(key.accept_lifetime.end_day, null)
@@ -58,7 +58,7 @@ resource "nxos_keychain" "keychain" {
   macsec_keychains = length(try(local.keychain_macsec_map[each.key], [])) > 0 ? { for keychain in try(local.device_config[each.key].key_chains, []) : keychain.name => {
     keys = length(try(keychain.keys, [])) > 0 ? { for key in try(keychain.keys, []) : tostring(key.id) => {
       cryptographic_algorithm = try(key.cryptographic_algorithm, null)
-      encryption_type         = try(key.encryption_type, null)
+      encryption_type         = try(key.encryption_type, try(key.key_octet_string, null) != null ? "unencrypted" : null)
       key_hex_string          = try(key.key_octet_string, null)
       duration                = try(key.send_lifetime.duration, null)
       end_day                 = try(key.send_lifetime.end_day, null)
