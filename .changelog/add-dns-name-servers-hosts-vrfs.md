@@ -1,1 +1,0 @@
-- Add DNS domain lists (`dns.domain_lists`), name servers (`dns.name_servers`), static hosts (`dns.hosts`) and per-VRF DNS settings (`dns.vrfs`)

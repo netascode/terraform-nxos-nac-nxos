@@ -1,1 +1,0 @@
-- Add Tenant Routed Multicast (TRM) support including `system.advertise_evpn_multicast`, `system.ip_multicast_overlay_spt_only`, `system.ip_multicast_overlay_distributed_dr`, `routing.bgp.mvpn_vri_id`, and VRF `mdt_v4_vxlan` and `mdt_v6_vxlan`

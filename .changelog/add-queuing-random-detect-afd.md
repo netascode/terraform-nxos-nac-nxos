@@ -1,1 +1,0 @@
-- Add WRED/ECN `random_detect` and Approximate Fair Discard `afd` configuration to `qos.queuing_policy_maps[].classes[]`

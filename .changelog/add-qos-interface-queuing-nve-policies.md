@@ -1,2 +1,0 @@
-- Add per-interface egress queuing policy (`service_policy_type_queuing_output`) to Ethernet and port-channel interfaces
-- Add ingress QoS policy (`service_policy_type_qos_input`) to the NVE interface

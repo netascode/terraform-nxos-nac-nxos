@@ -1,1 +1,0 @@
-- Add NTP authentication key support (`ntp.authentication_keys`) including key type, key encryption and trusted keys

@@ -1,3 +1,188 @@
+## 0.4.0
+
+### Breaking Changes
+
+- BREAKING CHANGE: Rename `aaa.tacacs.server_groups.vrf` to `use_vrf` to align with the CLI (`use-vrf`)
+- BREAKING CHANGE: `routing.bgp.peer_templates[].connection_mode` renamed to `routing.bgp.peer_templates[].transport_connection_mode`
+- BREAKING CHANGE: Rename `community_lists` to `ip_community_lists` to align with the CLI (`ip community-list`)
+- BREAKING CHANGE: Rename `routing.pim.rps` and `routing.pim.vrfs.rps` to `rp_addresses` to align with the CLI (`ip pim rp-address`)
+- BREAKING CHANGE: Rename `interfaces.ethernets.switchport.mode` and `interfaces.port_channels.switchport.mode` enum value `host` to `private-vlan-host`, `promiscuous` to `private-vlan-promiscuous`, `trunk-secondary` to `private-vlan-trunk-secondary`, `trunk-promiscuous` to `private-vlan-trunk-promiscuous`
+- BREAKING CHANGE: Rename `route_maps.entries.match_ip_address_access_list` to `match_ip_address` to align with the CLI (`match ip address <acl>`), and fix it not being applied due to an invalid access-list DN
+- BREAKING CHANGE: Rename `route_maps.entries.set_policy_tag` to `set_pctag` to align with the CLI (`set pctag`)
+- BREAKING CHANGE: Move `vlan.vlans.mac_learn` to `vlan.configurations.mac_learn` to align with the CLI (`vlan configuration <id>` > `mac-learn disable`)
+- BREAKING CHANGE: Rename `interfaces.vlans.fabric_forwarding_mode` enum value `anycast-gw` to `anycast-gateway` and remove value `proxy-gw`
+- BREAKING CHANGE: `interfaces.ethernets` and `interfaces.port_channels` without `switchport.enabled` now follow `system.ethernet.default_switchport` (Layer 3 when set to `layer3`) instead of always being configured as Layer 2, including IPv4/IPv6 addressing, spanning-tree and VTP; on devices with `default_switchport: layer3` these interfaces change from Layer 2 to Layer 3 on the first apply after upgrading, so set `switchport.enabled: true` to keep them Layer 2
+- BREAKING CHANGE: `interfaces.management.id` changed from string (e.g., `mgmt0`) to integer (e.g., `0`) for consistency with other interface types; the `mgmt` prefix is now added by the module, so existing `mgmt0` values must be changed to `0`
+- BREAKING CHANGE: `ptp.ipv6_multicast_scope_rx`, `interfaces.ethernets.ptp.ipv6_multicast_scope_rx` and `interfaces.port_channels.ptp.ipv6_multicast_scope_rx` changed from integer to a structure with `ids` and `ranges` (`from`/`to`) of scope values (1-15)
+- BREAKING CHANGE: Rename `routing.bgp.bandwidth_reference`, `routing.bgp.bandwidth_reference_unit` to `reference_bandwidth`, `reference_bandwidth_unit` to align with the CLI (`reference-bandwidth`) and the VRF-level attributes
+- BREAKING CHANGE: `interfaces.ethernets.subinterfaces.encapsulation` and `interfaces.port_channels.subinterfaces.encapsulation` changed from string (e.g., `vlan-100`) to integer VLAN ID (1-4094, e.g., `100`); the `vlan-` prefix is now added by the module
+
+### New Features
+
+- Add RADIUS configuration (`aaa.radius`), including global settings, server monitoring, servers and server groups
+- Add RBAC roles (`aaa.roles`) with rules and VLAN, interface and VRF policies, and role feature groups (`aaa.role_feature_groups`)
+- Add user SSH public key support (`aaa.users.accounts.sshkey`)
+- Add global BFD timers support including `bfd.interval`, `bfd.min_rx`, `bfd.multiplier`, and `bfd.echo_rx_interval`
+- Add global BFD multihop timers support including `bfd.multihop_interval`, `bfd.multihop_min_rx`, and `bfd.multihop_multiplier`
+- Add static route BFD sessions (`routing.ip_route_static_bfds`, `routing.ipv6_route_static_bfds`)
+- Add BGP bestpath support (`bestpath`) including `always_compare_med`, `compare_routerid`, `compare_neighborid`, `as_path_ignore`, `as_path_multipath_relax`, `aigp_ignore`, `cost_community_ignore`, `igp_metric_ignore`, `med_confed`, `med_missing_as_worst`, and `med_non_deterministic` for the default VRF and VRFs
+- Add BGP peer-session templates support (`peer_session_templates`) including `local_as`, `local_as_propagation`, `dscp` and `internal_vpn_client`
+- Add BGP peer-policy templates support (`peer_policy_templates`) including route-map, prefix-list and filter-list in/out, `maximum_prefix`, `capability_additional_paths_send`, `capability_additional_paths_receive` and `inherit_peer_policies`
+- Add `inherit_peer_policies` support to BGP neighbor address families and peer template address families
+- Add `route_map_in`, `route_map_out`, `prefix_list_in` and `prefix_list_out` support to BGP peer template address families
+- Add `stage` attribute to CLI templates (`nxos.templates[].stage`, `nxos.devices[].cli_templates[].stage`) to apply CLI templates before (`pre`) or after (`post`, default) the modeled configuration
+- Add custom CoPP support (`qos.control_plane_class_maps`, `qos.control_plane_policy_maps` and `system.control_plane_service_policy_input`), including ACL, exception, redirect and protocol matches, policers, set CoS/DSCP and drop logging
+- Add hardware rate-limiter support (`system.hardware.rate_limiter`), globally and per module
+- Add crypto key pairs (`crypto.keys`) and CA trustpoints (`crypto.ca_trustpoints`)
+- Add DHCP relay source interface configuration, both global (`dhcp.ip_dhcp_relay.source_interface_type`/`source_interface_id`, `dhcp.ipv6_dhcp_relay.source_interface_type`/`source_interface_id`) and per interface (`interfaces.*.ip.dhcp_relay_source_interface_type`/`dhcp_relay_source_interface_id`, `interfaces.*.ipv6.dhcp_relay_source_interface_type`/`dhcp_relay_source_interface_id`)
+- Add DHCP snooping VLANs (`dhcp.ip_dhcp_snooping.vlans`), IP Source Guard excluded VLANs (`dhcp.ip_dhcp_snooping.ipsg_excluded_vlans`), static IP source bindings (`dhcp.ip_source_bindings`) and Dynamic ARP Inspection VLANs (`arp.inspection.vlans`)
+- Add DHCP snooping trust, Dynamic ARP Inspection trust and IP Source Guard configuration to Ethernet and port-channel interfaces (`interfaces.*.ip.dhcp_snooping_trust`, `interfaces.*.ip.arp_inspection_trust`, `interfaces.*.ip.verify_source_dhcp_snooping_vlan`)
+- Add dynamic load balancing (DLB) configuration (`system.hardware_profile.dlb`), including DLB interfaces, mode, flowlet aging, DRE thresholds, port load tuning and static pinning
+- Add `set_dlb_mode` to `qos.policy_maps.classes`
+- Add DNS domain lists (`dns.domain_lists`), name servers (`dns.name_servers`), static hosts (`dns.hosts`) and per-VRF DNS settings (`dns.vrfs`)
+- Add duplicate host IP address detection and recovery support (`fabric_forwarding.dup_host_ip_addr_detection_moves`, `dup_host_ip_addr_detection_seconds`, `dup_host_recovery_timer_timeout`, `dup_host_recovery_timer_recover_count`)
+- Add L2RIB duplicate MAC address detection and recovery support (`system.l2rib.dup_host_mac_detection_moves`, `dup_host_mac_detection_duration`, `dup_host_mac_recovery_timeout`, `dup_host_mac_recovery_retry_count`)
+- Add EIGRP support (`routing.eigrp_processes`) including per-VRF IPv4/IPv6 address families, metrics, stub, graceful restart, default-information, redistribution and maximum-prefix configuration
+- Add EIGRP interface support (`eigrp`) for ethernet, port-channel, SVI, loopback and subinterfaces including timers, metric components, BFD, authentication, distribute-lists, offset-lists and summary addresses
+- Add `eigrp` feature flag support
+- Add Enhanced Policy-Based Redirect (ePBR) support: `feature.epbr`, `epbr` services, service chains, failover groups, policies and infra VLANs, and interface `epbr` policy attachments
+- Add errdisable detection and recovery support (`system.errdisable.recovery_interval`, `system.errdisable.detect_cause`, `system.errdisable.recovery_cause`)
+- Add EVPN ESI multihoming support including `evpn.multihoming`, port-channel `ethernet_segment` and interface `evpn_multihoming_core_tracking`
+- Add EVPN storm control support including `evpn.storm_control.broadcast_level`, `evpn.storm_control.multicast_level` and `evpn.storm_control.unicast_level`
+- Add PIM `isolate` and `logging_level` support
+- Add IP extcommunity lists (`ip_extcommunity_lists`) with route target, site-of-origin, 4-byte AS generic and RMAC entries
+- Add IP large community lists (`ip_large_community_lists`)
+- Add route map match clauses `match_extcommunities`, `match_extcommunity_exact_match`, `match_large_communities` and `match_large_community_exact_match`
+- Add route map set clauses for 4-byte AS generic extended communities, extended community cost, color, bandwidth and EVPN RMAC (`set_extcommunity_*`), `set_extcomm_list`, large communities (`set_large_communities`, `set_large_community_additive`, `set_large_community_none`) and `set_large_community_list`
+- Add `feature.dot1x`, `feature.nat`, `feature.port_security`, `feature.scheduler` and `feature.tunnel` feature flag support
+- Add `feature.mpls_l3vpn` and `feature.mpls_segment_routing` to enable `feature mpls l3vpn` and `feature mpls segment-routing`
+- Add global QoS settings (`qos.statistics`, `qos.qos_policies_statistics`, `system.default_reset_dei` and `system.hardware_qos.dynamic_buffer_sharing`)
+- Add gRPC agent and gNMI support (`system.grpc`) including certificate, client root certificate, port, VRF, keepalive timeout, maximum concurrent calls, subscription filter file, merge, query condition and target-defined minimum interval
+- Add `feature.netconf`, `feature.openconfig` and `feature.restconf` feature flag support
+- Add `igmp_snooping` support including `optimise_multicast_flood`, `vxlan`, `disable_nve_static_router_port`, and `vxlan_umc_drop_vlan`
+- Add IGMP support including global `igmp` settings, `igmp.ssm_translates`, `igmp.vrfs[].ssm_translates` and interface-level `igmp` configuration (version, querier timers, report policies, state limits, join groups, static groups and static OIFs)
+- Add OSPF default-information originate (`default_information_originate`, `default_information_originate_always`, `default_information_originate_route_map`), graceful restart (`graceful_restart`, `graceful_restart_grace_period`, `graceful_restart_helper_disable`, `graceful_restart_planned_only`), SPF/LSA timers (`timers_throttle_spf_*`, `timers_throttle_lsa_*`, `timers_lsa_arrival`, `timers_lsa_group_pacing`) and `summary_addresses` support for the default VRF and VRFs
+- Add OSPF area range (`areas.ranges`) support
+- Add OSPFv3 graceful restart and LSA timer support for the default VRF and VRFs
+- Add OSPFv3 address family default-information originate, `timers_throttle_spf_*`, `redistributions`, `summary_addresses` and area (`areas` with `default_cost` and `ranges`) support
+- Add IS-IS per-level SPF interval (`spf_interval_level_*`), LSP generation interval (`lsp_gen_interval_level_*`) and graceful restart (`graceful_restart`, `graceful_restart_t3_manual`) support for the default VRF and VRFs
+- Add IS-IS address family `redistributions`, `summary_addresses` and inter-level route distribution (`distributions`) support
+- Add `mpls_ip_forwarding` to Ethernet, port-channel and VLAN interfaces to configure `mpls ip forwarding`
+- Add `ip_as_path_access_lists` support including `entries` with `seq`, `action`, and `regex`
+- Add `route_maps.entries.match_as_path` and `route_maps.entries.match_as_number_as_path_list` support
+- Add IPv4 ECMP load sharing configuration (`system.ip_load_sharing`)
+- Add IP SLA support (`ip_sla`), including ICMP echo, UDP echo, UDP jitter, TCP connect, DNS and HTTP operations, schedules, group schedules, reactions, responder, TWAMP responder and TWAMP server
+- Add `sla_sender`, `sla_responder` and `sla_twamp_server` feature options
+- Add key chain key accept and send lifetimes (`key_chains[].keys[].accept_lifetime`, `send_lifetime`)
+- Add global LACP support (`lacp.system_priority`, `lacp.system_mac`, `lacp.system_mac_role`, `lacp.port_number_front_panel`)
+- Add Ethernet interface `lacp_port_priority` and `lacp_rate` support
+- Add Ethernet and port-channel interface load interval counters (`interfaces.ethernets[].load_interval_counter_*`, `interfaces.port_channels[].load_interval_counter_*`)
+- Add sFlow data source interfaces (`sflow.data_source_interfaces`)
+- Add port-channel load-balance hash options (`system.port_channel.load_balance_direction`, `load_balance_fields`, `load_balance_encapsulation`, `load_balance_rotate`, `load_balance_concatenation`, `load_balance_fex_all`, `load_balance_symmetric`)
+- Add `logging.rate_limit` support
+- Add login protection (`system.login_block_for`, `system.login_block_for_attempts`, `system.login_block_for_within` and `system.login_quiet_mode_access_class`)
+- Add MAC address table support (`system.mac_address_table.aging_time`, `limit_system`, `limit_user_defined`, `notification_mac_move`, `notification_threshold_limit`, `notification_threshold_interval`, `static_clear`, `statics`)
+- Add MACsec support (`macsec`) including global shutdown, pre-shared key no-show and MACsec policies
+- Add MACsec key chain support (`key_chains[].macsec`) including key octet strings and send lifetimes
+- Add MACsec interface configuration (`interfaces.ethernets[].macsec_keychain`, `macsec_policy`, `macsec_fallback_keychain`)
+- Add MSDP support (`routing.msdp` and `routing.msdp.vrfs`) including originator ID, reconnect and SA intervals, flush routes, redistribution, group limits and peers (connect source, remote AS, description, shutdown, keepalive, password, key chain, mesh group, SA limit and SA policies)
+- Add `feature.msdp` feature flag support
+- Add NGOAM (VXLAN OAM) install ACL and loop detection support (`system.ngoam.install_acl`, `loop_detection`, `loop_detection_periodic_probe_interval`, `loop_detection_port_recovery_interval`)
+- Add NTP authentication key support (`ntp.authentication_keys`) including key type, key encryption and trusted keys
+- Add `object_group` support including `ip_addresses`, `ipv6_addresses`, and `ip_ports` with their `entries`
+- Add policy-based routing (PBR) support: `feature.pbr`, route map entries `match_ipv6_address`, `set_ip_next_hops`, `set_ipv6_next_hops` and `set_interface_null0`, and interface `ip.policy_route_map` / `ipv6.policy_route_map`
+- Add PIM static RP route-map and prefix-list group ranges (`rp_addresses[].route_map`, `rp_addresses[].prefix_list`)
+- Add PIM ASM configuration (`pre_build_spt`, `pre_build_spt_force`, `pre_build_spt_route_map`, `pre_build_spt_prefix_list`, `spt_threshold_infinity_group_list`, `use_shared_tree_only_group_list`, `sg_expiry_timer`, `sg_expiry_timer_sg_list`, `register_policy`, `register_source_interface_type`/`register_source_interface_id` and corresponding prefix-list variants) to `routing.pim` and `routing.pim.vrfs`
+- Add PIM BSR (`routing.pim.bsr`) and Auto-RP (`routing.pim.auto_rp`) configuration, including candidate BSR, candidate RP, mapping agent and filter policies, also per VRF
+- Add PIM interface hello configuration (`interfaces.*.pim.hello_interval`, `hello_authentication_ah_md5`, `hello_authentication_keychain`)
+- Add `system.udfs` support for user-defined field (UDF) configuration including offset, NetFlow RTP, MPLS stack, and TCAM region qualifiers
+- Add `system.hardware_profile.tcam_resource_templates` support for user-defined TCAM resource templates with UDF qualifiers
+- Add `system.dot1q_tunnel_transit_vlans` support
+- Add PoE support (`feature.poe`, `system.logging_level_poed`, `interfaces.ethernets.power_inline`, `interfaces.ethernets.power_inline_max`, `interfaces.ethernets.power_inline_default_consumption`, `interfaces.ethernets.power_inline_police_action`, `interfaces.ethernets.power_inline_port_priority`)
+- Add Private VLAN (PVLAN) support including `vlan.vlans.private_vlan_type`, `vlan.vlans.private_vlan_association`, `vlan.vlans.mac_learn`, and `system.private_vlan_fex_trunk`
+- Add `interfaces.ethernets.switchport.private_vlan` and `interfaces.port_channels.switchport.private_vlan` support including `mapping_primary_vlan`, `mapping_secondary_vlans`, `host_association_primary_vlan`, `host_association_secondary_vlan`, `trunk_native_vlan`, `trunk_allowed_vlans`, `trunk_promiscuous_mappings`, and `trunk_secondary_associations`
+- Add `interfaces.vlans.private_vlan_mapping` support
+- Add negated DSCP, CoS, IP precedence and access list match criteria (`match_not_dscp_values`, `match_cos_values`, `match_not_cos_values`, `match_precedence_values`, `match_not_precedence_values`, `match_access_group_names`) to `qos.class_maps[]`
+- Add DSCP, CoS and IP precedence marking (`set_dscp`, `set_cos`, `set_precedence`, `set_precedence_tunnel`) to `qos.policy_maps[].classes[]`
+- Add per-interface egress queuing policy (`service_policy_type_queuing_output`) to Ethernet and port-channel interfaces
+- Add ingress QoS policy (`service_policy_type_qos_input`) to the NVE interface
+- Add global PFC watchdog support (`qos.priority_flow_control`)
+- Add bandwidth percent (`bandwidth_percent`), shaping (`shape_min`, `shape_min_unit`, `shape_max`, `shape_max_unit`) and queue limit (`queue_limit`, `queue_limit_unit`, `queue_limit_dynamic`) to queuing policy map classes
+- Add WRED/ECN `random_detect` and Approximate Fair Discard `afd` configuration to `qos.queuing_policy_maps[].classes[]`
+- Add route map set clauses `set_as_path_prepend`, `set_as_path_prepend_last_as`, `set_tag`, `set_weight`, `set_origin`, `set_origin_egp_asn`, `set_extcommunity_rt`, `set_extcommunity_rt_additive` and `set_comm_list`
+- Add route map match clauses `match_interfaces`, `match_route_types` and `match_evpn_route_types`
+- Add route map PBR set clause `set_vrf` (`set vrf <name>`)
+- Add security group contract support (`vrfs[].security_contracts`) including source and destination security groups, policy map and unidirectional contracts
+- Add security group class map filter entry ether type, protocol, stateful, source/destination port range and TCP session rule configuration (`security_group.class_maps[].filter_entries[].ether_type`, `protocol`, `stateful`, `sport`, `sport_to`, `dport`, `dport_to`, `session_rule`)
+- Add security group external subnet selectors including route injection, next-hop and MPLS VPN encapsulation (`security_group.security_groups[].match_external_subnets_ipv4`, `match_external_subnets_ipv6`)
+- Add security group interface, VLAN/MAC and VLAN/interface selectors (`security_group.security_groups[].match_interfaces`, `match_vlan_macs`, `match_vlan_interfaces`)
+- Add security group layer4-7 type configuration (`security_group.security_groups[].type_layer4_7`)
+- Add `routing.segment_routing` to configure segment routing, including the SR-MPLS global block, SRGB timers and connected prefix SID map, SRv6 encapsulation source address and locators, and SR-TE encapsulation, liveness detection, PCC, affinity map, interfaces, segment lists, on-demand colors and policies
+- Add `feature.mpls_segment_routing_traffic_engineering` and `feature.srv6`
+- Add SNMP community (`snmp.communities`), context (`snmp.contexts`) and informs source interface (`snmp.source_interface_informs_type`, `snmp.source_interface_informs_id`) support
+- Add SNMP host source interface (`snmp.hosts.source_interface_type`, `snmp.hosts.source_interface_id`) and filter VRF (`snmp.hosts.filter_vrf`) support
+- Add MST spanning tree support (`spanning_tree.mst`) including region configuration (name, revision and instance VLAN mapping), timers, maximum hops, PVST simulation and per-instance priority and root bridge settings
+- Add per-interface MST instance cost and port priority (`interfaces.*.spanning_tree.mst_instances`)
+- Add global hardware QoS support (`system.hardware_qos`), including ingress priority-group buffer tuning, no-drop thresholds and pool sizes, burst detection, AFD profile, ETRAP and dynamic packet prioritization settings
+- Add `system.ip_ssh_source_interfaces` support (per-VRF SSH source interface)
+- Add `system.ip_ftp_source_interfaces` support (per-VRF FTP source interface)
+- Add `feature.password_encryption_aes` and `feature.password_encryption_aes_tam` support (`feature password encryption aes [tam]`)
+- Add `system.acllog_match_log_level` and `system.logging_ip_access_list` support (ACL logging match level, cache entries, interval, threshold, and detailed/MAC/SGT options)
+- Add telemetry certificate, destination profile compression, source interface, retry size, node ID and gRPC deadline (`telemetry.certificate_*`, `telemetry.destination_profile_*`)
+- Add telemetry destination group certificate, VRF, compression, source interface, chunking size and maximum message size (`telemetry.destination_groups`)
+- Add object tracking support (`tracks`) including interface, IP/IPv6 route, IP SLA and track list objects with up/down delays
+- Add HSRP group object tracking support (`hsrp.groups.tracks`) with priority `decrement`
+- Add Tenant Routed Multicast (TRM) support including `system.advertise_evpn_multicast`, `system.ip_multicast_overlay_spt_only`, `system.ip_multicast_overlay_distributed_dr`, `routing.bgp.mvpn_vri_id`, and VRF `mdt_v4_vxlan` and `mdt_v6_vxlan`
+- Add `vlan.configurations` support (`vlan configuration <id>`) including `layer_2_multicast_lookup_mac` and per-VLAN `igmp_snooping` with `enable`, `access_group`, `explicit_tracking`, `fast_leave`, `group_timeout`, `last_member_query_interval`, `link_local_groups_suppression`, `proxy_general_queries_mrt`, `proxy_leave_use_group_address`, `querier`, `querier_timeout`, `query_flood`, `query_interval`, `query_max_response_time`, `report_flood_all`, `report_flood_interfaces`, `report_suppression`, `robustness_variable`, `startup_query_count`, `startup_query_interval`, `v3_report_suppression`, `version`, `mrouter_interfaces`, and `static_groups`
+- Add `interfaces.ethernets.switchport.vlan_mapping` and `interfaces.port_channels.switchport.vlan_mapping` support including `enable`, `vlans` (VLAN translation with `vlan`, `inner_vlan`, `translated_vlan`, `rx`), and selective QinQ with `dot1q_tunnel`, `dot1q_tunnel_vlans`, and `dot1q_tunnel_all`
+- Add `security_group.security_groups.intra_group_isolation` support
+- Add `vlan.vlans.isolate` support
+- Add `interfaces.vlans.fabric_forwarding_mode_anycast_gateway_proxy` support
+- Add `vpc_orphan_port_suspend` support for ethernet and port-channel interfaces
+- Add VRF address family default VRF route leaking support including `import_vrf_default_map`, `import_vrf_default_prefix_limit`, `import_vrf_default_advertise_vpn`, `export_vrf_default_map`, `export_vrf_default_prefix_limit`, and `export_vrf_default_allow_vpn`
+- Add VRRP support (`interfaces.*.vrrp_groups`) including primary and secondary addresses, priority with forwarding thresholds, preemption, advertisement interval, text authentication, BFD, and interface and object tracking
+- Add VRRPv3 support (`interfaces.*.vrrpv3_groups`) for IPv4 and IPv6 including primary and secondary addresses, priority, preemption with delay, advertisement timers, VRRPv2 compatibility, address matching, object tracking and VRRS leaders
+- Add VRRS pathways (`interfaces.*.vrrs_pathways`) and FHRP interface delays (`interfaces.*.fhrp_delay_minimum`, `interfaces.*.fhrp_delay_reload`)
+- Add `feature.vrrp` and `feature.vrrpv3` feature flag support
+- Add VTP support (`vtp`, `feature.vtp`, `interfaces.ethernets.vtp`, `interfaces.port_channels.vtp`)
+- Add DHCP relay support (`ip.dhcp_relay_*` and `ipv6.dhcp_*`) to Ethernet and port-channel subinterfaces
+
+### Bug Fixes
+
+- Fix BGP neighbor and peer template `capability_suppress_4_byte_as` not being applied
+- Fix `routing.pim.register_rate_limit` and `routing.pim.vrfs.register_rate_limit` to configure `ip pim register-rate-limit`
+- Fix VRF address family `import_map` and `export_map` being ignored when no route targets are configured for the same direction
+- Fix perpetual diff on `ip_access_lists.entries.source.port_1`, `ip_access_lists.entries.source.port_2`, `ip_access_lists.entries.destination.port_1`, `ip_access_lists.entries.destination.port_2` and the equivalent `ipv6_access_lists` attributes when configured as port numbers, due to DME returning the service keyword (e.g. `smtp` for `25`); port numbers with a corresponding keyword are now translated to the keyword
+- Fix perpetual diff on `object_group.ip_ports.entries.port_1` and `object_group.ip_ports.entries.port_2` when configured as port numbers, by applying the same port number to service keyword translation
+- Fix `snmp.users.priv_type` values `aes-128` and `aes-256` not being applied correctly due to data model values not being translated to the provider's expected format
+- Fix `interfaces.ethernets.speed` and `interfaces.port_channels.speed` values (e.g. `100m`, `1g`, `25000`, `auto-100m-1g`) not being applied correctly due to data model values not being translated to the provider's expected format
+- Fix `interfaces.ethernets.negotiate_auto` and `interfaces.port_channels.negotiate_auto` value `25000` not being applied correctly due to data model value not being translated to the provider's expected format
+- Fix `interfaces.nve.host_reachability_protocol` values `flood-and-learn` and `openflow-ir` not being applied correctly due to data model values not being translated to the provider's expected format
+- Fix `routing.bgp.vrfs.neighbors.password_type` and `routing.bgp.vrfs.peer_templates.password_type` value `line` not being applied correctly due to data model value not being translated to the provider's expected format
+- Fix `system.hardware_profile.mpls_adjacency_stats_mode` values `packets` and `bytes` not being applied correctly due to data model values not being translated to the provider's expected format
+- Fix `qos.policy_maps.classes.police.cir_unit` and `qos.policy_maps.classes.police.pir_unit` value `percent` not being applied correctly due to data model value not being translated to the provider's expected format
+- Fix `logging.facilities.name` value `pltfm-config` not being applied correctly due to data model value not being translated to the provider's expected format
+- Fix `ip_access_lists.entries.source.prefix`, `ip_access_lists.entries.destination.prefix`, `ipv6_access_lists.entries.source.prefix`, and `ipv6_access_lists.entries.destination.prefix` value `any` not being applied correctly due to data model value not being translated to the provider's expected format (IPv4 ACLs use `0.0.0.0`, IPv6 ACLs use `::`)
+- Fix `route_maps.entries.set_community` not being applied correctly due to data model value not being translated to the provider's expected DME format (`regular:as2-nn2:<asn>:<value>` for 16-bit ASN, `regular:as4-nn2:<asn>:<value>` for 32-bit ASN, `regular:wk-nn2:<name>` for well-known communities `internet`/`no-export`/`no-advertise`/`local-AS`); space-separated values are now also supported as multiple communities
+- Fix `community_lists.entries.communities` not being applied correctly due to data model values not being translated to the provider's expected DME format (same transformation as `set_community`)
+- Fix IPv6 DHCP relay addresses (`interfaces.*.ipv6.dhcp_relay_addresses`) failing to apply
+- Fix DHCP relay addresses without a `vrf` being configured as `use-vrf none`; they are now configured without `use-vrf`. Existing deployments will see these relay addresses replaced on the next apply
+- Fix `ip.redirects: false` (and other disabled ICMPv4 interface options) not being applied, and unset ICMPv4 interface options disabling NX-OS defaults (`redirects`, `port_unreachable`)
+- Fix destroying or changing `macsec.shutdown` failing with "Frequent invocation of command" errors when done within 30 seconds of a previous MACsec status change
+- Fix `ip.access_group_in` and `ip.access_group_out` being ignored on management interfaces
+- Fix `vrf` being ignored on management interfaces
+- Fix destroy hanging the NX-OS private VLAN process when private VLANs are configured, which left features and configuration behind on the device (requires provider `0.19.0`)
+- Fix `ip.redirects`, `ip.unreachables`, `ip.port_unreachable`, `ipv6.redirects` and `ipv6.unreachables` being ignored on Ethernet and port-channel subinterfaces
+- Fix `ip.access_group_in` and `ip.access_group_out` being ignored on Ethernet and port-channel subinterfaces
+- Fix static route next hops in a non-default VRF without a `vrf` being configured as `vrf default`; they now default to the route's VRF. Existing deployments will see these next hops replaced on the next apply
+- Fix HSRP on Ethernet and port-channel subinterfaces being configured on an invalid interface ID (the subinterface number only, e.g. `10` instead of `eth1/1.10`)
+- Fix OSPF and IS-IS configuration not depending on route maps and prefix lists, and OSPF, IS-IS, HSRP and interface configuration not depending on key chains, which allowed them to be created before, or deleted after, the objects they reference
+- Fix perpetual plan diff on `interfaces.ethernets` and `interfaces.port_channels` (including vPC peer-link port-channels) when `mtu` is not declared; interfaces without `mtu` show a one-time diff on the first apply after upgrading
+
+### Other Changes
+
+- Allow any facility name in `logging.facilities`
+
 ## 0.3.0
 
 - Add `analytics.flow_records`, `analytics.flow_collectors`, and `analytics.flow_monitors` support

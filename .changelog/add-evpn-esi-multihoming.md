@@ -1,1 +1,0 @@
-- Add EVPN ESI multihoming support including `evpn.multihoming`, port-channel `ethernet_segment` and interface `evpn_multihoming_core_tracking`

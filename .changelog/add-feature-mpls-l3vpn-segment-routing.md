@@ -1,1 +1,0 @@
-- Add `feature.mpls_l3vpn` and `feature.mpls_segment_routing` to enable `feature mpls l3vpn` and `feature mpls segment-routing`

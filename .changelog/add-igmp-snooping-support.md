@@ -1,1 +1,0 @@
-- Add `igmp_snooping` support including `optimise_multicast_flood`, `vxlan`, `disable_nve_static_router_port`, and `vxlan_umc_drop_vlan`

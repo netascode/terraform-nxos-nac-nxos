@@ -1,2 +1,0 @@
-- Add IP SLA support (`ip_sla`), including ICMP echo, UDP echo, UDP jitter, TCP connect, DNS and HTTP operations, schedules, group schedules, reactions, responder, TWAMP responder and TWAMP server
-- Add `sla_sender`, `sla_responder` and `sla_twamp_server` feature options

@@ -1,4 +1,0 @@
-- Add Private VLAN (PVLAN) support including `vlan.vlans.private_vlan_type`, `vlan.vlans.private_vlan_association`, `vlan.vlans.mac_learn`, and `system.private_vlan_fex_trunk`
-- Add `interfaces.ethernets.switchport.private_vlan` and `interfaces.port_channels.switchport.private_vlan` support including `mapping_primary_vlan`, `mapping_secondary_vlans`, `host_association_primary_vlan`, `host_association_secondary_vlan`, `trunk_native_vlan`, `trunk_allowed_vlans`, `trunk_promiscuous_mappings`, and `trunk_secondary_associations`
-- Add `interfaces.vlans.private_vlan_mapping` support
-- BREAKING CHANGE: Rename `interfaces.ethernets.switchport.mode` and `interfaces.port_channels.switchport.mode` enum value `host` to `private-vlan-host`, `promiscuous` to `private-vlan-promiscuous`, `trunk-secondary` to `private-vlan-trunk-secondary`, `trunk-promiscuous` to `private-vlan-trunk-promiscuous`
