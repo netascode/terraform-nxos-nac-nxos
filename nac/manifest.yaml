@@ -1,0 +1,4 @@
+schema: 1
+tools:
+  nac-validate: 2.1.0
+  nac-test: 2.1.0
