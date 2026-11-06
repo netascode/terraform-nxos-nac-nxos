@@ -5,15 +5,30 @@ formatter: markdown table
 content: |-
   # Terraform Network-as-Code Cisco NX-OS Module
 
-  A Terraform module to configure Cisco NX-OS devices.
+  A Terraform module to configure Cisco NX-OS devices using [Network as Code](https://netascode.cisco.com). The desired configuration of one or more switches is described in YAML and translated by the module into [NX-OS provider](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest) resources, which are applied via NX-API.
+
+  ## Documentation
+
+  - [Introduction](https://netascode.cisco.com/docs/start/nxos/introduction/): concepts and architecture
+  - [First Steps](https://netascode.cisco.com/docs/start/nxos/first_steps/): step-by-step guide from a single switch to multi-device deployments
+  - [Data Model Reference](https://netascode.cisco.com/docs/data_models/nxos/overview/): all supported YAML attributes including types, ranges and examples
+  - [Supported Features](https://netascode.cisco.com/docs/data_models/nxos/features/)
+  - [Changelog](https://netascode.cisco.com/docs/changelogs/nxos/changelog/) and [Tested Versions](https://netascode.cisco.com/docs/changelogs/nxos/tested_versions/)
+
+  ## Prerequisites
+
+  - NX-API enabled on each device (`feature nxapi`)
+  - Device credentials provided via the `NXOS_USERNAME` and `NXOS_PASSWORD` environment variables
 
   ## Usage
 
-  This module supports an inventory driven approach, where a complete NX-OS configuration or parts of it are either modeled in one or more YAML files or natively using Terraform variables.
+  This module supports an inventory driven approach, where a complete NX-OS configuration or parts of it are either modeled in one or more YAML files (`yaml_files`, `yaml_directories`) or natively using Terraform variables (`model`).
+
+  Configuration is defined per device under `nxos.devices`. Settings shared across devices can be defined once using [global](https://netascode.cisco.com/docs/data_models/nxos/inventory/global/) configuration, [device groups](https://netascode.cisco.com/docs/data_models/nxos/inventory/device_group/), [templates](https://netascode.cisco.com/docs/data_models/nxos/inventory/template/) and [interface groups](https://netascode.cisco.com/docs/data_models/nxos/inventory/interface_group/). The `managed_devices` and `managed_device_groups` variables can be used to limit which devices are managed by a Terraform run.
 
   ## Examples
 
-  Configuring an NX-OS system configuration using YAML:
+  Configuring an NX-OS system configuration using YAML (see the [system data model](https://netascode.cisco.com/docs/data_models/nxos/system/system/) for all available attributes):
 
   #### `system.nac.yaml`
 
