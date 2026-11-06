@@ -29,6 +29,15 @@ import sys
 
 FRAGMENT_DIR = ".changelog"
 CHANGELOG_FILE = "CHANGELOG.md"
+BREAKING_PREFIX = "- BREAKING CHANGE:"
+
+# (heading, leading words) in output order; entries matching none go to "Other Changes"
+GROUPS = [
+    ("New Features", ("add",)),
+    ("Bug Fixes", ("fix",)),
+]
+OTHER_GROUP = "Other Changes"
+BREAKING_GROUP = "Breaking Changes"
 
 
 def read_fragments():
@@ -55,14 +64,40 @@ def read_fragments():
     return lines
 
 
+def group_entries(entries):
+    """Group entries by change type, keeping source order within each group.
+    Breaking changes come first, then groups by leading word, then the rest."""
+    groups = {BREAKING_GROUP: []}
+    groups.update({heading: [] for heading, _ in GROUPS})
+    groups[OTHER_GROUP] = []
+    for entry in entries:
+        if entry.upper().startswith(BREAKING_PREFIX):
+            groups[BREAKING_GROUP].append(entry)
+            continue
+        words = entry[2:].split(maxsplit=1)
+        first = words[0].lower() if words else ""
+        for heading, prefixes in GROUPS:
+            if first in prefixes:
+                groups[heading].append(entry)
+                break
+        else:
+            groups[OTHER_GROUP].append(entry)
+    return [(heading, items) for heading, items in groups.items() if items]
+
+
+def format_section(title, entries):
+    parts = [f"## {title}"]
+    for heading, items in group_entries(entries):
+        parts.append(f"### {heading}\n\n" + "\n".join(items))
+    return "\n\n".join(parts) + "\n\n"
+
+
 def preview():
     entries = read_fragments()
     if not entries:
         print("No changelog fragments found.")
         return
-    print("## Unreleased\n")
-    for entry in entries:
-        print(entry)
+    print(format_section("Unreleased", entries), end="")
 
 
 def release(version):
@@ -75,7 +110,7 @@ def release(version):
     if os.path.isfile(CHANGELOG_FILE):
         existing = open(CHANGELOG_FILE).read().lstrip("\n")
 
-    new_section = f"## {version}\n\n" + "\n".join(entries) + "\n\n"
+    new_section = format_section(version, entries)
     open(CHANGELOG_FILE, "w").write(new_section + existing)
 
     # Delete fragment files

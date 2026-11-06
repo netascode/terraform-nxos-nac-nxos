@@ -14,6 +14,15 @@ Create a new `.md` file with a descriptive name, e.g. `add-bfd-resource.md`:
 - Multiple entries per file are allowed for multi-change PRs
 - The filename is for identification only (lowercase, hyphens, `.md` extension)
 
+Entries are grouped automatically in the release section:
+
+| Entry starts with | Group |
+| --- | --- |
+| `- BREAKING CHANGE: ` | Breaking Changes |
+| `- Add ` | New Features |
+| `- Fix ` | Bug Fixes |
+| anything else | Other Changes |
+
 ## At Release Time
 
 Run `make release VERSION=X.Y.Z` to collect all fragments into `CHANGELOG.md` and delete the fragment files.
