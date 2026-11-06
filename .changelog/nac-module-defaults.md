@@ -1,0 +1,1 @@
+- Write the rendered data model to `model.yaml` by default (`write_model_file`), with a header marking it as generated; set `write_model_file = ""` to disable

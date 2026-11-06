@@ -47,7 +47,7 @@ variable "save_config" {
 }
 
 variable "write_model_file" {
-  description = "Write the rendered device model to a single YAML file. Value is a path pointing to the file to be created."
+  description = "Write the rendered data model to a single YAML file, e.g. for validation, testing and troubleshooting. Value is a path relative to the root module. Set to an empty string to disable."
   type        = string
-  default     = ""
+  default     = "model.yaml"
 }
