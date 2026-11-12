@@ -9,9 +9,9 @@ class Rule(RuleBase):
     title = "VLAN INTERFACE WITHOUT VLAN DEFINITION"
     affected_items_label = "VLAN interfaces without a VLAN"
     explanation = """\
-A VLAN interface (SVI) can only be created for a VLAN that exists on the
-device. If the VLAN is not defined under vlan.vlans, the SVI cannot be
-applied."""
+A VLAN interface (SVI) for a VLAN that is not defined under vlan.vlans is
+created on the device, but stays down (no-vlan) and cannot route traffic
+until the VLAN is defined."""
     recommendation = """\
 Define the VLAN on the same device as the VLAN interface:
 
