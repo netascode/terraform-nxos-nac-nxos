@@ -269,13 +269,13 @@ aaa_authentication:
   default_role: any(enum('no-login', 'assign-default-role'), regex("^.*[\$\%]\{.*$"), required=False)
   radius_directed_request: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   tacacs_directed_request: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
-  login_default_groups: any(list(str()), regex("^.*[\$\%]\{.*$"), required=False)
+  login_default_groups: any(list(str(), ordered=True), regex("^.*[\$\%]\{.*$"), required=False)
   login_default_fallback: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   login_default_local: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   login_default_none: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   login_default_error_enable: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   login_default_invalid_username_log: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
-  login_console_groups: any(list(str()), regex("^.*[\$\%]\{.*$"), required=False)
+  login_console_groups: any(list(str(), ordered=True), regex("^.*[\$\%]\{.*$"), required=False)
   login_console_fallback: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   login_console_local: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   login_console_none: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
@@ -284,12 +284,12 @@ aaa_authentication:
 
 aaa_authorization:
   command_type: any(enum('config-commands', 'commands'), regex("^.*[\$\%]\{.*$"))
-  groups: any(list(str()), regex("^.*[\$\%]\{.*$"), required=False)
+  groups: any(list(str(), ordered=True), regex("^.*[\$\%]\{.*$"), required=False)
   none: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   local: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
 
 aaa_accounting:
-  groups: any(list(str()), regex("^.*[\$\%]\{.*$"), required=False)
+  groups: any(list(str(), ordered=True), regex("^.*[\$\%]\{.*$"), required=False)
   none: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   local: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
 
@@ -313,12 +313,12 @@ analytics_flow_records:
 analytics_flow_collectors:
   name: str()
   description: str(required=False)
-  destination: any(ip(), regex("^.*[\$\%]\{.*$"), required=False)
+  destination: any(ip(type='address'), regex("^.*[\$\%]\{.*$"), required=False)
   transport_udp: any(int(min=0, max=65535), regex("^.*[\$\%]\{.*$"), required=False)
   dscp: any(int(min=0, max=63), regex("^.*[\$\%]\{.*$"), required=False)
   events_transport_udp: any(int(min=0, max=65535), regex("^.*[\$\%]\{.*$"), required=False)
   inband_interface: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
-  source_address: any(ip(), regex("^.*[\$\%]\{.*$"), required=False)
+  source_address: any(ip(type='address'), regex("^.*[\$\%]\{.*$"), required=False)
   source_interface_type: any(enum('ethernet', 'loopback', 'mgmt', 'port-channel', 'vlan', 'vni'), regex("^.*[\$\%]\{.*$"), required=False)
   source_interface_id: any(str(), int(min=0), required=False)
   v9: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
@@ -459,7 +459,7 @@ crypto_ca_trustpoints:
   rsakeypair: str(required=False, ref='crypto_key')
   ecckeypair: str(required=False, ref='crypto_key')
   cabundle: str(required=False)
-  revocation_check: any(list(enum('crl', 'ocsp', 'none')), regex("^.*[\$\%]\{.*$"), required=False)
+  revocation_check: any(list(enum('crl', 'ocsp', 'none'), ordered=True), regex("^.*[\$\%]\{.*$"), required=False)
   ocsp_url: str(required=False)
 
 dhcp:
@@ -509,7 +509,7 @@ dhcp_ip_dhcp_snooping_vlans:
   evpn: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
 
 dhcp_ip_source_bindings:
-  ip: any(ip(version=4), regex("^.*[\$\%]\{.*$"))
+  ip: any(ip(version=4, type='address'), regex("^.*[\$\%]\{.*$"))
   mac: any(mac(), regex("^.*[\$\%]\{.*$"))
   vlan: any(int(min=1, max=4094), regex("^.*[\$\%]\{.*$"))
   interface_type: any(enum('ethernet', 'port-channel'), regex("^.*[\$\%]\{.*$"))
@@ -556,7 +556,7 @@ epbr_services_probe:
   reverse_interface_id: any(str(), int(min=0), required=False)
 
 epbr_services_service_end_points:
-  ip: any(ip(), regex("^.*[\$\%]\{.*$"))
+  ip: any(ip(type='address'), regex("^.*[\$\%]\{.*$"))
   interface_type: any(enum('ethernet', 'loopback', 'mgmt', 'port-channel', 'vlan', 'vni'), regex("^.*[\$\%]\{.*$"), required=False)
   interface_id: any(str(), int(min=0), required=False)
   shutdown: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
@@ -585,7 +585,7 @@ epbr_services_service_end_points_probe:
   track: any(int(min=1, max=512), regex("^.*[\$\%]\{.*$"), required=False, ref='track')
 
 epbr_services_service_end_points_reverse:
-  ip: any(ip(), regex("^.*[\$\%]\{.*$"), required=False)
+  ip: any(ip(type='address'), regex("^.*[\$\%]\{.*$"), required=False)
   interface_type: any(enum('ethernet', 'loopback', 'mgmt', 'port-channel', 'vlan', 'vni'), regex("^.*[\$\%]\{.*$"), required=False)
   interface_id: any(str(), int(min=0), required=False)
   probe: include('epbr_services_service_end_points_probe', required=False)
@@ -680,7 +680,7 @@ evpn_multihoming:
   df_election_time: any(num(min=1, max=3), regex("^.*[\$\%]\{.*$"), required=False)
   ead_evi_route: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   ethernet_segment_delay_restore_time: any(int(min=30, max=1000), regex("^.*[\$\%]\{.*$"), required=False)
-  frr_anycast_source_ip: any(ip(version=4), regex("^.*[\$\%]\{.*$"), required=False)
+  frr_anycast_source_ip: any(ip(version=4, type='address'), regex("^.*[\$\%]\{.*$"), required=False)
 
 evpn_storm_control:
   broadcast_level: any(num(min=0, max=100), regex("^.*[\$\%]\{.*$"), required=False)
@@ -709,25 +709,25 @@ security_group_groups:
 
 security_group_groups_match_connected_endpoints_ipv4:
   vrf: str(ref='vrf')
-  address: any(ip(version=4), regex("^.*[\$\%]\{.*$"))
+  address: any(ip(version=4, type='network'), regex("^.*[\$\%]\{.*$"))
 
 security_group_groups_match_connected_endpoints_ipv6:
   vrf: str(ref='vrf')
-  address: any(ip(version=6), regex("^.*[\$\%]\{.*$"))
+  address: any(ip(version=6, type='network'), regex("^.*[\$\%]\{.*$"))
 
 security_group_groups_match_external_subnets_ipv4:
   vrf: str(ref='vrf')
-  address: any(ip(version=4), regex("^.*[\$\%]\{.*$"))
+  address: any(ip(version=4, type='network'), regex("^.*[\$\%]\{.*$"))
   route_inject: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
-  nexthop_ipv4: any(ip(version=4), regex("^.*[\$\%]\{.*$"), required=False)
+  nexthop_ipv4: any(ip(version=4, type='address'), regex("^.*[\$\%]\{.*$"), required=False)
   encap_type: any(enum('mpls-vpn'), regex("^.*[\$\%]\{.*$"), required=False)
 
 security_group_groups_match_external_subnets_ipv6:
   vrf: str(ref='vrf')
-  address: any(ip(version=6), regex("^.*[\$\%]\{.*$"))
+  address: any(ip(version=6, type='network'), regex("^.*[\$\%]\{.*$"))
   route_inject: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
-  nexthop_ipv4: any(ip(version=4), regex("^.*[\$\%]\{.*$"), required=False)
-  nexthop_ipv6: any(ip(version=6), regex("^.*[\$\%]\{.*$"), required=False)
+  nexthop_ipv4: any(ip(version=4, type='address'), regex("^.*[\$\%]\{.*$"), required=False)
+  nexthop_ipv6: any(ip(version=6, type='address'), regex("^.*[\$\%]\{.*$"), required=False)
   encap_type: any(enum('mpls-vpn'), regex("^.*[\$\%]\{.*$"), required=False)
 
 security_group_groups_match_interfaces:
@@ -871,8 +871,8 @@ igmp_vrfs:
   ssm_translates: list(include('igmp_ssm_translates'), required=False, primary_key='group,source')
 
 igmp_ssm_translates:
-  group: any(ip(version=4), regex("^.*[\$\%]\{.*$"))
-  source: any(ip(version=4), regex("^.*[\$\%]\{.*$"))
+  group: any(ip(version=4, type='network'), regex("^.*[\$\%]\{.*$"))
+  source: any(ip(version=4, type='address'), regex("^.*[\$\%]\{.*$"))
 
 igmp_snooping:
   optimise_multicast_flood: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
@@ -933,9 +933,9 @@ ip_access_lists_entries:
   ttl: any(int(min=0, max=255), regex("^.*[\$\%]\{.*$"), required=False)
 
 ip_access_lists_entries_source:
-  prefix: any(ip(version=4), enum('any'), regex("^.*[\$\%]\{.*$"), required=False)
+  prefix: any(ip(version=4, type='address'), enum('any'), regex("^.*[\$\%]\{.*$"), required=False)
   prefix_length: any(int(min=0, max=32), regex("^.*[\$\%]\{.*$"), required=False)
-  prefix_mask: any(ip(version=4), regex("^.*[\$\%]\{.*$"), required=False)
+  prefix_mask: any(ip(version=4, type='address'), regex("^.*[\$\%]\{.*$"), required=False)
   addrgroup: str(required=False, ref='ip_address_object_group')
   port_operator: any(enum('none', 'eq', 'neq', 'lt', 'gt', 'range'), regex("^.*[\$\%]\{.*$"), required=False)
   port_1: any(str(), int(), regex("^.*[\$\%]\{.*$"), required=False)
@@ -943,9 +943,9 @@ ip_access_lists_entries_source:
   portgroup: str(required=False, ref='ip_port_object_group')
 
 ip_access_lists_entries_destination:
-  prefix: any(ip(version=4), enum('any'), regex("^.*[\$\%]\{.*$"), required=False)
+  prefix: any(ip(version=4, type='address'), enum('any'), regex("^.*[\$\%]\{.*$"), required=False)
   prefix_length: any(int(min=0, max=32), regex("^.*[\$\%]\{.*$"), required=False)
-  prefix_mask: any(ip(version=4), regex("^.*[\$\%]\{.*$"), required=False)
+  prefix_mask: any(ip(version=4, type='address'), regex("^.*[\$\%]\{.*$"), required=False)
   addrgroup: str(required=False, ref='ip_address_object_group')
   port_operator: any(enum('none', 'eq', 'neq', 'lt', 'gt', 'range'), regex("^.*[\$\%]\{.*$"), required=False)
   port_1: any(str(), int(), regex("^.*[\$\%]\{.*$"), required=False)
@@ -1003,7 +1003,7 @@ ipv6_access_lists_entries:
   telemetry_queue: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
 
 ipv6_access_lists_entries_source:
-  prefix: any(ip(version=6), enum('any'), regex("^.*[\$\%]\{.*$"), required=False)
+  prefix: any(ip(version=6, type='address'), enum('any'), regex("^.*[\$\%]\{.*$"), required=False)
   prefix_length: any(int(min=0, max=128), regex("^.*[\$\%]\{.*$"), required=False)
   prefix_mask: any(str(), regex("^.*[\$\%]\{.*$"), required=False)
   addrgroup: str(required=False, ref='ipv6_address_object_group')
@@ -1013,7 +1013,7 @@ ipv6_access_lists_entries_source:
   portgroup: str(required=False, ref='ip_port_object_group')
 
 ipv6_access_lists_entries_destination:
-  prefix: any(ip(version=6), enum('any'), regex("^.*[\$\%]\{.*$"), required=False)
+  prefix: any(ip(version=6, type='address'), enum('any'), regex("^.*[\$\%]\{.*$"), required=False)
   prefix_length: any(int(min=0, max=128), regex("^.*[\$\%]\{.*$"), required=False)
   prefix_mask: any(str(), regex("^.*[\$\%]\{.*$"), required=False)
   addrgroup: str(required=False, ref='ipv6_address_object_group')
@@ -1033,9 +1033,9 @@ object_group_ip_addresses:
 
 object_group_ip_addresses_entries:
   sequence_number: any(int(min=1, max=4294967295), regex("^.*[\$\%]\{.*$"))
-  prefix: any(ip(version=4), regex("^.*[\$\%]\{.*$"), required=False)
+  prefix: any(ip(version=4, type='address'), regex("^.*[\$\%]\{.*$"), required=False)
   prefix_length: any(int(min=0, max=32), regex("^.*[\$\%]\{.*$"), required=False)
-  prefix_mask: any(ip(version=4), regex("^.*[\$\%]\{.*$"), required=False)
+  prefix_mask: any(ip(version=4, type='address'), regex("^.*[\$\%]\{.*$"), required=False)
 
 object_group_ipv6_addresses:
   name: str()
@@ -1043,7 +1043,7 @@ object_group_ipv6_addresses:
 
 object_group_ipv6_addresses_entries:
   sequence_number: any(int(min=1, max=4294967295), regex("^.*[\$\%]\{.*$"))
-  prefix: any(ip(version=6), regex("^.*[\$\%]\{.*$"), required=False)
+  prefix: any(ip(version=6, type='address'), regex("^.*[\$\%]\{.*$"), required=False)
   prefix_length: any(int(min=0, max=128), regex("^.*[\$\%]\{.*$"), required=False)
   prefix_mask: any(str(), regex("^.*[\$\%]\{.*$"), required=False)
 
@@ -1065,8 +1065,8 @@ ip_prefix_lists:
 ip_prefix_lists_entries:
   seq: any(int(), regex("^.*[\$\%]\{.*$"))
   action: any(enum('permit', 'deny'), regex("^.*[\$\%]\{.*$"), required=False)
-  prefix: any(ip(version=4), regex("^.*[\$\%]\{.*$"), required=False)
-  mask: any(ip(version=4), regex("^.*[\$\%]\{.*$"), required=False)
+  prefix: any(ip(version=4, type='network'), regex("^.*[\$\%]\{.*$"), required=False)
+  mask: any(ip(version=4, type='address'), regex("^.*[\$\%]\{.*$"), required=False)
   ge: any(int(min=0, max=32), regex("^.*[\$\%]\{.*$"), required=False)
   le: any(int(min=0, max=32), regex("^.*[\$\%]\{.*$"), required=False)
 
@@ -1078,7 +1078,7 @@ ipv6_prefix_lists:
 ipv6_prefix_lists_entries:
   seq: any(int(), regex("^.*[\$\%]\{.*$"))
   action: any(enum('permit', 'deny'), regex("^.*[\$\%]\{.*$"), required=False)
-  prefix: any(ip(version=6), regex("^.*[\$\%]\{.*$"), required=False)
+  prefix: any(ip(version=6, type='network'), regex("^.*[\$\%]\{.*$"), required=False)
   mask: any(int(min=0, max=128), regex("^.*[\$\%]\{.*$"), required=False)
   ge: any(int(min=0, max=128), regex("^.*[\$\%]\{.*$"), required=False)
   le: any(int(min=0, max=128), regex("^.*[\$\%]\{.*$"), required=False)
@@ -1138,11 +1138,11 @@ ip_sla_responder:
 
 ip_sla_responder_udp_echos:
   port: any(int(min=1, max=65535), regex("^.*[\$\%]\{.*$"))
-  ipaddress: any(ip(), regex("^.*[\$\%]\{.*$"), required=False)
+  ipaddress: any(ip(type='address'), regex("^.*[\$\%]\{.*$"), required=False)
 
 ip_sla_responder_tcp_connects:
   port: any(int(min=1, max=65535), regex("^.*[\$\%]\{.*$"))
-  ipaddress: any(ip(version=4), regex("^.*[\$\%]\{.*$"), required=False)
+  ipaddress: any(ip(version=4, type='address'), regex("^.*[\$\%]\{.*$"), required=False)
 
 ip_sla_operations:
   id: any(int(min=1, max=2147483647), regex("^.*[\$\%]\{.*$"))
@@ -1456,7 +1456,7 @@ netflow:
 netflow_exporters:
   name: str()
   description: str(required=False)
-  destination: any(ip(), regex("^.*[\$\%]\{.*$"), required=False)
+  destination: any(ip(type='address'), regex("^.*[\$\%]\{.*$"), required=False)
   dscp: any(int(min=0, max=63), regex("^.*[\$\%]\{.*$"), required=False)
   source_interface_type: any(enum('ethernet', 'loopback', 'mgmt', 'port-channel', 'vlan', 'vni'), regex("^.*[\$\%]\{.*$"), required=False)
   source_interface_id: any(str(), int(min=0), required=False)
@@ -1532,7 +1532,7 @@ ntp_authentication_keys:
   trusted: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
 
 ntp_servers:
-  ip: any(ip(), regex("^.*[\$\%]\{.*$"))
+  ip: any(ip(type='address'), regex("^.*[\$\%]\{.*$"))
   use_vrf: str(required=False, ref='vrf')
   key: any(int(min=1, max=65535), regex("^.*[\$\%]\{.*$"), required=False, ref='ntp_authentication_key')
   prefer: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
@@ -1540,7 +1540,7 @@ ntp_servers:
   maxpoll: any(int(min=4, max=16), regex("^.*[\$\%]\{.*$"), required=False)
 
 ntp_peers:
-  ip: any(ip(), regex("^.*[\$\%]\{.*$"))
+  ip: any(ip(type='address'), regex("^.*[\$\%]\{.*$"))
   use_vrf: str(required=False, ref='vrf')
   key: any(int(min=1, max=65535), regex("^.*[\$\%]\{.*$"), required=False, ref='ntp_authentication_key')
   prefer: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
@@ -1798,7 +1798,7 @@ route_maps_entries:
   set_large_community_additive: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   set_large_community_none: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   set_large_community_list: str(required=False, ref='large_community_list')
-  set_as_path_prepend: any(list(any(str(), int(min=1, max=4294967295))), regex("^.*[\$\%]\{.*$"), required=False)
+  set_as_path_prepend: any(list(any(str(), int(min=1, max=4294967295)), ordered=True), regex("^.*[\$\%]\{.*$"), required=False)
   set_as_path_prepend_last_as: any(int(min=1, max=10), regex("^.*[\$\%]\{.*$"), required=False)
   set_origin: any(enum('egp', 'igp', 'incomplete'), regex("^.*[\$\%]\{.*$"), required=False)
   set_origin_egp_asn: any(str(), int(min=1, max=4294967295), required=False)
@@ -1813,7 +1813,7 @@ route_maps_entries:
   set_metric_reliability: any(int(min=0, max=255), regex("^.*[\$\%]\{.*$"), required=False)
   set_metric_type: any(enum('type-1', 'type-2', 'internal', 'external'), regex("^.*[\$\%]\{.*$"), required=False)
   set_path_selection_advertise: any(enum('unspecified', 'all', 'backup', 'best2', 'multipaths'), regex("^.*[\$\%]\{.*$"), required=False)
-  set_evpn_gateway_ip: any(ip(version=4), regex("^.*[\$\%]\{.*$"), required=False)
+  set_evpn_gateway_ip: any(ip(version=4, type='address'), regex("^.*[\$\%]\{.*$"), required=False)
   set_evpn_gateway_ip_type: any(enum('ip-address', 'nexthop'), regex("^.*[\$\%]\{.*$"), required=False)
   set_ip_next_hop_peer_address: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   set_ip_next_hop_unchanged: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
@@ -1832,12 +1832,12 @@ route_maps_entries_set_extcommunity_costs:
   pre_bestpath: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
 
 route_maps_entries_set_ip_next_hops:
-  address: any(ip(version=4), regex("^.*[\$\%]\{.*$"))
+  address: any(ip(version=4, type='address'), regex("^.*[\$\%]\{.*$"))
   track: any(int(min=1, max=512), regex("^.*[\$\%]\{.*$"), required=False)
   vrf: str(required=False, ref='vrf')
 
 route_maps_entries_set_ipv6_next_hops:
-  address: any(ip(version=6), regex("^.*[\$\%]\{.*$"))
+  address: any(ip(version=6, type='address'), regex("^.*[\$\%]\{.*$"))
   track: any(int(min=1, max=512), regex("^.*[\$\%]\{.*$"), required=False)
   vrf: str(required=False, ref='vrf')
 
@@ -1878,7 +1878,7 @@ routing_ospf_processes:
   name_lookup: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   name_lookup_use_vrf: str(required=False)
   rfc1583compatibility: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
-  router_id: any(ip(version=4), regex("^.*[\$\%]\{.*$"), required=False)
+  router_id: any(ip(version=4, type='address'), regex("^.*[\$\%]\{.*$"), required=False)
   default_information_originate: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   default_information_originate_always: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   default_information_originate_route_map: str(required=False, ref='route_map')
@@ -1919,7 +1919,7 @@ routing_ospf_processes_vrfs:
   name_lookup: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   name_lookup_use_vrf: str(required=False)
   rfc1583compatibility: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
-  router_id: any(ip(version=4), regex("^.*[\$\%]\{.*$"), required=False)
+  router_id: any(ip(version=4, type='address'), regex("^.*[\$\%]\{.*$"), required=False)
   default_information_originate: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   default_information_originate_always: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   default_information_originate_route_map: str(required=False, ref='route_map')
@@ -1941,7 +1941,7 @@ routing_ospf_processes_vrfs:
   summary_addresses: list(include('routing_ospf_processes_summary_addresses'), required=False, primary_key='prefix')
 
 routing_ospf_processes_areas:
-  id: any(ip(version=4), int(min=0, max=4294967295))
+  id: any(ip(version=4, type='address'), int(min=0, max=4294967295))
   authentication: any(enum('simple', 'message-digest'), regex("^.*[\$\%]\{.*$"), required=False)
   default_cost: any(int(min=0, max=16777215), regex("^.*[\$\%]\{.*$"), required=False)
   nssa_no_redistribution: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
@@ -1953,7 +1953,7 @@ routing_ospf_processes_areas:
   ranges: list(include('routing_ospf_processes_areas_ranges'), required=False, primary_key='prefix')
 
 routing_ospf_processes_areas_ranges:
-  prefix: any(ip(version=4), regex("^.*[\$\%]\{.*$"))
+  prefix: any(ip(version=4, type='network'), regex("^.*[\$\%]\{.*$"))
   not_advertise: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   cost: any(int(min=0, max=16777215), regex("^.*[\$\%]\{.*$"), required=False)
 
@@ -1974,7 +1974,7 @@ routing_ospf_processes_redistributions:
   route_map: str(required=False, ref='route_map')
 
 routing_ospf_processes_summary_addresses:
-  prefix: any(ip(version=4), regex("^.*[\$\%]\{.*$"))
+  prefix: any(ip(version=4, type='network'), regex("^.*[\$\%]\{.*$"))
   not_advertise: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   tag: any(int(min=0, max=4294967295), regex("^.*[\$\%]\{.*$"), required=False)
 
@@ -1985,7 +1985,7 @@ routing_ospfv3_processes:
   shutdown: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   auto_cost_reference_bandwidth: any(int(min=0, max=4294967295), regex("^.*[\$\%]\{.*$"), required=False)
   auto_cost_reference_bandwidth_unit: any(enum('mbps', 'gbps'), regex("^.*[\$\%]\{.*$"), required=False)
-  router_id: any(ip(version=4), regex("^.*[\$\%]\{.*$"), required=False)
+  router_id: any(ip(version=4, type='address'), regex("^.*[\$\%]\{.*$"), required=False)
   bfd: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   log_adjacency_changes: any(enum('none', 'brief', 'detail'), regex("^.*[\$\%]\{.*$"), required=False)
   discard_route_external: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
@@ -2010,7 +2010,7 @@ routing_ospfv3_processes_vrfs:
   shutdown: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   auto_cost_reference_bandwidth: any(int(min=0, max=4294967295), regex("^.*[\$\%]\{.*$"), required=False)
   auto_cost_reference_bandwidth_unit: any(enum('mbps', 'gbps'), regex("^.*[\$\%]\{.*$"), required=False)
-  router_id: any(ip(version=4), regex("^.*[\$\%]\{.*$"), required=False)
+  router_id: any(ip(version=4, type='address'), regex("^.*[\$\%]\{.*$"), required=False)
   bfd: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   log_adjacency_changes: any(enum('none', 'brief', 'detail'), regex("^.*[\$\%]\{.*$"), required=False)
   discard_route_external: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
@@ -2030,7 +2030,7 @@ routing_ospfv3_processes_vrfs:
   address_families: list(include('routing_ospfv3_processes_address_families'), required=False, primary_key='address_family')
 
 routing_ospfv3_processes_areas:
-  id: any(ip(version=4), int(min=0, max=4294967295))
+  id: any(ip(version=4, type='address'), int(min=0, max=4294967295))
   type: any(enum('regular', 'stub', 'nssa'), regex("^.*[\$\%]\{.*$"), required=False)
   redistribute: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   nssa_translate_type7: any(enum('always', 'candidate', 'never'), regex("^.*[\$\%]\{.*$"), required=False)
@@ -2054,12 +2054,12 @@ routing_ospfv3_processes_address_families:
   summary_addresses: list(include('routing_ospfv3_processes_address_families_summary_addresses'), required=False, primary_key='prefix')
 
 routing_ospfv3_processes_address_families_areas:
-  id: any(ip(version=4), int(min=0, max=4294967295))
+  id: any(ip(version=4, type='address'), int(min=0, max=4294967295))
   default_cost: any(int(min=0, max=16777215), regex("^.*[\$\%]\{.*$"), required=False)
   ranges: list(include('routing_ospfv3_processes_address_families_areas_ranges'), required=False, primary_key='prefix')
 
 routing_ospfv3_processes_address_families_areas_ranges:
-  prefix: any(ip(version=6), regex("^.*[\$\%]\{.*$"))
+  prefix: any(ip(version=6, type='network'), regex("^.*[\$\%]\{.*$"))
   not_advertise: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   cost: any(int(min=0, max=16777215), regex("^.*[\$\%]\{.*$"), required=False)
 
@@ -2070,7 +2070,7 @@ routing_ospfv3_processes_address_families_redistributions:
   route_map: str(required=False, ref='route_map')
 
 routing_ospfv3_processes_address_families_summary_addresses:
-  prefix: any(ip(version=6), regex("^.*[\$\%]\{.*$"))
+  prefix: any(ip(version=6, type='network'), regex("^.*[\$\%]\{.*$"))
   not_advertise: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   tag: any(int(min=0, max=4294967295), regex("^.*[\$\%]\{.*$"), required=False)
 
@@ -2169,7 +2169,7 @@ routing_isis_instances_vrfs_address_families:
   multi_topology: any(enum('standard', 'multi-topology', 'multi-topology-transition'), regex("^.*[\$\%]\{.*$"), required=False)
   router_id_interface_type: any(enum('ethernet', 'loopback', 'mgmt', 'port-channel', 'vlan', 'vni'), regex("^.*[\$\%]\{.*$"), required=False)
   router_id_interface_id: any(str(), int(min=0), required=False)
-  router_id_ip_address: any(ip(version=4), regex("^.*[\$\%]\{.*$"), required=False)
+  router_id_ip_address: any(ip(version=4, type='address'), regex("^.*[\$\%]\{.*$"), required=False)
   table_map: str(required=False)
   table_map_filter: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   distributions: list(include('routing_isis_instances_vrfs_address_families_distributions'), required=False, primary_key='source_level')
@@ -2189,7 +2189,7 @@ routing_isis_instances_vrfs_address_families_redistributions:
   route_map: str(required=False, ref='route_map')
 
 routing_isis_instances_vrfs_address_families_summary_addresses:
-  prefix: any(ip(), regex("^.*[\$\%]\{.*$"))
+  prefix: any(ip(type='network'), regex("^.*[\$\%]\{.*$"))
   level: any(enum('level-1', 'level-2', 'level-1-2'), regex("^.*[\$\%]\{.*$"))
 
 routing_eigrp_processes:
@@ -2207,7 +2207,7 @@ routing_eigrp_processes_vrfs_address_families:
   address_family: any(enum('ipv4-unicast', 'ipv6-unicast'), regex("^.*[\$\%]\{.*$"))
   shutdown: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   autonomous_system: any(int(min=1, max=65535), regex("^.*[\$\%]\{.*$"), required=False)
-  router_id: any(ip(version=4), regex("^.*[\$\%]\{.*$"), required=False)
+  router_id: any(ip(version=4, type='address'), regex("^.*[\$\%]\{.*$"), required=False)
   distance_internal: any(int(min=1, max=255), regex("^.*[\$\%]\{.*$"), required=False)
   distance_external: any(int(min=1, max=255), regex("^.*[\$\%]\{.*$"), required=False)
   maximum_paths: any(int(min=1, max=32), regex("^.*[\$\%]\{.*$"), required=False)
@@ -2333,22 +2333,22 @@ routing_pim_vrfs:
   auto_rp: include('routing_pim_vrfs_auto_rp', required=False)
 
 routing_pim_vrfs_rp_addresses:
-  address: any(ip(version=4), regex("^.*[\$\%]\{.*$"))
-  group_list: any(ip(version=4), regex("^.*[\$\%]\{.*$"), required=False)
+  address: any(ip(version=4, type='address'), regex("^.*[\$\%]\{.*$"))
+  group_list: any(ip(version=4, type='network'), regex("^.*[\$\%]\{.*$"), required=False)
   bidir: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   override: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   route_map: str(required=False, ref='route_map')
   prefix_list: str(required=False, ref='ip_prefix_list')
 
 routing_pim_vrfs_anycast_rps:
-  address: any(ip(version=4), regex("^.*[\$\%]\{.*$"))
-  set_address: any(ip(version=4), regex("^.*[\$\%]\{.*$"))
+  address: any(ip(version=4, type='address'), regex("^.*[\$\%]\{.*$"))
+  set_address: any(ip(version=4, type='address'), regex("^.*[\$\%]\{.*$"))
 
 routing_pim_vrfs_ssm:
-  range_1: any(ip(version=4), regex("^.*[\$\%]\{.*$"), required=False)
-  range_2: any(ip(version=4), regex("^.*[\$\%]\{.*$"), required=False)
-  range_3: any(ip(version=4), regex("^.*[\$\%]\{.*$"), required=False)
-  range_4: any(ip(version=4), regex("^.*[\$\%]\{.*$"), required=False)
+  range_1: any(ip(version=4, type='network'), regex("^.*[\$\%]\{.*$"), required=False)
+  range_2: any(ip(version=4, type='network'), regex("^.*[\$\%]\{.*$"), required=False)
+  range_3: any(ip(version=4, type='network'), regex("^.*[\$\%]\{.*$"), required=False)
+  range_4: any(ip(version=4, type='network'), regex("^.*[\$\%]\{.*$"), required=False)
   prefix_list: str(required=False, ref='ip_prefix_list')
   none: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   route_map: str(required=False, ref='route_map')
@@ -2363,7 +2363,7 @@ routing_pim_vrfs_bsr:
   bsr_candidate_interval: any(int(min=1, max=65535), regex("^.*[\$\%]\{.*$"), required=False)
   rp_candidate_interface_type: any(enum('ethernet', 'loopback', 'mgmt', 'port-channel', 'vlan', 'vni'), regex("^.*[\$\%]\{.*$"), required=False)
   rp_candidate_interface_id: str(required=False)
-  rp_candidate_group_list: any(ip(version=4), regex("^.*[\$\%]\{.*$"), required=False)
+  rp_candidate_group_list: any(ip(version=4, type='network'), regex("^.*[\$\%]\{.*$"), required=False)
   rp_candidate_route_map: str(required=False, ref='route_map')
   rp_candidate_prefix_list: str(required=False, ref='ip_prefix_list')
   rp_candidate_priority: any(int(min=0, max=255), regex("^.*[\$\%]\{.*$"), required=False)
@@ -2380,7 +2380,7 @@ routing_pim_vrfs_auto_rp:
   mapping_agent_scope: any(int(min=1, max=255), regex("^.*[\$\%]\{.*$"), required=False)
   rp_candidate_interface_type: any(enum('ethernet', 'loopback', 'mgmt', 'port-channel', 'vlan', 'vni'), regex("^.*[\$\%]\{.*$"), required=False)
   rp_candidate_interface_id: str(required=False)
-  rp_candidate_group_list: any(ip(version=4), regex("^.*[\$\%]\{.*$"), required=False)
+  rp_candidate_group_list: any(ip(version=4, type='network'), regex("^.*[\$\%]\{.*$"), required=False)
   rp_candidate_route_map: str(required=False, ref='route_map')
   rp_candidate_prefix_list: str(required=False, ref='ip_prefix_list')
   rp_candidate_scope: any(int(min=1, max=255), regex("^.*[\$\%]\{.*$"), required=False)
@@ -2414,11 +2414,11 @@ routing_msdp_vrfs:
   peers: list(include('routing_msdp_vrfs_peers'), required=False, primary_key='address')
 
 routing_msdp_vrfs_group_limits:
-  source: any(ip(version=4), regex("^.*[\$\%]\{.*$"))
+  source: any(ip(version=4, type='network'), regex("^.*[\$\%]\{.*$"))
   limit: any(int(min=0, max=4294967295), regex("^.*[\$\%]\{.*$"), required=False)
 
 routing_msdp_vrfs_peers:
-  address: any(ip(version=4), regex("^.*[\$\%]\{.*$"))
+  address: any(ip(version=4, type='address'), regex("^.*[\$\%]\{.*$"))
   connect_source_interface_type: any(enum('ethernet', 'loopback', 'mgmt', 'port-channel', 'vlan', 'vni'), regex("^.*[\$\%]\{.*$"))
   connect_source_interface_id: any(str(), int(min=0))
   remote_as: any(str(), int(min=0, max=4294967295), required=False)
@@ -2454,13 +2454,13 @@ routing_bgp:
   peer_templates: list(include('routing_bgp_peer_templates'), required=False, primary_key='name', ref_name='bgp_peer_template')
   peer_session_templates: list(include('routing_bgp_peer_session_templates'), required=False, primary_key='name', ref_name='bgp_peer_session_template')
   peer_policy_templates: list(include('routing_bgp_peer_policy_templates'), required=False, primary_key='name', ref_name='bgp_peer_policy_template')
-  router_id: any(ip(version=4), regex("^.*[\$\%]\{.*$"), required=False)
+  router_id: any(ip(version=4, type='address'), regex("^.*[\$\%]\{.*$"), required=False)
   allocate_index: any(int(min=1, max=8000), regex("^.*[\$\%]\{.*$"), required=False)
   bestpath_limit_always: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   bestpath_limit: any(int(min=1, max=3600), regex("^.*[\$\%]\{.*$"), required=False)
   reference_bandwidth: any(int(min=0, max=4294967295), regex("^.*[\$\%]\{.*$"), required=False)
   reference_bandwidth_unit: any(enum('mbps', 'gbps'), regex("^.*[\$\%]\{.*$"), required=False)
-  cluster_id: any(ip(version=4), int(min=0, max=4294967295), regex("^.*[$%]\{.*$"), required=False)
+  cluster_id: any(ip(version=4, type='address'), int(min=0, max=4294967295), regex("^.*[$%]\{.*$"), required=False)
   hold_time: any(int(min=3, max=3600), regex("^.*[\$\%]\{.*$"), required=False)
   keepalive_interval: any(int(min=0, max=3600), regex("^.*[\$\%]\{.*$"), required=False)
   local_as: any(str(), int(min=0, max=4294967295), required=False)
@@ -2641,13 +2641,13 @@ routing_bgp_peer_policy_templates:
 
 routing_bgp_vrfs:
   vrf: str(ref='vrf')
-  router_id: any(ip(version=4), regex("^.*[\$\%]\{.*$"), required=False)
+  router_id: any(ip(version=4, type='address'), regex("^.*[\$\%]\{.*$"), required=False)
   allocate_index: any(int(min=1, max=8000), regex("^.*[\$\%]\{.*$"), required=False)
   bestpath_limit_always: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   bestpath_limit: any(int(min=1, max=3600), regex("^.*[\$\%]\{.*$"), required=False)
   reference_bandwidth: any(int(min=0, max=4294967295), regex("^.*[\$\%]\{.*$"), required=False)
   reference_bandwidth_unit: any(enum('mbps', 'gbps'), regex("^.*[\$\%]\{.*$"), required=False)
-  cluster_id: any(ip(version=4), int(min=0, max=4294967295), regex("^.*[$%]\{.*$"), required=False)
+  cluster_id: any(ip(version=4, type='address'), int(min=0, max=4294967295), regex("^.*[$%]\{.*$"), required=False)
   hold_time: any(int(min=3, max=3600), regex("^.*[\$\%]\{.*$"), required=False)
   keepalive_interval: any(int(min=0, max=3600), regex("^.*[\$\%]\{.*$"), required=False)
   local_as: any(str(), int(min=0, max=4294967295), required=False)
@@ -2669,7 +2669,7 @@ routing_bgp_vrfs:
   address_families: list(include('routing_bgp_vrfs_address_families'), required=False, primary_key='address_family')
 
 routing_bgp_vrfs_neighbors:
-  ip: any(ip(), regex("^.*[\$\%]\{.*$"), required=False)
+  ip: any(ip(type='address,network'), regex("^.*[\$\%]\{.*$"), required=False)
   interface_type: any(enum('ethernet', 'loopback', 'mgmt', 'port-channel', 'vlan', 'vni'), regex("^.*[\$\%]\{.*$"), required=False)
   interface_id: any(str(), int(min=0), required=False)
   remote_as: any(str(), int(min=0, max=4294967295), required=False)
@@ -2795,7 +2795,7 @@ routing_bgp_vrfs_address_families:
   aggregate_addresses: list(include('routing_bgp_vrfs_address_families_aggregate_addresses'), required=False, primary_key='prefix')
 
 routing_bgp_vrfs_address_families_networks:
-  prefix: any(ip(), regex("^.*[\$\%]\{.*$"))
+  prefix: any(ip(type='network'), regex("^.*[\$\%]\{.*$"))
   evpn: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   route_map: str(required=False, ref='route_map')
 
@@ -2806,7 +2806,7 @@ routing_bgp_vrfs_address_families_redistributions:
   asn: any(str(), int(min=0, max=4294967295), required=False)
 
 routing_bgp_vrfs_address_families_aggregate_addresses:
-  prefix: any(ip(), regex("^.*[\$\%]\{.*$"))
+  prefix: any(ip(type='network'), regex("^.*[\$\%]\{.*$"))
   as_set: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   summary_only: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   advertise_map: str(required=False, ref='route_map')
@@ -2831,25 +2831,25 @@ routing_segment_routing_mpls_connected_prefix_sid_map_address_families:
   prefixes: list(include('routing_segment_routing_mpls_connected_prefix_sid_map_address_families_prefixes'), required=False, primary_key='prefix')
 
 routing_segment_routing_mpls_connected_prefix_sid_map_address_families_prefixes:
-  prefix: any(ip(), regex("^.*[\$\%]\{.*$"))
+  prefix: any(ip(type='network'), regex("^.*[\$\%]\{.*$"))
   index: any(int(min=0, max=471804), regex("^.*[\$\%]\{.*$"), required=False)
   absolute: any(int(min=16000, max=471804), regex("^.*[\$\%]\{.*$"), required=False)
 
 routing_segment_routing_srv6:
-  encapsulation_source_address: any(ip(version=6), regex("^.*[\$\%]\{.*$"), required=False)
+  encapsulation_source_address: any(ip(version=6, type='address'), regex("^.*[\$\%]\{.*$"), required=False)
   locators: list(include('routing_segment_routing_srv6_locators'), required=False, primary_key='name', ref_name='srv6_locator')
 
 routing_segment_routing_srv6_locators:
   name: str()
-  prefix: any(ip(version=6), regex("^.*[\$\%]\{.*$"), required=False)
+  prefix: any(ip(version=6, type='network'), regex("^.*[\$\%]\{.*$"), required=False)
 
 routing_segment_routing_traffic_engineering:
-  encapsulation_mpls_source_ipv4: any(ip(version=4), regex("^.*[\$\%]\{.*$"), required=False)
+  encapsulation_mpls_source_ipv4: any(ip(version=4, type='address'), regex("^.*[\$\%]\{.*$"), required=False)
   liveness_detection_interval: any(int(min=50, max=30000), regex("^.*[\$\%]\{.*$"), required=False)
   liveness_detection_multiplier: any(int(min=1, max=10), regex("^.*[\$\%]\{.*$"), required=False)
   liveness_detection_mpls_bfd: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   liveness_detection_mpls_oam: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
-  pcc_source_address_ipv4: any(ip(version=4), regex("^.*[\$\%]\{.*$"), required=False)
+  pcc_source_address_ipv4: any(ip(version=4, type='address'), regex("^.*[\$\%]\{.*$"), required=False)
   pcc_pce_addresses: list(include('routing_segment_routing_traffic_engineering_pcc_pce_addresses'), required=False, primary_key='ipv4')
   affinity_map_colors: list(include('routing_segment_routing_traffic_engineering_affinity_map_colors'), required=False, primary_key='color', ref_name='srte_affinity_color')
   segment_routing_srv6_locators: any(list(str(ref='srv6_locator')), regex("^.*[\$\%]\{.*$"), required=False)
@@ -2859,7 +2859,7 @@ routing_segment_routing_traffic_engineering:
   policies: list(include('routing_segment_routing_traffic_engineering_policies'), required=False, primary_key='name')
 
 routing_segment_routing_traffic_engineering_pcc_pce_addresses:
-  ipv4: any(ip(version=4), regex("^.*[\$\%]\{.*$"))
+  ipv4: any(ip(version=4, type='address'), regex("^.*[\$\%]\{.*$"))
   precedence: any(int(min=0, max=255), regex("^.*[\$\%]\{.*$"), required=False)
 
 routing_segment_routing_traffic_engineering_affinity_map_colors:
@@ -2879,7 +2879,7 @@ routing_segment_routing_traffic_engineering_segment_lists:
 routing_segment_routing_traffic_engineering_segment_lists_indexes:
   index: any(int(min=1, max=65535), regex("^.*[\$\%]\{.*$"))
   mpls_label: any(int(min=16, max=471804), regex("^.*[\$\%]\{.*$"), required=False)
-  segment_routing_srv6: any(ip(version=6), regex("^.*[\$\%]\{.*$"), required=False)
+  segment_routing_srv6: any(ip(version=6, type='address'), regex("^.*[\$\%]\{.*$"), required=False)
   policy_endpoint: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
 
 routing_segment_routing_traffic_engineering_on_demand_colors:
@@ -2892,7 +2892,7 @@ routing_segment_routing_traffic_engineering_on_demand_colors:
 routing_segment_routing_traffic_engineering_policies:
   name: str()
   color: any(int(min=0, max=4294967295), regex("^.*[\$\%]\{.*$"), required=False)
-  endpoint: any(ip(), regex("^.*[\$\%]\{.*$"), required=False)
+  endpoint: any(ip(type='address'), regex("^.*[\$\%]\{.*$"), required=False)
   shutdown: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   lockdown: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   liveness_detection: include('routing_segment_routing_traffic_engineering_liveness_detection', required=False)
@@ -2922,7 +2922,7 @@ routing_segment_routing_traffic_engineering_candidate_paths_preferences:
 
 routing_ip_routes:
   vrf: str(required=False, ref='vrf')
-  prefix: any(ip(version=4), regex("^.*[\$\%]\{.*$"))
+  prefix: any(ip(version=4, type='network'), regex("^.*[\$\%]\{.*$"))
   preference: any(int(min=1, max=255), regex("^.*[\$\%]\{.*$"), required=False)
   tag: any(int(min=0, max=4294967295), regex("^.*[\$\%]\{.*$"), required=False)
   bfd: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
@@ -2931,7 +2931,7 @@ routing_ip_routes:
 routing_ip_routes_next_hops:
   interface_type: any(enum('ethernet', 'loopback', 'mgmt', 'port-channel', 'vlan', 'vni'), regex("^.*[\$\%]\{.*$"), required=False)
   interface_id: any(str(), int(min=0), required=False)
-  address: any(ip(version=4), regex("^.*[\$\%]\{.*$"), required=False)
+  address: any(ip(version=4, type='address'), regex("^.*[\$\%]\{.*$"), required=False)
   vrf: str(required=False, ref='vrf')
   track: any(int(min=0, max=4294967295), regex("^.*[\$\%]\{.*$"), required=False)
   preference: any(int(min=0, max=255), regex("^.*[\$\%]\{.*$"), required=False)
@@ -2940,7 +2940,7 @@ routing_ip_routes_next_hops:
 
 routing_ipv6_routes:
   vrf: str(required=False, ref='vrf')
-  prefix: any(ip(version=6), regex("^.*[\$\%]\{.*$"))
+  prefix: any(ip(version=6, type='network'), regex("^.*[\$\%]\{.*$"))
   preference: any(int(min=1, max=255), regex("^.*[\$\%]\{.*$"), required=False)
   tag: any(int(min=0, max=4294967295), regex("^.*[\$\%]\{.*$"), required=False)
   next_hops: list(include('routing_ipv6_routes_next_hops'), required=False)
@@ -2948,7 +2948,7 @@ routing_ipv6_routes:
 routing_ipv6_routes_next_hops:
   interface_type: any(enum('ethernet', 'loopback', 'mgmt', 'port-channel', 'vlan', 'vni'), regex("^.*[\$\%]\{.*$"), required=False)
   interface_id: any(str(), int(min=0), required=False)
-  address: any(ip(version=6), regex("^.*[\$\%]\{.*$"), required=False)
+  address: any(ip(version=6, type='address'), regex("^.*[\$\%]\{.*$"), required=False)
   vrf: str(required=False, ref='vrf')
   track: any(int(min=0, max=4294967295), regex("^.*[\$\%]\{.*$"), required=False)
   preference: any(int(min=0, max=255), regex("^.*[\$\%]\{.*$"), required=False)
@@ -2959,13 +2959,13 @@ routing_ip_route_static_bfds:
   vrf: str(required=False, ref='vrf')
   interface_type: any(enum('ethernet', 'loopback', 'mgmt', 'port-channel', 'vlan', 'vni'), regex("^.*[\$\%]\{.*$"))
   interface_id: any(str(), int(min=0))
-  next_hop: any(ip(version=4), regex("^.*[\$\%]\{.*$"))
+  next_hop: any(ip(version=4, type='address'), regex("^.*[\$\%]\{.*$"))
 
 routing_ipv6_route_static_bfds:
   vrf: str(required=False, ref='vrf')
   interface_type: any(enum('ethernet', 'loopback', 'mgmt', 'port-channel', 'vlan', 'vni'), regex("^.*[\$\%]\{.*$"))
   interface_id: any(str(), int(min=0))
-  next_hop: any(ip(version=6), regex("^.*[\$\%]\{.*$"))
+  next_hop: any(ip(version=6, type='address'), regex("^.*[\$\%]\{.*$"))
 
 snmp:
   contact: str(required=False)
@@ -3123,10 +3123,10 @@ monitor_sessions:
   filter_access_group: str(required=False, ref='ip_access_list')
   mtu: any(int(min=64, max=10240), regex("^.*[\$\%]\{.*$"), required=False)
   erspan_id: any(int(min=0, max=1023), regex("^.*[\$\%]\{.*$"), required=False)
-  destination_ip: any(ip(version=4), regex("^.*[\$\%]\{.*$"), required=False)
-  destination_ipv6: any(ip(version=6), regex("^.*[\$\%]\{.*$"), required=False)
-  source_ip: any(ip(version=4), regex("^.*[\$\%]\{.*$"), required=False)
-  source_ipv6: any(ip(version=6), regex("^.*[\$\%]\{.*$"), required=False)
+  destination_ip: any(ip(version=4, type='address'), regex("^.*[\$\%]\{.*$"), required=False)
+  destination_ipv6: any(ip(version=6, type='address'), regex("^.*[\$\%]\{.*$"), required=False)
+  source_ip: any(ip(version=4, type='address'), regex("^.*[\$\%]\{.*$"), required=False)
+  source_ipv6: any(ip(version=6, type='address'), regex("^.*[\$\%]\{.*$"), required=False)
   ip_dscp: any(int(min=0, max=63), regex("^.*[\$\%]\{.*$"), required=False)
   ip_ttl: any(int(min=1, max=255), regex("^.*[\$\%]\{.*$"), required=False)
   vrf: str(required=False, ref='vrf')
@@ -3148,7 +3148,7 @@ monitor_sessions_source_vlans:
   direction: any(enum('rx', 'tx', 'both'), regex("^.*[\$\%]\{.*$"), required=False)
 
 sflow:
-  agent_ip: any(ip(), regex("^.*[\$\%]\{.*$"), required=False)
+  agent_ip: any(ip(type='address'), regex("^.*[\$\%]\{.*$"), required=False)
   collector_port: any(int(min=1, max=65535), regex("^.*[\$\%]\{.*$"), required=False)
   collectors: list(include('sflow_collectors'), required=False, primary_key='address')
   counter_poll_interval: any(int(min=0, max=2147483647), regex("^.*[\$\%]\{.*$"), required=False)
@@ -3160,9 +3160,9 @@ sflow:
   data_source_interfaces: list(include('sflow_data_source_interfaces'), required=False, primary_key='interface_id')
 
 sflow_collectors:
-  address: any(ip(), regex("^.*[\$\%]\{.*$"))
+  address: any(ip(type='address'), regex("^.*[\$\%]\{.*$"))
   vrf: str(required=False, ref='vrf')
-  source_address: any(ip(), regex("^.*[\$\%]\{.*$"), required=False)
+  source_address: any(ip(type='address'), regex("^.*[\$\%]\{.*$"), required=False)
 
 sflow_data_source_interfaces:
   interface_type: any(enum('ethernet', 'port-channel'), regex("^.*[\$\%]\{.*$"))
@@ -3256,9 +3256,9 @@ system:
   cfs_distribute: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   cfs_eth_distribute: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   cfs_ipv4_distribute: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
-  cfs_ipv4_mcast_address: any(ip(version=4), regex("^.*[\$\%]\{.*$"), required=False)
+  cfs_ipv4_mcast_address: any(ip(version=4, type='address'), regex("^.*[\$\%]\{.*$"), required=False)
   cfs_ipv6_distribute: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
-  cfs_ipv6_mcast_address: any(ip(version=6), regex("^.*[\$\%]\{.*$"), required=False)
+  cfs_ipv6_mcast_address: any(ip(version=6, type='address'), regex("^.*[\$\%]\{.*$"), required=False)
   cli_aliases: list(include('system_cli_aliases'), required=False, primary_key='name')
   copp_profile: any(enum('strict', 'moderate', 'lenient', 'dense'), regex("^.*[\$\%]\{.*$"), required=False)
   copp_rate_limit: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
@@ -3268,8 +3268,8 @@ system:
   mac_address_table: include('system_mac_address_table', required=False)
   l2rib: include('system_l2rib', required=False)
   ngoam: include('system_ngoam', required=False)
-  erspan_origin_ip_address: any(ip(version=4), regex("^.*[\$\%]\{.*$"), required=False)
-  erspan_origin_ipv6_address: any(ip(version=6), regex("^.*[\$\%]\{.*$"), required=False)
+  erspan_origin_ip_address: any(ip(version=4, type='address'), regex("^.*[\$\%]\{.*$"), required=False)
+  erspan_origin_ipv6_address: any(ip(version=6, type='address'), regex("^.*[\$\%]\{.*$"), required=False)
   clock: include('system_clock', required=False)
   icam_monitor_interval: any(int(min=1, max=24), regex("^.*[\$\%]\{.*$"), required=False)
   icam_monitor_history: any(int(min=168, max=1344), regex("^.*[\$\%]\{.*$"), required=False)
@@ -3429,7 +3429,7 @@ vlan_configurations_igmp_snooping:
   link_local_groups_suppression: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   proxy_general_queries_mrt: any(int(min=0, max=25), regex("^.*[\$\%]\{.*$"), required=False)
   proxy_leave_use_group_address: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
-  querier: any(ip(version=4), regex("^.*[\$\%]\{.*$"), required=False)
+  querier: any(ip(version=4, type='address'), regex("^.*[\$\%]\{.*$"), required=False)
   querier_timeout: any(int(min=1, max=65535), regex("^.*[\$\%]\{.*$"), required=False)
   query_flood: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   query_interval: any(int(min=1, max=18000), regex("^.*[\$\%]\{.*$"), required=False)
@@ -3450,8 +3450,8 @@ vlan_configurations_igmp_snooping_interfaces:
   interface_id: any(str(), int(min=0))
 
 vlan_configurations_igmp_snooping_static_groups:
-  group: any(ip(version=4), regex("^.*[\$\%]\{.*$"))
-  source: any(ip(version=4), regex("^.*[\$\%]\{.*$"), required=False)
+  group: any(ip(version=4, type='address'), regex("^.*[\$\%]\{.*$"))
+  source: any(ip(version=4, type='address'), regex("^.*[\$\%]\{.*$"), required=False)
   interfaces: list(include('vlan_configurations_igmp_snooping_interfaces'), primary_key='interface_type,interface_id')
 
 vpc:
@@ -3472,21 +3472,21 @@ vpc:
   mac_address_bpdu_source_version_2: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   peer_gateway: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   peer_gateway_exclude_vlans: include('general_vlans', required=False)
-  virtual_peer_link_destination: any(ip(version=4), regex("^.*[\$\%]\{.*$"), required=False)
+  virtual_peer_link_destination: any(ip(version=4, type='address'), regex("^.*[\$\%]\{.*$"), required=False)
   peer_switch: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   role_priority: any(int(min=1, max=65535), regex("^.*[\$\%]\{.*$"), required=False)
   system_mac: str(required=False)
   system_priority: any(int(min=1, max=65535), regex("^.*[\$\%]\{.*$"), required=False)
   track: any(int(min=0, max=500), regex("^.*[\$\%]\{.*$"), required=False)
-  virtual_peer_link_source: any(ip(version=4), regex("^.*[\$\%]\{.*$"), required=False)
+  virtual_peer_link_source: any(ip(version=4, type='address'), regex("^.*[\$\%]\{.*$"), required=False)
   keepalive: include('vpc_keepalive', required=False)
   ip_arp_synchronize: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   ipv6_nd_synchronize: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   peer_link_port_channel: any(int(min=1, max=4096), regex("^.*[\$\%]\{.*$"), required=False, ref='port_channel')
 
 vpc_keepalive:
-  destination_ip: any(ip(version=4), regex("^.*[\$\%]\{.*$"))
-  source_ip: any(ip(version=4), regex("^.*[\$\%]\{.*$"))
+  destination_ip: any(ip(version=4, type='address'), regex("^.*[\$\%]\{.*$"))
+  source_ip: any(ip(version=4, type='address'), regex("^.*[\$\%]\{.*$"))
   hold_timeout: any(int(min=3, max=10), regex("^.*[\$\%]\{.*$"), required=False)
   interval: any(int(min=400, max=10000), regex("^.*[\$\%]\{.*$"), required=False)
   timeout: any(int(min=3, max=20), regex("^.*[\$\%]\{.*$"), required=False)
@@ -3640,8 +3640,8 @@ interface_group_configuration:
   cdp: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   lldp_receive: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   lldp_transmit: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
-  lldp_tlv_set_management_address: any(ip(version=4), regex("^.*[\$\%]\{.*$"), required=False)
-  lldp_tlv_set_management_address_ipv6: any(ip(version=6), regex("^.*[\$\%]\{.*$"), required=False)
+  lldp_tlv_set_management_address: any(ip(version=4, type='address'), regex("^.*[\$\%]\{.*$"), required=False)
+  lldp_tlv_set_management_address_ipv6: any(ip(version=6, type='address'), regex("^.*[\$\%]\{.*$"), required=False)
   lldp_tlv_set_vlan: any(int(min=0, max=4094), regex("^.*[\$\%]\{.*$"), required=False)
   lldp_dcbx_version: any(enum('auto', 'CEE', 'IEEE'), regex("^.*[\$\%]\{.*$"), required=False)
   udld: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
@@ -3749,8 +3749,8 @@ interfaces_nve:
   source_interface_hold_down_time: any(int(min=1, max=1500), regex("^.*[\$\%]\{.*$"), required=False)
   host_reachability_protocol: any(enum('flood-and-learn', 'bgp', 'controller', 'openflow', 'openflow-ir'), regex("^.*[\$\%]\{.*$"), required=False)
   global_ingress_replication_protocol_bgp: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
-  global_mcast_group_l2: any(ip(version=4), regex("^.*[\$\%]\{.*$"), required=False)
-  global_mcast_group_l3: any(ip(version=4), regex("^.*[\$\%]\{.*$"), required=False)
+  global_mcast_group_l2: any(ip(version=4, type='address'), regex("^.*[\$\%]\{.*$"), required=False)
+  global_mcast_group_l3: any(ip(version=4, type='address'), regex("^.*[\$\%]\{.*$"), required=False)
   multicast_routing_source_interface_type: any(enum('ethernet', 'loopback', 'mgmt', 'port-channel', 'vlan', 'vni'), regex("^.*[\$\%]\{.*$"), required=False)
   multicast_routing_source_interface_id: any(str(), int(min=0), required=False)
   multisite_border_gateway_interface_type: any(enum('ethernet', 'loopback', 'mgmt', 'port-channel', 'vlan', 'vni'), regex("^.*[\$\%]\{.*$"), required=False)
@@ -3769,9 +3769,9 @@ interfaces_nve:
 interfaces_nves_vnis:
   vni: any(int(min=1, max=16777215), regex("^.*[\$\%]\{.*$"))
   associate_vrf: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
-  mcast_group: any(ip(version=4), regex("^.*[\$\%]\{.*$"), required=False)
+  mcast_group: any(ip(version=4, type='address'), regex("^.*[\$\%]\{.*$"), required=False)
   multisite_ingress_replication: any(enum('enable', 'disable', 'optimized'), regex("^.*[\$\%]\{.*$"), required=False)
-  multisite_mcast_group: any(ip(version=4), regex("^.*[\$\%]\{.*$"), required=False)
+  multisite_mcast_group: any(ip(version=4, type='address'), regex("^.*[\$\%]\{.*$"), required=False)
   spine_anycast_gateway: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   suppress_arp: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   ingress_replication_protocol: any(enum('bgp', 'static', 'unknown'), regex("^.*[\$\%]\{.*$"), required=False)
@@ -3863,8 +3863,8 @@ interfaces_ethernets:
   cdp: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   lldp_receive: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   lldp_transmit: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
-  lldp_tlv_set_management_address: any(ip(version=4), regex("^.*[\$\%]\{.*$"), required=False)
-  lldp_tlv_set_management_address_ipv6: any(ip(version=6), regex("^.*[\$\%]\{.*$"), required=False)
+  lldp_tlv_set_management_address: any(ip(version=4, type='address'), regex("^.*[\$\%]\{.*$"), required=False)
+  lldp_tlv_set_management_address_ipv6: any(ip(version=6, type='address'), regex("^.*[\$\%]\{.*$"), required=False)
   lldp_tlv_set_vlan: any(int(min=0, max=4094), regex("^.*[\$\%]\{.*$"), required=False)
   lldp_dcbx_version: any(enum('auto', 'CEE', 'IEEE'), regex("^.*[\$\%]\{.*$"), required=False)
   udld: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
@@ -3958,8 +3958,8 @@ interfaces_port_channels:
   cdp: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   lldp_receive: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   lldp_transmit: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
-  lldp_tlv_set_management_address: any(ip(version=4), regex("^.*[\$\%]\{.*$"), required=False)
-  lldp_tlv_set_management_address_ipv6: any(ip(version=6), regex("^.*[\$\%]\{.*$"), required=False)
+  lldp_tlv_set_management_address: any(ip(version=4, type='address'), regex("^.*[\$\%]\{.*$"), required=False)
+  lldp_tlv_set_management_address_ipv6: any(ip(version=6, type='address'), regex("^.*[\$\%]\{.*$"), required=False)
   lldp_tlv_set_vlan: any(int(min=0, max=4094), regex("^.*[\$\%]\{.*$"), required=False)
   lldp_dcbx_version: any(enum('auto', 'CEE', 'IEEE'), regex("^.*[\$\%]\{.*$"), required=False)
   vtp: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
@@ -4032,18 +4032,18 @@ interfaces_epbr:
   l2_policy_reverse_egress_interface_id: any(str(), int(min=0), required=False)
 
 interfaces_ipv6_addresses:
-  address: any(ip(version=6), regex("^.*[\$\%]\{.*$"))
+  address: any(ip(version=6, type='interface,network'), regex("^.*[\$\%]\{.*$"))
   type: any(enum('primary', 'secondary'), regex("^.*[\$\%]\{.*$"), required=False)
   tag: any(int(min=0, max=4294967295), regex("^.*[\$\%]\{.*$"), required=False)
   eui64: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   route_preference: any(int(min=0, max=255), regex("^.*[\$\%]\{.*$"), required=False)
 
 interfaces_ip_secondary_addresses:
-  address: any(ip(version=4), regex("^.*[\$\%]\{.*$"))
+  address: any(ip(version=4, type='interface'), regex("^.*[\$\%]\{.*$"))
   tag: any(int(min=0, max=4294967295), regex("^.*[\$\%]\{.*$"), required=False)
 
 interfaces_ip:
-  address: any(ip(version=4), regex("^.*[\$\%]\{.*$"), required=False)
+  address: any(ip(version=4, type='interface'), regex("^.*[\$\%]\{.*$"), required=False)
   tag: any(int(min=0, max=4294967295), regex("^.*[\$\%]\{.*$"), required=False)
   secondary_addresses: list(include('interfaces_ip_secondary_addresses'), required=False, primary_key='address')
   forward: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
@@ -4062,7 +4062,7 @@ interfaces_ip:
   dhcp_relay_smart_relay: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   dhcp_relay_subnet_broadcast: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   dhcp_relay_information_option: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
-  dhcp_relay_source_subnet: any(ip(version=4), regex("^.*[\$\%]\{.*$"), required=False)
+  dhcp_relay_source_subnet: any(ip(version=4, type='address'), regex("^.*[\$\%]\{.*$"), required=False)
   dhcp_relay_source_interface_type: any(enum('ethernet', 'loopback', 'mgmt', 'port-channel', 'vlan', 'vni'), regex("^.*[\$\%]\{.*$"), required=False)
   dhcp_relay_source_interface_id: any(str(), int(min=0), required=False)
   dhcp_relay_addresses: list(include('interfaces_ip_dhcp_relay_addresses'), required=False, primary_key='address')
@@ -4077,7 +4077,7 @@ interfaces_ipv6:
   link_local_use_bia: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   address_use_link_local_only: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   verify_unicast_source_reachable_via: any(enum('disabled', 'rx', 'any', 'any-allow-default', 'rx-allow-vni-hosts'), regex("^.*[\$\%]\{.*$"), required=False)
-  address_link_local: any(ip(version=6), regex("^.*[\$\%]\{.*$"), required=False)
+  address_link_local: any(ip(version=6, type='address'), regex("^.*[\$\%]\{.*$"), required=False)
   addresses: list(include('interfaces_ipv6_addresses'), required=False, primary_key='address')
   dhcp_smart_relay: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   dhcp_relay_source_interface_type: any(enum('ethernet', 'loopback', 'mgmt', 'port-channel', 'vlan', 'vni'), regex("^.*[\$\%]\{.*$"), required=False)
@@ -4240,7 +4240,7 @@ interfaces_eigrp_address_families_offset_lists:
   offset: any(int(min=0, max=2147483647), regex("^.*[\$\%]\{.*$"), required=False)
 
 interfaces_eigrp_address_families_summary_addresses:
-  prefix: any(ip(), regex("^.*[\$\%]\{.*$"))
+  prefix: any(ip(type='network'), regex("^.*[\$\%]\{.*$"))
   distance: any(int(min=1, max=255), regex("^.*[\$\%]\{.*$"), required=False)
   leak_map: str(required=False, ref='route_map')
 
@@ -4248,7 +4248,7 @@ interfaces_ospf:
   process: str(ref='ospf_process')
   advertise_secondaries: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   advertise_subnet: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
-  area: any(ip(version=4), int(min=0, max=4294967295), required=False)
+  area: any(ip(version=4, type='address'), int(min=0, max=4294967295), required=False)
   bfd: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   cost: any(int(min=0, max=65535), regex("^.*[\$\%]\{.*$"), required=False)
   dead_interval: any(int(min=0, max=65535), regex("^.*[\$\%]\{.*$"), required=False)
@@ -4271,7 +4271,7 @@ interfaces_ospf:
 interfaces_ospfv3:
   process: str(ref='ospfv3_process')
   advertise_secondaries: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
-  area: any(ip(version=4), int(min=0, max=4294967295), required=False)
+  area: any(ip(version=4, type='address'), int(min=0, max=4294967295), required=False)
   bfd: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   cost: any(int(min=0, max=65535), regex("^.*[\$\%]\{.*$"), required=False)
   dead_interval: any(int(min=0, max=65535), regex("^.*[\$\%]\{.*$"), required=False)
@@ -4328,16 +4328,16 @@ interfaces_igmp:
   suppress_v3_gsq: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
 
 interfaces_igmp_join_groups:
-  group: any(ip(version=4), regex("^.*[\$\%]\{.*$"))
-  source: any(ip(version=4), regex("^.*[\$\%]\{.*$"), required=False)
+  group: any(ip(version=4, type='address'), regex("^.*[\$\%]\{.*$"))
+  source: any(ip(version=4, type='address'), regex("^.*[\$\%]\{.*$"), required=False)
 
 interfaces_igmp_static_groups:
-  group: any(ip(version=4), regex("^.*[\$\%]\{.*$"))
-  source: any(ip(version=4), regex("^.*[\$\%]\{.*$"), required=False)
+  group: any(ip(version=4, type='address'), regex("^.*[\$\%]\{.*$"))
+  source: any(ip(version=4, type='address'), regex("^.*[\$\%]\{.*$"), required=False)
 
 interfaces_igmp_static_oifs:
-  group: any(ip(version=4), regex("^.*[\$\%]\{.*$"))
-  source: any(ip(version=4), regex("^.*[\$\%]\{.*$"), required=False)
+  group: any(ip(version=4, type='address'), regex("^.*[\$\%]\{.*$"))
+  source: any(ip(version=4, type='address'), regex("^.*[\$\%]\{.*$"), required=False)
 
 interfaces_bfd:
   interval: any(int(min=0, max=999), regex("^.*[\$\%]\{.*$"), required=False)
@@ -4347,7 +4347,7 @@ interfaces_bfd:
   echo_rx_interval: any(int(min=0, max=999), regex("^.*[\$\%]\{.*$"), required=False)
   optimize_subinterface: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   per_link: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
-  source_ip: any(ip(), regex("^.*[\$\%]\{.*$"), required=False)
+  source_ip: any(ip(type='address'), regex("^.*[\$\%]\{.*$"), required=False)
   vpc_watch: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   track_member_link: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   authentication_type: any(enum('none', 'keyed-sha1', 'meticulous-keyed-sha1'), regex("^.*[\$\%]\{.*$"), required=False)
@@ -4380,7 +4380,7 @@ interfaces_hsrp_groups:
   forwarding_threshold_lower: any(int(min=0, max=255), regex("^.*[\$\%]\{.*$"), required=False)
   timers_hello: any(int(min=250, max=254000), regex("^.*[\$\%]\{.*$"), required=False)
   timers_hold: any(int(min=750, max=255000), regex("^.*[\$\%]\{.*$"), required=False)
-  ip: any(ip(), regex("^.*[\$\%]\{.*$"), required=False)
+  ip: any(ip(type='address'), regex("^.*[\$\%]\{.*$"), required=False)
   mac_address: any(mac(), regex("^.*[\$\%]\{.*$"), required=False)
   name: str(required=False)
   preempt: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
@@ -4397,11 +4397,11 @@ interfaces_hsrp_groups_tracks:
 interfaces_vrrp_groups:
   id: any(int(min=1, max=255), regex("^.*[\$\%]\{.*$"))
   shutdown: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
-  address: any(ip(version=4), regex("^.*[\$\%]\{.*$"), required=False)
-  secondary_addresses: any(list(ip(version=4)), regex("^.*[\$\%]\{.*$"), required=False)
+  address: any(ip(version=4, type='address'), regex("^.*[\$\%]\{.*$"), required=False)
+  secondary_addresses: any(list(ip(version=4, type='address')), regex("^.*[\$\%]\{.*$"), required=False)
   advertisement_interval: any(int(min=1, max=255), regex("^.*[\$\%]\{.*$"), required=False)
   authentication_text: str(required=False)
-  bfd: any(ip(version=4), regex("^.*[\$\%]\{.*$"), required=False)
+  bfd: any(ip(version=4, type='address'), regex("^.*[\$\%]\{.*$"), required=False)
   preempt: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   priority: any(int(min=1, max=254), regex("^.*[\$\%]\{.*$"), required=False)
   forwarding_threshold_lower: any(int(min=1, max=254), regex("^.*[\$\%]\{.*$"), required=False)
@@ -4420,8 +4420,8 @@ interfaces_vrrpv3_groups:
   address_family: any(enum('ipv4', 'ipv6'), regex("^.*[\$\%]\{.*$"))
   shutdown: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   description: str(required=False)
-  address: any(ip(), regex("^.*[\$\%]\{.*$"), required=False)
-  secondary_addresses: any(list(ip()), regex("^.*[\$\%]\{.*$"), required=False)
+  address: any(ip(type='address'), regex("^.*[\$\%]\{.*$"), required=False)
+  secondary_addresses: any(list(ip(type='address')), regex("^.*[\$\%]\{.*$"), required=False)
   match_address: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   preempt: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   preempt_delay_minimum: any(int(min=0, max=3600), regex("^.*[\$\%]\{.*$"), required=False)
@@ -4441,14 +4441,14 @@ interfaces_vrrs_pathways:
   description: str(required=False)
   mac_address: any(mac(), regex("^.*[\$\%]\{.*$"), required=False)
   mac_advert_interval: any(int(min=1, max=300), regex("^.*[\$\%]\{.*$"), required=False)
-  addresses: any(list(ip()), regex("^.*[\$\%]\{.*$"), required=False)
+  addresses: any(list(ip(type='address')), regex("^.*[\$\%]\{.*$"), required=False)
 
 interfaces_ip_dhcp_relay_addresses:
-  address: any(ip(version=4), regex("^.*[\$\%]\{.*$"))
+  address: any(ip(version=4, type='address'), regex("^.*[\$\%]\{.*$"))
   vrf: str(required=False, ref='vrf')
 
 interfaces_ipv6_dhcp_relay_addresses:
-  address: any(ip(version=6), regex("^.*[\$\%]\{.*$"))
+  address: any(ip(version=6, type='address'), regex("^.*[\$\%]\{.*$"))
   vrf: str(required=False, ref='vrf')
 
 interfaces_spanning_tree:
@@ -4470,11 +4470,11 @@ interfaces_spanning_tree_mst_instances:
 
 interfaces_storm_control:
   action: any(list(enum('none', 'shutdown', 'trap')), regex("^.*[\$\%]\{.*$"), required=False)
-  broadcast_level: any(list(num()), regex("^.*[\$\%]\{.*$"), required=False)
+  broadcast_level: any(list(num(), ordered=True), regex("^.*[\$\%]\{.*$"), required=False)
   broadcast_pps: any(int(min=0, max=4294967295), regex("^.*[\$\%]\{.*$"), required=False)
-  multicast_level: any(list(num()), regex("^.*[\$\%]\{.*$"), required=False)
+  multicast_level: any(list(num(), ordered=True), regex("^.*[\$\%]\{.*$"), required=False)
   multicast_pps: any(int(min=0, max=4294967295), regex("^.*[\$\%]\{.*$"), required=False)
-  unicast_level: any(list(num()), regex("^.*[\$\%]\{.*$"), required=False)
+  unicast_level: any(list(num(), ordered=True), regex("^.*[\$\%]\{.*$"), required=False)
   unicast_pps: any(int(min=0, max=4294967295), regex("^.*[\$\%]\{.*$"), required=False)
 
 general_vlans:
@@ -4540,8 +4540,8 @@ interfaces_management:
   cdp: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   lldp_receive: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   lldp_transmit: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
-  lldp_tlv_set_management_address: any(ip(version=4), regex("^.*[\$\%]\{.*$"), required=False)
-  lldp_tlv_set_management_address_ipv6: any(ip(version=6), regex("^.*[\$\%]\{.*$"), required=False)
+  lldp_tlv_set_management_address: any(ip(version=4, type='address'), regex("^.*[\$\%]\{.*$"), required=False)
+  lldp_tlv_set_management_address_ipv6: any(ip(version=6, type='address'), regex("^.*[\$\%]\{.*$"), required=False)
   lldp_tlv_set_vlan: any(int(min=0, max=4094), regex("^.*[\$\%]\{.*$"), required=False)
   lldp_dcbx_version: any(enum('auto', 'CEE', 'IEEE'), regex("^.*[\$\%]\{.*$"), required=False)
 
@@ -4935,14 +4935,14 @@ dns:
   vrfs: list(include('dns_vrfs'), required=False, primary_key='vrf')
 
 dns_name_servers:
-  ip: any(ip(), regex("^.*[\$\%]\{.*$"))
+  ip: any(ip(type='address'), regex("^.*[\$\%]\{.*$"))
   source_interface_type: any(enum('ethernet', 'loopback', 'mgmt', 'port-channel', 'vlan', 'vni'), regex("^.*[\$\%]\{.*$"), required=False)
   source_interface_id: any(str(), int(min=0), required=False)
 
 dns_hosts:
   name: str()
-  ip_address: any(ip(version=4), regex("^.*[\$\%]\{.*$"), required=False)
-  ipv6_address: any(ip(version=6), regex("^.*[\$\%]\{.*$"), required=False)
+  ip_address: any(ip(version=4, type='address'), regex("^.*[\$\%]\{.*$"), required=False)
+  ipv6_address: any(ip(version=6, type='address'), regex("^.*[\$\%]\{.*$"), required=False)
 
 dns_vrfs:
   vrf: str(ref='vrf')
@@ -5006,7 +5006,7 @@ telemetry_destination_groups:
   destinations: list(include('telemetry_destination_groups_destinations'), required=False, primary_key='ip_address,port')
 
 telemetry_destination_groups_destinations:
-  ip_address: any(ip(), regex("^.*[\$\%]\{.*$"))
+  ip_address: any(ip(type='address'), regex("^.*[\$\%]\{.*$"))
   port: any(int(min=0, max=65535), regex("^.*[\$\%]\{.*$"))
   protocol: any(enum('UDP', 'gRPC', 'HTTP'), regex("^.*[\$\%]\{.*$"), required=False)
   encoding: any(enum('GPB', 'JSON', 'GPB-compact', 'Form-data'), regex("^.*[\$\%]\{.*$"), required=False)
@@ -5040,9 +5040,9 @@ tracks:
   interface_line_protocol: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   interface_ip_routing: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   interface_ipv6_routing: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
-  ip_route: any(ip(version=4), regex("^.*[\$\%]\{.*$"), required=False)
+  ip_route: any(ip(version=4, type='network'), regex("^.*[\$\%]\{.*$"), required=False)
   ip_route_reachability_hmm: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
-  ipv6_route: any(ip(version=6), regex("^.*[\$\%]\{.*$"), required=False)
+  ipv6_route: any(ip(version=6, type='network'), regex("^.*[\$\%]\{.*$"), required=False)
   ipv6_route_reachability_hmm: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   ip_sla: any(int(min=1, max=2147483647), regex("^.*[\$\%]\{.*$"), required=False)
   ip_sla_reachability: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
@@ -5081,8 +5081,8 @@ ptp:
   priority1: any(int(min=0, max=255), regex("^.*[\$\%]\{.*$"), required=False)
   priority2: any(int(min=0, max=255), regex("^.*[\$\%]\{.*$"), required=False)
   device_type: any(enum('boundary-clock', 'generalized-ptp', 'ordinary-clock-grandmaster'), regex("^.*[\$\%]\{.*$"), required=False)
-  source: any(ip(version=4), regex("^.*[\$\%]\{.*$"), required=False)
-  source_ipv6: any(ip(version=6), regex("^.*[\$\%]\{.*$"), required=False)
+  source: any(ip(version=4, type='address'), regex("^.*[\$\%]\{.*$"), required=False)
+  source_ipv6: any(ip(version=6, type='address'), regex("^.*[\$\%]\{.*$"), required=False)
   vrf: str(required=False, ref='vrf')
   vrf_ipv6: str(required=False, ref='vrf')
   offload: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
@@ -5131,7 +5131,7 @@ ptp_domains:
   priority: any(int(min=0, max=255), regex("^.*[\$\%]\{.*$"), required=False)
 
 ptp_interfaces_peers:
-  ip: any(ip(), regex("^.*[\$\%]\{.*$"))
+  ip: any(ip(type='address'), regex("^.*[\$\%]\{.*$"))
   transmission_unicast_negotiation_schema: str(required=False)
 
 interfaces_ptp:
@@ -5157,8 +5157,8 @@ interfaces_ptp:
   neighbor_propagation_delay_threshold: any(int(min=5, max=2000000), regex("^.*[\$\%]\{.*$"), required=False)
   asymmetric_delay_value: any(int(min=0, max=512000000), regex("^.*[\$\%]\{.*$"), required=False)
   asymmetric_delay_direction: any(enum('none', 'forward-path', 'reverse-path'), regex("^.*[\$\%]\{.*$"), required=False)
-  ucast_source: any(ip(version=4), regex("^.*[\$\%]\{.*$"), required=False)
-  ucast_source_ipv6: any(ip(version=6), regex("^.*[\$\%]\{.*$"), required=False)
+  ucast_source: any(ip(version=4, type='address'), regex("^.*[\$\%]\{.*$"), required=False)
+  ucast_source_ipv6: any(ip(version=6, type='address'), regex("^.*[\$\%]\{.*$"), required=False)
   ucast_source_vrf: str(required=False, ref='vrf')
   ucast_source_vrf_ipv6: str(required=False, ref='vrf')
   ipv6_multicast_scope_tx: any(int(min=0, max=65535), regex("^.*[\$\%]\{.*$"), required=False)
