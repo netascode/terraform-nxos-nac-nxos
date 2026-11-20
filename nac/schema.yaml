@@ -5,7 +5,7 @@ defaults: any(required=False)
 
 nxos:
   global: include('global', required=False)
-  devices: list(include('devices'), required=False, primary_key='name')
+  devices: list(include('devices'), required=False, primary_key='name', unique='url')
   device_groups: list(include('device_groups'), required=False, primary_key='name')
   interface_groups: list(include('interface_groups'), required=False, primary_key='name')
   templates: list(include('nxos_templates'), required=False, primary_key='name')
@@ -226,7 +226,7 @@ aaa_users_accounts_roles:
 
 aaa_role_feature_groups:
   name: str()
-  features: list(str(), required=False)
+  features: list(str(), required=False, unique=True)
 
 aaa_roles:
   name: str()
@@ -259,7 +259,7 @@ aaa_roles_interface_policy_permit_interfaces:
 
 aaa_roles_vrf_policy:
   deny: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
-  permit_vrfs: list(str(), required=False)
+  permit_vrfs: list(str(), required=False, unique=True)
 
 aaa_tacacs_server_group_servers:
   host: str()
@@ -441,7 +441,7 @@ ip_community_lists_entries:
   seq: any(int(min=1, max=4294967294), regex("^.*[\$\%]\{.*$"))
   action: any(enum('permit', 'deny'), regex("^.*[\$\%]\{.*$"), required=False)
   regex: str(required=False)
-  communities: list(str(), required=False)
+  communities: list(str(), required=False, unique=True)
 
 crypto:
   keys: list(include('crypto_keys'), required=False, primary_key='label')
@@ -1115,7 +1115,7 @@ ip_large_community_lists_entries:
   seq: any(int(min=1, max=4294967294), regex("^.*[\$\%]\{.*$"))
   action: any(enum('permit', 'deny'), regex("^.*[\$\%]\{.*$"), required=False)
   regex: str(required=False)
-  communities: any(list(str()), regex("^.*[\$\%]\{.*$"), required=False)
+  communities: any(list(str(), unique=True), regex("^.*[\$\%]\{.*$"), required=False)
 
 ip_sla:
   logging_traps: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
@@ -1133,8 +1133,8 @@ ip_sla_responder:
   enable: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   twamp: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   twamp_timeout: any(int(min=1, max=604800), regex("^.*[\$\%]\{.*$"), required=False)
-  udp_echos: list(include('ip_sla_responder_udp_echos'), required=False)
-  tcp_connects: list(include('ip_sla_responder_tcp_connects'), required=False)
+  udp_echos: list(include('ip_sla_responder_udp_echos'), required=False, unique='port,ipaddress')
+  tcp_connects: list(include('ip_sla_responder_tcp_connects'), required=False, unique='port,ipaddress')
 
 ip_sla_responder_udp_echos:
   port: any(int(min=1, max=65535), regex("^.*[\$\%]\{.*$"))
@@ -1154,7 +1154,7 @@ ip_sla_operations:
   http: include('ip_sla_operations_http', required=False)
   schedule: include('ip_sla_operations_schedule', required=False)
   reaction_configurations: list(include('ip_sla_operations_reaction_configurations'), required=False, primary_key='react')
-  reaction_triggers: any(list(int(min=1, max=2147483647)), regex("^.*[\$\%]\{.*$"), required=False)
+  reaction_triggers: any(list(int(min=1, max=2147483647), unique=True), regex("^.*[\$\%]\{.*$"), required=False)
 
 ip_sla_operations_icmp_echo:
   destination: str()
@@ -1854,10 +1854,10 @@ routing:
   msdp: include('routing_msdp', required=False)
   bgp: include('routing_bgp', required=False)
   segment_routing: include('routing_segment_routing', required=False)
-  ip_routes: list(include('routing_ip_routes'), required=False)
-  ipv6_routes: list(include('routing_ipv6_routes'), required=False)
-  ip_route_static_bfds: list(include('routing_ip_route_static_bfds'), required=False)
-  ipv6_route_static_bfds: list(include('routing_ipv6_route_static_bfds'), required=False)
+  ip_routes: list(include('routing_ip_routes'), required=False, unique='prefix,vrf')
+  ipv6_routes: list(include('routing_ipv6_routes'), required=False, unique='prefix,vrf')
+  ip_route_static_bfds: list(include('routing_ip_route_static_bfds'), required=False, unique='interface_type,interface_id,next_hop,vrf')
+  ipv6_route_static_bfds: list(include('routing_ipv6_route_static_bfds'), required=False, unique='interface_type,interface_id,next_hop,vrf')
 
 routing_ospf_processes:
   name: str()
@@ -1896,7 +1896,7 @@ routing_ospf_processes:
   timers_lsa_group_pacing: any(int(min=1, max=1800), regex("^.*[\$\%]\{.*$"), required=False)
   max_metric_router_lsa: include('routing_ospf_processes_max_metric_router_lsa', required=False)
   areas: list(include('routing_ospf_processes_areas'), required=False, primary_key='id')
-  redistributions: list(include('routing_ospf_processes_redistributions'), required=False)
+  redistributions: list(include('routing_ospf_processes_redistributions'), required=False, unique='protocol,protocol_instance,asn')
   summary_addresses: list(include('routing_ospf_processes_summary_addresses'), required=False, primary_key='prefix')
   vrfs: list(include('routing_ospf_processes_vrfs'), required=False, primary_key='vrf')
 
@@ -1937,7 +1937,7 @@ routing_ospf_processes_vrfs:
   timers_lsa_group_pacing: any(int(min=1, max=1800), regex("^.*[\$\%]\{.*$"), required=False)
   max_metric_router_lsa: include('routing_ospf_processes_max_metric_router_lsa', required=False)
   areas: list(include('routing_ospf_processes_areas'), required=False, primary_key='id')
-  redistributions: list(include('routing_ospf_processes_redistributions'), required=False)
+  redistributions: list(include('routing_ospf_processes_redistributions'), required=False, unique='protocol,protocol_instance,asn')
   summary_addresses: list(include('routing_ospf_processes_summary_addresses'), required=False, primary_key='prefix')
 
 routing_ospf_processes_areas:
@@ -2050,7 +2050,7 @@ routing_ospfv3_processes_address_families:
   timers_throttle_spf_hold_time: any(int(min=1, max=600000), regex("^.*[\$\%]\{.*$"), required=False)
   timers_throttle_spf_max_time: any(int(min=1, max=600000), regex("^.*[\$\%]\{.*$"), required=False)
   areas: list(include('routing_ospfv3_processes_address_families_areas'), required=False, primary_key='id')
-  redistributions: list(include('routing_ospfv3_processes_address_families_redistributions'), required=False)
+  redistributions: list(include('routing_ospfv3_processes_address_families_redistributions'), required=False, unique='protocol,protocol_instance,asn')
   summary_addresses: list(include('routing_ospfv3_processes_address_families_summary_addresses'), required=False, primary_key='prefix')
 
 routing_ospfv3_processes_address_families_areas:
@@ -2173,7 +2173,7 @@ routing_isis_instances_vrfs_address_families:
   table_map: str(required=False)
   table_map_filter: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   distributions: list(include('routing_isis_instances_vrfs_address_families_distributions'), required=False, primary_key='source_level')
-  redistributions: list(include('routing_isis_instances_vrfs_address_families_redistributions'), required=False)
+  redistributions: list(include('routing_isis_instances_vrfs_address_families_redistributions'), required=False, unique='protocol,protocol_instance,asn')
   summary_addresses: list(include('routing_isis_instances_vrfs_address_families_summary_addresses'), required=False, primary_key='prefix')
 
 routing_isis_instances_vrfs_address_families_distributions:
@@ -2258,7 +2258,7 @@ routing_eigrp_processes_vrfs_address_families:
   stub_redistributed: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   stub_receive_only: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   stub_leak_map: str(required=False)
-  redistributions: list(include('routing_eigrp_processes_vrfs_address_families_redistributions'), required=False)
+  redistributions: list(include('routing_eigrp_processes_vrfs_address_families_redistributions'), required=False, unique='protocol,protocol_instance,asn')
 
 routing_eigrp_processes_vrfs_address_families_redistributions:
   protocol: any(enum('static', 'direct', 'bgp', 'isis', 'ospf', 'ospfv3', 'eigrp', 'rip', 'amt', 'lisp'), regex("^.*[\$\%]\{.*$"))
@@ -2478,7 +2478,7 @@ routing_bgp:
   graceful_restart_restart_time: any(int(min=1, max=3600), regex("^.*[\$\%]\{.*$"), required=False)
   graceful_restart_stalepath_time: any(int(min=1, max=3600), regex("^.*[\$\%]\{.*$"), required=False)
   bestpath: include('routing_bgp_bestpath', required=False)
-  neighbors: list(include('routing_bgp_vrfs_neighbors'), required=False)
+  neighbors: list(include('routing_bgp_vrfs_neighbors'), required=False, unique='ip')
   address_families: list(include('routing_bgp_vrfs_address_families'), required=False, primary_key='address_family')
   vrfs: list(include('routing_bgp_vrfs'), required=False, primary_key='vrf')
 
@@ -2665,7 +2665,7 @@ routing_bgp_vrfs:
   graceful_restart_restart_time: any(int(min=1, max=3600), regex("^.*[\$\%]\{.*$"), required=False)
   graceful_restart_stalepath_time: any(int(min=1, max=3600), regex("^.*[\$\%]\{.*$"), required=False)
   bestpath: include('routing_bgp_bestpath', required=False)
-  neighbors: list(include('routing_bgp_vrfs_neighbors'), required=False)
+  neighbors: list(include('routing_bgp_vrfs_neighbors'), required=False, unique='ip')
   address_families: list(include('routing_bgp_vrfs_address_families'), required=False, primary_key='address_family')
 
 routing_bgp_vrfs_neighbors:
@@ -2791,7 +2791,7 @@ routing_bgp_vrfs_address_families:
   additional_paths_install_backup: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   additional_paths_selection_route_map: str(required=False)
   networks: list(include('routing_bgp_vrfs_address_families_networks'), required=False, primary_key='prefix')
-  redistributions: list(include('routing_bgp_vrfs_address_families_redistributions'), required=False)
+  redistributions: list(include('routing_bgp_vrfs_address_families_redistributions'), required=False, unique='protocol,protocol_instance,asn')
   aggregate_addresses: list(include('routing_bgp_vrfs_address_families_aggregate_addresses'), required=False, primary_key='prefix')
 
 routing_bgp_vrfs_address_families_networks:
@@ -3443,7 +3443,7 @@ vlan_configurations_igmp_snooping:
   v3_report_suppression: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   version: any(enum(2, 3), regex("^.*[\$\%]\{.*$"), required=False)
   mrouter_interfaces: list(include('vlan_configurations_igmp_snooping_interfaces'), required=False, primary_key='interface_type,interface_id')
-  static_groups: list(include('vlan_configurations_igmp_snooping_static_groups'), required=False)
+  static_groups: list(include('vlan_configurations_igmp_snooping_static_groups'), required=False, unique='group,source')
 
 vlan_configurations_igmp_snooping_interfaces:
   interface_type: any(enum('ethernet', 'port-channel'), regex("^.*[\$\%]\{.*$"))
@@ -4318,10 +4318,10 @@ interfaces_igmp:
   report_policy_prefix_list: str(required=False)
   access_group: str(required=False)
   access_group_prefix_list: str(required=False)
-  join_groups: list(include('interfaces_igmp_join_groups'), required=False)
+  join_groups: list(include('interfaces_igmp_join_groups'), required=False, unique='group,source')
   join_group_route_map: str(required=False)
-  static_groups: list(include('interfaces_igmp_static_groups'), required=False)
-  static_oifs: list(include('interfaces_igmp_static_oifs'), required=False)
+  static_groups: list(include('interfaces_igmp_static_groups'), required=False, unique='group,source')
+  static_oifs: list(include('interfaces_igmp_static_oifs'), required=False, unique='group,source')
   static_oif_route_map: str(required=False)
   report_link_local_groups: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   immediate_leave: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
