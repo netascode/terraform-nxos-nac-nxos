@@ -123,6 +123,28 @@ locals {
       }
     ]
   ])
+
+  # Port-channel members get the layer, switchport mode, VLANs and MTU of their port-channel, as NX-OS only adds
+  # interfaces with matching settings to a port-channel (members without a configured port-channel keep their own).
+  # Like their port-channel, members of the vPC peer-link get no default MTU and no user-configured flags.
+  port_channel_member_settings = { for device in local.devices : device.name => {
+    for eth in try(local.device_config[device.name].interfaces.ethernets, []) : "eth${eth.id}" => [
+      for pc in try(local.device_config[device.name].interfaces.port_channels, []) : {
+        layer       = !try(pc.switchport.enabled, local.default_switchport_enabled[device.name]) ? "Layer3" : "Layer2"
+        mode        = try(local.switchport_mode_map[try(pc.switchport.mode)], try(pc.switchport.mode, null))
+        access_vlan = !try(pc.switchport.enabled, local.default_switchport_enabled[device.name]) ? "unknown" : try(pc.switchport.access_vlan, null) != null ? "vlan-${pc.switchport.access_vlan}" : null
+        native_vlan = !try(pc.switchport.enabled, local.default_switchport_enabled[device.name]) ? "unknown" : try(pc.switchport.trunk_native_vlan, null) != null ? "vlan-${pc.switchport.trunk_native_vlan}" : null
+        trunk_vlans = !try(pc.switchport.enabled, local.default_switchport_enabled[device.name]) ? "1-4094" : try(provider::utils::normalize_vlans(try(pc.switchport.trunk_allowed_vlans), "string-nxos"), null)
+        mtu         = try(local.device_config[device.name].vpc.peer_link_port_channel, null) == pc.id ? try(pc.mtu, null) : try(pc.mtu, 1500)
+        user_configured_flags = try(local.device_config[device.name].vpc.peer_link_port_channel, null) == pc.id ? null : join(",", sort(compact([
+          "admin_layer",
+          "admin_mtu",
+          try(eth.mac_address, null) != null ? "admin_router_mac" : "",
+          try(eth.shutdown, null) != null || !try(pc.switchport.enabled, local.default_switchport_enabled[device.name]) ? "admin_state" : "",
+        ])))
+      } if pc.id == eth.channel_group
+    ][0] if try(eth.channel_group, null) != null && contains([for pc in try(local.device_config[device.name].interfaces.port_channels, []) : pc.id], eth.channel_group)
+  } }
 }
 
 resource "nxos_physical_interface" "physical_interface" {
@@ -131,7 +153,7 @@ resource "nxos_physical_interface" "physical_interface" {
   device = each.key
   physical_interfaces = length(try(local.device_config[each.key].interfaces.ethernets, [])) > 0 ? { for int in try(local.device_config[each.key].interfaces.ethernets, []) : "eth${int.id}" => {
     fec_mode                           = try(int.fec, null)
-    access_vlan                        = try(int.channel_group, null) != null ? null : (!try(int.switchport.enabled, local.default_switchport_enabled[each.key]) ? "unknown" : try(int.switchport.access_vlan, null) != null ? "vlan-${int.switchport.access_vlan}" : null)
+    access_vlan                        = can(local.port_channel_member_settings[each.key]["eth${int.id}"]) ? local.port_channel_member_settings[each.key]["eth${int.id}"].access_vlan : try(int.channel_group, null) != null ? null : (!try(int.switchport.enabled, local.default_switchport_enabled[each.key]) ? "unknown" : try(int.switchport.access_vlan, null) != null ? "vlan-${int.switchport.access_vlan}" : null)
     admin_state                        = try(int.shutdown, null) != null ? (try(int.shutdown) ? "down" : "up") : "up"
     auto_negotiation                   = try(local.interface_negotiate_auto_map[try(int.negotiate_auto)], try(int.negotiate_auto, null))
     bandwidth                          = try(int.bandwidth, null)
@@ -143,7 +165,7 @@ resource "nxos_physical_interface" "physical_interface" {
     dot1q_ethertype                    = try(int.dot1q_ethertype, null)
     duplex                             = try(int.duplex, null)
     itu_channel                        = try(int.itu_channel, null)
-    layer                              = try(int.channel_group, null) != null ? null : (!try(int.switchport.enabled, local.default_switchport_enabled[each.key]) ? "Layer3" : "Layer2")
+    layer                              = can(local.port_channel_member_settings[each.key]["eth${int.id}"]) ? local.port_channel_member_settings[each.key]["eth${int.id}"].layer : try(int.channel_group, null) != null ? null : (!try(int.switchport.enabled, local.default_switchport_enabled[each.key]) ? "Layer3" : "Layer2")
     link_active_jitter_management      = try(int.link_active_jitter_management, null) != null ? (try(int.link_active_jitter_management) ? "enable" : "disable") : null
     link_debounce_down                 = try(int.link_debounce_time, null)
     link_debounce_up                   = try(int.link_debounce_link_up, null)
@@ -158,9 +180,9 @@ resource "nxos_physical_interface" "physical_interface" {
     mdix                               = try(int.mdix, null)
     media_type                         = try(int.media_type, null)
     medium                             = try(int.medium, null)
-    mode                               = try(local.switchport_mode_map[try(int.switchport.mode)], try(int.switchport.mode, null))
-    mtu                                = try(int.mtu, null)
-    native_vlan                        = try(int.channel_group, null) != null ? null : (!try(int.switchport.enabled, local.default_switchport_enabled[each.key]) ? "unknown" : try(int.switchport.trunk_native_vlan, null) != null ? "vlan-${int.switchport.trunk_native_vlan}" : null)
+    mode                               = can(local.port_channel_member_settings[each.key]["eth${int.id}"]) ? local.port_channel_member_settings[each.key]["eth${int.id}"].mode : try(local.switchport_mode_map[try(int.switchport.mode)], try(int.switchport.mode, null))
+    mtu                                = can(local.port_channel_member_settings[each.key]["eth${int.id}"]) ? local.port_channel_member_settings[each.key]["eth${int.id}"].mtu : try(int.channel_group, null) != null ? try(int.mtu, null) : try(int.mtu, 1500)
+    native_vlan                        = can(local.port_channel_member_settings[each.key]["eth${int.id}"]) ? local.port_channel_member_settings[each.key]["eth${int.id}"].native_vlan : try(int.channel_group, null) != null ? null : (!try(int.switchport.enabled, local.default_switchport_enabled[each.key]) ? "unknown" : try(int.switchport.trunk_native_vlan, null) != null ? "vlan-${int.switchport.trunk_native_vlan}" : null)
     packet_timestamp_egress_source_id  = try(int.packet_timestamp_egress_source_id, null)
     packet_timestamp_ingress_source_id = try(int.packet_timestamp_ingress_source_id, null)
     packet_timestamp_state             = try(int.packet_timestamp, null)
@@ -170,11 +192,11 @@ resource "nxos_physical_interface" "physical_interface" {
     squelch                            = try(int.squelch, null) != null ? (try(int.squelch) ? "enable" : "disable") : null
     transparent_mode                   = try(int.switchport.monitor, null) == null ? null : (try(int.switchport.monitor) ? "trans-port" : "not-a-trans-port")
     trunk_logging                      = try(int.logging_event_port_trunk_status, null) != null ? (try(int.logging_event_port_trunk_status) ? "enable" : "disable") : null
-    trunk_vlans                        = try(int.channel_group, null) != null ? null : (!try(int.switchport.enabled, local.default_switchport_enabled[each.key]) ? "1-4094" : try(provider::utils::normalize_vlans(try(int.switchport.trunk_allowed_vlans), "string-nxos"), null))
+    trunk_vlans                        = can(local.port_channel_member_settings[each.key]["eth${int.id}"]) ? local.port_channel_member_settings[each.key]["eth${int.id}"].trunk_vlans : try(int.channel_group, null) != null ? null : (!try(int.switchport.enabled, local.default_switchport_enabled[each.key]) ? "1-4094" : try(provider::utils::normalize_vlans(try(int.switchport.trunk_allowed_vlans), "string-nxos"), null))
     uni_directional_ethernet           = try(int.uni_directional_ethernet, null)
-    user_configured_flags = try(int.channel_group, null) != null ? null : join(",", sort(compact([
+    user_configured_flags = can(local.port_channel_member_settings[each.key]["eth${int.id}"]) ? local.port_channel_member_settings[each.key]["eth${int.id}"].user_configured_flags : try(int.channel_group, null) != null ? null : join(",", sort(compact([
       "admin_layer",
-      # NX-OS always reports admin_mtu as user-configured (any MTU value counts, including the default), even when mtu is not declared
+      # admin_mtu is reported once an MTU has been written, which the module always does (default 1500)
       "admin_mtu",
       try(int.mac_address, null) != null ? "admin_router_mac" : "",
       try(int.shutdown, null) != null || !try(int.switchport.enabled, local.default_switchport_enabled[each.key]) ? "admin_state" : "",
