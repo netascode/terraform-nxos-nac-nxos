@@ -1,0 +1,1 @@
+- Add support for template instances (`nxos.template_instances`), the `DEVICES` and `DEVICE` template variables and the `parse_vlans`, `expand_interfaces` and `fail` template functions

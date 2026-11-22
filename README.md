@@ -20,7 +20,7 @@ A Terraform module to configure Cisco NX-OS devices using [Network as Code](http
 
 This module supports an inventory driven approach, where a complete NX-OS configuration or parts of it are either modeled in one or more YAML files (`yaml_files`, `yaml_directories`) or natively using Terraform variables (`model`).
 
-Configuration is defined per device under `nxos.devices`. Settings shared across devices can be defined once using [global](https://netascode.cisco.com/docs/data_models/nxos/inventory/global/) configuration, [device groups](https://netascode.cisco.com/docs/data_models/nxos/inventory/device_group/), [templates](https://netascode.cisco.com/docs/data_models/nxos/inventory/template/) and [interface groups](https://netascode.cisco.com/docs/data_models/nxos/inventory/interface_group/). The `managed_devices` and `managed_device_groups` variables can be used to limit which devices are managed by a Terraform run.
+Configuration is defined per device under `nxos.devices`. Settings shared across devices can be defined once using [global](https://netascode.cisco.com/docs/data_models/nxos/inventory/global/) configuration, [device groups](https://netascode.cisco.com/docs/data_models/nxos/inventory/device_group/), [templates](https://netascode.cisco.com/docs/data_models/nxos/inventory/template/), [template instances](https://netascode.cisco.com/docs/data_models/nxos/inventory/template_instance/) and [interface groups](https://netascode.cisco.com/docs/data_models/nxos/inventory/interface_group/). The `managed_devices` and `managed_device_groups` variables can be used to limit which devices are managed by a Terraform run.
 
 ## Examples
 
@@ -57,7 +57,7 @@ module "nxos" {
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.9.0 |
 | <a name="requirement_local"></a> [local](#requirement\_local) | >= 2.7.0, < 3.0.0 |
 | <a name="requirement_nxos"></a> [nxos](#requirement\_nxos) | ~> 0.22.0 |
-| <a name="requirement_utils"></a> [utils](#requirement\_utils) | >= 2.1.0, < 3.0.0 |
+| <a name="requirement_utils"></a> [utils](#requirement\_utils) | = 2.3.0-beta.0 |
 ## Inputs
 
 | Name | Description | Type | Default | Required |
