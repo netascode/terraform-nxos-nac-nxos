@@ -5,15 +5,16 @@ defaults: any(required=False)
 
 nxos:
   global: include('global', required=False)
-  devices: list(include('devices'), required=False, primary_key='name', unique='url')
-  device_groups: list(include('device_groups'), required=False, primary_key='name')
+  devices: list(include('devices'), required=False, primary_key='name', unique='url', ref_name='device')
+  device_groups: list(include('device_groups'), required=False, primary_key='name', ref_name='device_group')
   interface_groups: list(include('interface_groups'), required=False, primary_key='name')
-  templates: list(include('nxos_templates'), required=False, primary_key='name')
+  templates: list(include('nxos_templates'), required=False, primary_key='name', ref_name='template')
+  template_instances: list(include('nxos_template_instances'), required=False, primary_key='name')
 
 global:
   variables: map(key=str(), required=False)
   configuration: include('device_configuration', required=False)
-  templates: list(str(), required=False)
+  templates: list(str(ref='template'), required=False)
 
 devices:
   name: str()
@@ -22,7 +23,7 @@ devices:
   device_groups: list(str(), required=False)
   variables: map(key=str(), required=False)
   configuration: include('device_configuration', required=False)
-  templates: list(str(), required=False)
+  templates: list(str(ref='template'), required=False)
   cli_templates: list(include('nxos_cli_templates'), required=False, primary_key='name')
 
 device_configuration:
@@ -84,7 +85,7 @@ device_groups:
   devices: list(str(), required=False)
   variables: map(key=str(), required=False)
   configuration: include('device_configuration', required=False)
-  templates: list(str(), required=False)
+  templates: list(str(ref='template'), required=False)
 
 interface_groups:
   name: str()
@@ -104,6 +105,20 @@ nxos_cli_templates:
   stage: enum('pre', 'post', required=False)
   order: int(min=0, max=9, required=False)
   content: str()
+
+nxos_template_instances:
+  name: str()
+  template: str(ref='template')
+  devices: list(str(ref='device'), required=False)
+  device_groups: list(str(ref='device_group'), required=False)
+  variables: map(key=str(), required=False)
+  items: list(include('nxos_template_instances_items'), required=False, unique='name')
+
+nxos_template_instances_items:
+  name: any(str(), int(), required=False)
+  devices: list(str(ref='device'), required=False)
+  device_groups: list(str(ref='device_group'), required=False)
+  variables: map(key=str(), required=False)
 
 aaa:
   radius: include('aaa_radius', required=False)
