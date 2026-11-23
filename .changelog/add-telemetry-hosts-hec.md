@@ -1,0 +1,1 @@
+- Add telemetry host destinations (`telemetry.destination_groups[].hosts`, NX-OS 10.6(3) or later), including Splunk HTTP Event Collector (HEC) streaming with `protocol: HEC` and the `token`, `token_encryption`, `index` and `endpoint` options
