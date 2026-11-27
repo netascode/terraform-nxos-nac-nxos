@@ -24,6 +24,12 @@ resource "nxos_snmp" "snmp" {
   aaa_server_state_change_trap_status                   = try(local.device_config[each.key].snmp.traps.aaa_server_state_change, null) == null ? null : (try(local.device_config[each.key].snmp.traps.aaa_server_state_change) ? "enable" : "disable")
   bfd_session_down_trap_status                          = try(local.device_config[each.key].snmp.traps.bfd_session_down, null) == null ? null : (try(local.device_config[each.key].snmp.traps.bfd_session_down) ? "enable" : "disable")
   bfd_session_up_trap_status                            = try(local.device_config[each.key].snmp.traps.bfd_session_up, null) == null ? null : (try(local.device_config[each.key].snmp.traps.bfd_session_up) ? "enable" : "disable")
+  bgp_traps_all                                         = try(local.device_config[each.key].snmp.traps.bgp, null) == null ? null : (try(local.device_config[each.key].snmp.traps.bgp) ? "enabled" : "disabled")
+  bgp_traps_state_changes                               = try(local.device_config[each.key].snmp.traps.bgp_state_changes, null) == null ? null : (try(local.device_config[each.key].snmp.traps.bgp_state_changes) ? "enabled" : "disabled")
+  bgp_traps_state_changes_all_fsm                       = try(local.device_config[each.key].snmp.traps.bgp_state_changes_all, null)
+  bgp_traps_state_changes_backward_transition           = try(local.device_config[each.key].snmp.traps.bgp_state_changes_backward_trans, null)
+  bgp_traps_state_changes_limited                       = try(local.device_config[each.key].snmp.traps.bgp_state_changes_limited, null)
+  bgp_traps_threshold_prefix                            = try(local.device_config[each.key].snmp.traps.bgp_threshold_prefix, null)
   bridge_new_root_trap_status                           = try(local.device_config[each.key].snmp.traps.bridge_newroot, null) == null ? null : (try(local.device_config[each.key].snmp.traps.bridge_newroot) ? "enable" : "disable")
   bridge_topology_change_trap_status                    = try(local.device_config[each.key].snmp.traps.bridge_topology_change, null) == null ? null : (try(local.device_config[each.key].snmp.traps.bridge_topology_change) ? "enable" : "disable")
   callhome_event_notify_trap_status                     = try(local.device_config[each.key].snmp.traps.callhome_event_notify, null) == null ? null : (try(local.device_config[each.key].snmp.traps.callhome_event_notify) ? "enable" : "disable")
@@ -138,6 +144,18 @@ resource "nxos_snmp" "snmp" {
     trap        = try(event.trap, null)
   } } : null
 
+  ospf_traps_instances = length(try(local.device_config[each.key].snmp.traps.ospf_tags, [])) > 0 ? { for tag in try(local.device_config[each.key].snmp.traps.ospf_tags, []) : tag.tag => {
+    all               = try(tag.enable, null)
+    lsa               = try(tag.lsa, null)
+    rate_limit_rate   = try(tag.rate_limit_rate, null)
+    rate_limit_window = try(tag.rate_limit_window, null)
+  } } : null
+  ospfv3_traps_instances = length(try(local.device_config[each.key].snmp.traps.ospfv3_tags, [])) > 0 ? { for tag in try(local.device_config[each.key].snmp.traps.ospfv3_tags, []) : tag.tag => {
+    all               = try(tag.enable, null)
+    lsa               = try(tag.lsa, null)
+    rate_limit_rate   = try(tag.rate_limit_rate, null)
+    rate_limit_window = try(tag.rate_limit_window, null)
+  } } : null
   depends_on = [
     nxos_cli.cli_pre_9,
     nxos_feature.feature,

@@ -1,0 +1,1 @@
+- Add SNMP BGP traps (`snmp.traps.bgp`, `snmp.traps.bgp_state_changes`, `snmp.traps.bgp_state_changes_all`, `snmp.traps.bgp_state_changes_backward_trans`, `snmp.traps.bgp_state_changes_limited`, `snmp.traps.bgp_threshold_prefix`) and per-tag OSPF and OSPFv3 traps (`snmp.traps.ospf_tags`, `snmp.traps.ospfv3_tags`)
