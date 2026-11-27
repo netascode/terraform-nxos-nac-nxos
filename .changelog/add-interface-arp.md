@@ -1,0 +1,1 @@
+- Add interface ARP settings (`ip.arp_timeout`, `ip.arp_cache_intf_limit`, `ip.arp_gratuitous_*`, `ip.arp_outside_subnet`, `ip.arp_delete_adj_on_mac_delete`, `ip.arp_refresh_adj_on_mac_delete`, `ip.arp_unnum_svi_dup_ip_detection`, `ip.proxy_arp`, `ip.local_proxy_arp*`) to Ethernet, port-channel, SVI, loopback, subinterface and management interfaces

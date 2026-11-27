@@ -232,6 +232,86 @@ locals {
     }
   } }
 
+  arp_interface_attributes = [
+    "arp_timeout",
+    "arp_cache_intf_limit",
+    "arp_gratuitous_request",
+    "arp_gratuitous_update",
+    "arp_gratuitous_hsrp_duplicate",
+    "arp_outside_subnet",
+    "arp_delete_adj_on_mac_delete",
+    "arp_refresh_adj_on_mac_delete",
+    "arp_unnum_svi_dup_ip_detection",
+    "proxy_arp",
+    "local_proxy_arp",
+    "local_proxy_arp_no_hw_flooding",
+    "local_proxy_arp_reachable",
+  ]
+
+  arp_interfaces_all = flatten([
+    for device in local.devices : concat(
+      [for int in try(local.device_config[device.name].interfaces.vlans, []) : {
+        device       = device.name
+        vrf          = try(int.vrf, "default")
+        interface_id = "vlan${int.id}"
+        ip           = try(int.ip, {})
+      }],
+      [for int in try(local.device_config[device.name].interfaces.loopbacks, []) : {
+        device       = device.name
+        vrf          = try(int.vrf, "default")
+        interface_id = "lo${int.id}"
+        ip           = try(int.ip, {})
+      }],
+      [for int in try(local.device_config[device.name].interfaces.ethernets, []) : {
+        device       = device.name
+        vrf          = try(int.vrf, "default")
+        interface_id = "eth${int.id}"
+        ip           = try(int.ip, {})
+      }],
+      [for int in try(local.device_config[device.name].interfaces.port_channels, []) : {
+        device       = device.name
+        vrf          = try(int.vrf, "default")
+        interface_id = "po${int.id}"
+        ip           = try(int.ip, {})
+      }],
+      [for int in try(local.device_config[device.name].interfaces.management, []) : {
+        device       = device.name
+        vrf          = try(int.vrf, "management")
+        interface_id = "mgmt${int.id}"
+        ip           = try(int.ip, {})
+      }],
+      # Subinterfaces (ethernets)
+      flatten([for eth in try(local.device_config[device.name].interfaces.ethernets, []) :
+        [for sub in try(eth.subinterfaces, []) : {
+          device       = device.name
+          vrf          = try(sub.vrf, "default")
+          interface_id = "eth${eth.id}.${sub.id}"
+          ip           = try(sub.ip, {})
+        }]
+      ]),
+      # Subinterfaces (port channels)
+      flatten([for pc in try(local.device_config[device.name].interfaces.port_channels, []) :
+        [for sub in try(pc.subinterfaces, []) : {
+          device       = device.name
+          vrf          = try(sub.vrf, "default")
+          interface_id = "po${pc.id}.${sub.id}"
+          ip           = try(sub.ip, {})
+        }]
+      ]),
+    )
+  ])
+
+  arp_interfaces = [for e in local.arp_interfaces_all : e
+  if length([for attr in local.arp_interface_attributes : attr if try(e.ip[attr], null) != null]) > 0]
+
+  arp_interfaces_by_device = { for entry in local.arp_interfaces : entry.device => entry... }
+
+  arp_vrfs_by_device = { for device_name, entries in local.arp_interfaces_by_device : device_name => {
+    for vrf in distinct([for e in entries : e.vrf]) : vrf => {
+      interfaces = { for e in entries : e.interface_id => e.ip if e.vrf == vrf }
+    }
+  } }
+
   hypershield_source_interface_type_map = {
     "ethernet"     = "eth"
     "loopback"     = "lo"
@@ -371,6 +451,7 @@ resource "nxos_system" "system" {
     try(local.device_config[device.name].system.ssh, null) != null ||
     try(local.device_config[device.name].system.grpc, null) != null ||
     length(try(local.nd_interfaces_by_device[device.name], [])) > 0 ||
+    length(try(local.arp_interfaces_by_device[device.name], [])) > 0 ||
     length(try(local.cdp_interfaces_by_device[device.name], [])) > 0 ||
     length(try(local.lldp_interfaces_by_device[device.name], [])) > 0 ||
     length(try(local.udld_interfaces_by_device[device.name], [])) > 0 ||
@@ -446,6 +527,26 @@ resource "nxos_system" "system" {
   arp_resolve_outside_subnet              = try(local.device_config[each.key].arp.outside_subnet, null) != null ? (try(local.device_config[each.key].arp.outside_subnet) ? "enabled" : "disabled") : null
   arp_suppression_timeout                 = try(local.device_config[each.key].arp.suppression_timeout, null)
   arp_timeout                             = try(local.device_config[each.key].arp.timeout, null)
+
+  # arpDom -> arpIf nested maps (VRF -> interfaces)
+  arp_vrfs = length(try(local.arp_vrfs_by_device[each.key], {})) > 0 ? { for vrf_name, vrf_data in try(local.arp_vrfs_by_device[each.key], {}) : vrf_name => {
+    interfaces = { for int_id, ip in vrf_data.interfaces : int_id => {
+      delete_adjacency_on_mac_delete            = try(ip.arp_delete_adj_on_mac_delete, null) != null ? (ip.arp_delete_adj_on_mac_delete ? "enabled" : "disabled") : null
+      duplicate_ip_detection_for_unnumbered_svi = try(ip.arp_unnum_svi_dup_ip_detection, null) != null ? (ip.arp_unnum_svi_dup_ip_detection ? "enabled" : "disabled") : null
+      gratuitous_hsrp_duplicate                 = try(ip.arp_gratuitous_hsrp_duplicate, null) != null ? (ip.arp_gratuitous_hsrp_duplicate ? "enabled" : "disabled") : null
+      gratuitous_request                        = try(ip.arp_gratuitous_request, null) != null ? (ip.arp_gratuitous_request ? "enabled" : "disabled") : null
+      gratuitous_update                         = try(ip.arp_gratuitous_update, null) != null ? (ip.arp_gratuitous_update ? "enabled" : "disabled") : null
+      interface_cache_limit                     = try(ip.arp_cache_intf_limit, null)
+      # `ip local-proxy-arp no-hw-flooding|reachable` implies `ip local-proxy-arp`
+      local_proxy_arp                      = try(ip.local_proxy_arp_no_hw_flooding, false) || try(ip.local_proxy_arp_reachable, false) ? "enabled" : (try(ip.local_proxy_arp, null) != null ? (ip.local_proxy_arp ? "enabled" : "disabled") : null)
+      local_proxy_arp_no_hardware_flooding = try(ip.local_proxy_arp_no_hw_flooding, null) != null ? (ip.local_proxy_arp_no_hw_flooding ? "enabled" : "disabled") : null
+      local_proxy_arp_reachable            = try(ip.local_proxy_arp_reachable, null) != null ? (ip.local_proxy_arp_reachable ? "enabled" : "disabled") : null
+      proxy_arp                            = try(ip.proxy_arp, null) != null ? (ip.proxy_arp ? "enabled" : "disabled") : null
+      refresh_timer_for_mac_delete         = try(ip.arp_refresh_adj_on_mac_delete, null)
+      resolve_outside_subnet               = try(ip.arp_outside_subnet, null) != null ? (ip.arp_outside_subnet ? "enabled" : "disabled") : null
+      timeout                              = try(ip.arp_timeout, null)
+    } }
+  } } : null
 
   # arpVpcDom nested map
   arp_vpc_domains = try(local.device_config[each.key].vpc.ip_arp_synchronize, null) != null ? { tostring(try(local.device_config[each.key].vpc.domain_id)) = {
