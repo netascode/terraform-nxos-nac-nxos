@@ -468,6 +468,12 @@ resource "nxos_system" "system" {
     try(local.device_config[device.name].feature.password_encryption_aes_tam, null) != null ||
     try(local.device_config[device.name].system.acllog_match_log_level, null) != null ||
     try(local.device_config[device.name].system.logging_ip_access_list, null) != null ||
+    try(local.device_config[device.name].system.ip_dscp_lop, null) != null ||
+    try(local.device_config[device.name].system.ip_tcp_mss, null) != null ||
+    try(local.device_config[device.name].system.ip_tcp_path_mtu_discovery, null) != null ||
+    try(local.device_config[device.name].system.ip_tcp_synwait_time, null) != null ||
+    try(local.device_config[device.name].system.sockets_local_port_range_start_port, null) != null ||
+    try(local.device_config[device.name].system.sockets_local_port_range_end_port, null) != null ||
     length(try(local.device_config[device.name].system.ip_ssh_source_interfaces, [])) > 0 ||
     length(try(local.device_config[device.name].system.ip_ftp_source_interfaces, [])) > 0 ||
     try(local.ngmvpn_configured[device.name], false) ||
@@ -564,6 +570,14 @@ resource "nxos_system" "system" {
   nd_off_list_timeout                    = try(local.device_config[each.key].nd.off_list_timeout, null)
   nd_probe_interval_for_solicit_neighbor = try(local.device_config[each.key].nd.solicit_na_interval, null)
   nd_solicit_neighbor_advertisement      = try(local.device_config[each.key].nd.solicit_neighbor_advertisement, null) != null ? (try(local.device_config[each.key].nd.solicit_neighbor_advertisement) ? "enabled" : "disabled") : null
+
+  # tcpudpEntity / tcpudpInst attributes
+  tcp_dscp_locally_originated_packets = try(local.device_config[each.key].system.ip_dscp_lop, null)
+  tcp_mss                             = try(local.device_config[each.key].system.ip_tcp_mss, null)
+  tcp_path_mtu_discovery              = try(local.device_config[each.key].system.ip_tcp_path_mtu_discovery, null) == null ? null : (try(local.device_config[each.key].system.ip_tcp_path_mtu_discovery) ? "enabled" : "disabled")
+  tcp_syn_wait_time                   = try(local.device_config[each.key].system.ip_tcp_synwait_time, null)
+  tcp_start_port_range                = try(local.device_config[each.key].system.sockets_local_port_range_start_port, null)
+  tcp_end_port_range                  = try(local.device_config[each.key].system.sockets_local_port_range_end_port, null)
 
   # ndVpcDom nested map
   nd_vpc_domains = try(local.device_config[each.key].vpc.ipv6_nd_synchronize, null) != null ? { tostring(try(local.device_config[each.key].vpc.domain_id)) = {
