@@ -11,6 +11,7 @@ resource "nxos_feature" "feature" {
   dot1x                                    = try(local.device_config[each.key].feature.dot1x, null) == null ? null : (try(local.device_config[each.key].feature.dot1x) ? "enabled" : "disabled")
   eigrp                                    = try(local.device_config[each.key].feature.eigrp, null) == null ? null : (try(local.device_config[each.key].feature.eigrp) ? "enabled" : "disabled")
   epbr                                     = try(local.device_config[each.key].feature.epbr, null) == null ? null : (try(local.device_config[each.key].feature.epbr) ? "enabled" : "disabled")
+  evmed                                    = try(local.device_config[each.key].feature.evmed, null) == null ? null : (try(local.device_config[each.key].feature.evmed) ? "enabled" : "disabled")
   evpn                                     = try(local.device_config[each.key].feature.evpn, null) == null ? null : (try(local.device_config[each.key].feature.evpn) ? "enabled" : "disabled")
   grpc                                     = try(local.device_config[each.key].feature.grpc, null) == null ? null : (try(local.device_config[each.key].feature.grpc) ? "enabled" : "disabled")
   hmm                                      = try(local.device_config[each.key].feature.fabric_forwarding, null) == null ? null : (try(local.device_config[each.key].feature.fabric_forwarding) ? "enabled" : "disabled")

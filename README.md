@@ -106,6 +106,7 @@ No outputs.
 | [nxos_cli.cli_pre_9](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/cli) | resource |
 | [nxos_default_qos.default_qos](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/default_qos) | resource |
 | [nxos_dhcp.dhcp](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/dhcp) | resource |
+| [nxos_eem.eem](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/eem) | resource |
 | [nxos_eigrp.eigrp](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/eigrp) | resource |
 | [nxos_epbr.epbr](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/epbr) | resource |
 | [nxos_esg.esg](https://registry.terraform.io/providers/CiscoDevNet/nxos/latest/docs/resources/esg) | resource |

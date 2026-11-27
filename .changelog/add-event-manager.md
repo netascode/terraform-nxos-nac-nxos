@@ -1,0 +1,2 @@
+- Add event manager configuration (`event_manager.environments`, `event_manager.applets`)
+- Add `feature.evmed`
