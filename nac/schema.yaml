@@ -3059,6 +3059,12 @@ snmp_traps:
   aaa_server_state_change: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   bfd_session_down: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   bfd_session_up: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
+  bgp: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
+  bgp_state_changes: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
+  bgp_state_changes_all: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
+  bgp_state_changes_backward_trans: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
+  bgp_state_changes_limited: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
+  bgp_threshold_prefix: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   bridge_newroot: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   bridge_topology_change: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   callhome_event_notify: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
@@ -3111,6 +3117,8 @@ snmp_traps:
   mpls_vpn_vrf_down: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   mpls_vpn_vrf_up: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   msdp_backward_transition: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
+  ospf_tags: list(include('snmp_traps_ospf_tags'), required=False, primary_key='tag')
+  ospfv3_tags: list(include('snmp_traps_ospfv3_tags'), required=False, primary_key='tag')
   pim_neighbor_loss: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   port_security_access_secure_mac_violation: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   port_security_trunk_secure_mac_violation: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
@@ -3132,6 +3140,20 @@ snmp_traps:
   vtp_notifs: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   vtp_vlan_create: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   vtp_vlan_delete: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
+
+snmp_traps_ospf_tags:
+  tag: str()
+  enable: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
+  lsa: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
+  rate_limit_window: any(int(min=1, max=60), regex("^.*[\$\%]\{.*$"), required=False)
+  rate_limit_rate: any(int(min=0, max=256), regex("^.*[\$\%]\{.*$"), required=False)
+
+snmp_traps_ospfv3_tags:
+  tag: str()
+  enable: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
+  lsa: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
+  rate_limit_window: any(int(min=1, max=60), regex("^.*[\$\%]\{.*$"), required=False)
+  rate_limit_rate: any(int(min=0, max=256), regex("^.*[\$\%]\{.*$"), required=False)
 
 monitor_sessions:
   id: any(int(min=1, max=32), regex("^.*[\$\%]\{.*$"))
