@@ -80,6 +80,9 @@ resource "nxos_bgp" "bgp" {
   nexthop_suppress_default_resolution      = try(local.device_config[each.key].routing.bgp.nexthop_suppress_default_resolution, null) == null ? null : (try(local.device_config[each.key].routing.bgp.nexthop_suppress_default_resolution) ? "enabled" : "disabled")
   rd_dual                                  = try(local.device_config[each.key].routing.bgp.rd_dual, null) == null ? null : (try(local.device_config[each.key].routing.bgp.rd_dual) ? "enabled" : "disabled")
   rd_dual_id                               = try(local.device_config[each.key].routing.bgp.rd_dual_id, null)
+  event_histories = length(try(local.device_config[each.key].routing.bgp.event_histories, [])) > 0 ? { for eh in try(local.device_config[each.key].routing.bgp.event_histories, []) : eh.type => {
+    size = try(eh.size, null)
+  } } : null
 
   vrfs = merge(
     # Synthetic "default" VRF from process-level attributes

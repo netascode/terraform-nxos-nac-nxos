@@ -1,0 +1,1 @@
+- Add BGP event-history buffer sizes (`routing.bgp.event_histories`)
