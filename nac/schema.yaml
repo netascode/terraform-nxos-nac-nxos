@@ -5019,6 +5019,7 @@ telemetry_destination_groups:
   use_chunking_size: any(int(min=64, max=4096), regex("^.*[\$\%]\{.*$"), required=False)
   message_max_size: any(int(min=12288, max=32768), regex("^.*[\$\%]\{.*$"), required=False)
   destinations: list(include('telemetry_destination_groups_destinations'), required=False, primary_key='ip_address,port')
+  hosts: list(include('telemetry_destination_groups_hosts'), required=False, primary_key='host,port')
 
 telemetry_destination_groups_destinations:
   ip_address: any(ip(type='address'), regex("^.*[\$\%]\{.*$"))
@@ -5026,6 +5027,26 @@ telemetry_destination_groups_destinations:
   protocol: any(enum('UDP', 'gRPC', 'HTTP'), regex("^.*[\$\%]\{.*$"), required=False)
   encoding: any(enum('GPB', 'JSON', 'GPB-compact', 'Form-data'), regex("^.*[\$\%]\{.*$"), required=False)
   node_id: str(required=False)
+
+telemetry_destination_groups_hosts:
+  host: str()
+  port: any(int(min=0, max=65535), regex("^.*[\$\%]\{.*$"))
+  protocol: any(enum('UDP', 'gRPC', 'HTTP', 'HEC'), regex("^.*[\$\%]\{.*$"), required=False)
+  encoding: any(enum('GPB', 'JSON', 'GPB-compact', 'Form-data'), regex("^.*[\$\%]\{.*$"), required=False)
+  node_id: str(required=False)
+  grpc_async: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
+  dialin_stream: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
+  proxy: str(required=False)
+  proxy_port: any(int(min=1, max=65535), regex("^.*[\$\%]\{.*$"), required=False)
+  proxy_username: str(required=False)
+  proxy_password: str(required=False)
+  proxy_password_encryption: any(enum('0', '7'), regex("^.*[\$\%]\{.*$"), required=False)
+  certificate_trustpoint: str(required=False)
+  certificate_hostname: str(required=False)
+  token: str(required=False)
+  token_encryption: any(enum('0', '7'), regex("^.*[\$\%]\{.*$"), required=False)
+  index: str(required=False)
+  endpoint: str(required=False)
 
 telemetry_sensor_groups:
   id: any(int(), str(), regex("^.*[\$\%]\{.*$"))
