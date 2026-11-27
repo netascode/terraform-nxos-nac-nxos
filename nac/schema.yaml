@@ -37,6 +37,7 @@ device_configuration:
   dhcp: include('dhcp', required=False)
   dns: include('dns', required=False)
   epbr: include('epbr', required=False)
+  event_manager: include('event_manager', required=False)
   security_group: include('security_group', required=False)
   evpn: include('evpn', required=False)
   fabric_forwarding: include('fabric_forwarding', required=False)
@@ -160,9 +161,9 @@ aaa_radius_servers:
   test_password: str(required=False)
   test_password_type: any(enum('0', '7'), regex("^.*[\$\%]\{.*$"), required=False)
   test_username: str(required=False)
-  tls_client_trustpoint: str(required=False)
+  tls_client_trustpoint: str(required=False, ref='crypto_ca_trustpoint')
   tls_idle_timeout: any(int(min=60, max=600), regex("^.*[\$\%]\{.*$"), required=False)
-  dtls_client_trustpoint: str(required=False)
+  dtls_client_trustpoint: str(required=False, ref='crypto_ca_trustpoint')
   dtls_idle_timeout: any(int(min=60, max=600), regex("^.*[\$\%]\{.*$"), required=False)
 
 aaa_radius_server_groups:
@@ -460,7 +461,7 @@ ip_community_lists_entries:
 
 crypto:
   keys: list(include('crypto_keys'), required=False, primary_key='label', ref_name='crypto_key')
-  ca_trustpoints: list(include('crypto_ca_trustpoints'), required=False, primary_key='name')
+  ca_trustpoints: list(include('crypto_ca_trustpoints'), required=False, primary_key='name', ref_name='crypto_ca_trustpoint')
 
 crypto_keys:
   label: str()
@@ -665,6 +666,226 @@ epbr_policies_matches_sequences:
   set_service: str(ref='epbr_service')
   fail_action: any(enum('bypass', 'forward', 'drop'), regex("^.*[\$\%]\{.*$"), required=False)
 
+event_manager:
+  environments: list(include('event_manager_environments'), required=False, primary_key='name')
+  applets: list(include('event_manager_applets'), required=False, primary_key='name')
+
+event_manager_environments:
+  name: str()
+  value: str()
+
+event_manager_applets:
+  name: str()
+  override: str(required=False)
+  description: str(required=False)
+  event: include('event_manager_applets_event', required=False)
+  tag: include('event_manager_applets_tag', required=False)
+  actions: list(include('event_manager_applets_actions'), required=False, primary_key='label')
+
+event_manager_applets_event:
+  application: include('event_manager_applets_event_application', required=False)
+  cli: include('event_manager_applets_event_cli', required=False)
+  counter: include('event_manager_applets_event_counter', required=False)
+  fanabsent: include('event_manager_applets_event_fan', required=False)
+  fanbad: include('event_manager_applets_event_fan', required=False)
+  fib_adjacency_extra: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
+  fib_resource_tcam_usage: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
+  fib_route: any(enum('inconsistent', 'missing', 'extra'), regex("^.*[\$\%]\{.*$"), required=False)
+  gold: include('event_manager_applets_event_gold', required=False)
+  internal_link_flap: include('event_manager_applets_event_internal_link_flap', required=False)
+  memory: any(enum('minor', 'severe', 'critical'), regex("^.*[\$\%]\{.*$"), required=False)
+  module: include('event_manager_applets_event_module', required=False)
+  module_failure: include('event_manager_applets_event_module_failure', required=False)
+  neighbor_discovery: include('event_manager_applets_event_neighbor_discovery', required=False)
+  none: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
+  oir: include('event_manager_applets_event_oir', required=False)
+  policy_default: include('event_manager_applets_event_policy_default', required=False)
+  poweroverbudget: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
+  snmp: include('event_manager_applets_event_snmp', required=False)
+  storm_control: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
+  syslog: include('event_manager_applets_event_syslog', required=False)
+  sysmgr_memory: include('event_manager_applets_event_sysmgr_memory', required=False)
+  sysmgr_switchover: include('event_manager_applets_event_sysmgr_switchover', required=False)
+  temperature: include('event_manager_applets_event_temperature', required=False)
+  timer: include('event_manager_applets_event_timer', required=False)
+  track: include('event_manager_applets_event_track', required=False)
+  tags: list(include('event_manager_applets_event_tags'), required=False, max=4, primary_key='tag', ref_name='event_manager_tag')
+
+event_manager_applets_event_tags:
+  tag: str()
+  application: include('event_manager_applets_event_application', required=False)
+  cli: include('event_manager_applets_event_tags_cli', required=False)
+  counter: include('event_manager_applets_event_counter', required=False)
+  module: include('event_manager_applets_event_module', required=False)
+  neighbor_discovery: include('event_manager_applets_event_neighbor_discovery', required=False)
+  none: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
+  oir: include('event_manager_applets_event_oir', required=False)
+  snmp: include('event_manager_applets_event_snmp', required=False)
+  syslog: include('event_manager_applets_event_tags_syslog', required=False)
+  timer: include('event_manager_applets_event_timer', required=False)
+  track: include('event_manager_applets_event_track', required=False)
+
+event_manager_applets_event_application:
+  sub_system: any(int(min=0, max=4294967295), regex("^.*[\$\%]\{.*$"))
+  type: any(int(min=0, max=4294967295), regex("^.*[\$\%]\{.*$"))
+
+event_manager_applets_event_cli:
+  match: str()
+  count: any(int(min=1, max=65000), regex("^.*[\$\%]\{.*$"), required=False)
+  time: any(int(min=0, max=10000000), regex("^.*[\$\%]\{.*$"), required=False)
+
+event_manager_applets_event_tags_cli:
+  match: str()
+
+event_manager_applets_event_tags_syslog:
+  priority: any(int(min=0, max=7), enum('alerts', 'critical', 'debugging', 'emergencies', 'errors', 'informational', 'notifications', 'warnings'), regex("^.*[\$\%]\{.*$"), required=False)
+  pattern: str()
+
+event_manager_applets_event_counter:
+  name: str()
+  entry_val: any(int(min=0, max=2147483647), regex("^.*[\$\%]\{.*$"))
+  entry_op: any(enum('gt', 'ge', 'eq', 'ne', 'lt', 'le'), regex("^.*[\$\%]\{.*$"))
+  exit_val: any(int(min=0, max=2147483647), regex("^.*[\$\%]\{.*$"), required=False)
+  exit_op: any(enum('gt', 'ge', 'eq', 'ne', 'lt', 'le'), regex("^.*[\$\%]\{.*$"), required=False)
+
+event_manager_applets_event_fan:
+  fan: any(int(min=0), str(), required=False)
+  time: any(int(min=10, max=64000), regex("^.*[\$\%]\{.*$"))
+
+event_manager_applets_event_gold:
+  module: any(int(min=0, max=4294967295), enum('all'), regex("^.*[\$\%]\{.*$"))
+  test: str()
+  severity: any(enum('minor', 'moderate', 'major'), regex("^.*[\$\%]\{.*$"), required=False)
+  testing_type: any(enum('scheduled', 'monitoring'), regex("^.*[\$\%]\{.*$"))
+  consecutive_failure: any(int(min=0, max=4294967295), regex("^.*[\$\%]\{.*$"))
+
+event_manager_applets_event_internal_link_flap:
+  count: any(int(min=0, max=65000), regex("^.*[\$\%]\{.*$"))
+  time: any(int(min=0, max=10000000), regex("^.*[\$\%]\{.*$"), required=False)
+
+event_manager_applets_event_module:
+  status: any(enum('online', 'offline', 'any'), regex("^.*[\$\%]\{.*$"))
+  module: any(int(min=0), str())
+
+event_manager_applets_event_module_failure:
+  type: any(enum('unexpected-registration', 'registration-failure', 'registration-timeout', 'runtime-diag-failure', 'runtime-diag-timeout', 'lc-ready-timeout', 'lc-failed', 'lc-not-responding', 'lc-sw-failure', 'image-upgrade-failed', 'sequence-timeout', 'hitless-upgrade-reg-failure', 'hitless-upgrade-diag-failure', 'hitless-upgrade-procmgr-notif', 'hitless-upgrade-seq-timeout', 'upgrade-srg-not-compatible', 'hitless-upgrade-failure', 'srg-info-resp-timeout', 'image-download-failed', 'insertion-seq-failure', 'addon-sequence-failure', 'any'), regex("^.*[\$\%]\{.*$"))
+  module: any(int(min=0), str())
+  count: any(int(min=0, max=65000), regex("^.*[\$\%]\{.*$"))
+  time: any(int(min=0, max=10000000), regex("^.*[\$\%]\{.*$"), required=False)
+
+event_manager_applets_event_neighbor_discovery:
+  interface_type: any(enum('ethernet', 'loopback', 'mgmt', 'port-channel', 'vlan', 'vni'), regex("^.*[\$\%]\{.*$"))
+  interface_id: str()
+  cdp: any(enum('add', 'update', 'delete', 'all'), regex("^.*[\$\%]\{.*$"))
+
+event_manager_applets_event_oir:
+  fan: any(enum('insert', 'remove', 'anyoir'), regex("^.*[\$\%]\{.*$"), required=False)
+  module: any(enum('insert', 'remove', 'anyoir'), regex("^.*[\$\%]\{.*$"), required=False)
+  powersupply: any(enum('insert', 'remove', 'anyoir'), regex("^.*[\$\%]\{.*$"), required=False)
+  number: any(int(min=0, max=32), regex("^.*[\$\%]\{.*$"), required=False)
+
+event_manager_applets_event_policy_default:
+  disable: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
+  count: any(int(min=1, max=65000), regex("^.*[\$\%]\{.*$"), required=False)
+  time: any(int(min=0, max=32768), regex("^.*[\$\%]\{.*$"), required=False)
+
+event_manager_applets_event_snmp:
+  oid: str()
+  get_type: any(enum('exact', 'next'), regex("^.*[\$\%]\{.*$"))
+  entry_op: any(enum('gt', 'ge', 'eq', 'ne', 'lt', 'le'), regex("^.*[\$\%]\{.*$"))
+  entry_val: any(int(min=0), regex("^.*[\$\%]\{.*$"))
+  exit_comb: any(enum('or', 'and'), regex("^.*[\$\%]\{.*$"), required=False)
+  exit_op: any(enum('gt', 'ge', 'eq', 'ne', 'lt', 'le'), regex("^.*[\$\%]\{.*$"), required=False)
+  exit_val: any(int(min=0), regex("^.*[\$\%]\{.*$"), required=False)
+  exit_time: any(int(min=0, max=4294967295), regex("^.*[\$\%]\{.*$"), required=False)
+  poll_interval: any(int(min=1, max=2147483647), regex("^.*[\$\%]\{.*$"))
+
+event_manager_applets_event_syslog:
+  occurs: any(int(min=1, max=65000), regex("^.*[\$\%]\{.*$"), required=False)
+  period: any(int(min=0, max=4294967295), regex("^.*[\$\%]\{.*$"), required=False)
+  priority: any(int(min=0, max=7), enum('alerts', 'critical', 'debugging', 'emergencies', 'errors', 'informational', 'notifications', 'warnings'), regex("^.*[\$\%]\{.*$"), required=False)
+  pattern: str()
+
+event_manager_applets_event_sysmgr_memory:
+  module: any(int(min=0, max=4294967295), regex("^.*[\$\%]\{.*$"), required=False)
+  major: any(int(min=1, max=99), regex("^.*[\$\%]\{.*$"))
+  minor: any(int(min=1, max=99), regex("^.*[\$\%]\{.*$"))
+  clear: any(int(min=1, max=99), regex("^.*[\$\%]\{.*$"))
+
+event_manager_applets_event_sysmgr_switchover:
+  count: any(int(min=1, max=65000), regex("^.*[\$\%]\{.*$"))
+  time: any(int(min=1, max=4294967295), regex("^.*[\$\%]\{.*$"))
+
+event_manager_applets_event_temperature:
+  module: any(int(min=0), str(), required=False)
+  sensor: any(int(min=0), str(), required=False)
+  threshold: any(enum('major', 'minor', 'any'), regex("^.*[\$\%]\{.*$"))
+
+event_manager_applets_event_timer:
+  watchdog_time: any(num(min=0), regex("^.*[\$\%]\{.*$"), required=False)
+  absolute_time: any(num(min=0), regex("^.*[\$\%]\{.*$"), required=False)
+  countdown_time: any(num(min=0), regex("^.*[\$\%]\{.*$"), required=False)
+  cron_entry: str(required=False)
+  name: str(required=False)
+
+event_manager_applets_event_track:
+  id: any(int(min=1, max=512), regex("^.*[\$\%]\{.*$"), ref='track')
+  state: any(enum('up', 'down', 'any'), regex("^.*[\$\%]\{.*$"))
+
+event_manager_applets_tag:
+  tag_1: str(ref='event_manager_tag')
+  operator_1: any(enum('and', 'andnot', 'or'), regex("^.*[\$\%]\{.*$"))
+  tag_2: str(ref='event_manager_tag')
+  operator_2: any(enum('and', 'andnot', 'or'), regex("^.*[\$\%]\{.*$"), required=False)
+  tag_3: str(required=False, ref='event_manager_tag')
+  operator_3: any(enum('and', 'andnot', 'or'), regex("^.*[\$\%]\{.*$"), required=False)
+  tag_4: str(required=False, ref='event_manager_tag')
+  happens: any(int(min=1, max=4294967295), regex("^.*[\$\%]\{.*$"))
+  in: any(int(min=0, max=4294967295), regex("^.*[\$\%]\{.*$"))
+
+event_manager_applets_actions:
+  label: any(str(), num())
+  cli: str(required=False)
+  cli_local: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
+  collect_yaml_file: str(required=False)
+  collect_max_triggers: any(int(min=0, max=65000), regex("^.*[\$\%]\{.*$"), required=False)
+  collect_rate_limit: any(int(min=0, max=65000), regex("^.*[\$\%]\{.*$"), required=False)
+  collect_purge_time: any(int(min=2880, max=65000), regex("^.*[\$\%]\{.*$"), required=False)
+  collect_component: str(required=False)
+  collect_disable: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
+  counter_name: str(required=False)
+  counter_value: any(int(), str(), required=False)
+  counter_op: any(enum('nop', 'set', 'inc', 'dec'), regex("^.*[\$\%]\{.*$"), required=False)
+  event_default: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
+  exceptionlog_module: any(int(min=0), str(), required=False)
+  exceptionlog_syserr: str(required=False)
+  exceptionlog_devid: any(int(min=0), str(), required=False)
+  exceptionlog_errtype: any(int(min=0), str(), required=False)
+  exceptionlog_errcode: any(int(min=0), str(), required=False)
+  exceptionlog_phylayer: any(int(min=0), str(), required=False)
+  exceptionlog_ports: any(int(min=0), str(), required=False)
+  exceptionlog_harderror: any(int(min=0, max=4), regex("^.*[\$\%]\{.*$"), required=False)
+  exceptionlog_desc: str(required=False)
+  forceshut_module: any(int(min=0), str(), required=False)
+  forceshut_reset_reason: str(required=False)
+  overbudgetshut: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
+  overbudgetshut_module: any(int(min=0), str(), required=False)
+  policy_default: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
+  publish_event_sub_system: any(int(min=0, max=4294967295), regex("^.*[\$\%]\{.*$"), required=False)
+  publish_event_type: any(int(min=0, max=4294967295), regex("^.*[\$\%]\{.*$"), required=False)
+  publish_event_arg1: str(required=False)
+  publish_event_arg2: str(required=False)
+  publish_event_arg3: str(required=False)
+  publish_event_arg4: str(required=False)
+  reload: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
+  reload_module: any(int(min=0), str(), required=False)
+  snmp_trap: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
+  snmp_trap_intdata1: any(int(), str(), required=False)
+  snmp_trap_intdata2: any(int(), str(), required=False)
+  snmp_trap_strdata: str(required=False)
+  syslog_priority: any(enum('alerts', 'critical', 'debugging', 'emergencies', 'errors', 'informational', 'notifications', 'warnings'), regex("^\$\w+$"), regex("^.*[\$\%]\{.*$"), required=False)
+  syslog_msg: str(required=False)
+
 evpn:
   multisite_border_gateway: include('evpn_multisite_border_gateway', required=False)
   multihoming: include('evpn_multihoming', required=False)
@@ -809,6 +1030,7 @@ feature:
   dot1x: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   eigrp: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   epbr: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
+  evmed: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   evpn: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   fabric_forwarding: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   grpc: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
@@ -1426,7 +1648,7 @@ logging_servers:
   use_vrf: str(required=False, ref='vrf')
   facility: any(enum('kern', 'user', 'mail', 'daemon', 'auth', 'syslog', 'lpr', 'news', 'uucp', 'cron', 'authpriv', 'ftp', 'local0', 'local1', 'local2', 'local3', 'local4', 'local5', 'local6', 'local7'), regex("^.*[\$\%]\{.*$"), required=False)
   transport: any(enum('udp', 'tcp', 'tls'), regex("^.*[\$\%]\{.*$"), required=False)
-  trustpoint_client_identity: str(required=False)
+  trustpoint_client_identity: str(required=False, ref='crypto_ca_trustpoint')
 
 macsec:
   shutdown: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
@@ -1571,7 +1793,7 @@ system_nxapi:
   certificate_httpscrt: str(required=False)
   certificate_httpskey: str(required=False)
   certificate_httpskey_passphrase: str(required=False)
-  certificate_trustpoint: str(required=False)
+  certificate_trustpoint: str(required=False, ref='crypto_ca_trustpoint')
   ssl_protocols: str(required=False)
   ssl_ciphers_weak: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   client_cert_auth: any(enum('off', 'optional', 'strict', 'two-step'), regex("^.*[\$\%]\{.*$"), required=False)
@@ -1848,12 +2070,12 @@ route_maps_entries_set_extcommunity_costs:
 
 route_maps_entries_set_ip_next_hops:
   address: any(ip(version=4, type='address'), regex("^.*[\$\%]\{.*$"))
-  track: any(int(min=1, max=512), regex("^.*[\$\%]\{.*$"), required=False)
+  track: any(int(min=1, max=512), regex("^.*[\$\%]\{.*$"), required=False, ref='track')
   vrf: str(required=False, ref='vrf')
 
 route_maps_entries_set_ipv6_next_hops:
   address: any(ip(version=6, type='address'), regex("^.*[\$\%]\{.*$"))
-  track: any(int(min=1, max=512), regex("^.*[\$\%]\{.*$"), required=False)
+  track: any(int(min=1, max=512), regex("^.*[\$\%]\{.*$"), required=False, ref='track')
   vrf: str(required=False, ref='vrf')
 
 route_maps_entries_match_interfaces:
@@ -2953,7 +3175,7 @@ routing_ip_routes_next_hops:
   interface_id: any(str(), int(min=0), required=False)
   address: any(ip(version=4, type='address'), regex("^.*[\$\%]\{.*$"), required=False)
   vrf: str(required=False, ref='vrf')
-  track: any(int(min=0, max=4294967295), regex("^.*[\$\%]\{.*$"), required=False)
+  track: any(int(min=1, max=512), regex("^.*[\$\%]\{.*$"), required=False, ref='track')
   preference: any(int(min=0, max=255), regex("^.*[\$\%]\{.*$"), required=False)
   tag: any(int(min=0, max=4294967295), regex("^.*[\$\%]\{.*$"), required=False)
   name: str(required=False)
@@ -2970,7 +3192,7 @@ routing_ipv6_routes_next_hops:
   interface_id: any(str(), int(min=0), required=False)
   address: any(ip(version=6, type='address'), regex("^.*[\$\%]\{.*$"), required=False)
   vrf: str(required=False, ref='vrf')
-  track: any(int(min=0, max=4294967295), regex("^.*[\$\%]\{.*$"), required=False)
+  track: any(int(min=1, max=512), regex("^.*[\$\%]\{.*$"), required=False, ref='track')
   preference: any(int(min=0, max=255), regex("^.*[\$\%]\{.*$"), required=False)
   tag: any(int(min=0, max=4294967295), regex("^.*[\$\%]\{.*$"), required=False)
   name: str(required=False)
@@ -3142,14 +3364,14 @@ snmp_traps:
   vtp_vlan_delete: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
 
 snmp_traps_ospf_tags:
-  tag: str()
+  tag: any(enum('all'), str(ref='ospf_process'))
   enable: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   lsa: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   rate_limit_window: any(int(min=1, max=60), regex("^.*[\$\%]\{.*$"), required=False)
   rate_limit_rate: any(int(min=0, max=256), regex("^.*[\$\%]\{.*$"), required=False)
 
 snmp_traps_ospfv3_tags:
-  tag: str()
+  tag: any(enum('all'), str(ref='ospfv3_process'))
   enable: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   lsa: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   rate_limit_window: any(int(min=1, max=60), regex("^.*[\$\%]\{.*$"), required=False)
@@ -3525,7 +3747,7 @@ vpc:
   role_priority: any(int(min=1, max=65535), regex("^.*[\$\%]\{.*$"), required=False)
   system_mac: str(required=False)
   system_priority: any(int(min=1, max=65535), regex("^.*[\$\%]\{.*$"), required=False)
-  track: any(int(min=0, max=500), regex("^.*[\$\%]\{.*$"), required=False)
+  track: any(int(min=1, max=500), regex("^.*[\$\%]\{.*$"), required=False, ref='track')
   virtual_peer_link_source: any(ip(version=4, type='address'), regex("^.*[\$\%]\{.*$"), required=False)
   keepalive: include('vpc_keepalive', required=False)
   ip_arp_synchronize: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
@@ -5042,7 +5264,7 @@ telemetry:
   merge_subscriptions: any(bool(), regex("^.*[\$\%]\{.*$"), required=False)
   certificate_filename: str(required=False)
   certificate_hostname: str(required=False)
-  certificate_trustpoint: str(required=False)
+  certificate_trustpoint: str(required=False, ref='crypto_ca_trustpoint')
   destination_profile_use_vrf: str(required=False, ref='vrf')
   destination_profile_use_compression: any(enum('gzip'), regex("^.*[\$\%]\{.*$"), required=False)
   destination_profile_source_interface_type: any(enum('ethernet', 'loopback', 'mgmt', 'port-channel', 'vlan', 'vni'), regex("^.*[\$\%]\{.*$"), required=False)
@@ -5087,7 +5309,7 @@ telemetry_destination_groups_hosts:
   proxy_username: str(required=False)
   proxy_password: str(required=False)
   proxy_password_encryption: any(enum('0', '7'), regex("^.*[\$\%]\{.*$"), required=False)
-  certificate_trustpoint: str(required=False)
+  certificate_trustpoint: str(required=False, ref='crypto_ca_trustpoint')
   certificate_hostname: str(required=False)
   token: str(required=False)
   token_encryption: any(enum('0', '7'), regex("^.*[\$\%]\{.*$"), required=False)
