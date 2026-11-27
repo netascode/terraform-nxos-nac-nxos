@@ -39,6 +39,24 @@ resource "nxos_telemetry" "telemetry" {
       node_id  = try(dest.node_id, null)
       protocol = try(dest.protocol, null)
     } } : null
+    hosts = length(try(dg.hosts, [])) > 0 ? { for host in try(dg.hosts, []) : "${host.host};${host.port}" => {
+      certificate_hostname           = try(host.certificate_hostname, null)
+      certificate_trustpoint         = try(host.certificate_trustpoint, null)
+      dial_in_stream                 = try(host.dialin_stream, null)
+      encoding                       = try(host.encoding, null)
+      endpoint                       = try(host.endpoint, null)
+      grpc_async                     = try(host.grpc_async, null)
+      index                          = try(host.index, null)
+      node_id                        = try(host.node_id, null)
+      protocol                       = try(host.protocol, null)
+      proxy_password                 = try(host.proxy_password, null)
+      proxy_password_encryption_type = try(host.proxy_password_encryption, null)
+      proxy_port                     = try(host.proxy_port, null)
+      proxy_server                   = try(host.proxy, null)
+      proxy_username                 = try(host.proxy_username, null)
+      token                          = try(host.token, null)
+      token_encryption_type          = try(host.token_encryption, null)
+    } } : null
   } } : null
   sensor_groups = length(try(local.device_config[each.key].telemetry.sensor_groups, [])) > 0 ? { for sg in try(local.device_config[each.key].telemetry.sensor_groups, []) : sg.id => {
     data_source = try(sg.data_source, null)
