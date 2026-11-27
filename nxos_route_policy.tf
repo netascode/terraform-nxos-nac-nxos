@@ -222,6 +222,7 @@ resource "nxos_route_policy" "route_policy" {
       } : null
 
       set_metric                       = try(entry.set_metric, null)
+      set_metric_is_bgp                = try(entry.set_metric, null) != null ? alltrue([for a in ["set_metric_delay", "set_metric_load", "set_metric_mtu", "set_metric_reliability"] : try(entry[a], null) == null]) : null
       set_metric_delay                 = try(entry.set_metric_delay, null)
       set_metric_load                  = try(entry.set_metric_load, null)
       set_metric_mtu                   = try(entry.set_metric_mtu, null)

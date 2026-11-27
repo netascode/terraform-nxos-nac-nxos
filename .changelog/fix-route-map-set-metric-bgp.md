@@ -1,0 +1,1 @@
+- Fix creating route-map entries with a BGP `set_metric` (for example `"100"` or `"+50"`) without the EIGRP delay, reliability, load and MTU values, which NX-OS rejected with `Delay/Load/MTU cannot be null`
